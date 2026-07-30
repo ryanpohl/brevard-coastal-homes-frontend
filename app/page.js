@@ -21,33 +21,52 @@ export default async function HomePage() {
 
   return (
     <div>
-      <div style={{ position: 'relative', height: 560, background: 'var(--color-nav-bg)' }}>
-        <Image
-          src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1600&q=80"
-          alt="Brevard County coastal estate"
-          fill
-          priority
-          style={{ objectFit: 'cover', opacity: 0.85 }}
-        />
+      <div style={{ position: 'relative', width: '100%', minHeight: 716, background: 'var(--color-nav-bg)' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 716, overflow: 'hidden' }}>
+          <Image
+            src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1600&q=80"
+            alt="Brevard County coastal estate"
+            fill
+            priority
+            style={{ objectFit: 'cover' }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(180deg, rgba(15,35,45,0.35) 0%, rgba(15,35,45,0.15) 40%, rgba(10,25,32,0.55) 100%)',
+              pointerEvents: 'none',
+            }}
+          />
+        </div>
+
         <div
           style={{
-            position: 'absolute',
-            inset: 0,
+            position: 'relative',
+            zIndex: 5,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
-            color: '#fff',
-            background: 'linear-gradient(180deg, rgba(28,27,48,0.15), rgba(28,27,48,0.55))',
+            padding: '188px 16px 104px',
           }}
         >
-          <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', maxWidth: 800 }}>Brevard County Listings</h1>
-        </div>
-      </div>
+          <h1
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontWeight: 600,
+              fontSize: 'clamp(28px, 5vw, 46px)',
+              color: '#ffffff',
+              margin: '0 0 28px',
+              textAlign: 'center',
+              textShadow: '0 2px 18px rgba(0,0,0,0.35)',
+              letterSpacing: 1,
+            }}
+          >
+            Brevard County Listings
+          </h1>
 
-      <div className="container">
-        <SearchBar cities={cities} neighborhoods={neighborhoods} />
+          <SearchBar cities={cities} neighborhoods={neighborhoods} />
+        </div>
       </div>
 
       <section className="container" style={{ padding: '64px clamp(16px, 4vw, 56px)' }}>

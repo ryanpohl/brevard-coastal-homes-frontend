@@ -164,6 +164,28 @@ textarea:focus {
   box-shadow: var(--shadow-nav-menu);
 }
 
+/* Home page hero search bar (components/SearchBar.js) — dark glass dropdown
+   panels matching design/design_files/Home.dc.html's hero search component. */
+.hero-search-panel {
+  background: rgba(10, 20, 24, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.32);
+}
+
+.hero-search-item {
+  color: #d8dee0;
+  transition: color 0.15s ease;
+}
+
+.hero-search-item:hover {
+  color: #ffffff;
+}
+
+.hero-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.65);
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
