@@ -24,8 +24,8 @@ export default async function HomePage() {
       <div style={{ position: 'relative', width: '100%', minHeight: 716, background: 'var(--color-nav-bg)' }}>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 716, overflow: 'hidden' }}>
           <Image
-            src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1600&q=80"
-            alt="Brevard County coastal estate"
+            src="/hero/brevard-hero.jpg"
+            alt="Beachfront estate with private pool overlooking the Brevard County coastline"
             fill
             priority
             style={{ objectFit: 'cover' }}
