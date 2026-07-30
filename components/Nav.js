@@ -39,7 +39,14 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
     >
       <div
         className="container"
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px clamp(16px, 4vw, 56px)' }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 12,
+          padding: '16px clamp(16px, 4vw, 56px) 10px',
+        }}
       >
         <Link
           href="/"
@@ -49,15 +56,6 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
         </Link>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-          <NavLink label="Search by City" active={openMenu === 'city'} onEnter={() => openNow('city')} />
-          <NavLink
-            label="Search by Neighborhood"
-            active={openMenu === 'neighborhood'}
-            onEnter={() => openNow('neighborhood')}
-          />
-          <NavLink label="Looking to Sell" href="/looking-to-sell" plain />
-          <NavLink label="Contact Us" href="/contact" plain />
-
           {signedIn ? (
             <NavLink label={`My Account`} href="/my-account" active={openMenu === 'account'} onEnter={() => openNow('account')} />
           ) : (
@@ -67,6 +65,29 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
             </>
           )}
         </div>
+      </div>
+
+      <div
+        className="container"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          rowGap: 8,
+          columnGap: 'clamp(16px, 4vw, 36px)',
+          padding: '0 clamp(16px, 4vw, 56px) 16px',
+        }}
+      >
+        <NavLink label="Search by City" bare active={openMenu === 'city'} onEnter={() => openNow('city')} />
+        <NavLink
+          label="Search by Neighborhood"
+          bare
+          active={openMenu === 'neighborhood'}
+          onEnter={() => openNow('neighborhood')}
+        />
+        <NavLink label="Looking to Sell" href="/looking-to-sell" bare />
+        <NavLink label="Contact Us" href="/contact" bare />
       </div>
 
       {openMenu === 'city' && (
@@ -130,24 +151,30 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
   );
 }
 
-function NavLink({ label, href, plain, gold, active, onEnter }) {
+function NavLink({ label, href, bare, gold, active, onEnter }) {
   const base = {
     color: '#fff',
     fontSize: 12,
     fontWeight: 600,
     letterSpacing: 1,
     textTransform: 'uppercase',
-    padding: '9px 16px',
-    borderRadius: 3,
     whiteSpace: 'nowrap',
-    border: gold ? 'none' : '1px solid rgba(255,255,255,0.5)',
-    background: gold ? 'var(--color-gold)' : 'transparent',
   };
-  const style = gold ? { ...base, color: 'var(--color-ink-dark)' } : base;
+
+  let style;
+  if (bare) {
+    // Plain text nav link — no border/background box, just generous tap
+    // padding so it's still comfortable to hit on mobile.
+    style = { ...base, padding: '6px 4px', border: 'none', background: 'transparent', opacity: active ? 1 : 0.92 };
+  } else if (gold) {
+    style = { ...base, padding: '9px 16px', borderRadius: 3, border: 'none', background: 'var(--color-gold)', color: 'var(--color-ink-dark)' };
+  } else {
+    style = { ...base, padding: '9px 16px', borderRadius: 3, border: '1px solid rgba(255,255,255,0.5)', background: 'transparent' };
+  }
 
   if (href) {
     return (
-      <Link href={href} style={style}>
+      <Link href={href} className={bare ? 'nav-link-bare' : undefined} style={style}>
         {label}
       </Link>
     );
@@ -155,7 +182,12 @@ function NavLink({ label, href, plain, gold, active, onEnter }) {
 
   return (
     <div style={{ position: 'relative' }} onMouseEnter={onEnter}>
-      <button type="button" style={{ ...style, cursor: 'pointer' }} onClick={onEnter}>
+      <button
+        type="button"
+        className={bare ? 'nav-link-bare' : undefined}
+        style={{ ...style, cursor: 'pointer' }}
+        onClick={onEnter}
+      >
         {label}
       </button>
     </div>
