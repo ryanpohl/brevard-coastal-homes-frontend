@@ -69,35 +69,90 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <section className="container" style={{ padding: '64px clamp(16px, 4vw, 56px)' }}>
-        <h2 className="section-heading">Search By City</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16 }}>
-          {cities.map((city) => (
-            <PlaceCard key={city.slug} name={city.name} thumbnail={city.thumbnail} href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`} />
-          ))}
-        </div>
-      </section>
+      <div style={{ background: 'var(--color-nav-bg)', padding: '64px 0' }}>
+        <section className="container">
+          <h2 className="section-heading" style={{ color: '#fff' }}>
+            Search By City
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16 }}>
+            {cities.map((city) => (
+              <PlaceCard
+                key={city.slug}
+                name={city.name}
+                thumbnail={city.thumbnail}
+                href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
+                sizes="(min-width: 900px) 20vw, (min-width: 600px) 33vw, 50vw"
+              />
+            ))}
+          </div>
+        </section>
+      </div>
 
-      <section className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
-        <h2 className="section-heading">Search By Neighborhood</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
-          {neighborhoods.map((n) => (
-            <PlaceCard key={n.slug} name={n.name} thumbnail={n.thumbnail} href={`/neighborhoods/${n.slug}`} />
-          ))}
-        </div>
-      </section>
+      <div style={{ background: 'var(--color-nav-bg)', padding: '0 0 64px' }}>
+        <section className="container">
+          <h2 className="section-heading" style={{ color: '#fff' }}>
+            Search By Neighborhood
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+            {neighborhoods.map((n) => (
+              <PlaceCard
+                key={n.slug}
+                name={n.name}
+                thumbnail={n.thumbnail}
+                href={`/neighborhoods/${n.slug}`}
+                sizes="(min-width: 900px) 25vw, (min-width: 600px) 33vw, 50vw"
+              />
+            ))}
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
 
-function PlaceCard({ name, thumbnail, href }) {
+function PlaceCard({ name, thumbnail, href, sizes }) {
   const src = placePhotoUrl(thumbnail);
   return (
-    <Link href={href} className="card" style={{ overflow: 'hidden', display: 'block' }}>
-      <div style={{ position: 'relative', width: '100%', paddingTop: '75%', background: '#e6e1d6' }}>
-        {src && <Image src={src} alt={name} fill sizes="20vw" style={{ objectFit: 'cover' }} />}
-      </div>
-      <p style={{ padding: 12, fontWeight: 600, fontSize: 14 }}>{name}</p>
+    <Link
+      href={href}
+      style={{ position: 'relative', display: 'block', overflow: 'hidden', width: '100%', paddingTop: '75%', background: '#2a3942' }}
+    >
+      {src && (
+        <Image
+          src={src}
+          alt={name}
+          fill
+          sizes={sizes}
+          style={{ objectFit: 'cover' }}
+        />
+      )}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(8,18,23,0.82) 100%)',
+          pointerEvents: 'none',
+        }}
+      />
+      <p
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          margin: 0,
+          padding: '10px 14px 16px',
+          color: '#fff',
+          fontFamily: 'var(--font-heading)',
+          fontWeight: 600,
+          fontSize: 18,
+          textAlign: 'center',
+          lineHeight: 1.25,
+          textShadow: '0 2px 10px rgba(0,0,0,0.5)',
+        }}
+      >
+        {name}
+      </p>
     </Link>
   );
 }
