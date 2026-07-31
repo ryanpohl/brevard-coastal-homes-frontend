@@ -262,16 +262,15 @@ export default function SearchBar({ cities, neighborhoods }) {
           <PillTrigger label="Property Type" onClick={() => openNow('propertyType')} />
           {openMenu === 'propertyType' && (
             <div
+              className="hero-search-panel"
               style={{
                 position: 'absolute',
                 top: '100%',
                 left: 0,
                 right: 0,
                 marginTop: 4,
-                background: '#ffffff',
                 borderRadius: 4,
-                boxShadow: '0 12px 32px rgba(0,0,0,0.32)',
-                padding: 10,
+                padding: '14px 16px',
                 zIndex: 10,
                 width: 'min(240px, 80vw)',
               }}
@@ -600,7 +599,10 @@ function PanelHeading({ children }) {
 
 function PropertyTypeCheckbox({ label, checked, onChange }) {
   return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 6px', fontSize: 14, color: '#1c2b30', cursor: 'pointer' }}>
+    <label
+      className="hero-search-item"
+      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 6px', fontSize: 14, cursor: 'pointer' }}
+    >
       <input type="checkbox" checked={checked} onChange={onChange} style={{ width: 'auto' }} />
       <span>{label}</span>
     </label>
