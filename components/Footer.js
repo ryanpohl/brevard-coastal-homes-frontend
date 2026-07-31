@@ -3,7 +3,7 @@ import { PROPERTY_TYPE_TO_SLUG } from '@/lib/constants';
 
 export default function Footer({ cities = [], neighborhoods = [] }) {
   return (
-    <footer style={{ background: 'var(--color-nav-bg)', color: 'rgba(255,255,255,0.85)', marginTop: 64 }}>
+    <footer style={{ background: 'var(--color-nav-bg)', color: 'rgba(255,255,255,0.85)' }}>
       <div className="container" style={{ padding: '48px clamp(16px, 4vw, 56px)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32 }}>
         <div>
           <h4 style={{ color: '#fff', fontSize: 18, marginBottom: 16 }}>Brevard Coastal Homes</h4>
