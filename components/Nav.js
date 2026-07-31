@@ -171,7 +171,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
 function NavLink({ label, href, bare, gold, active, onEnter, panel }) {
   const base = {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: 600,
     letterSpacing: 1,
     textTransform: 'uppercase',
@@ -184,9 +184,9 @@ function NavLink({ label, href, bare, gold, active, onEnter, panel }) {
     // padding so it's still comfortable to hit on mobile.
     style = { ...base, padding: '6px 4px', border: 'none', background: 'transparent', opacity: active ? 1 : 0.92 };
   } else if (gold) {
-    style = { ...base, padding: '9px 16px', borderRadius: 3, border: 'none', background: 'var(--color-gold)', color: 'var(--color-ink-dark)' };
+    style = { ...base, padding: '11px 20px', borderRadius: 3, border: 'none', background: 'var(--color-gold)', color: 'var(--color-ink-dark)' };
   } else {
-    style = { ...base, padding: '9px 16px', borderRadius: 3, border: '1px solid rgba(255,255,255,0.5)', background: 'transparent' };
+    style = { ...base, padding: '11px 20px', borderRadius: 3, border: '1px solid rgba(255,255,255,0.5)', background: 'transparent' };
   }
 
   if (href) {
