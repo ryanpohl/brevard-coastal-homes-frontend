@@ -232,11 +232,29 @@ textarea:focus {
 
 .hero-search-item {
   color: #d8dee0;
-  transition: color 0.15s ease;
+  border-radius: 4px;
+  transition: color 0.15s ease, background-color 0.15s ease;
 }
 
 .hero-search-item:hover {
   color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Dimmer companion to .hero-search-item — used for secondary links stacked
+   under a primary one (e.g. the "(Condos)" link under each city's "Homes"
+   link in the nav's Search by City dropdown) so the pair reads as a
+   hierarchy at rest, but the secondary link still brightens to full white
+   plus the same hover highlight as its primary sibling. */
+.hero-search-item-secondary {
+  color: rgba(216, 222, 224, 0.75);
+  border-radius: 4px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.hero-search-item-secondary:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .hero-search-input::placeholder {
