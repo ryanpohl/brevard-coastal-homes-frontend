@@ -140,6 +140,22 @@ h4 {
   border: 1px solid var(--color-border-light);
 }
 
+/* Footer links reset `a { text-decoration: none }` above so they read as
+   plain text — this underline makes it clear each one is a separate,
+   clickable link (important where two links sit on one line, e.g.
+   "Cocoa Beach Homes · Condos"). */
+.footer-link {
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.35);
+  text-underline-offset: 3px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+.footer-link:hover {
+  color: #fff;
+  text-decoration-color: rgba(255, 255, 255, 0.9);
+}
+
 .section-heading {
   font-size: 28px;
   font-weight: 600;
