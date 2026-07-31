@@ -21,8 +21,8 @@ export default async function HomePage() {
 
   return (
     <div>
-      <div style={{ position: 'relative', width: '100%', minHeight: 716, background: 'var(--color-nav-bg)' }}>
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 716, overflow: 'hidden' }}>
+      <div style={{ position: 'relative', width: '100%', minHeight: 692, background: 'var(--color-nav-bg)' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 692, overflow: 'hidden' }}>
           <Image
             src="/hero/brevard-hero.jpg"
             alt="Beachfront estate with private pool overlooking the Brevard County coastline"
