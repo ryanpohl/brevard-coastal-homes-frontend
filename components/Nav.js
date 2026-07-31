@@ -98,14 +98,22 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
             openMenu === 'city' && (
               <DropdownPanel grid={5}>
                 {cities.map((city) => (
-                  <Link
-                    key={city.slug}
-                    href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
-                    className="hero-search-item"
-                    style={gridLinkStyle}
-                  >
-                    {city.name}
-                  </Link>
+                  <div key={city.slug}>
+                    <Link
+                      href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
+                      className="hero-search-item"
+                      style={cityHomeLinkStyle}
+                    >
+                      {city.name} Homes
+                    </Link>
+                    <Link
+                      href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Condo}`}
+                      className="hero-search-item"
+                      style={gridCondoLinkStyle}
+                    >
+                      (Condos)
+                    </Link>
+                  </div>
                 ))}
               </DropdownPanel>
             )
@@ -253,9 +261,24 @@ function DropdownPanel({ children, grid }) {
 }
 
 const gridLinkStyle = {
+  display: 'block',
   padding: '8px 10px',
   fontSize: 13,
   borderRadius: 4,
+};
+
+// City dropdown items pair a "<City> Homes" link with a "(Condos)" link
+// stacked beneath it, so the two split the padding gridLinkStyle uses for
+// a single-link cell (top link drops its bottom padding, bottom link
+// drops its top padding) instead of each keeping the full 8px and reading
+// with an oversized gap between them.
+const cityHomeLinkStyle = { ...gridLinkStyle, padding: '8px 10px 0' };
+const gridCondoLinkStyle = {
+  display: 'block',
+  padding: '2px 10px 8px',
+  fontSize: 12,
+  borderRadius: 4,
+  opacity: 0.75,
 };
 
 const accountRowStyle = {
