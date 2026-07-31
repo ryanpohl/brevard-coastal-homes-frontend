@@ -10,6 +10,15 @@ export const metadata = {
     'Search homes, condos, and land for sale across Cocoa Beach, Melbourne Beach, Satellite Beach, Viera, and every coastal city and neighborhood in Brevard County, FL.',
 };
 
+// Per-city crop overrides for PlaceCard's cover photo. The default center
+// crop works for most thumbnails, but tall portrait source photos can lose
+// their focal point (e.g. the Cocoa Beach Pier sign sits near the top of
+// its source image and gets cropped out by a center crop) — override those
+// here rather than re-cropping the source file.
+const CITY_IMAGE_POSITION = {
+  'cocoa-beach': 'top',
+};
+
 export default async function HomePage() {
   let cities = [];
   let neighborhoods = [];
@@ -70,18 +79,19 @@ export default async function HomePage() {
       </div>
 
       <div style={{ background: 'var(--color-nav-bg)', padding: '64px 0' }}>
-        <section className="container">
+        <section className="wide-container">
           <h2 className="section-heading" style={{ color: '#fff' }}>
             Search By City
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
+          <div className="city-grid">
             {cities.map((city) => (
               <PlaceCard
                 key={city.slug}
                 name={city.name}
                 thumbnail={city.thumbnail}
                 href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
-                sizes="(min-width: 1100px) 25vw, (min-width: 640px) 50vw, 100vw"
+                sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 100vw"
+                objectPosition={CITY_IMAGE_POSITION[city.slug]}
               />
             ))}
           </div>
@@ -110,7 +120,7 @@ export default async function HomePage() {
   );
 }
 
-function PlaceCard({ name, thumbnail, href, sizes }) {
+function PlaceCard({ name, thumbnail, href, sizes, objectPosition = 'center' }) {
   const src = placePhotoUrl(thumbnail);
   return (
     <Link
@@ -123,7 +133,7 @@ function PlaceCard({ name, thumbnail, href, sizes }) {
           alt={name}
           fill
           sizes={sizes}
-          style={{ objectFit: 'cover' }}
+          style={{ objectFit: 'cover', objectPosition }}
         />
       )}
       <div

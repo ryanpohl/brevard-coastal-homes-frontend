@@ -68,6 +68,36 @@ h4 {
   padding: 0 clamp(16px, 4vw, 56px);
 }
 
+/* Wider than .container — used for the Search By City grid so its 5-across
+   desktop layout gets as much room as possible instead of being squeezed
+   into the standard 1280px content width. */
+.wide-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 2.5vw, 40px);
+}
+
+/* Responsive grid for Search By City: 2 rows of 5 on desktop, collapsing to
+   fewer columns on smaller screens so cards stay comfortably tappable on
+   mobile instead of being squished into 5 tiny columns. */
+.city-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+@media (min-width: 640px) {
+  .city-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .city-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
