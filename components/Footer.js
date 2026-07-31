@@ -16,12 +16,12 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
           <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Cities</h4>
           {cities.map((city) => (
             <div key={city.slug} style={{ marginBottom: 8 }}>
-              <Link href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`} style={footerLinkStyle}>
-                {city.name}
+              <Link href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`} className="footer-link" style={footerLinkStyle}>
+                {city.name} Homes
               </Link>
               {/* Footer always links to Condos, even for cities excluded from the nav dropdown (e.g. Viera West) */}
               {' · '}
-              <Link href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Condo}`} style={footerLinkStyle}>
+              <Link href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Condo}`} className="footer-link" style={footerLinkStyle}>
                 Condos
               </Link>
             </div>
@@ -32,7 +32,7 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
           <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Neighborhoods</h4>
           {neighborhoods.map((n) => (
             <div key={n.slug} style={{ marginBottom: 8 }}>
-              <Link href={`/neighborhoods/${n.slug}`} style={footerLinkStyle}>
+              <Link href={`/neighborhoods/${n.slug}`} className="footer-link" style={footerLinkStyle}>
                 {n.name}
               </Link>
             </div>
@@ -41,11 +41,11 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
 
         <div>
           <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Company</h4>
-          <Link href="/contact" style={footerLinkStyle}>
+          <Link href="/contact" className="footer-link" style={footerLinkStyle}>
             Contact Us
           </Link>
           <br />
-          <Link href="/looking-to-sell" style={footerLinkStyle}>
+          <Link href="/looking-to-sell" className="footer-link" style={footerLinkStyle}>
             Looking to Sell
           </Link>
         </div>
