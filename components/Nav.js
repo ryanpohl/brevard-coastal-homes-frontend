@@ -31,6 +31,15 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
     if (closeTimer.current) clearTimeout(closeTimer.current);
   }, []);
 
+  // Immediately closes whatever menu is open — wired to non-dropdown nav
+  // items (brand link, Looking to Sell, Contact Us) so hovering one of
+  // those closes a dropdown left open from a sibling trigger, instead of
+  // it lingering until the mouse leaves the whole nav bar.
+  const closeNow = useCallback(() => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setOpenMenu(null);
+  }, []);
+
   return (
     <div
       style={{ background: 'var(--color-nav-bg)', position: 'relative', zIndex: 30 }}
@@ -50,6 +59,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
       >
         <Link
           href="/"
+          onMouseEnter={closeNow}
           style={{ fontFamily: 'var(--font-heading)', fontSize: 26, fontWeight: 600, color: '#fff', letterSpacing: 0.5 }}
         >
           Brevard Coastal Homes
@@ -79,36 +89,43 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           padding: '0 clamp(16px, 4vw, 56px) 16px',
         }}
       >
-        <NavLink label="Search by City" bare active={openMenu === 'city'} onEnter={() => openNow('city')} />
+        <NavLink
+          label="Search by City"
+          bare
+          active={openMenu === 'city'}
+          onEnter={() => openNow('city')}
+          panel={
+            openMenu === 'city' && (
+              <DropdownPanel grid={5}>
+                {cities.map((city) => (
+                  <Link key={city.slug} href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`} style={gridLinkStyle}>
+                    {city.name}
+                  </Link>
+                ))}
+              </DropdownPanel>
+            )
+          }
+        />
         <NavLink
           label="Search by Neighborhood"
           bare
           active={openMenu === 'neighborhood'}
           onEnter={() => openNow('neighborhood')}
+          panel={
+            openMenu === 'neighborhood' && (
+              <DropdownPanel grid={4}>
+                {neighborhoods.map((n) => (
+                  <Link key={n.slug} href={`/neighborhoods/${n.slug}`} style={gridLinkStyle}>
+                    {n.name}
+                  </Link>
+                ))}
+              </DropdownPanel>
+            )
+          }
         />
-        <NavLink label="Looking to Sell" href="/looking-to-sell" bare />
-        <NavLink label="Contact Us" href="/contact" bare />
+        <NavLink label="Looking to Sell" href="/looking-to-sell" bare onEnter={closeNow} />
+        <NavLink label="Contact Us" href="/contact" bare onEnter={closeNow} />
       </div>
-
-      {openMenu === 'city' && (
-        <DropdownPanel wide grid={5}>
-          {cities.map((city) => (
-            <Link key={city.slug} href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`} style={gridLinkStyle}>
-              {city.name}
-            </Link>
-          ))}
-        </DropdownPanel>
-      )}
-
-      {openMenu === 'neighborhood' && (
-        <DropdownPanel wide grid={4}>
-          {neighborhoods.map((n) => (
-            <Link key={n.slug} href={`/neighborhoods/${n.slug}`} style={gridLinkStyle}>
-              {n.name}
-            </Link>
-          ))}
-        </DropdownPanel>
-      )}
 
       {openMenu === 'account' && signedIn && (
         <div
@@ -151,7 +168,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
   );
 }
 
-function NavLink({ label, href, bare, gold, active, onEnter }) {
+function NavLink({ label, href, bare, gold, active, onEnter, panel }) {
   const base = {
     color: '#fff',
     fontSize: 12,
@@ -174,9 +191,12 @@ function NavLink({ label, href, bare, gold, active, onEnter }) {
 
   if (href) {
     return (
-      <Link href={href} className={bare ? 'nav-link-bare' : undefined} style={style}>
-        {label}
-      </Link>
+      <div style={{ position: 'relative' }} onMouseEnter={onEnter}>
+        <Link href={href} className={bare ? 'nav-link-bare' : undefined} style={style}>
+          {label}
+        </Link>
+        {panel}
+      </div>
     );
   }
 
@@ -190,29 +210,32 @@ function NavLink({ label, href, bare, gold, active, onEnter }) {
       >
         {label}
       </button>
+      {panel}
     </div>
   );
 }
 
+// Anchored to its trigger's own position:relative wrapper (see NavLink)
+// so it opens directly underneath the link that triggered it, rather than
+// being right-aligned to the whole nav bar regardless of which item opened it.
 function DropdownPanel({ children, grid }) {
   return (
     <div
-      className="container"
-      style={{ position: 'absolute', top: '100%', left: 0, right: 0, display: 'flex', justifyContent: 'flex-end' }}
+      className="card"
+      style={{
+        position: 'absolute',
+        top: '100%',
+        left: 0,
+        marginTop: 8,
+        padding: 18,
+        display: 'grid',
+        gridTemplateColumns: `repeat(${grid}, minmax(140px, 1fr))`,
+        gap: 8,
+        boxShadow: 'var(--shadow-nav-menu)',
+        zIndex: 40,
+      }}
     >
-      <div
-        className="card"
-        style={{
-          marginTop: 8,
-          padding: 18,
-          display: 'grid',
-          gridTemplateColumns: `repeat(${grid}, minmax(140px, 1fr))`,
-          gap: 8,
-          boxShadow: 'var(--shadow-nav-menu)',
-        }}
-      >
-        {children}
-      </div>
+      {children}
     </div>
   );
 }
