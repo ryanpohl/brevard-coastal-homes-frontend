@@ -181,8 +181,10 @@ function NavLink({ label, href, bare, gold, active, onEnter, panel }) {
   let style;
   if (bare) {
     // Plain text nav link — no border/background box, just generous tap
-    // padding so it's still comfortable to hit on mobile.
-    style = { ...base, padding: '6px 4px', border: 'none', background: 'transparent', opacity: active ? 1 : 0.92 };
+    // padding so it's still comfortable to hit on mobile. Sized up a bit
+    // larger than the base (which the Sign In/Join buttons still use)
+    // since these links carry more of the header's visual weight.
+    style = { ...base, fontSize: 16, padding: '6px 4px', border: 'none', background: 'transparent', opacity: active ? 1 : 0.92 };
   } else if (gold) {
     style = { ...base, padding: '11px 20px', borderRadius: 3, border: 'none', background: 'var(--color-gold)', color: 'var(--color-ink-dark)' };
   } else {
