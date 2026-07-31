@@ -49,7 +49,7 @@ export default function AuthPanel({ mode: initialMode, onClose }) {
 
   return (
     <div
-      className="card"
+      className="nav-dropdown-panel"
       style={{
         position: 'absolute',
         top: '100%',
@@ -91,7 +91,7 @@ export default function AuthPanel({ mode: initialMode, onClose }) {
         )}
 
         {error && <p className="error-text" style={{ marginBottom: 12 }}>{error}</p>}
-        {notice && <p style={{ color: 'var(--color-success)', fontSize: 13, marginBottom: 12 }}>{notice}</p>}
+        {notice && <p style={{ color: '#7bd8a0', fontSize: 13, marginBottom: 12 }}>{notice}</p>}
 
         <button type="submit" className="btn btn-primary" disabled={submitting} style={{ width: '100%' }}>
           {submitting ? 'Please wait…' : mode === 'signin' ? 'Sign In' : mode === 'join' ? 'Create Account' : 'Send Reset Link'}
@@ -126,7 +126,7 @@ function Field({ label, children }) {
 const linkBtnStyle = {
   background: 'none',
   border: 'none',
-  color: 'var(--color-ink)',
+  color: 'rgba(255, 255, 255, 0.85)',
   textDecoration: 'underline',
   cursor: 'pointer',
   fontSize: 12,

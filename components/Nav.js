@@ -98,7 +98,12 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
             openMenu === 'city' && (
               <DropdownPanel grid={5}>
                 {cities.map((city) => (
-                  <Link key={city.slug} href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`} style={gridLinkStyle}>
+                  <Link
+                    key={city.slug}
+                    href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
+                    className="hero-search-item"
+                    style={gridLinkStyle}
+                  >
                     {city.name}
                   </Link>
                 ))}
@@ -115,7 +120,12 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
             openMenu === 'neighborhood' && (
               <DropdownPanel grid={4}>
                 {neighborhoods.map((n) => (
-                  <Link key={n.slug} href={`/neighborhoods/${n.slug}`} style={gridLinkStyle}>
+                  <Link
+                    key={n.slug}
+                    href={`/neighborhoods/${n.slug}`}
+                    className="hero-search-item"
+                    style={gridLinkStyle}
+                  >
                     {n.name}
                   </Link>
                 ))}
@@ -129,7 +139,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
 
       {openMenu === 'account' && signedIn && (
         <div
-          className="card"
+          className="nav-dropdown-panel"
           style={{
             position: 'absolute',
             top: '100%',
@@ -141,7 +151,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
             zIndex: 40,
           }}
         >
-          <p style={{ fontWeight: 700, marginBottom: 12 }}>{user?.name}</p>
+          <p style={{ fontWeight: 700, marginBottom: 12, color: '#fff' }}>{user?.name}</p>
           <Link href="/my-account" style={accountRowStyle}>
             My Profile
           </Link>
@@ -155,7 +165,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
               setOpenMenu(null);
             }}
             className="btn btn-outline"
-            style={{ width: '100%', marginTop: 8 }}
+            style={{ width: '100%', marginTop: 8, color: '#fff', borderColor: 'rgba(255,255,255,0.5)' }}
           >
             Sign Out
           </button>
@@ -223,7 +233,7 @@ function NavLink({ label, href, bare, gold, active, onEnter, panel }) {
 function DropdownPanel({ children, grid }) {
   return (
     <div
-      className="card"
+      className="nav-dropdown-panel"
       style={{
         position: 'absolute',
         top: '100%',
@@ -246,16 +256,15 @@ const gridLinkStyle = {
   padding: '8px 10px',
   fontSize: 13,
   borderRadius: 4,
-  color: 'var(--color-ink)',
 };
 
 const accountRowStyle = {
   display: 'block',
   padding: '10px 12px',
-  border: '1px solid var(--color-border-light)',
+  border: '1px solid rgba(255, 255, 255, 0.2)',
   borderRadius: 6,
   marginBottom: 8,
   fontSize: 13,
   fontWeight: 600,
-  color: 'var(--color-success)',
+  color: '#fff',
 };
