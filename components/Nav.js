@@ -108,7 +108,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                     </Link>
                     <Link
                       href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Condo}`}
-                      className="hero-search-item"
+                      className="hero-search-item-secondary"
                       style={gridCondoLinkStyle}
                     >
                       (Condos)
@@ -278,7 +278,6 @@ const gridCondoLinkStyle = {
   padding: '2px 10px 8px',
   fontSize: 12,
   borderRadius: 4,
-  opacity: 0.75,
 };
 
 const accountRowStyle = {
