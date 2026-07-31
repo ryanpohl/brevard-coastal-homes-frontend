@@ -140,6 +140,17 @@ h4 {
   border: 1px solid var(--color-border-light);
 }
 
+/* Top nav dropdown panels (Search by City/Neighborhood, My Account,
+   Sign In/Join) — solid dark navy matching the nav bar's own background,
+   used instead of .card so these read consistently against the plain
+   light-cream body background on every non-homepage page. */
+.nav-dropdown-panel {
+  background: var(--color-nav-bg);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-card);
+  color: rgba(255, 255, 255, 0.85);
+}
+
 /* Footer links reset `a { text-decoration: none }` above so they read as
    plain text — this underline makes it clear each one is a separate,
    clickable link (important where two links sit on one line, e.g.
