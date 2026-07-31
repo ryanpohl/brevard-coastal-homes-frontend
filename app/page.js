@@ -74,14 +74,14 @@ export default async function HomePage() {
           <h2 className="section-heading" style={{ color: '#fff' }}>
             Search By City
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
             {cities.map((city) => (
               <PlaceCard
                 key={city.slug}
                 name={city.name}
                 thumbnail={city.thumbnail}
                 href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
-                sizes="(min-width: 900px) 20vw, (min-width: 600px) 33vw, 50vw"
+                sizes="(min-width: 1100px) 25vw, (min-width: 640px) 50vw, 100vw"
               />
             ))}
           </div>
