@@ -125,6 +125,7 @@ function PlaceCard({ name, thumbnail, href, sizes, objectPosition = 'center' }) 
   return (
     <Link
       href={href}
+      className="place-card"
       style={{ position: 'relative', display: 'block', overflow: 'hidden', width: '100%', paddingTop: '75%', background: '#2a3942' }}
     >
       {src && (
@@ -133,6 +134,7 @@ function PlaceCard({ name, thumbnail, href, sizes, objectPosition = 'center' }) 
           alt={name}
           fill
           sizes={sizes}
+          className="place-card-image"
           style={{ objectFit: 'cover', objectPosition }}
         />
       )}
