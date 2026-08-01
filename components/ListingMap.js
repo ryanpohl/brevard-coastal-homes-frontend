@@ -18,6 +18,19 @@ function escapeHtml(value) {
   ));
 }
 
+// Google's official "dynamic library import" bootstrap loader — see
+// https://developers.google.com/maps/documentation/javascript/load-maps-js-api.
+// This tiny inline snippet synchronously defines `google.maps.importLibrary`
+// (no network request yet); the actual Maps JS payload is fetched lazily the
+// first time importLibrary() is called, in the effect below. A plain
+// `<script src=".../maps/api/js?...&loading=async">` tag does NOT define
+// importLibrary on its own in current API versions — using one caused a
+// "google.maps.Map is not a constructor" crash. This bootstrap snippet is
+// the only supported way to get importLibrary, so don't swap it back out.
+function mapsBootstrapLoaderSrc(key) {
+  return `(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=\`https://maps.\${c}apis.com/maps/api/js?\`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({key:"${key}",v:"weekly"});`;
+}
+
 /**
  * Google Map for the city/neighborhood listing pages (and, later, Property
  * Detail's single-pin map): centers on `center` ({lat, lng}) and drops a pin
@@ -35,22 +48,20 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
   const mapInstanceRef = useRef(null);
   const markersRef = useRef([]);
   const [scriptLoaded, setScriptLoaded] = useState(
-    () => typeof window !== 'undefined' && !!(window.google && window.google.maps)
+    () => typeof window !== 'undefined' && !!window.google?.maps?.importLibrary
   );
 
   const effectiveCenter = center && center.lat != null && center.lng != null ? center : FALLBACK_CENTER;
   const effectiveZoom = center && center.lat != null && center.lng != null ? zoom : FALLBACK_ZOOM;
 
   useEffect(() => {
-    if (!scriptLoaded || !mapRef.current || !window.google || !window.google.maps) return;
+    if (!scriptLoaded || !mapRef.current || !window.google?.maps?.importLibrary) return;
     let cancelled = false;
 
-    // The script is loaded with `loading=async`, which switches the Maps JS
-    // API to its newer per-library dynamic-import model — `google.maps.Map`
-    // (and Marker/InfoWindow) aren't guaranteed to exist the instant the
-    // script tag's onLoad fires, only after explicitly importing the
-    // libraries that define them. Once imported, the classes are still
-    // available directly off `google.maps` as used below.
+    // Map/Marker/InfoWindow aren't defined until their libraries are
+    // explicitly imported through the bootstrap loader above — once
+    // imported, the classes are available directly off `google.maps` as
+    // used below (importLibrary populates the shared namespace).
     async function init() {
       await Promise.all([
         window.google.maps.importLibrary('maps'),
@@ -137,9 +148,9 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
     <>
       <Script
         id="google-maps-js"
-        src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&loading=async`}
         strategy="afterInteractive"
         onLoad={() => setScriptLoaded(true)}
+        dangerouslySetInnerHTML={{ __html: mapsBootstrapLoaderSrc(GOOGLE_MAPS_API_KEY) }}
       />
       <div
         ref={mapRef}
