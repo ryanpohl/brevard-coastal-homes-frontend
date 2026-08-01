@@ -15,6 +15,7 @@
   --color-muted-light: #8a8f92;
   --color-success: #2f7a4f;
   --color-error: #c0392b;
+  --color-maroon: #7a2a35;
   --color-card: #ffffff;
   --color-bg: #f7f5ef;
 
@@ -129,9 +130,52 @@ h4 {
   color: var(--color-ink);
 }
 
+/* Schedule a Showing / Ask a Question buttons in the listing-page filter bar
+   (FilterBar.js, via InquiryModals) — a green/maroon pair per the design
+   reference, distinct from the site's default navy .btn-primary so these
+   two calls-to-action stand out against the other (outlined) filter pills. */
+.btn-success {
+  background: var(--color-success);
+  color: #fff;
+}
+
+.btn-maroon {
+  background: var(--color-maroon);
+  color: #fff;
+}
+
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* City/neighborhood listing pages (app/[citySlug]/[propertySlug]/page.js,
+   app/neighborhoods/[slug]/page.js): map on the left, results grid on the
+   right. Stacks to a single column (map on top, fixed height) below 900px
+   so the sticky-tall map doesn't crowd out the listings on mobile. */
+.listing-page-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.listing-page-map {
+  position: relative;
+  height: 320px;
+}
+
+@media (min-width: 900px) {
+  .listing-page-layout {
+    grid-template-columns: minmax(280px, 400px) 1fr;
+  }
+
+  .listing-page-map {
+    position: sticky;
+    top: 20px;
+    height: calc(100vh - 40px);
+    min-height: 480px;
+  }
 }
 
 .card {
