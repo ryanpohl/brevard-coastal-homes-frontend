@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Preview — Property Detail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  :root {
+    --color-nav-bg: #1c1b30; --color-ink: #1c2b30; --color-ink-dark: #10242c;
+    --color-gold: #c9a15a; --color-border: #cfd8da; --color-border-light: #e6e1d6;
+    --color-border-warm: #d8d2c2; --color-muted: #667377; --color-muted-dark: #445055;
+    --color-muted-light: #8a8f92; --color-success: #2f7a4f; --color-error: #c0392b;
+    --color-maroon: #7a2a35; --color-card: #ffffff; --color-bg: #f7f5ef;
+    --radius-pill: 999px; --radius-card: 8px; --radius-btn: 4px;
+    --font-heading: 'Playfair Display', serif; --font-body: 'Jost', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font-body); color: var(--color-ink); background: var(--color-bg); }
+  input, select, textarea {
+    width: 100%; font-family: var(--font-body); font-size: 14px; padding: 10px 12px;
+    border: 1px solid var(--color-border); border-radius: var(--radius-btn); background: #fff; color: var(--color-ink);
+  }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(16,36,44,0.55); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 100; }
+  .error-text { color: var(--color-error); font-size: 13px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useMemo } = React;
+
+const MOCK_LISTING = {
+  id: 1,
+  mlsId: '918442',
+  propertyType: 'Home',
+  status: 'Active',
+  price: 1895000,
+  address: '154 Shorebreak Lane, Melbourne Beach, FL 32951',
+  beds: 5,
+  baths: 4.5,
+  sqft: 4120,
+  acreage: null,
+  zoning: null,
+  waterfront: 'Oceanfront',
+  description: "Oceanfront Retreat | Melbourne Beach. Set directly on the sand in Melbourne Beach, this coastal estate pairs unobstructed Atlantic views with clean, contemporary architecture. Walls of glass open the main living space to a wraparound terrace, infinity-edge pool, and private beach walkway. A chef's kitchen, first-floor primary suite, and covered outdoor living area make this home as functional for everyday living as it is for entertaining. Upstairs, four additional bedrooms each open to ocean-facing balconies. A rare offering along one of Brevard County's most sought-after stretches of coastline.",
+  photos: [
+    'https://picsum.photos/seed/pd-hero/1200/800',
+    'https://picsum.photos/seed/pd-1/400/300',
+    'https://picsum.photos/seed/pd-2/400/300',
+    'https://picsum.photos/seed/pd-3/400/300',
+    'https://picsum.photos/seed/pd-4/400/300',
+    'https://picsum.photos/seed/pd-5/400/300',
+    'https://picsum.photos/seed/pd-6/400/300',
+  ],
+};
+
+const AGENT_INFO = { name: 'Ryan Pohl', phone: '(321) 350-7661' };
+const PROPERTY_TYPE_LABEL = { Home: 'Single Family Home', Condo: 'Condo', Land: 'Land' };
+function formatPrice(p) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(p); }
+const inputStyle = { border: '1px solid var(--color-border-warm)' };
+const DOW = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+const MONTH = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+
+// ---- PropertyGallery (mirrors components/PropertyGallery.js, next/image -> img) ----
+function PropertyGallery({ photos, address }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [tab, setTab] = useState('photos');
+  const hasPhotos = photos.length > 0;
+  const heroPhoto = hasPhotos ? photos[Math.min(activeIndex, photos.length - 1)] : null;
+  const thumbnails = photos.slice(1, 7);
+  const extraCount = photos.length - 7;
+
+  return (
+    <div>
+      {tab === 'photos' ? (
+        <>
+          <div style={{ position: 'relative', width: '100%', height: 'clamp(240px, 42vw, 460px)', borderRadius: 4, overflow: 'hidden', background: 'var(--color-border-light)' }}>
+            {heroPhoto ? <img src={heroPhoto} alt={address} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /> : <div>No photo available</div>}
+          </div>
+          {thumbnails.length > 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(70px, 1fr))', gap: 8, marginTop: 8 }}>
+              {thumbnails.map((photo, i) => {
+                const photoIndex = i + 1;
+                const isLast = i === thumbnails.length - 1;
+                const isActive = activeIndex === photoIndex;
+                return (
+                  <button key={photoIndex} type="button" onClick={() => setActiveIndex(photoIndex)}
+                    style={{ position: 'relative', height: 78, borderRadius: 3, overflow: 'hidden', border: isActive ? '2px solid var(--color-ink)' : '2px solid transparent', padding: 0, cursor: 'pointer', background: 'var(--color-border-light)' }}>
+                    <img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    {isLast && extraCount > 0 && <div style={{ position: 'absolute', inset: 0, background: 'rgba(16,36,44,0.55)', color: '#fff', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+{extraCount}</div>}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </>
+      ) : (
+        <div style={{ width: '100%', height: 'clamp(240px, 42vw, 460px)', borderRadius: 4, background: 'var(--color-border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: 'var(--color-muted)', fontSize: 14, padding: 20 }}>
+          Virtual tour not available for this listing yet.
+        </div>
+      )}
+      <div style={{ display: 'flex', gap: 28, marginTop: 20, borderBottom: '1px solid var(--color-border-light)', paddingBottom: 14 }}>
+        <button type="button" onClick={() => setTab('photos')} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: tab === 'photos' ? 600 : 500, color: tab === 'photos' ? 'var(--color-ink)' : 'var(--color-muted-light)', borderBottom: tab === 'photos' ? '2px solid var(--color-ink)' : '2px solid transparent', paddingBottom: 10, background: 'none', border: 'none', borderBottomWidth: 2, cursor: 'pointer' }}>📷 Photos</button>
+        <button type="button" onClick={() => setTab('tour')} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: tab === 'tour' ? 600 : 500, color: tab === 'tour' ? 'var(--color-ink)' : 'var(--color-muted-light)', borderBottom: tab === 'tour' ? '2px solid var(--color-ink)' : '2px solid transparent', paddingBottom: 10, background: 'none', border: 'none', borderBottomWidth: 2, cursor: 'pointer' }}>▶ Virtual Tour</button>
+      </div>
+    </div>
+  );
+}
+
+function StatItem({ value, label, big }) {
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <div style={{ fontSize: big ? 18 : 22, fontWeight: 700, color: 'var(--color-ink)' }}>{value}</div>
+      <div style={{ fontSize: 11, letterSpacing: 0.5, color: 'var(--color-muted-light)', textTransform: 'uppercase' }}>{label}</div>
+    </div>
+  );
+}
+
+// ---- PropertyContactPanel (mirrors components/PropertyContactPanel.js, api calls -> stub) ----
+function RadioLabel({ name, checked, onChange, children }) {
+  return (
+    <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--color-muted-dark)', cursor: 'pointer' }}>
+      <input type="radio" name={name} checked={checked} onChange={onChange} style={{ width: 'auto' }} />
+      {children}
+    </label>
+  );
+}
+
+function ModalShell({ onClose, maxWidth, children }) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div style={{ background: '#fff', borderRadius: 6, width: `min(${maxWidth || 480}px, 100%)`, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 60px rgba(0,0,0,0.4)', position: 'relative' }} onClick={(e) => e.stopPropagation()}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function MakeOfferModal({ onClose }) {
+  const [purchasePlan, setPurchasePlan] = useState(null);
+  const [hasBuyerAgency, setHasBuyerAgency] = useState(null);
+  const [hasToured, setHasToured] = useState(null);
+  return (
+    <ModalShell onClose={onClose} maxWidth={560}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#e7e2cf', padding: '18px 26px' }}>
+        <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 600, color: 'var(--color-ink)' }}>Want to make an Offer?</div>
+        <button type="button" onClick={onClose} style={{ cursor: 'pointer', fontSize: 20, color: 'var(--color-muted)', lineHeight: 1, background: 'none', border: 'none' }}>×</button>
+      </div>
+      <div style={{ padding: '26px 30px 32px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', gap: '14px 16px', alignItems: 'center' }}>
+          <label style={{ fontSize: 13 }}>Name</label><input style={inputStyle} />
+          <label style={{ fontSize: 13 }}>Email</label><input style={inputStyle} />
+          <label style={{ fontSize: 13 }}>Mobile Phone</label><input style={inputStyle} />
+          <label style={{ fontSize: 13 }}>Offer Price</label><input type="number" style={inputStyle} />
+        </div>
+        <div style={{ marginTop: 24 }}>
+          <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 10 }}>How do you plan to purchase?</div>
+          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+            <RadioLabel name="pp" checked={purchasePlan === 'cash'} onChange={() => setPurchasePlan('cash')}>I plan to make a cash offer</RadioLabel>
+            <RadioLabel name="pp" checked={purchasePlan === 'financing'} onChange={() => setPurchasePlan('financing')}>I plan to use financing</RadioLabel>
+          </div>
+        </div>
+        <div style={{ marginTop: 22 }}>
+          <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 10 }}>Have you signed an exclusive buyer agency agreement with another Agent or Broker?</div>
+          <div style={{ display: 'flex', gap: 24 }}>
+            <RadioLabel name="ba" checked={hasBuyerAgency === 'yes'} onChange={() => setHasBuyerAgency('yes')}>Yes</RadioLabel>
+            <RadioLabel name="ba" checked={hasBuyerAgency === 'no'} onChange={() => setHasBuyerAgency('no')}>No</RadioLabel>
+          </div>
+        </div>
+        <div style={{ marginTop: 22 }}>
+          <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 10 }}>Have you visited the property for a tour?</div>
+          <div style={{ display: 'flex', gap: 24 }}>
+            <RadioLabel name="tr" checked={hasToured === 'yes'} onChange={() => setHasToured('yes')}>Yes</RadioLabel>
+            <RadioLabel name="tr" checked={hasToured === 'no'} onChange={() => setHasToured('no')}>No</RadioLabel>
+          </div>
+        </div>
+        <button type="button" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-ink-dark)', color: '#fff', fontSize: 14, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', padding: 14, borderRadius: 4, border: 'none', cursor: 'pointer', width: '100%', marginTop: 28 }}>Submit Information Here</button>
+        <div style={{ textAlign: 'center', fontSize: 13, color: 'var(--color-muted)', marginTop: 10 }}>*We will get back to you shortly.</div>
+      </div>
+    </ModalShell>
+  );
+}
+
+function AskQuestionModal({ onClose }) {
+  const [contactMethods, setContactMethods] = useState([]);
+  function toggleMethod(m) { setContactMethods((ms) => ms.includes(m) ? ms.filter(x => x !== m) : [...ms, m]); }
+  return (
+    <ModalShell onClose={onClose}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px 26px', borderBottom: '1px solid var(--color-border-light)' }}>
+        <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 600 }}>Ask a Question Here</div>
+        <button type="button" onClick={onClose} style={{ cursor: 'pointer', fontSize: 20, color: 'var(--color-muted)', lineHeight: 1, background: 'none', border: 'none' }}>×</button>
+      </div>
+      <div style={{ padding: '24px 26px 30px' }}>
+        <div style={{ fontSize: 16, color: 'var(--color-muted-dark)', marginBottom: 10 }}>Enter your contact information below & we will reach out to you shortly with an answer.</div>
+        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8, textDecoration: 'underline' }}>How would you like us to respond?</div>
+        <div style={{ display: 'flex', gap: 20, marginBottom: 16 }}>
+          {['Call', 'Text', 'Email'].map((m) => (
+            <label key={m} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, cursor: 'pointer' }}>
+              <input type="checkbox" checked={contactMethods.includes(m)} onChange={() => toggleMethod(m)} style={{ width: 'auto' }} /> {m}
+            </label>
+          ))}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10, marginBottom: 10 }}>
+          <input placeholder="Name" style={inputStyle} />
+          <input placeholder="Phone" style={inputStyle} />
+        </div>
+        <input placeholder="Email" style={{ ...inputStyle, marginBottom: 10 }} />
+        <textarea placeholder="Enter your question here......" rows={3} style={{ ...inputStyle, marginBottom: 18 }} />
+        <button type="button" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-success)', color: '#fff', fontSize: 14, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', padding: 14, borderRadius: 4, border: 'none', cursor: 'pointer' }}>Submit</button>
+      </div>
+    </ModalShell>
+  );
+}
+
+function RequestShowingForm({ dateOptions }) {
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [tourType, setTourType] = useState(null);
+  return (
+    <form style={{ padding: '20px 24px 28px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 12, flexWrap: 'wrap', textAlign: 'center' }}>
+        <div style={{ fontSize: 13, color: 'var(--color-muted-dark)' }}>Select a preferred date &amp; time</div>
+        <span style={{ fontSize: 11, color: 'var(--color-muted-light)', letterSpacing: 1, textTransform: 'uppercase' }}>Or</span>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, fontSize: 14 }}>
+          <span style={{ fontWeight: 700, fontSize: 15 }}>Set Up by Phone</span>
+          <span style={{ color: 'var(--color-muted)', fontSize: 12 }}>(Call or Text)</span>
+          <span style={{ fontWeight: 700, color: 'var(--color-gold)' }}>{AGENT_INFO.phone}</span>
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8, marginBottom: 16 }}>
+        {dateOptions.map((d) => {
+          const isSelected = selectedDate === d.iso;
+          return (
+            <button key={d.iso} type="button" onClick={() => setSelectedDate(d.iso)} style={{ border: isSelected ? '2px solid var(--color-ink)' : '1px solid var(--color-border-warm)', background: isSelected ? '#e4e8ea' : 'none', borderRadius: 4, textAlign: 'center', padding: isSelected ? '9px 3px' : '10px 4px', cursor: 'pointer' }}>
+              <div style={{ fontSize: 10, color: 'var(--color-muted-light)' }}>{d.dow}</div>
+              <div style={{ fontSize: 18, fontWeight: 700 }}>{d.day}</div>
+              <div style={{ fontSize: 10, color: 'var(--color-muted-light)' }}>{d.month}</div>
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 10, marginBottom: 16 }}>
+        <label style={{ border: tourType === 'in_person' ? '1px solid var(--color-ink)' : '1px solid var(--color-border-warm)', borderRadius: 4, padding: 12, display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer', fontWeight: tourType === 'in_person' ? 700 : 400 }}>
+          <input type="radio" name="tt" checked={tourType === 'in_person'} onChange={() => setTourType('in_person')} style={{ width: 'auto' }} /> 🏠 In Person
+        </label>
+        <label style={{ border: tourType === 'virtual' ? '1px solid var(--color-ink)' : '1px solid var(--color-border-warm)', borderRadius: 4, padding: 12, display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer', fontWeight: tourType === 'virtual' ? 700 : 400 }}>
+          <input type="radio" name="tt" checked={tourType === 'virtual'} onChange={() => setTourType('virtual')} style={{ width: 'auto' }} /> 📱 Virtual
+        </label>
+      </div>
+      <input placeholder="Name" style={{ ...inputStyle, marginBottom: 10 }} />
+      <input placeholder="Email" style={{ ...inputStyle, marginBottom: 10 }} />
+      <input placeholder="Mobile Phone" style={{ ...inputStyle, marginBottom: 10 }} />
+      <textarea placeholder="Add a message or question here ..." rows={3} style={{ ...inputStyle, marginBottom: 16 }} />
+      <button type="button" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#8b2626', color: '#fff', fontSize: 14, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', padding: 14, borderRadius: 4, border: 'none', cursor: 'pointer' }}>Submit</button>
+    </form>
+  );
+}
+
+function PropertyContactPanel() {
+  const [offerOpen, setOfferOpen] = useState(false);
+  const [askOpen, setAskOpen] = useState(false);
+  const dateOptions = useMemo(() => {
+    const today = new Date();
+    return Array.from({ length: 12 }, (_, i) => {
+      const d = new Date(today); d.setDate(today.getDate() + i);
+      return { iso: d.toISOString().slice(0, 10), dow: DOW[d.getDay()], day: String(d.getDate()).padStart(2, '0'), month: MONTH[d.getMonth()] };
+    });
+  }, []);
+  return (
+    <div style={{ background: '#fff', borderRadius: 6, overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.10)' }}>
+      <div style={{ background: 'var(--color-ink-dark)', color: '#fff', textAlign: 'center', padding: '28px 24px' }}>
+        <div style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 600 }}>Call or Text {AGENT_INFO.phone}</div>
+        <div style={{ fontSize: 22, letterSpacing: 0.5, marginTop: 4 }}>{AGENT_INFO.name}</div>
+        <div style={{ fontSize: 14, marginTop: 12, opacity: 0.9 }}>We are standing by to assist you.</div>
+        <div style={{ fontSize: 13, marginTop: 16, opacity: 0.85 }}>Want to make an offer or ask a question? Select one the buttons below.</div>
+        <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+          <button type="button" onClick={() => setOfferOpen(true)} style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'var(--color-gold)', color: 'var(--color-ink-dark)', fontSize: 14, fontWeight: 600, padding: '12px 20px', borderRadius: 999, border: 'none', cursor: 'pointer' }}>★ Make an Offer</button>
+          <button type="button" onClick={() => setAskOpen(true)} style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'var(--color-gold)', color: 'var(--color-ink-dark)', fontSize: 14, fontWeight: 600, padding: '12px 20px', borderRadius: 999, border: 'none', cursor: 'pointer' }}>★ Ask a Question</button>
+        </div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center', padding: '14px 0', fontSize: 13, fontWeight: 600, borderBottom: '2px solid var(--color-ink)' }}>REQUEST SHOWING</div>
+      </div>
+      <RequestShowingForm dateOptions={dateOptions} />
+      {offerOpen && <MakeOfferModal onClose={() => setOfferOpen(false)} />}
+      {askOpen && <AskQuestionModal onClose={() => setAskOpen(false)} />}
+    </div>
+  );
+}
+
+// ---- Page layout (mirrors app/listings/[id]/page.js) ----
+const STATUS_COLOR = { Active: '#7c8a4c', Pending: 'var(--color-gold)', Sold: 'var(--color-muted)', 'Off Market': 'var(--color-muted)' };
+
+function Page() {
+  const listing = MOCK_LISTING;
+  const photos = listing.photos;
+  const isLand = listing.propertyType === 'Land';
+  const fullBaths = Math.floor(listing.baths);
+  const partialBaths = Math.round(listing.baths - fullBaths);
+  const [streetLine, ...rest] = listing.address.split(',');
+  const cityStateZip = rest.join(',').trim();
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, maxWidth: 1500, margin: '0 auto', padding: '24px clamp(16px, 4vw, 56px) 88px', alignItems: 'start' }}>
+      <div>
+        <div style={{ position: 'relative' }}>
+          <PropertyGallery photos={photos} address={listing.address} />
+          <div style={{ position: 'absolute', top: 14, right: 14, width: 44, height: 44, borderRadius: '50%', background: 'rgba(255,255,255,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>♡</div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginTop: 20 }}>
+          <div>
+            <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 400 }}>{streetLine}</div>
+            {cityStateZip && <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 400 }}>{cityStateZip}</div>}
+            <div style={{ fontSize: 12, letterSpacing: 0.8, fontWeight: 600, marginTop: 8, color: STATUS_COLOR[listing.status] }}>{listing.status.toUpperCase()}</div>
+          </div>
+          <div style={{ textAlign: 'right' }}><div style={{ fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 600 }}>{formatPrice(listing.price)}</div></div>
+        </div>
+        <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', padding: '22px 0', borderBottom: '1px solid var(--color-border-light)' }}>
+          {!isLand && <StatItem value={listing.beds} label="Beds" />}
+          {!isLand && <StatItem value={fullBaths} label="Full Baths" />}
+          {!isLand && <StatItem value={partialBaths} label="Partial Baths" />}
+          <StatItem value={PROPERTY_TYPE_LABEL[listing.propertyType]} label="Type" big />
+          {!isLand && <StatItem value={listing.sqft.toLocaleString()} label="Sq.Ft." />}
+          {listing.mlsId && <StatItem value={listing.mlsId} label="MLS #" />}
+        </div>
+        {listing.waterfront && listing.waterfront !== 'None' && <p style={{ fontSize: 13, color: 'var(--color-success)', fontWeight: 600, marginTop: 16 }}>{listing.waterfront}</p>}
+        {listing.description && <p style={{ fontSize: 15, lineHeight: 1.75, color: 'var(--color-muted-dark)', marginTop: 20 }}>{listing.description}</p>}
+        <div style={{ marginTop: 32 }}>
+          <h2 style={{ fontSize: 18, marginBottom: 12, fontFamily: 'var(--font-heading)' }}>Location</h2>
+          <div style={{ height: 320, background: 'var(--color-border-light)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-muted)' }}>[ Map ]</div>
+        </div>
+      </div>
+      <PropertyContactPanel />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Page />);
+</script>
+</body>
+</html>
