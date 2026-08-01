@@ -4,6 +4,7 @@ import * as api from '@/lib/api';
 import { formatPrice, PROPERTY_TYPE_LABEL, AGENT_INFO } from '@/lib/constants';
 import FavoriteButton from '@/components/FavoriteButton';
 import InquiryModals from '@/components/InquiryModals';
+import ListingMap from '@/components/ListingMap';
 
 export async function generateMetadata({ params }) {
   try {
@@ -132,19 +133,12 @@ export default async function ListingDetailPage({ params }) {
           {listing.description && <p style={{ lineHeight: 1.7 }}>{listing.description}</p>}
 
           <div style={{ marginTop: 32 }}>
-            <div
-              className="card"
-              style={{
-                height: 320,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--color-muted)',
-                background: 'var(--color-bg)',
-              }}
-            >
-              Map placeholder — {listing.address}
-            </div>
+            <ListingMap
+              center={listing.latitude != null && listing.longitude != null ? { lat: listing.latitude, lng: listing.longitude } : null}
+              listings={[listing]}
+              height={320}
+              zoom={15}
+            />
           </div>
         </div>
 
