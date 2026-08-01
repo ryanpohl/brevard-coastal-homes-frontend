@@ -3,7 +3,12 @@ import * as api from '@/lib/api';
 import { SLUG_TO_PROPERTY_TYPE, PROPERTY_TYPE_LABEL } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import ListingCard from '@/components/ListingCard';
+import ListingMap from '@/components/ListingMap';
 import Pagination from '@/components/Pagination';
+
+// Matches the reference design's "1-30 of 34 Homes" pagination — the
+// backend defaults to 24 if this isn't passed.
+const PAGE_SIZE = 30;
 
 /**
  * City listing page — one route covers all 10 cities x 3 property types
@@ -42,10 +47,9 @@ export default async function CityListingsPage({ params, searchParams }) {
   }
 
   let seo = null;
-  let listingCount = null;
   let jsonLd = null;
   try {
-    ({ seo, listingCount, jsonLd } = await api.getCitySeo(citySlug, propertyType));
+    ({ seo, jsonLd } = await api.getCitySeo(citySlug, propertyType));
   } catch {
     // No SEO row yet (e.g. seed:seo hasn't run) — render with sensible fallbacks below.
   }
@@ -57,6 +61,7 @@ export default async function CityListingsPage({ params, searchParams }) {
   const page = Number(searchParams.page) || 1;
 
   let results = [];
+  let total = 0;
   let totalPages = 1;
   try {
     const data = await api.getListings({
@@ -69,21 +74,35 @@ export default async function CityListingsPage({ params, searchParams }) {
       waterfront: searchParams.waterfront,
       sort: searchParams.sort,
       page,
+      pageSize: PAGE_SIZE,
     });
     results = data.results || [];
+    total = data.total ?? results.length;
     totalPages = data.totalPages || 1;
   } catch {
     // Backend unreachable or no matches — render an empty grid rather than crashing.
   }
+
+  const typeLabel = PROPERTY_TYPE_LABEL[propertyType] || 'Homes';
+  const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const rangeEnd = Math.min(page * PAGE_SIZE, total);
+
+  // Real per-listing coordinates come from the Spark MLS sync (null until
+  // then); the map center falls back to the city's own coordinate so it's
+  // always centered on the right place even with zero pins to show yet.
+  const mapCenter = city.latitude != null && city.longitude != null ? { lat: city.latitude, lng: city.longitude } : null;
 
   return (
     <div>
       {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
 
       <div className="container" style={{ padding: '32px clamp(16px, 4vw, 56px) 0' }}>
-        <h1 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', marginBottom: 12 }}>
+        <h1 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', marginBottom: 8 }}>
           {seo?.h1 || `${PROPERTY_TYPE_LABEL[propertyType]} in ${city.name}, FL`}
         </h1>
+        <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
+          {total} result{total === 1 ? '' : 's'}
+        </p>
         {seo?.introCopy && (
           <p style={{ maxWidth: 760, color: 'var(--color-muted-dark)', marginBottom: 16 }}>{seo.introCopy}</p>
         )}
@@ -91,44 +110,36 @@ export default async function CityListingsPage({ params, searchParams }) {
 
       <FilterBar waterfrontFlags={city.filters} showZoning={propertyType === 'Land'} />
 
-      <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 16px', fontSize: 13, color: 'var(--color-muted)' }}>
-        {listingCount ?? results.length} listing{(listingCount ?? results.length) === 1 ? '' : 's'} found
-      </div>
-
-      <div
-        className="container"
-        style={{
-          padding: '0 clamp(16px, 4vw, 56px) 32px',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-          gap: 20,
-        }}
-      >
-        {results.map((listing) => (
-          <ListingCard key={listing.id} listing={listing} />
-        ))}
-        {results.length === 0 && (
-          <p style={{ gridColumn: '1 / -1', color: 'var(--color-muted)' }}>
-            No listings match your search yet. Try adjusting your filters.
-          </p>
-        )}
-      </div>
-
-      <Pagination page={page} totalPages={totalPages} />
-
       <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
-        <div
-          className="card"
-          style={{
-            height: 320,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'var(--color-muted)',
-            background: 'var(--color-bg)',
-          }}
-        >
-          Map placeholder — {city.name} {PROPERTY_TYPE_LABEL[propertyType]}
+        <div className="listing-page-layout">
+          <div className="listing-page-map">
+            <ListingMap center={mapCenter} listings={results} height="100%" />
+          </div>
+
+          <div>
+            <div style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 16 }}>
+              {total === 0 ? '0 results' : `${rangeStart}-${rangeEnd} of ${total} ${typeLabel}`}
+            </div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                gap: 20,
+              }}
+            >
+              {results.map((listing) => (
+                <ListingCard key={listing.id} listing={listing} />
+              ))}
+              {results.length === 0 && (
+                <p style={{ gridColumn: '1 / -1', color: 'var(--color-muted)' }}>
+                  No listings match your search yet. Try adjusting your filters.
+                </p>
+              )}
+            </div>
+
+            <Pagination page={page} totalPages={totalPages} />
+          </div>
         </div>
       </div>
     </div>
