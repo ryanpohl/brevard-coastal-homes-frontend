@@ -5,11 +5,22 @@ import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
 
 /**
- * "Schedule a Showing" and "Ask a Question" trigger buttons + modal forms for
- * the Property Detail page, per design/README.md's Modals section. Both post
- * to the backend's /api/inquiries/* endpoints with the listing's id attached.
+ * "Schedule a Showing" and "Ask a Question" trigger buttons + modal forms.
+ * Both post to the backend's /api/inquiries/* endpoints. Two call sites:
+ *  - Property Detail page's sidebar (default props): listingId is always
+ *    passed, so the request is tied to that one listing.
+ *  - The city/neighborhood listing page's filter bar (FilterBar.js): no
+ *    listingId — these are general "ask about this area" submissions, and
+ *    the backend accepts that (listingId is optional there). Passes
+ *    `containerStyle`/`scheduleClassName`/`questionClassName` to get the
+ *    inline green/maroon pill look instead of the sidebar's stacked buttons.
  */
-export default function InquiryModals({ listingId }) {
+export default function InquiryModals({
+  listingId,
+  containerStyle,
+  scheduleClassName = 'btn btn-primary',
+  questionClassName = 'btn btn-outline',
+}) {
   const { user } = useAuth();
   const [open, setOpen] = useState(null); // 'schedule' | 'question' | null
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '', preferredDate: '', preferredTime: '' });
@@ -51,11 +62,11 @@ export default function InquiryModals({ listingId }) {
 
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <button type="button" className="btn btn-primary" onClick={() => openModal('schedule')}>
+      <div style={containerStyle || { display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <button type="button" className={scheduleClassName} onClick={() => openModal('schedule')}>
           Schedule a Showing
         </button>
-        <button type="button" className="btn btn-outline" onClick={() => openModal('question')}>
+        <button type="button" className={questionClassName} onClick={() => openModal('question')}>
           Ask a Question
         </button>
       </div>

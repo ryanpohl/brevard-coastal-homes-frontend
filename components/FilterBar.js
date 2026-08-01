@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { SORT_OPTIONS, PRICE_BANDS, BED_OPTIONS, BATH_OPTIONS } from '@/lib/constants';
+import InquiryModals from './InquiryModals';
 
 /**
  * Filter bar for listing pages: Property Type, Price, Beds, Baths,
@@ -167,6 +168,16 @@ export default function FilterBar({ waterfrontFlags, showZoning }) {
           </button>
         ))}
       </FilterTrigger>
+
+      {/* General "ask about this area" versions of the Property Detail page's
+          Schedule a Showing / Ask a Question modals — no listingId, since no
+          one listing is selected here (see InquiryModals.js and the
+          backend's now-optional listingId on these two inquiry types). */}
+      <InquiryModals
+        containerStyle={{ display: 'flex', gap: 10, marginLeft: 'auto' }}
+        scheduleClassName="btn btn-success"
+        questionClassName="btn btn-maroon"
+      />
     </div>
   );
 }
