@@ -1,10 +1,20 @@
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import * as api from '@/lib/api';
-import { formatPrice, PROPERTY_TYPE_LABEL, AGENT_INFO } from '@/lib/constants';
+import { formatPrice, PROPERTY_TYPE_LABEL } from '@/lib/constants';
 import FavoriteButton from '@/components/FavoriteButton';
-import InquiryModals from '@/components/InquiryModals';
+import PropertyGallery from '@/components/PropertyGallery';
+import PropertyContactPanel from '@/components/PropertyContactPanel';
 import ListingMap from '@/components/ListingMap';
+
+// Status badge color — matches design/design_files/Property Detail.dc.html's
+// olive-green "ACTIVE" for the common case; the other statuses aren't shown
+// in that mockup, so these are reasonable extensions in the same spirit.
+const STATUS_COLOR = {
+  Active: '#7c8a4c',
+  Pending: 'var(--color-gold)',
+  Sold: 'var(--color-muted)',
+  'Off Market': 'var(--color-muted)',
+};
 
 export async function generateMetadata({ params }) {
   try {
@@ -33,131 +43,104 @@ export default async function ListingDetailPage({ params }) {
   const photos = listing.photos && listing.photos.length ? listing.photos : [];
   const isLand = listing.propertyType === 'Land';
 
+  // MLS full-bath/half-bath counts aren't stored separately — `baths` is a
+  // single value like 4.5 (4 full + 1 half), which is how MLS feeds
+  // typically report it. Split it back out for the design's separate
+  // "FULL BATHS" / "PARTIAL BATHS" stat tiles.
+  const fullBaths = listing.baths != null ? Math.floor(listing.baths) : null;
+  const partialBaths = listing.baths != null ? Math.round(listing.baths - Math.floor(listing.baths)) : null;
+
+  // Design shows the address on two lines ("street" / "city, state zip");
+  // this project's `address` field is one string (e.g. "154 Shorebreak
+  // Lane, Melbourne Beach, FL 32951"), so split on the first comma.
+  const [streetLine, ...restOfAddress] = listing.address.split(',');
+  const cityStateZip = restOfAddress.join(',').trim();
+
+  const mapCenter = listing.latitude != null && listing.longitude != null ? { lat: listing.latitude, lng: listing.longitude } : null;
+
   return (
-    <div className="container" style={{ padding: '32px clamp(16px, 4vw, 56px) 64px' }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+        gap: 24,
+        maxWidth: 1500,
+        margin: '0 auto',
+        padding: '24px clamp(16px, 4vw, 56px) 88px',
+        alignItems: 'start',
+      }}
+    >
       {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: photos.length > 1 ? '2fr 1fr' : '1fr',
-          gap: 10,
-          marginBottom: 28,
-        }}
-      >
-        <div
-          style={{
-            position: 'relative',
-            width: '100%',
-            paddingTop: '62%',
-            borderRadius: 8,
-            overflow: 'hidden',
-            background: 'var(--color-border-light)',
-          }}
-        >
-          {photos[0] && (
-            <Image
-              src={photos[0]}
-              alt={listing.address}
-              fill
-              priority
-              sizes="(max-width: 900px) 100vw, 60vw"
-              style={{ objectFit: 'cover' }}
-            />
-          )}
+      {/* LEFT: photos, header, stats, description, map */}
+      <div>
+        <div style={{ position: 'relative' }}>
+          <PropertyGallery photos={photos} address={listing.address} />
           <div style={{ position: 'absolute', top: 14, right: 14 }}>
             <FavoriteButton listingId={listing.id} initialFavorited={listing.isFavorited} size={44} />
           </div>
         </div>
 
-        {photos.length > 1 && (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateRows: `repeat(${Math.min(photos.length - 1, 3)}, 1fr)`,
-              gap: 10,
-            }}
-          >
-            {photos.slice(1, 4).map((photo, i) => (
-              <div
-                key={i}
-                style={{
-                  position: 'relative',
-                  width: '100%',
-                  minHeight: 90,
-                  borderRadius: 8,
-                  overflow: 'hidden',
-                  background: 'var(--color-border-light)',
-                }}
-              >
-                <Image src={photo} alt={`${listing.address} photo ${i + 2}`} fill sizes="20vw" style={{ objectFit: 'cover' }} />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 32 }}>
-        <div>
-          <p style={{ fontSize: 30, fontWeight: 700, marginBottom: 6 }}>{formatPrice(listing.price)}</p>
-          <p style={{ fontSize: 16, color: 'var(--color-muted-dark)', marginBottom: 12 }}>{listing.address}</p>
-
-          <div
-            style={{
-              display: 'flex',
-              gap: 20,
-              flexWrap: 'wrap',
-              fontSize: 14,
-              color: 'var(--color-muted-dark)',
-              marginBottom: 16,
-              paddingBottom: 16,
-              borderBottom: '1px solid var(--color-border-light)',
-            }}
-          >
-            {isLand ? (
-              <>
-                {listing.acreage && <span>{listing.acreage} acres</span>}
-                {listing.zoning && <span>{listing.zoning} zoning</span>}
-              </>
-            ) : (
-              <>
-                <span>{listing.beds ?? '—'} beds</span>
-                <span>{listing.baths ?? '—'} baths</span>
-                {listing.sqft && <span>{listing.sqft.toLocaleString()} sqft</span>}
-              </>
-            )}
-            <span>{PROPERTY_TYPE_LABEL[listing.propertyType] || listing.propertyType}</span>
-            {listing.waterfront && <span style={{ color: 'var(--color-success)', fontWeight: 600 }}>{listing.waterfront}</span>}
-          </div>
-
-          {listing.description && <p style={{ lineHeight: 1.7 }}>{listing.description}</p>}
-
-          <div style={{ marginTop: 32 }}>
-            <ListingMap
-              center={listing.latitude != null && listing.longitude != null ? { lat: listing.latitude, lng: listing.longitude } : null}
-              listings={[listing]}
-              height={320}
-              zoom={15}
-            />
-          </div>
-        </div>
-
-        <div>
-          <div className="card" style={{ padding: 20, position: 'sticky', top: 20 }}>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 16 }}>
-              <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'var(--color-border-light)', flexShrink: 0 }} />
-              <div>
-                <p style={{ fontWeight: 600 }}>{AGENT_INFO.name}</p>
-                <p style={{ fontSize: 12, color: 'var(--color-muted)' }}>{AGENT_INFO.businessName}</p>
-              </div>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginTop: 20 }}>
+          <div>
+            <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 400, color: 'var(--color-ink)' }}>
+              {streetLine}
             </div>
-            {AGENT_INFO.phone && <p style={{ fontSize: 14, marginBottom: 4 }}>{AGENT_INFO.phone}</p>}
-            {AGENT_INFO.email && <p style={{ fontSize: 14, marginBottom: 16 }}>{AGENT_INFO.email}</p>}
-
-            <InquiryModals listingId={listing.id} />
+            {cityStateZip && (
+              <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 400, color: 'var(--color-ink)' }}>
+                {cityStateZip}
+              </div>
+            )}
+            <div style={{ fontSize: 12, letterSpacing: 0.8, fontWeight: 600, marginTop: 8, color: STATUS_COLOR[listing.status] || 'var(--color-muted)' }}>
+              {listing.status?.toUpperCase()}
+            </div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 600, color: 'var(--color-ink)' }}>{formatPrice(listing.price)}</div>
           </div>
         </div>
+
+        <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', padding: '22px 0', borderBottom: '1px solid var(--color-border-light)' }}>
+          {isLand ? (
+            <>
+              {listing.acreage != null && <StatItem value={listing.acreage} label="Acres" />}
+              {listing.zoning && <StatItem value={listing.zoning} label="Zoning" big />}
+            </>
+          ) : (
+            <>
+              {listing.beds != null && <StatItem value={listing.beds} label="Beds" />}
+              {fullBaths != null && <StatItem value={fullBaths} label="Full Baths" />}
+              {partialBaths != null && <StatItem value={partialBaths} label="Partial Baths" />}
+            </>
+          )}
+          <StatItem value={PROPERTY_TYPE_LABEL[listing.propertyType] || listing.propertyType} label="Type" big />
+          {!isLand && listing.sqft != null && <StatItem value={listing.sqft.toLocaleString()} label="Sq.Ft." />}
+          {listing.mlsId && <StatItem value={listing.mlsId} label="MLS #" />}
+        </div>
+
+        {listing.waterfront && listing.waterfront !== 'None' && (
+          <p style={{ fontSize: 13, color: 'var(--color-success)', fontWeight: 600, marginTop: 16 }}>{listing.waterfront}</p>
+        )}
+
+        {listing.description && <p style={{ fontSize: 15, lineHeight: 1.75, color: 'var(--color-muted-dark)', marginTop: 20 }}>{listing.description}</p>}
+
+        <div style={{ marginTop: 32 }}>
+          <h2 style={{ fontSize: 18, marginBottom: 12 }}>Location</h2>
+          <ListingMap center={mapCenter} listings={[listing]} height={320} zoom={15} />
+        </div>
       </div>
+
+      {/* RIGHT: contact panel (Call/Text + Make an Offer + Ask a Question + inline Request Showing) */}
+      <PropertyContactPanel listingId={listing.id} />
+    </div>
+  );
+}
+
+function StatItem({ value, label, big }) {
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <div style={{ fontSize: big ? 18 : 22, fontWeight: 700, color: 'var(--color-ink)' }}>{value}</div>
+      <div style={{ fontSize: 11, letterSpacing: 0.5, color: 'var(--color-muted-light)', textTransform: 'uppercase' }}>{label}</div>
     </div>
   );
 }
