@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Script from 'next/script';
 import { formatPrice } from '@/lib/constants';
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -53,6 +52,31 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
 
   const effectiveCenter = center && center.lat != null && center.lng != null ? center : FALLBACK_CENTER;
   const effectiveZoom = center && center.lat != null && center.lng != null ? zoom : FALLBACK_ZOOM;
+
+  // Inject the bootstrap loader ourselves instead of relying on next/script's
+  // `onLoad` — that callback does not reliably fire for inline
+  // (dangerouslySetInnerHTML) scripts, which left `scriptLoaded` stuck at
+  // false forever and the map silently never initializing (confirmed via
+  // manual QA: importLibrary('maps') worked fine when called directly from
+  // the console, but the component's own effect never ran). The IIFE
+  // defines `google.maps.importLibrary` synchronously the moment it
+  // executes — appending the script tag runs it immediately, so we can flip
+  // scriptLoaded right after appending rather than waiting on a load event.
+  useEffect(() => {
+    if (typeof window === 'undefined' || !GOOGLE_MAPS_API_KEY) return;
+    if (window.google?.maps?.importLibrary) {
+      setScriptLoaded(true);
+      return;
+    }
+    if (!window.__gmapsBootstrapInjected) {
+      window.__gmapsBootstrapInjected = true;
+      const script = document.createElement('script');
+      script.id = 'google-maps-js';
+      script.innerHTML = mapsBootstrapLoaderSrc(GOOGLE_MAPS_API_KEY);
+      document.head.appendChild(script);
+    }
+    setScriptLoaded(true);
+  }, []);
 
   useEffect(() => {
     if (!scriptLoaded || !mapRef.current || !window.google?.maps?.importLibrary) return;
@@ -145,17 +169,9 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
   }
 
   return (
-    <>
-      <Script
-        id="google-maps-js"
-        strategy="afterInteractive"
-        onLoad={() => setScriptLoaded(true)}
-        dangerouslySetInnerHTML={{ __html: mapsBootstrapLoaderSrc(GOOGLE_MAPS_API_KEY) }}
-      />
-      <div
-        ref={mapRef}
-        style={{ width: '100%', height, minHeight: 320, borderRadius: 8, overflow: 'hidden', background: 'var(--color-border-light)' }}
-      />
-    </>
+    <div
+      ref={mapRef}
+      style={{ width: '100%', height, minHeight: 320, borderRadius: 8, overflow: 'hidden', background: 'var(--color-border-light)' }}
+    />
   );
 }
