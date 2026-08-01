@@ -43,54 +43,74 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
 
   useEffect(() => {
     if (!scriptLoaded || !mapRef.current || !window.google || !window.google.maps) return;
+    let cancelled = false;
 
-    if (!mapInstanceRef.current) {
-      mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
-        center: effectiveCenter,
-        zoom: effectiveZoom,
-        streetViewControl: false,
-        mapTypeControl: false,
-        fullscreenControl: false,
-        clickableIcons: false,
+    // The script is loaded with `loading=async`, which switches the Maps JS
+    // API to its newer per-library dynamic-import model — `google.maps.Map`
+    // (and Marker/InfoWindow) aren't guaranteed to exist the instant the
+    // script tag's onLoad fires, only after explicitly importing the
+    // libraries that define them. Once imported, the classes are still
+    // available directly off `google.maps` as used below.
+    async function init() {
+      await Promise.all([
+        window.google.maps.importLibrary('maps'),
+        window.google.maps.importLibrary('marker'),
+      ]);
+      if (cancelled || !mapRef.current) return;
+
+      if (!mapInstanceRef.current) {
+        mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
+          center: effectiveCenter,
+          zoom: effectiveZoom,
+          streetViewControl: false,
+          mapTypeControl: false,
+          fullscreenControl: false,
+          clickableIcons: false,
+        });
+      }
+      const map = mapInstanceRef.current;
+
+      // Clear any markers from a previous render (e.g. filters changed the result set).
+      markersRef.current.forEach((marker) => marker.setMap(null));
+      markersRef.current = [];
+
+      const points = listings.filter((l) => l.latitude != null && l.longitude != null);
+
+      if (points.length === 0) {
+        map.setCenter(effectiveCenter);
+        map.setZoom(effectiveZoom);
+        return;
+      }
+
+      const bounds = new window.google.maps.LatLngBounds();
+      points.forEach((listing) => {
+        const position = { lat: listing.latitude, lng: listing.longitude };
+        const marker = new window.google.maps.Marker({ position, map, title: listing.address });
+        const infoWindow = new window.google.maps.InfoWindow({
+          content: `<div style="font-family: 'Jost', sans-serif; font-size: 13px; max-width: 190px;">
+            <a href="/listings/${listing.id}" style="font-weight: 600; color: #1c2b30; text-decoration: none;">
+              ${escapeHtml(formatPrice(listing.price))}
+            </a>
+            <div style="color: #667377; margin-top: 2px;">${escapeHtml(listing.address)}</div>
+          </div>`,
+        });
+        marker.addListener('click', () => infoWindow.open({ anchor: marker, map }));
+        markersRef.current.push(marker);
+        bounds.extend(position);
       });
-    }
-    const map = mapInstanceRef.current;
 
-    // Clear any markers from a previous render (e.g. filters changed the result set).
-    markersRef.current.forEach((marker) => marker.setMap(null));
-    markersRef.current = [];
-
-    const points = listings.filter((l) => l.latitude != null && l.longitude != null);
-
-    if (points.length === 0) {
-      map.setCenter(effectiveCenter);
-      map.setZoom(effectiveZoom);
-      return;
+      if (points.length > 1) {
+        map.fitBounds(bounds);
+      } else {
+        map.setCenter(bounds.getCenter());
+        map.setZoom(15);
+      }
     }
 
-    const bounds = new window.google.maps.LatLngBounds();
-    points.forEach((listing) => {
-      const position = { lat: listing.latitude, lng: listing.longitude };
-      const marker = new window.google.maps.Marker({ position, map, title: listing.address });
-      const infoWindow = new window.google.maps.InfoWindow({
-        content: `<div style="font-family: 'Jost', sans-serif; font-size: 13px; max-width: 190px;">
-          <a href="/listings/${listing.id}" style="font-weight: 600; color: #1c2b30; text-decoration: none;">
-            ${escapeHtml(formatPrice(listing.price))}
-          </a>
-          <div style="color: #667377; margin-top: 2px;">${escapeHtml(listing.address)}</div>
-        </div>`,
-      });
-      marker.addListener('click', () => infoWindow.open({ anchor: marker, map }));
-      markersRef.current.push(marker);
-      bounds.extend(position);
-    });
-
-    if (points.length > 1) {
-      map.fitBounds(bounds);
-    } else {
-      map.setCenter(bounds.getCenter());
-      map.setZoom(15);
-    }
+    init();
+    return () => {
+      cancelled = true;
+    };
   }, [scriptLoaded, effectiveCenter.lat, effectiveCenter.lng, effectiveZoom, listings]);
 
   if (!GOOGLE_MAPS_API_KEY) {
