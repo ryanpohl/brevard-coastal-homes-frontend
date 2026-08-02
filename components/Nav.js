@@ -99,20 +99,23 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
               <DropdownPanel grid={5}>
                 {cities.map((city) => (
                   <div key={city.slug}>
+                    <div style={cityListingsLabelStyle}>{city.name} Listings</div>
                     <Link
                       href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
                       className="hero-search-item"
                       style={cityHomeLinkStyle}
                     >
-                      {city.name} Homes
+                      Homes
                     </Link>
-                    <Link
-                      href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Condo}`}
-                      className="hero-search-item-secondary"
-                      style={gridCondoLinkStyle}
-                    >
-                      (Condos)
-                    </Link>
+                    {city.showCondosInNav !== false && (
+                      <Link
+                        href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Condo}`}
+                        className="hero-search-item-secondary"
+                        style={gridCondoLinkStyle}
+                      >
+                        Condos
+                      </Link>
+                    )}
                   </div>
                 ))}
               </DropdownPanel>
@@ -267,12 +270,19 @@ const gridLinkStyle = {
   borderRadius: 4,
 };
 
-// City dropdown items pair a "<City> Homes" link with a "(Condos)" link
-// stacked beneath it, so the two split the padding gridLinkStyle uses for
-// a single-link cell (top link drops its bottom padding, bottom link
-// drops its top padding) instead of each keeping the full 8px and reading
-// with an oversized gap between them.
-const cityHomeLinkStyle = { ...gridLinkStyle, padding: '8px 10px 0' };
+// City dropdown items show a non-link "<City> Listings" header, followed
+// by "Homes" and "Condos" links stacked beneath it — the three split the
+// padding gridLinkStyle uses for a single-link cell (header keeps its top
+// padding, the two links drop their top/bottom padding in turn) instead
+// of each keeping the full 8px and reading with an oversized gap between
+// them.
+const cityListingsLabelStyle = {
+  padding: '8px 10px 0',
+  fontSize: 13,
+  fontWeight: 700,
+  color: '#fff',
+};
+const cityHomeLinkStyle = { ...gridLinkStyle, padding: '2px 10px 0', fontSize: 12 };
 const gridCondoLinkStyle = {
   display: 'block',
   padding: '2px 10px 8px',
