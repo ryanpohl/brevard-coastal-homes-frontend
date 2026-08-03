@@ -309,13 +309,13 @@ export default function SearchBar({ cities, neighborhoods }) {
                 position: 'absolute',
                 top: '100%',
                 left: 0,
-                right: 0,
                 marginTop: 4,
                 background: '#2b2723',
                 borderRadius: 4,
                 boxShadow: '0 12px 32px rgba(0,0,0,0.32)',
                 padding: '22px 22px 24px',
                 zIndex: 10,
+                width: 'min(320px, 85vw)',
               }}
             >
               <div ref={trackRef} style={{ position: 'relative', height: 4, background: '#6b6a66', borderRadius: 2, margin: '4px 6px 14px' }}>
@@ -369,11 +369,23 @@ export default function SearchBar({ cities, neighborhoods }) {
               <div style={{ display: 'flex', gap: 14 }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#ffffff', marginBottom: 8 }}>MIN</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#1c1a17', border: '1px solid #55524c', borderRadius: 4, padding: '10px 12px' }}>
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center', background: '#1c1a17', border: '1px solid #55524c', borderRadius: 4, padding: '10px 12px' }}>
                     <select
                       value={minIndex}
                       onChange={onMinSelectChange}
-                      style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: '#ffffff', fontFamily: 'var(--font-body)', fontSize: 13, padding: 0 }}
+                      style={{
+                        width: '100%',
+                        background: 'transparent',
+                        border: 'none',
+                        outline: 'none',
+                        color: '#ffffff',
+                        fontFamily: 'var(--font-body)',
+                        fontSize: 13,
+                        padding: '0 16px 0 0',
+                        appearance: 'none',
+                        WebkitAppearance: 'none',
+                        MozAppearance: 'none',
+                      }}
                     >
                       <option value={0} style={{ color: '#1c2b30' }}>
                         No min
@@ -384,15 +396,30 @@ export default function SearchBar({ cities, neighborhoods }) {
                         </option>
                       ))}
                     </select>
+                    <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 10, color: '#b9b6ae', pointerEvents: 'none' }}>
+                      &#9662;
+                    </span>
                   </div>
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#ffffff', marginBottom: 8 }}>MAX</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#1c1a17', border: '1px solid #55524c', borderRadius: 4, padding: '10px 12px' }}>
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center', background: '#1c1a17', border: '1px solid #55524c', borderRadius: 4, padding: '10px 12px' }}>
                     <select
                       value={maxIndex}
                       onChange={onMaxSelectChange}
-                      style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: '#ffffff', fontFamily: 'var(--font-body)', fontSize: 13, padding: 0 }}
+                      style={{
+                        width: '100%',
+                        background: 'transparent',
+                        border: 'none',
+                        outline: 'none',
+                        color: '#ffffff',
+                        fontFamily: 'var(--font-body)',
+                        fontSize: 13,
+                        padding: '0 16px 0 0',
+                        appearance: 'none',
+                        WebkitAppearance: 'none',
+                        MozAppearance: 'none',
+                      }}
                     >
                       {PRICE_STEPS.map((p, i) => (
                         <option key={p.value} value={i} style={{ color: '#1c2b30' }}>
@@ -403,6 +430,9 @@ export default function SearchBar({ cities, neighborhoods }) {
                         No limit
                       </option>
                     </select>
+                    <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 10, color: '#b9b6ae', pointerEvents: 'none' }}>
+                      &#9662;
+                    </span>
                   </div>
                 </div>
               </div>
