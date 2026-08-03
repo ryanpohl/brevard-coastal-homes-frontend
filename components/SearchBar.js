@@ -20,10 +20,15 @@ import { PROPERTY_TYPE_TO_SLUG, BED_OPTIONS, BATH_OPTIONS } from '@/lib/constant
 
 const PRICE_STEPS = buildPriceSteps();
 
+// Step sizing (set 2026-08-03 per Ryan): $100K increments from $100K up to
+// $1M, then $500K increments from $1M up to $4M, then $1M increments from
+// $4M up to the $8M ceiling. Same array backs both the Min and Max
+// selects/slider handles.
 function buildPriceSteps() {
   const values = [];
-  for (let v = 100000; v < 1000000; v += 50000) values.push(v);
-  for (let v = 1000000; v <= 10000000; v += 1000000) values.push(v);
+  for (let v = 100000; v <= 1000000; v += 100000) values.push(v);
+  for (let v = 1500000; v <= 4000000; v += 500000) values.push(v);
+  for (let v = 5000000; v <= 8000000; v += 1000000) values.push(v);
   return values.map((v) => ({
     value: v,
     label: v >= 1000000 ? `$${(v / 1000000).toFixed(v % 1000000 === 0 ? 0 : 1)}M` : `$${(v / 1000).toFixed(0)}K`,
