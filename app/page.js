@@ -99,18 +99,18 @@ export default async function HomePage() {
       </div>
 
       <div style={{ background: 'var(--color-nav-bg)', padding: '0 0 64px' }}>
-        <section className="container">
+        <section className="wide-container">
           <h2 className="section-heading" style={{ color: '#fff' }}>
             Search By Neighborhood
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+          <div className="city-grid">
             {neighborhoods.map((n) => (
               <PlaceCard
                 key={n.slug}
                 name={n.name}
                 thumbnail={n.thumbnail}
                 href={`/neighborhoods/${n.slug}`}
-                sizes="(min-width: 900px) 25vw, (min-width: 600px) 33vw, 50vw"
+                sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 100vw"
               />
             ))}
           </div>
