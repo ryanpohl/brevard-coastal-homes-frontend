@@ -370,7 +370,6 @@ export default function SearchBar({ cities, neighborhoods }) {
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#ffffff', marginBottom: 8 }}>MIN</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#1c1a17', border: '1px solid #55524c', borderRadius: 4, padding: '10px 12px' }}>
-                    <span style={{ fontSize: 13, color: '#b9b6ae' }}>$</span>
                     <select
                       value={minIndex}
                       onChange={onMinSelectChange}
@@ -390,7 +389,6 @@ export default function SearchBar({ cities, neighborhoods }) {
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#ffffff', marginBottom: 8 }}>MAX</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#1c1a17', border: '1px solid #55524c', borderRadius: 4, padding: '10px 12px' }}>
-                    <span style={{ fontSize: 13, color: '#b9b6ae' }}>$</span>
                     <select
                       value={maxIndex}
                       onChange={onMaxSelectChange}
