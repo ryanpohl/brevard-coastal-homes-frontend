@@ -129,7 +129,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           onEnter={() => openNow('neighborhood')}
           panel={
             openMenu === 'neighborhood' && (
-              <DropdownPanel grid={4}>
+              <DropdownPanel grid={5}>
                 {neighborhoods.map((n) => (
                   <Link
                     key={n.slug}
