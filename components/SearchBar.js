@@ -313,9 +313,10 @@ export default function SearchBar({ cities, neighborhoods }) {
                 background: '#2b2723',
                 borderRadius: 4,
                 boxShadow: '0 12px 32px rgba(0,0,0,0.32)',
-                padding: '22px 22px 24px',
+                padding: '22px 20px 24px',
                 zIndex: 10,
-                width: 'min(320px, 85vw)',
+                width: 'min(380px, 92vw)',
+                boxSizing: 'border-box',
               }}
             >
               <div ref={trackRef} style={{ position: 'relative', height: 4, background: '#6b6a66', borderRadius: 2, margin: '4px 6px 14px' }}>
@@ -369,19 +370,20 @@ export default function SearchBar({ cities, neighborhoods }) {
               <div style={{ display: 'flex', gap: 14 }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#ffffff', marginBottom: 8 }}>MIN</div>
-                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center', background: '#1c1a17', border: '1px solid #55524c', borderRadius: 4, padding: '10px 12px' }}>
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center', background: '#1c1a17', border: '1px solid #55524c', borderRadius: 4, padding: '10px 8px', boxSizing: 'border-box' }}>
                     <select
                       value={minIndex}
                       onChange={onMinSelectChange}
                       style={{
                         width: '100%',
+                        boxSizing: 'border-box',
                         background: 'transparent',
                         border: 'none',
                         outline: 'none',
                         color: '#ffffff',
                         fontFamily: 'var(--font-body)',
-                        fontSize: 13,
-                        padding: '0 16px 0 0',
+                        fontSize: 12,
+                        padding: '0 18px 0 0',
                         appearance: 'none',
                         WebkitAppearance: 'none',
                         MozAppearance: 'none',
@@ -396,26 +398,27 @@ export default function SearchBar({ cities, neighborhoods }) {
                         </option>
                       ))}
                     </select>
-                    <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 10, color: '#b9b6ae', pointerEvents: 'none' }}>
+                    <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', fontSize: 10, color: '#b9b6ae', pointerEvents: 'none' }}>
                       &#9662;
                     </span>
                   </div>
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#ffffff', marginBottom: 8 }}>MAX</div>
-                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center', background: '#1c1a17', border: '1px solid #55524c', borderRadius: 4, padding: '10px 12px' }}>
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center', background: '#1c1a17', border: '1px solid #55524c', borderRadius: 4, padding: '10px 8px', boxSizing: 'border-box' }}>
                     <select
                       value={maxIndex}
                       onChange={onMaxSelectChange}
                       style={{
                         width: '100%',
+                        boxSizing: 'border-box',
                         background: 'transparent',
                         border: 'none',
                         outline: 'none',
                         color: '#ffffff',
                         fontFamily: 'var(--font-body)',
-                        fontSize: 13,
-                        padding: '0 16px 0 0',
+                        fontSize: 12,
+                        padding: '0 18px 0 0',
                         appearance: 'none',
                         WebkitAppearance: 'none',
                         MozAppearance: 'none',
@@ -430,7 +433,7 @@ export default function SearchBar({ cities, neighborhoods }) {
                         No limit
                       </option>
                     </select>
-                    <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 10, color: '#b9b6ae', pointerEvents: 'none' }}>
+                    <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', fontSize: 10, color: '#b9b6ae', pointerEvents: 'none' }}>
                       &#9662;
                     </span>
                   </div>
