@@ -122,7 +122,7 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
       <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
         <div className="listing-page-layout">
           <div className="listing-page-map">
-            <ListingMap center={mapCenter} listings={results} height="100%" zoom={15} />
+            <ListingMap center={mapCenter} listings={results} height="100%" zoom={neighborhood.mapZoom || 15} />
           </div>
 
           <div>
