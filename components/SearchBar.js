@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { PROPERTY_TYPE_TO_SLUG, BED_OPTIONS, BATH_OPTIONS } from '@/lib/constants';
+import ScheduleShowingModal from './ScheduleShowingModal';
 
 /**
  * Home page hero search bar. Rebuilt to match the Claude Design mockup's
@@ -51,6 +51,7 @@ const BATH_ITEMS = ['Any Baths', ...BATH_OPTIONS.map((n) => `${n}+`)];
 export default function SearchBar({ cities, neighborhoods }) {
   const router = useRouter();
   const [openMenu, setOpenMenu] = useState(null); // 'location' | 'propertyType' | 'price' | 'beds' | 'baths' | null
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const closeTimer = useRef(null);
 
   const [citySlug, setCitySlug] = useState('');
@@ -534,8 +535,9 @@ export default function SearchBar({ cities, neighborhoods }) {
         >
           Search
         </button>
-        <Link
-          href="/contact"
+        <button
+          type="button"
+          onClick={() => setScheduleModalOpen(true)}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -552,12 +554,13 @@ export default function SearchBar({ cities, neighborhoods }) {
             letterSpacing: 1.2,
             textTransform: 'uppercase',
             color: '#ffffff',
-            textDecoration: 'none',
           }}
         >
           Schedule a Showing
-        </Link>
+        </button>
       </div>
+
+      {scheduleModalOpen && <ScheduleShowingModal onClose={() => setScheduleModalOpen(false)} />}
     </form>
   );
 }
