@@ -36,7 +36,7 @@ export default function PropertyContactPanel({ listingId }) {
         {AGENT_INFO.phone && (
           <div style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 600 }}>Call or Text {AGENT_INFO.phone}</div>
         )}
-        <div style={{ fontSize: 22, letterSpacing: 0.5, marginTop: 4 }}>{AGENT_INFO.name}</div>
+        <div style={{ fontSize: 22, letterSpacing: 0.5, marginTop: 4 }}>{AGENT_INFO.businessName}</div>
         <div style={{ fontSize: 14, marginTop: 12, opacity: 0.9 }}>We are standing by to assist you.</div>
         <div style={{ fontSize: 13, marginTop: 16, opacity: 0.85 }}>
           Want to make an offer or ask a question? Select one the buttons below.
