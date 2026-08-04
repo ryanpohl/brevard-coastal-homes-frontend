@@ -1,5 +1,6 @@
 'use client';
 
+import { createPortal } from 'react-dom';
 import PropertyContactPanel from './PropertyContactPanel';
 
 /**
@@ -12,9 +13,19 @@ import PropertyContactPanel from './PropertyContactPanel';
  * "reach out to us" entry point, not tied to one property (per Ryan,
  * 2026-08-04: keep all three buttons as designed even though "Make an
  * Offer" only really makes sense once a specific listing is picked).
+ *
+ * Rendered via a portal into document.body (2026-08-04, per Ryan — the nav
+ * bar was covering the top of the popup). The hero section in app/page.js
+ * wraps its content (including SearchBar, and therefore this modal) in a
+ * `position: relative; z-index: 5` div, which creates its own stacking
+ * context — so even though .modal-overlay itself has z-index: 100, that
+ * only wins against other elements *inside* that z-index:5 context, not
+ * against the Nav (components/Nav.js, z-index: 30), which is a sibling of
+ * <main> in app/layout.js and lives in a *different* stacking context.
+ * Portaling straight to document.body escapes that nesting entirely.
  */
 export default function ScheduleShowingModal({ onClose }) {
-  return (
+  const modal = (
     <div className="modal-overlay" onClick={onClose}>
       <div
         style={{ position: 'relative', width: 'min(440px, 100%)', maxHeight: '90vh', overflowY: 'auto', borderRadius: 6 }}
@@ -50,4 +61,6 @@ export default function ScheduleShowingModal({ onClose }) {
       </div>
     </div>
   );
+
+  return createPortal(modal, document.body);
 }
