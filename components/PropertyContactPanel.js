@@ -104,7 +104,7 @@ export default function PropertyContactPanel({ listingId }) {
 function RequestShowingForm({ listingId, dateOptions, user }) {
   const [selectedDate, setSelectedDate] = useState(null); // iso string
   const [tourType, setTourType] = useState(null); // 'in_person' | 'virtual'
-  const [form, setForm] = useState({ name: user?.name || '', email: user?.email || '', phone: '', message: '' });
+  const [form, setForm] = useState({ propertyAddress: '', name: user?.name || '', email: user?.email || '', phone: '', message: '' });
   const [status, setStatus] = useState({ submitting: false, error: '', success: '' });
 
   function update(field, value) {
@@ -209,6 +209,12 @@ function RequestShowingForm({ listingId, dateOptions, user }) {
         </label>
       </div>
 
+      <input
+        placeholder="Address of Property"
+        value={form.propertyAddress}
+        onChange={(e) => update('propertyAddress', e.target.value)}
+        style={{ ...inputStyle, marginBottom: 10 }}
+      />
       <input placeholder="Name" required value={form.name} onChange={(e) => update('name', e.target.value)} style={{ ...inputStyle, marginBottom: 10 }} />
       <input
         type="email"
