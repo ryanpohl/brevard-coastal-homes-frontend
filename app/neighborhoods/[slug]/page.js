@@ -108,6 +108,11 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // Condos/Townhomes), Price, and Beds/Baths dropdown options. See
   // lib/constants.js's ARIPEKA_* exports.
   const isAripeka = slug === 'aripeka';
+  // Summer Lakes (per Ryan, 2026-08-05) hides Property Type entirely (like
+  // Adelaide) and reuses Aripeka's Price/Beds/Baths options, since Ryan
+  // specified the identical Under $1M / $1M-$1.5M / Above $1.5M price bands
+  // and 3+ Beds / 2+ Baths starting points for this community too.
+  const isSummerLakes = slug === 'summer-lakes';
 
   const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const rangeEnd = Math.min(page * PAGE_SIZE, total);
@@ -137,11 +142,11 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
 
       <FilterBar
         waterfrontFlags={waterfrontFlags}
-        hidePropertyType={isAdelaide}
+        hidePropertyType={isAdelaide || isSummerLakes}
         propertyTypeOptions={isAripeka ? ARIPEKA_PROPERTY_TYPE_OPTIONS : undefined}
-        priceBands={isAdelaide ? ADELAIDE_PRICE_BANDS : isAripeka ? ARIPEKA_PRICE_BANDS : undefined}
-        bedOptions={isAdelaide ? ADELAIDE_BED_OPTIONS : isAripeka ? ARIPEKA_BED_OPTIONS : undefined}
-        bathOptions={isAdelaide ? ADELAIDE_BATH_OPTIONS : isAripeka ? ARIPEKA_BATH_OPTIONS : undefined}
+        priceBands={isAdelaide ? ADELAIDE_PRICE_BANDS : isAripeka || isSummerLakes ? ARIPEKA_PRICE_BANDS : undefined}
+        bedOptions={isAdelaide ? ADELAIDE_BED_OPTIONS : isAripeka || isSummerLakes ? ARIPEKA_BED_OPTIONS : undefined}
+        bathOptions={isAdelaide ? ADELAIDE_BATH_OPTIONS : isAripeka || isSummerLakes ? ARIPEKA_BATH_OPTIONS : undefined}
       />
 
       <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
