@@ -13,6 +13,7 @@ import {
   HARBOR_ISLAND_BEACH_CLUB_BED_OPTIONS,
   HARBOR_ISLAND_BEACH_CLUB_BATH_OPTIONS,
   VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_NEIGHBORHOOD_OPTIONS,
+  VIERA_BUILDERS_SUB_COMMUNITIES,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -48,11 +49,33 @@ export async function generateMetadata({ params, searchParams }) {
 export default async function NeighborhoodListingsPage({ params, searchParams }) {
   const { slug } = params;
 
+  // Viera Builders Communities Viera West's 6 sub-communities (per Ryan,
+  // 2026-08-05) aren't real rows in the backend's `neighborhoods` table
+  // yet — see lib/constants.js's VIERA_BUILDERS_SUB_COMMUNITIES — so
+  // api.getNeighborhood(slug) would 404 for them. Build a stand-in
+  // neighborhood object instead when the slug matches one of these, so
+  // this same page template renders for them exactly like every real
+  // neighborhood. `city: { slug: 'viera-west' }` reuses that real city's
+  // waterfront filter flags (none) and coordinates (as the map fallback
+  // center, since these don't have their own lat/lng yet).
+  const subCommunity = VIERA_BUILDERS_SUB_COMMUNITIES.find((c) => c.slug === slug);
+
   let neighborhood;
-  try {
-    ({ neighborhood } = await api.getNeighborhood(slug));
-  } catch {
-    notFound();
+  if (subCommunity) {
+    neighborhood = {
+      slug,
+      name: subCommunity.name,
+      city: { slug: 'viera-west' },
+      latitude: null,
+      longitude: null,
+      mapZoom: null,
+    };
+  } else {
+    try {
+      ({ neighborhood } = await api.getNeighborhood(slug));
+    } catch {
+      notFound();
+    }
   }
 
   // The neighborhood object itself doesn't carry waterfront filter flags —
@@ -75,10 +98,15 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
 
   let seo = null;
   let jsonLd = null;
-  try {
-    ({ seo, jsonLd } = await api.getNeighborhoodSeo(slug, primaryType));
-  } catch {
-    // No SEO row yet for this neighborhood/property type — render with fallbacks below.
+  if (!subCommunity) {
+    // Skipped for the 6 synthetic sub-community pages above — there's no
+    // backend SEO row for them (they don't exist as real neighborhoods),
+    // so this would just be a guaranteed-to-fail request every time.
+    try {
+      ({ seo, jsonLd } = await api.getNeighborhoodSeo(slug, primaryType));
+    } catch {
+      // No SEO row yet for this neighborhood/property type — render with fallbacks below.
+    }
   }
 
   const page = Number(searchParams.page) || 1;
@@ -169,7 +197,9 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
     ? HARBOR_ISLAND_BEACH_CLUB_H1
     : isVieraBuildersCommunitiesVieraWest
       ? VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_H1
-      : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
+      : subCommunity?.comingSoon
+        ? `Homes for Sale in ${neighborhood.name}, FL (Coming Soon)`
+        : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
   // Bold sans-serif H1 styling (per Ryan, 2026-08-05) — originally added for
   // Harbor Island Beach Club, now shared by Viera Builders Communities
   // Viera West per Ryan's follow-up request to match that same style. Every
