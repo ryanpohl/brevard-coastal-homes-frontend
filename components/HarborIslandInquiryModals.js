@@ -99,10 +99,20 @@ export default function HarborIslandInquiryModals() {
 
   return (
     <>
-      <button type="button" className="btn btn-maroon" onClick={() => openModal('foreclosures')}>
+      <button
+        type="button"
+        className="btn btn-maroon"
+        onClick={() => openModal('foreclosures')}
+        style={{ maxWidth: 190, whiteSpace: 'normal', textAlign: 'center', lineHeight: 1.3, padding: '10px 16px' }}
+      >
         Contact Us Here about Foreclosures in Harbor Island
       </button>
-      <button type="button" className="btn btn-gold" onClick={() => openModal('propertyManagement')}>
+      <button
+        type="button"
+        className="btn btn-gold"
+        onClick={() => openModal('propertyManagement')}
+        style={{ maxWidth: 190, whiteSpace: 'normal', textAlign: 'center', lineHeight: 1.3, padding: '10px 16px' }}
+      >
         Request Information on Property Management
       </button>
 
