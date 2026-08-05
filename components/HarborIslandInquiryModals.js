@@ -103,7 +103,7 @@ export default function HarborIslandInquiryModals() {
         type="button"
         className="btn btn-maroon"
         onClick={() => openModal('foreclosures')}
-        style={{ maxWidth: 260, whiteSpace: 'normal', textAlign: 'center', lineHeight: 1.25, padding: '8px 20px' }}
+        style={{ maxWidth: 320, whiteSpace: 'normal', textAlign: 'center', lineHeight: 1.25, padding: '8px 20px' }}
       >
         Contact Us Here about Foreclosures in Harbor Island
       </button>
@@ -111,7 +111,7 @@ export default function HarborIslandInquiryModals() {
         type="button"
         className="btn btn-gold"
         onClick={() => openModal('propertyManagement')}
-        style={{ maxWidth: 260, whiteSpace: 'normal', textAlign: 'center', lineHeight: 1.25, padding: '8px 20px' }}
+        style={{ maxWidth: 320, whiteSpace: 'normal', textAlign: 'center', lineHeight: 1.25, padding: '8px 20px' }}
       >
         Request Information on Property Management
       </button>
