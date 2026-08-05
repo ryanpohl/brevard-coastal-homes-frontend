@@ -23,6 +23,7 @@ export default function FilterBar({
   bathOptions,
   excludeWaterfrontOptions,
   hideWaterfront,
+  extraActions,
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -189,15 +190,24 @@ export default function FilterBar({
         ))}
       </FilterTrigger>
 
-      {/* General "ask about this area" versions of the Property Detail page's
-          Schedule a Showing / Ask a Question modals — no listingId, since no
-          one listing is selected here (see InquiryModals.js and the
-          backend's now-optional listingId on these two inquiry types). */}
-      <InquiryModals
-        containerStyle={{ display: 'flex', gap: 10, marginLeft: 'auto' }}
-        scheduleClassName="btn btn-success"
-        questionClassName="btn btn-maroon"
-      />
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginLeft: 'auto' }}>
+        {/* General "ask about this area" versions of the Property Detail
+            page's Schedule a Showing / Ask a Question modals — no
+            listingId, since no one listing is selected here (see
+            InquiryModals.js and the backend's now-optional listingId on
+            these two inquiry types). */}
+        <InquiryModals
+          containerStyle={{ display: 'flex', gap: 10 }}
+          scheduleClassName="btn btn-success"
+          questionClassName="btn btn-maroon"
+        />
+
+        {/* Optional page-specific extra CTA buttons/modals, e.g. Harbor
+            Island Beach Club's Foreclosures/Property Management buttons
+            (see app/neighborhoods/[slug]/page.js). Rendered in the same
+            right-aligned button group as Schedule a Showing/Ask a Question. */}
+        {extraActions}
+      </div>
     </div>
   );
 }
