@@ -190,7 +190,23 @@ export default function FilterBar({
         ))}
       </FilterTrigger>
 
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginLeft: 'auto' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 10,
+          flexWrap: 'wrap',
+          // Right-aligned (pinned to the far edge when it wraps to its own
+          // line) on every page that has no extraActions — the original
+          // Schedule a Showing/Ask a Question CTA placement. Pages that DO
+          // pass extraActions (currently just Harbor Island Beach Club,
+          // per Ryan 2026-08-05) instead get the whole button group
+          // left-aligned, starting under Property Type on its own full-
+          // width line, since a longer 4-button row reads better flush
+          // left than pinned to the right edge.
+          marginLeft: extraActions ? 0 : 'auto',
+          width: extraActions ? '100%' : undefined,
+        }}
+      >
         {/* General "ask about this area" versions of the Property Detail
             page's Schedule a Showing / Ask a Question modals — no
             listingId, since no one listing is selected here (see
@@ -205,7 +221,7 @@ export default function FilterBar({
         {/* Optional page-specific extra CTA buttons/modals, e.g. Harbor
             Island Beach Club's Foreclosures/Property Management buttons
             (see app/neighborhoods/[slug]/page.js). Rendered in the same
-            right-aligned button group as Schedule a Showing/Ask a Question. */}
+            button group as Schedule a Showing/Ask a Question. */}
         {extraActions}
       </div>
     </div>
