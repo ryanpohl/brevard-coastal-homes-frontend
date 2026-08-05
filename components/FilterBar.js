@@ -12,7 +12,7 @@ import InquiryModals from './InquiryModals';
  * Filters are pushed to the URL query string, so the server component that
  * renders this page re-fetches filtered results on navigation.
  */
-export default function FilterBar({ waterfrontFlags, showZoning }) {
+export default function FilterBar({ waterfrontFlags, showZoning, hidePropertyType, priceBands }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -65,6 +65,8 @@ export default function FilterBar({ waterfrontFlags, showZoning }) {
     waterfrontFlags?.riverfront && 'Riverfront',
   ].filter(Boolean);
 
+  const effectivePriceBands = priceBands || PRICE_BANDS;
+
   return (
     <div
       className="container"
@@ -72,27 +74,29 @@ export default function FilterBar({ waterfrontFlags, showZoning }) {
       onMouseLeave={scheduleClose}
       onMouseEnter={cancelClose}
     >
-      <FilterTrigger
-        label={currentPropertyTypes.length ? currentPropertyTypes.join(', ') : 'Property Type'}
-        active={openMenu === 'propertyType'}
-        onEnter={() => openNow('propertyType')}
-      >
-        {['Home', 'Condo', 'Land'].map((pt) => (
-          <Checkbox
-            key={pt}
-            label={pt === 'Home' ? 'Single-Family Homes' : pt === 'Condo' ? 'Condos/Townhomes' : 'Land'}
-            checked={currentPropertyTypes.includes(pt)}
-            onChange={() => toggleMultiValue('propertyType', pt)}
-          />
-        ))}
-      </FilterTrigger>
+      {!hidePropertyType && (
+        <FilterTrigger
+          label={currentPropertyTypes.length ? currentPropertyTypes.join(', ') : 'Property Type'}
+          active={openMenu === 'propertyType'}
+          onEnter={() => openNow('propertyType')}
+        >
+          {['Home', 'Condo', 'Land'].map((pt) => (
+            <Checkbox
+              key={pt}
+              label={pt === 'Home' ? 'Single-Family Homes' : pt === 'Condo' ? 'Condos/Townhomes' : 'Land'}
+              checked={currentPropertyTypes.includes(pt)}
+              onChange={() => toggleMultiValue('propertyType', pt)}
+            />
+          ))}
+        </FilterTrigger>
+      )}
 
       <FilterTrigger
         label={currentPriceMin || currentPriceMax ? 'Price' : 'Price'}
         active={openMenu === 'price'}
         onEnter={() => openNow('price')}
       >
-        {PRICE_BANDS.map((band) => (
+        {effectivePriceBands.map((band) => (
           <button
             key={band.label}
             type="button"
