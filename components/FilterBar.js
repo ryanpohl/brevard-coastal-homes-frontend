@@ -12,7 +12,7 @@ import InquiryModals from './InquiryModals';
  * Filters are pushed to the URL query string, so the server component that
  * renders this page re-fetches filtered results on navigation.
  */
-export default function FilterBar({ waterfrontFlags, showZoning, hidePropertyType, priceBands }) {
+export default function FilterBar({ waterfrontFlags, showZoning, hidePropertyType, priceBands, bedOptions, bathOptions }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -66,6 +66,8 @@ export default function FilterBar({ waterfrontFlags, showZoning, hidePropertyTyp
   ].filter(Boolean);
 
   const effectivePriceBands = priceBands || PRICE_BANDS;
+  const effectiveBedOptions = bedOptions || BED_OPTIONS;
+  const effectiveBathOptions = bathOptions || BATH_OPTIONS;
 
   return (
     <div
@@ -110,7 +112,7 @@ export default function FilterBar({ waterfrontFlags, showZoning, hidePropertyTyp
       </FilterTrigger>
 
       <FilterTrigger label={currentBeds ? `${currentBeds}+ Beds` : 'Beds'} active={openMenu === 'beds'} onEnter={() => openNow('beds')}>
-        {BED_OPTIONS.map((n) => (
+        {effectiveBedOptions.map((n) => (
           <button
             key={n}
             type="button"
@@ -124,7 +126,7 @@ export default function FilterBar({ waterfrontFlags, showZoning, hidePropertyTyp
       </FilterTrigger>
 
       <FilterTrigger label={currentBaths ? `${currentBaths}+ Baths` : 'Baths'} active={openMenu === 'baths'} onEnter={() => openNow('baths')}>
-        {BATH_OPTIONS.map((n) => (
+        {effectiveBathOptions.map((n) => (
           <button
             key={n}
             type="button"
