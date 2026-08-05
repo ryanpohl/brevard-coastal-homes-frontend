@@ -200,6 +200,12 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // (they cover Melbourne's other neighborhoods), but Suntree itself is an
   // inland community along Wickham Rd — see CLAUDE.md's "Suntree" note.
   const isSuntree = slug === 'suntree';
+  // South Merritt Island (per Ryan, 2026-08-05): drops Condos/Townhomes
+  // from Property Type — reuses Aripeka's Home/Land-only list (same
+  // ARIPEKA_PROPERTY_TYPE_OPTIONS constant; South Merritt Island doesn't
+  // get its own dedicated constant since the values are identical). Every
+  // other filter on this page (Price/Beds/Baths/Waterfront) is unaffected.
+  const isSouthMerrittIsland = slug === 'south-merritt-island';
   // Harbor Island Beach Club (per Ryan, 2026-08-05): drops Land from
   // Property Type (keeps Home/Condo — its own HARBOR_ISLAND_BEACH_CLUB_*
   // options, not reused from Aripeka since Aripeka drops Condo instead),
@@ -291,7 +297,7 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
         waterfrontFlags={waterfrontFlags}
         hidePropertyType={isAdelaide || isSummerLakes}
         propertyTypeOptions={
-          isAripeka || isLansingIsland || isTortoiseIsland
+          isAripeka || isLansingIsland || isTortoiseIsland || isSouthMerrittIsland
             ? ARIPEKA_PROPERTY_TYPE_OPTIONS
             : isHarborIslandBeachClub
               ? HARBOR_ISLAND_BEACH_CLUB_PROPERTY_TYPE_OPTIONS
