@@ -113,6 +113,14 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // specified the identical Under $1M / $1M-$1.5M / Above $1.5M price bands
   // and 3+ Beds / 2+ Baths starting points for this community too.
   const isSummerLakes = slug === 'summer-lakes';
+  // Lansing Island (per Ryan, 2026-08-05): drops Condos/Townhomes from
+  // Property Type (reuses Aripeka's Home/Land-only list), hides the Price
+  // dropdown entirely, reuses Aripeka's 3+ Beds / 2+ Baths starting points,
+  // and drops Oceanfront from Waterfront — its parent city (Indian Harbour
+  // Beach) has both oceanfront and riverfront flags set, so without this
+  // override Waterfront would show both; Lansing Island itself only faces
+  // the Indian River, not the ocean.
+  const isLansingIsland = slug === 'lansing-island';
 
   const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const rangeEnd = Math.min(page * PAGE_SIZE, total);
@@ -143,10 +151,12 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
       <FilterBar
         waterfrontFlags={waterfrontFlags}
         hidePropertyType={isAdelaide || isSummerLakes}
-        propertyTypeOptions={isAripeka ? ARIPEKA_PROPERTY_TYPE_OPTIONS : undefined}
+        propertyTypeOptions={isAripeka || isLansingIsland ? ARIPEKA_PROPERTY_TYPE_OPTIONS : undefined}
+        hidePrice={isLansingIsland}
         priceBands={isAdelaide ? ADELAIDE_PRICE_BANDS : isAripeka || isSummerLakes ? ARIPEKA_PRICE_BANDS : undefined}
-        bedOptions={isAdelaide ? ADELAIDE_BED_OPTIONS : isAripeka || isSummerLakes ? ARIPEKA_BED_OPTIONS : undefined}
-        bathOptions={isAdelaide ? ADELAIDE_BATH_OPTIONS : isAripeka || isSummerLakes ? ARIPEKA_BATH_OPTIONS : undefined}
+        bedOptions={isAdelaide ? ADELAIDE_BED_OPTIONS : isAripeka || isSummerLakes || isLansingIsland ? ARIPEKA_BED_OPTIONS : undefined}
+        bathOptions={isAdelaide ? ADELAIDE_BATH_OPTIONS : isAripeka || isSummerLakes || isLansingIsland ? ARIPEKA_BATH_OPTIONS : undefined}
+        excludeWaterfrontOptions={isLansingIsland ? ['Oceanfront'] : undefined}
       />
 
       <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
