@@ -59,6 +59,10 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // waterfront filter flags (none) and coordinates (as the map fallback
   // center, since these don't have their own lat/lng yet).
   const subCommunity = VIERA_BUILDERS_SUB_COMMUNITIES.find((c) => c.slug === slug);
+  // Needed ahead of the listings fetch below too — see its subdivision/
+  // neighborhood param logic. Declared once here; reused later for the H1/
+  // FilterBar wiring instead of being recomputed.
+  const isVieraBuildersCommunitiesVieraWest = slug === 'viera-builders-communities-viera-west';
 
   let neighborhood;
   if (subCommunity) {
@@ -111,24 +115,43 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
 
   const page = Number(searchParams.page) || 1;
 
+  // Which of `neighborhood`/`subdivision` filters listings depends on the
+  // page (per Ryan, 2026-08-05, once the backend gained a real
+  // listings.subdivision column — see backend/src/db/schema.sql):
+  //  - Every normal neighborhood page: `neighborhood: slug`, matched against
+  //    the backend's neighborhoods table via neighborhood_id — unchanged.
+  //  - The 6 synthetic sub-community pages (subCommunity, e.g. Pangea Park):
+  //    these aren't real neighborhoods rows, so filter by `subdivision`
+  //    instead, matching the MLS feed's SubdivisionName text for that one
+  //    community exactly.
+  //  - Viera Builders Communities Viera West itself: its own slug isn't
+  //    expected to appear as a real listing's neighborhood_id or
+  //    SubdivisionName (real MLS listings here are individually tagged
+  //    with one of the 6 sub-community names, not this wrapper's) — so it
+  //    filters by `subdivision` too, defaulting to the union of all 6
+  //    community names (i.e. "show listings from any of them") unless the
+  //    visitor has narrowed it via the page's own "Neighborhood" FilterBar
+  //    dropdown, which sets the same `subdivision` URL param to a specific
+  //    subset. This is a best-guess pending the real feed being connected
+  //    next week — verify against it then per schema.sql's comment.
+  const listingsFilterParams = subCommunity
+    ? { subdivision: subCommunity.name }
+    : isVieraBuildersCommunitiesVieraWest
+      ? { subdivision: searchParams.subdivision || VIERA_BUILDERS_SUB_COMMUNITIES.map((c) => c.name).join(',') }
+      : { neighborhood: slug };
+
   let results = [];
   let total = 0;
   let totalPages = 1;
   try {
     const data = await api.getListings({
-      neighborhood: slug,
+      ...listingsFilterParams,
       propertyType: searchParams.propertyType ? searchParams.propertyType.split(',') : undefined,
       priceMin: searchParams.priceMin,
       priceMax: searchParams.priceMax,
       beds: searchParams.beds,
       baths: searchParams.baths,
       waterfront: searchParams.waterfront,
-      // Passed through for Viera Builders Communities Viera West's new
-      // Neighborhood dropdown (see below) — the backend doesn't have a
-      // sub-community column to match this against yet, so it's currently
-      // ignored server-side rather than actually filtering results; see
-      // lib/constants.js's VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_* comment.
-      subdivision: searchParams.subdivision,
       sort: searchParams.sort,
       page,
       pageSize: PAGE_SIZE,
@@ -190,7 +213,9 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_NEIGHBORHOOD_OPTIONS — plus a
   // custom H1 (exact text from Ryan's reference screenshot) styled with the
   // same bold sans-serif look as Harbor Island Beach Club's H1 below.
-  const isVieraBuildersCommunitiesVieraWest = slug === 'viera-builders-communities-viera-west';
+  // (isVieraBuildersCommunitiesVieraWest itself is declared earlier, above
+  // the listings fetch, since that fetch's subdivision/neighborhood param
+  // choice needs it too.)
   const VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_H1 =
     'Viera Builders Communities located in Viera West, FL Real Estate & Homes for Sale include the following neighborhoods (Pangea Park, Laurasia, Reeling Park, Farallon Fields, Atlin Cove, & Crossmolina)';
   const h1Text = isHarborIslandBeachClub
