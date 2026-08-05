@@ -168,7 +168,25 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
       {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
 
       <div className="container" style={{ padding: '32px clamp(16px, 4vw, 56px) 0' }}>
-        <h1 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', marginBottom: 8 }}>{h1Text}</h1>
+        <h1
+          style={{
+            fontSize: 'clamp(26px, 3.5vw, 38px)',
+            marginBottom: 8,
+            // Harbor Island Beach Club (per Ryan, 2026-08-05) gets a bold
+            // sans-serif H1 matching his "The Hamptons Luxury Homes"
+            // reference image, instead of the site-wide serif Playfair
+            // Display heading style — scoped to this one page only via
+            // isHarborIslandBeachClub; every other neighborhood/city page's
+            // H1 is unaffected. Uses the site's existing Jost body font
+            // (now loaded with 700/800 weights too, see globals.css) rather
+            // than introducing a third typeface.
+            ...(isHarborIslandBeachClub
+              ? { fontFamily: 'var(--font-body)', fontWeight: 800 }
+              : {}),
+          }}
+        >
+          {h1Text}
+        </h1>
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
