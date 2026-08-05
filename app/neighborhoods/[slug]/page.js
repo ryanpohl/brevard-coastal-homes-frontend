@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import * as api from '@/lib/api';
+import { ADELAIDE_PRICE_BANDS } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import ListingCard from '@/components/ListingCard';
 import ListingMap from '@/components/ListingMap';
@@ -117,7 +118,11 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
         )}
       </div>
 
-      <FilterBar waterfrontFlags={waterfrontFlags} />
+      <FilterBar
+        waterfrontFlags={waterfrontFlags}
+        hidePropertyType={slug === 'adelaide'}
+        priceBands={slug === 'adelaide' ? ADELAIDE_PRICE_BANDS : undefined}
+      />
 
       <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
         <div className="listing-page-layout">
