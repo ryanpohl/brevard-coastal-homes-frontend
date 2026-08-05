@@ -107,7 +107,14 @@ export default function FilterBar({
           {neighborhoodOptions.map((name) => (
             <Checkbox
               key={name}
-              label={name}
+              // Atlin Cove has no data yet (per Ryan, 2026-08-05, same
+              // "(Coming Soon)" treatment as its entry in the "Communities"
+              // nav dropdown — see lib/constants.js's
+              // VIERA_BUILDERS_SUB_COMMUNITIES comingSoon flag). Only the
+              // displayed label changes; the checkbox's value/URL param
+              // stays the plain name so it still matches the backend's
+              // subdivision filter correctly if a visitor checks it anyway.
+              label={name === 'Atlin Cove' ? `${name} (Coming Soon)` : name}
               checked={currentSubdivisions.includes(name)}
               onChange={() => toggleMultiValue('subdivision', name)}
             />
