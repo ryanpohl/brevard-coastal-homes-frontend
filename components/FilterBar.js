@@ -17,9 +17,11 @@ export default function FilterBar({
   showZoning,
   hidePropertyType,
   propertyTypeOptions,
+  hidePrice,
   priceBands,
   bedOptions,
   bathOptions,
+  excludeWaterfrontOptions,
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -71,7 +73,7 @@ export default function FilterBar({
   const waterfrontOptions = [
     waterfrontFlags?.oceanfront && 'Oceanfront',
     waterfrontFlags?.riverfront && 'Riverfront',
-  ].filter(Boolean);
+  ].filter(Boolean).filter((opt) => !excludeWaterfrontOptions?.includes(opt));
 
   const effectivePriceBands = priceBands || PRICE_BANDS;
   const effectiveBedOptions = bedOptions || BED_OPTIONS;
@@ -102,23 +104,25 @@ export default function FilterBar({
         </FilterTrigger>
       )}
 
-      <FilterTrigger
-        label={currentPriceMin || currentPriceMax ? 'Price' : 'Price'}
-        active={openMenu === 'price'}
-        onEnter={() => openNow('price')}
-      >
-        {effectivePriceBands.map((band) => (
-          <button
-            key={band.label}
-            type="button"
-            className="btn btn-outline"
-            style={{ width: '100%', marginBottom: 6, justifyContent: 'flex-start' }}
-            onClick={() => updateParams({ priceMin: band.priceMin, priceMax: band.priceMax })}
-          >
-            {band.label}
-          </button>
-        ))}
-      </FilterTrigger>
+      {!hidePrice && (
+        <FilterTrigger
+          label={currentPriceMin || currentPriceMax ? 'Price' : 'Price'}
+          active={openMenu === 'price'}
+          onEnter={() => openNow('price')}
+        >
+          {effectivePriceBands.map((band) => (
+            <button
+              key={band.label}
+              type="button"
+              className="btn btn-outline"
+              style={{ width: '100%', marginBottom: 6, justifyContent: 'flex-start' }}
+              onClick={() => updateParams({ priceMin: band.priceMin, priceMax: band.priceMax })}
+            >
+              {band.label}
+            </button>
+          ))}
+        </FilterTrigger>
+      )}
 
       <FilterTrigger label={currentBeds ? `${currentBeds}+ Beds` : 'Beds'} active={openMenu === 'beds'} onEnter={() => openNow('beds')}>
         {effectiveBedOptions.map((n) => (
