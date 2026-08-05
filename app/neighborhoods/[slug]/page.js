@@ -14,6 +14,7 @@ import {
   HARBOR_ISLAND_BEACH_CLUB_BATH_OPTIONS,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
+import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import ListingCard from '@/components/ListingCard';
 import ListingMap from '@/components/ListingMap';
 import Pagination from '@/components/Pagination';
@@ -141,6 +142,16 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // Waterfront dropdown entirely via the new hideWaterfront prop — unlike
   // Lansing Island/Tortoise Island, which only exclude Oceanfront.
   const isHarborIslandBeachClub = slug === 'harbor-island-beach-club';
+  // Harbor Island Beach Club also gets a custom H1 (per Ryan, 2026-08-05,
+  // matching his reference screenshot exactly) instead of the backend SEO
+  // h1/generic fallback used by every other neighborhood page, plus two
+  // extra CTA buttons — see HarborIslandInquiryModals.js, rendered via
+  // FilterBar's extraActions prop.
+  const HARBOR_ISLAND_BEACH_CLUB_H1 =
+    'Harbor Island Beach Club, Melbourne Beach FL Homes & Condos for sale. Contact us about current foreclosures & off-market properties currently available in Harbor Island.';
+  const h1Text = isHarborIslandBeachClub
+    ? HARBOR_ISLAND_BEACH_CLUB_H1
+    : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
 
   const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const rangeEnd = Math.min(page * PAGE_SIZE, total);
@@ -157,9 +168,7 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
       {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
 
       <div className="container" style={{ padding: '32px clamp(16px, 4vw, 56px) 0' }}>
-        <h1 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', marginBottom: 8 }}>
-          {seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`}
-        </h1>
+        <h1 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', marginBottom: 8 }}>{h1Text}</h1>
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
@@ -208,6 +217,7 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
         }
         excludeWaterfrontOptions={isLansingIsland || isTortoiseIsland ? ['Oceanfront'] : undefined}
         hideWaterfront={isHarborIslandBeachClub}
+        extraActions={isHarborIslandBeachClub ? <HarborIslandInquiryModals /> : undefined}
       />
 
       <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
