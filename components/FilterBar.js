@@ -12,7 +12,15 @@ import InquiryModals from './InquiryModals';
  * Filters are pushed to the URL query string, so the server component that
  * renders this page re-fetches filtered results on navigation.
  */
-export default function FilterBar({ waterfrontFlags, showZoning, hidePropertyType, priceBands, bedOptions, bathOptions }) {
+export default function FilterBar({
+  waterfrontFlags,
+  showZoning,
+  hidePropertyType,
+  propertyTypeOptions,
+  priceBands,
+  bedOptions,
+  bathOptions,
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -68,6 +76,7 @@ export default function FilterBar({ waterfrontFlags, showZoning, hidePropertyTyp
   const effectivePriceBands = priceBands || PRICE_BANDS;
   const effectiveBedOptions = bedOptions || BED_OPTIONS;
   const effectiveBathOptions = bathOptions || BATH_OPTIONS;
+  const effectivePropertyTypes = propertyTypeOptions || ['Home', 'Condo', 'Land'];
 
   return (
     <div
@@ -82,7 +91,7 @@ export default function FilterBar({ waterfrontFlags, showZoning, hidePropertyTyp
           active={openMenu === 'propertyType'}
           onEnter={() => openNow('propertyType')}
         >
-          {['Home', 'Condo', 'Land'].map((pt) => (
+          {effectivePropertyTypes.map((pt) => (
             <Checkbox
               key={pt}
               label={pt === 'Home' ? 'Single-Family Homes' : pt === 'Condo' ? 'Condos/Townhomes' : 'Land'}
