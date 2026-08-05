@@ -22,6 +22,7 @@ export default function FilterBar({
   bedOptions,
   bathOptions,
   excludeWaterfrontOptions,
+  hideWaterfront,
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -152,7 +153,7 @@ export default function FilterBar({
         ))}
       </FilterTrigger>
 
-      {waterfrontOptions.length > 0 && (
+      {!hideWaterfront && waterfrontOptions.length > 0 && (
         <FilterTrigger
           label={currentWaterfront.length ? currentWaterfront.join(', ') : 'Waterfront'}
           active={openMenu === 'waterfront'}
