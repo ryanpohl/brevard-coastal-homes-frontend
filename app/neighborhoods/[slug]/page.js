@@ -16,6 +16,7 @@ import {
   VIERA_BUILDERS_SUB_COMMUNITIES,
   VIERA_BUILDERS_PRICE_BANDS,
   VIERA_BUILDERS_PROPERTY_TYPE_OPTIONS,
+  SOUTH_MERRITT_ISLAND_PRICE_BANDS,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -315,7 +316,9 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
                 ? HARBOR_ISLAND_BEACH_CLUB_PRICE_BANDS
                 : isVieraBuilders
                   ? VIERA_BUILDERS_PRICE_BANDS
-                  : undefined
+                  : isSouthMerrittIsland
+                    ? SOUTH_MERRITT_ISLAND_PRICE_BANDS
+                    : undefined
         }
         bedOptions={
           isAdelaide
