@@ -8,6 +8,10 @@ import {
   ARIPEKA_PRICE_BANDS,
   ARIPEKA_BED_OPTIONS,
   ARIPEKA_BATH_OPTIONS,
+  HARBOR_ISLAND_BEACH_CLUB_PROPERTY_TYPE_OPTIONS,
+  HARBOR_ISLAND_BEACH_CLUB_PRICE_BANDS,
+  HARBOR_ISLAND_BEACH_CLUB_BED_OPTIONS,
+  HARBOR_ISLAND_BEACH_CLUB_BATH_OPTIONS,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import ListingCard from '@/components/ListingCard';
@@ -129,6 +133,14 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // riverfront flags set, so without this override Waterfront would show
   // both.
   const isTortoiseIsland = slug === 'tortoise-island';
+  // Harbor Island Beach Club (per Ryan, 2026-08-05): drops Land from
+  // Property Type (keeps Home/Condo — its own HARBOR_ISLAND_BEACH_CLUB_*
+  // options, not reused from Aripeka since Aripeka drops Condo instead),
+  // uses its own price bands, drops 1+/2+ from BOTH Beds and Baths (Baths
+  // starts at 3+ here, not 2+ like Aripeka/Adelaide), and hides the
+  // Waterfront dropdown entirely via the new hideWaterfront prop — unlike
+  // Lansing Island/Tortoise Island, which only exclude Oceanfront.
+  const isHarborIslandBeachClub = slug === 'harbor-island-beach-club';
 
   const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const rangeEnd = Math.min(page * PAGE_SIZE, total);
@@ -159,12 +171,43 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
       <FilterBar
         waterfrontFlags={waterfrontFlags}
         hidePropertyType={isAdelaide || isSummerLakes}
-        propertyTypeOptions={isAripeka || isLansingIsland || isTortoiseIsland ? ARIPEKA_PROPERTY_TYPE_OPTIONS : undefined}
+        propertyTypeOptions={
+          isAripeka || isLansingIsland || isTortoiseIsland
+            ? ARIPEKA_PROPERTY_TYPE_OPTIONS
+            : isHarborIslandBeachClub
+              ? HARBOR_ISLAND_BEACH_CLUB_PROPERTY_TYPE_OPTIONS
+              : undefined
+        }
         hidePrice={isLansingIsland || isTortoiseIsland}
-        priceBands={isAdelaide ? ADELAIDE_PRICE_BANDS : isAripeka || isSummerLakes ? ARIPEKA_PRICE_BANDS : undefined}
-        bedOptions={isAdelaide ? ADELAIDE_BED_OPTIONS : isAripeka || isSummerLakes || isLansingIsland || isTortoiseIsland ? ARIPEKA_BED_OPTIONS : undefined}
-        bathOptions={isAdelaide ? ADELAIDE_BATH_OPTIONS : isAripeka || isSummerLakes || isLansingIsland || isTortoiseIsland ? ARIPEKA_BATH_OPTIONS : undefined}
+        priceBands={
+          isAdelaide
+            ? ADELAIDE_PRICE_BANDS
+            : isAripeka || isSummerLakes
+              ? ARIPEKA_PRICE_BANDS
+              : isHarborIslandBeachClub
+                ? HARBOR_ISLAND_BEACH_CLUB_PRICE_BANDS
+                : undefined
+        }
+        bedOptions={
+          isAdelaide
+            ? ADELAIDE_BED_OPTIONS
+            : isAripeka || isSummerLakes || isLansingIsland || isTortoiseIsland
+              ? ARIPEKA_BED_OPTIONS
+              : isHarborIslandBeachClub
+                ? HARBOR_ISLAND_BEACH_CLUB_BED_OPTIONS
+                : undefined
+        }
+        bathOptions={
+          isAdelaide
+            ? ADELAIDE_BATH_OPTIONS
+            : isAripeka || isSummerLakes || isLansingIsland || isTortoiseIsland
+              ? ARIPEKA_BATH_OPTIONS
+              : isHarborIslandBeachClub
+                ? HARBOR_ISLAND_BEACH_CLUB_BATH_OPTIONS
+                : undefined
+        }
         excludeWaterfrontOptions={isLansingIsland || isTortoiseIsland ? ['Oceanfront'] : undefined}
+        hideWaterfront={isHarborIslandBeachClub}
       />
 
       <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
