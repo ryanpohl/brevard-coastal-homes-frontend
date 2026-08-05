@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import * as api from '@/lib/api';
-import { ADELAIDE_PRICE_BANDS } from '@/lib/constants';
+import { ADELAIDE_PRICE_BANDS, ADELAIDE_BED_OPTIONS, ADELAIDE_BATH_OPTIONS } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import ListingCard from '@/components/ListingCard';
 import ListingMap from '@/components/ListingMap';
@@ -92,6 +92,11 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
     // Backend unreachable or no matches — render an empty grid rather than crashing.
   }
 
+  // Adelaide (per Ryan, 2026-08-05) gets its own Price/Beds/Baths dropdown
+  // options — a higher-end community than the site-wide defaults fit — and
+  // hides Property Type entirely. See lib/constants.js's ADELAIDE_* exports.
+  const isAdelaide = slug === 'adelaide';
+
   const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const rangeEnd = Math.min(page * PAGE_SIZE, total);
 
@@ -120,8 +125,10 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
 
       <FilterBar
         waterfrontFlags={waterfrontFlags}
-        hidePropertyType={slug === 'adelaide'}
-        priceBands={slug === 'adelaide' ? ADELAIDE_PRICE_BANDS : undefined}
+        hidePropertyType={isAdelaide}
+        priceBands={isAdelaide ? ADELAIDE_PRICE_BANDS : undefined}
+        bedOptions={isAdelaide ? ADELAIDE_BED_OPTIONS : undefined}
+        bathOptions={isAdelaide ? ADELAIDE_BATH_OPTIONS : undefined}
       />
 
       <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
