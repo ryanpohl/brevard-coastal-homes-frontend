@@ -12,6 +12,7 @@ import {
   HARBOR_ISLAND_BEACH_CLUB_PRICE_BANDS,
   HARBOR_ISLAND_BEACH_CLUB_BED_OPTIONS,
   HARBOR_ISLAND_BEACH_CLUB_BATH_OPTIONS,
+  VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_NEIGHBORHOOD_OPTIONS,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -94,6 +95,12 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
       beds: searchParams.beds,
       baths: searchParams.baths,
       waterfront: searchParams.waterfront,
+      // Passed through for Viera Builders Communities Viera West's new
+      // Neighborhood dropdown (see below) — the backend doesn't have a
+      // sub-community column to match this against yet, so it's currently
+      // ignored server-side rather than actually filtering results; see
+      // lib/constants.js's VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_* comment.
+      subdivision: searchParams.subdivision,
       sort: searchParams.sort,
       page,
       pageSize: PAGE_SIZE,
@@ -149,9 +156,26 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // FilterBar's extraActions prop.
   const HARBOR_ISLAND_BEACH_CLUB_H1 =
     'Harbor Island Beach Club, Melbourne Beach FL Homes & Condos for sale. Contact us about current foreclosures & off-market properties currently available in Harbor Island.';
+  // Viera Builders Communities Viera West (per Ryan, 2026-08-05): drops a
+  // new "Neighborhood" dropdown (before Property Type) listing its 6
+  // sub-communities — see lib/constants.js's
+  // VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_NEIGHBORHOOD_OPTIONS — plus a
+  // custom H1 (exact text from Ryan's reference screenshot) styled with the
+  // same bold sans-serif look as Harbor Island Beach Club's H1 below.
+  const isVieraBuildersCommunitiesVieraWest = slug === 'viera-builders-communities-viera-west';
+  const VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_H1 =
+    'Viera Builders Communities located in Viera West, FL Real Estate & Homes for Sale include the following neighborhoods (Pangea Park, Laurasia, Reeling Park, Farallon Fields, Atlin Cove, & Crossmolina)';
   const h1Text = isHarborIslandBeachClub
     ? HARBOR_ISLAND_BEACH_CLUB_H1
-    : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
+    : isVieraBuildersCommunitiesVieraWest
+      ? VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_H1
+      : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
+  // Bold sans-serif H1 styling (per Ryan, 2026-08-05) — originally added for
+  // Harbor Island Beach Club, now shared by Viera Builders Communities
+  // Viera West per Ryan's follow-up request to match that same style. Every
+  // other neighborhood/city page keeps the default serif Playfair Display
+  // heading, unaffected by this flag.
+  const useBoldSansSerifH1 = isHarborIslandBeachClub || isVieraBuildersCommunitiesVieraWest;
 
   const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const rangeEnd = Math.min(page * PAGE_SIZE, total);
@@ -172,15 +196,15 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
           style={{
             fontSize: 'clamp(26px, 3.5vw, 38px)',
             marginBottom: 8,
-            // Harbor Island Beach Club (per Ryan, 2026-08-05) gets a bold
-            // sans-serif H1 matching his "The Hamptons Luxury Homes"
-            // reference image, instead of the site-wide serif Playfair
-            // Display heading style — scoped to this one page only via
-            // isHarborIslandBeachClub; every other neighborhood/city page's
-            // H1 is unaffected. Uses the site's existing Jost body font
-            // (now loaded with 700/800 weights too, see globals.css) rather
-            // than introducing a third typeface.
-            ...(isHarborIslandBeachClub
+            // Bold sans-serif H1 (per Ryan, 2026-08-05), matching his "The
+            // Hamptons Luxury Homes" reference image, instead of the
+            // site-wide serif Playfair Display heading style — scoped via
+            // useBoldSansSerifH1 (Harbor Island Beach Club and Viera
+            // Builders Communities Viera West); every other neighborhood/
+            // city page's H1 is unaffected. Uses the site's existing Jost
+            // body font (now loaded with 700/800 weights too, see
+            // globals.css) rather than introducing a third typeface.
+            ...(useBoldSansSerifH1
               ? { fontFamily: 'var(--font-body)', fontWeight: 800 }
               : {}),
           }}
@@ -236,6 +260,9 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
         excludeWaterfrontOptions={isLansingIsland || isTortoiseIsland ? ['Oceanfront'] : undefined}
         hideWaterfront={isHarborIslandBeachClub}
         extraActions={isHarborIslandBeachClub ? <HarborIslandInquiryModals /> : undefined}
+        neighborhoodOptions={
+          isVieraBuildersCommunitiesVieraWest ? VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_NEIGHBORHOOD_OPTIONS : undefined
+        }
       />
 
       <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
