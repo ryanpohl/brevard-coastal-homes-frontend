@@ -194,6 +194,12 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // riverfront flags set, so without this override Waterfront would show
   // both.
   const isTortoiseIsland = slug === 'tortoise-island';
+  // Suntree (per Ryan, 2026-08-05): hides the Waterfront dropdown entirely,
+  // via the same hideWaterfront prop as Harbor Island Beach Club below.
+  // Suntree's parent city (Melbourne) has oceanfront/riverfront flags set
+  // (they cover Melbourne's other neighborhoods), but Suntree itself is an
+  // inland community along Wickham Rd — see CLAUDE.md's "Suntree" note.
+  const isSuntree = slug === 'suntree';
   // Harbor Island Beach Club (per Ryan, 2026-08-05): drops Land from
   // Property Type (keeps Home/Condo — its own HARBOR_ISLAND_BEACH_CLUB_*
   // options, not reused from Aripeka since Aripeka drops Condo instead),
@@ -324,7 +330,7 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
                 : undefined
         }
         excludeWaterfrontOptions={isLansingIsland || isTortoiseIsland ? ['Oceanfront'] : undefined}
-        hideWaterfront={isHarborIslandBeachClub}
+        hideWaterfront={isHarborIslandBeachClub || isSuntree}
         extraActions={isHarborIslandBeachClub ? <HarborIslandInquiryModals /> : undefined}
         neighborhoodOptions={
           isVieraBuildersCommunitiesVieraWest ? VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_NEIGHBORHOOD_OPTIONS : undefined
