@@ -14,6 +14,8 @@ import {
   HARBOR_ISLAND_BEACH_CLUB_BATH_OPTIONS,
   VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_NEIGHBORHOOD_OPTIONS,
   VIERA_BUILDERS_SUB_COMMUNITIES,
+  VIERA_BUILDERS_PRICE_BANDS,
+  VIERA_BUILDERS_PROPERTY_TYPE_OPTIONS,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -218,6 +220,11 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // choice needs it too.)
   const VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_H1 =
     'Viera Builders Communities located in Viera West, FL Real Estate & Homes for Sale include the following neighborhoods (Pangea Park, Laurasia, Reeling Park, Farallon Fields, Atlin Cove, & Crossmolina)';
+  // True on the wrapper page AND all 6 individual sub-community pages (per
+  // Ryan, 2026-08-05) — drives the shared VIERA_BUILDERS_PRICE_BANDS /
+  // VIERA_BUILDERS_PROPERTY_TYPE_OPTIONS (drops Land) below, so every one
+  // of these 7 pages gets the same Price/Property Type dropdown options.
+  const isVieraBuilders = isVieraBuildersCommunitiesVieraWest || Boolean(subCommunity);
   const h1Text = isHarborIslandBeachClub
     ? HARBOR_ISLAND_BEACH_CLUB_H1
     : isVieraBuildersCommunitiesVieraWest
@@ -282,7 +289,9 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
             ? ARIPEKA_PROPERTY_TYPE_OPTIONS
             : isHarborIslandBeachClub
               ? HARBOR_ISLAND_BEACH_CLUB_PROPERTY_TYPE_OPTIONS
-              : undefined
+              : isVieraBuilders
+                ? VIERA_BUILDERS_PROPERTY_TYPE_OPTIONS
+                : undefined
         }
         hidePrice={isLansingIsland || isTortoiseIsland}
         priceBands={
@@ -292,7 +301,9 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
               ? ARIPEKA_PRICE_BANDS
               : isHarborIslandBeachClub
                 ? HARBOR_ISLAND_BEACH_CLUB_PRICE_BANDS
-                : undefined
+                : isVieraBuilders
+                  ? VIERA_BUILDERS_PRICE_BANDS
+                  : undefined
         }
         bedOptions={
           isAdelaide
