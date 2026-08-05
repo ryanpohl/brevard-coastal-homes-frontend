@@ -110,9 +110,10 @@ export default function HarborIslandInquiryModals() {
           lineHeight: 1.25,
           padding: '8px 20px',
           // Darker yellow per Ryan (2026-08-05) — was btn-maroon, then
-          // changed to this deeper gold/amber so it reads distinct from
-          // the lighter btn-gold used by the Property Management button.
-          background: '#8a6a1f',
+          // changed to this deep gold/amber so it reads distinct from the
+          // blue Property Management button; lightened slightly per
+          // Ryan's follow-up ("a little lighter") from an initial #8a6a1f.
+          background: '#a8842c',
           color: '#fff',
         }}
       >
@@ -120,9 +121,18 @@ export default function HarborIslandInquiryModals() {
       </button>
       <button
         type="button"
-        className="btn btn-gold"
+        className="btn"
         onClick={() => openModal('propertyManagement')}
-        style={{ maxWidth: 320, whiteSpace: 'normal', textAlign: 'center', lineHeight: 1.25, padding: '8px 20px' }}
+        style={{
+          maxWidth: 320,
+          whiteSpace: 'normal',
+          textAlign: 'center',
+          lineHeight: 1.25,
+          padding: '8px 20px',
+          // Blue per Ryan (2026-08-05) — was btn-gold.
+          background: '#2b6ea8',
+          color: '#fff',
+        }}
       >
         Request Information on Property Management
       </button>
