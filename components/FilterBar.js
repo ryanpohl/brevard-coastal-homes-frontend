@@ -24,6 +24,7 @@ export default function FilterBar({
   excludeWaterfrontOptions,
   hideWaterfront,
   extraActions,
+  neighborhoodOptions,
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -64,6 +65,7 @@ export default function FilterBar({
     updateParams({ [paramKey]: next.join(',') });
   };
 
+  const currentSubdivisions = (searchParams.get('subdivision') || '').split(',').filter(Boolean);
   const currentPropertyTypes = (searchParams.get('propertyType') || '').split(',').filter(Boolean);
   const currentWaterfront = (searchParams.get('waterfront') || '').split(',').filter(Boolean);
   const currentSort = searchParams.get('sort') || 'newest';
@@ -89,6 +91,30 @@ export default function FilterBar({
       onMouseLeave={scheduleClose}
       onMouseEnter={cancelClose}
     >
+      {/* Optional page-specific "Neighborhood" dropdown for sub-communities
+          within one neighborhood page, e.g. Viera Builders Communities
+          Viera West's Atlin Cove/Crossmolina/Farallon Fields/Laurasia/
+          Pangea Park/Reeling Park (per Ryan, 2026-08-05). Placed before
+          Property Type per Ryan's request. Multi-select checkboxes, same
+          pattern as Property Type/Waterfront, driven by a `subdivision`
+          URL param. See app/neighborhoods/[slug]/page.js. */}
+      {neighborhoodOptions && neighborhoodOptions.length > 0 && (
+        <FilterTrigger
+          label={currentSubdivisions.length ? currentSubdivisions.join(', ') : 'Neighborhood'}
+          active={openMenu === 'subdivision'}
+          onEnter={() => openNow('subdivision')}
+        >
+          {neighborhoodOptions.map((name) => (
+            <Checkbox
+              key={name}
+              label={name}
+              checked={currentSubdivisions.includes(name)}
+              onChange={() => toggleMultiValue('subdivision', name)}
+            />
+          ))}
+        </FilterTrigger>
+      )}
+
       {!hidePropertyType && (
         <FilterTrigger
           label={currentPropertyTypes.length ? currentPropertyTypes.join(', ') : 'Property Type'}
