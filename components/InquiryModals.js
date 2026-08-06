@@ -14,12 +14,19 @@ import * as api from '@/lib/api';
  *    the backend accepts that (listingId is optional there). Passes
  *    `containerStyle`/`scheduleClassName`/`questionClassName` to get the
  *    inline green/maroon pill look instead of the sidebar's stacked buttons.
+ *
+ * `showSchedule` (default true) lets a caller suppress this component's own
+ * "Schedule a Showing" button/modal — used by FilterBar.js (per Ryan,
+ * 2026-08-06), which renders its own "Schedule a Showing" button that opens
+ * the richer ScheduleShowingModal/PropertyContactPanel design instead, while
+ * still using this component for "Ask a Question".
  */
 export default function InquiryModals({
   listingId,
   containerStyle,
   scheduleClassName = 'btn btn-primary',
   questionClassName = 'btn btn-outline',
+  showSchedule = true,
 }) {
   const { user } = useAuth();
   const [open, setOpen] = useState(null); // 'schedule' | 'question' | null
@@ -63,9 +70,11 @@ export default function InquiryModals({
   return (
     <>
       <div style={containerStyle || { display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <button type="button" className={scheduleClassName} onClick={() => openModal('schedule')}>
-          Schedule a Showing
-        </button>
+        {showSchedule && (
+          <button type="button" className={scheduleClassName} onClick={() => openModal('schedule')}>
+            Schedule a Showing
+          </button>
+        )}
         <button type="button" className={questionClassName} onClick={() => openModal('question')}>
           Ask a Question
         </button>

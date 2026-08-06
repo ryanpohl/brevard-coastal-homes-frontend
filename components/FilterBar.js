@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { SORT_OPTIONS, PRICE_BANDS, BED_OPTIONS, BATH_OPTIONS } from '@/lib/constants';
 import InquiryModals from './InquiryModals';
+import ScheduleShowingModal from './ScheduleShowingModal';
 
 /**
  * Filter bar for listing pages: Property Type, Price, Beds, Baths,
@@ -30,6 +31,7 @@ export default function FilterBar({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [openMenu, setOpenMenu] = useState(null);
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const closeTimer = useRef(null);
 
   const openNow = (key) => {
@@ -240,15 +242,27 @@ export default function FilterBar({
           width: extraActions ? '100%' : undefined,
         }}
       >
-        {/* General "ask about this area" versions of the Property Detail
-            page's Schedule a Showing / Ask a Question modals — no
-            listingId, since no one listing is selected here (see
-            InquiryModals.js and the backend's now-optional listingId on
-            these two inquiry types). */}
+        {/* Schedule a Showing (per Ryan, 2026-08-06): opens the same
+            dark "Call or Text" hero card + gold Make an Offer/Ask a
+            Question buttons + inline Request Showing date-grid panel used
+            on the homepage hero (SearchBar.js) and the Property Detail
+            page's sidebar — see ScheduleShowingModal.js/
+            PropertyContactPanel.js. No listingId — general "ask about
+            this area" inquiry, same as the homepage's version. */}
+        <button type="button" className="btn btn-success" onClick={() => setScheduleModalOpen(true)}>
+          Schedule a Showing
+        </button>
+
+        {/* Ask a Question keeps its existing simpler modal (InquiryModals.js)
+            — schedule button suppressed here since the button above now
+            covers that. No listingId, since no one listing is selected here
+            (see InquiryModals.js and the backend's now-optional listingId
+            on these two inquiry types). */}
         <InquiryModals
           containerStyle={{ display: 'flex', gap: 10 }}
           scheduleClassName="btn btn-success"
           questionClassName="btn btn-maroon"
+          showSchedule={false}
         />
 
         {/* Optional page-specific extra CTA buttons/modals, e.g. Harbor
@@ -257,6 +271,8 @@ export default function FilterBar({
             button group as Schedule a Showing/Ask a Question. */}
         {extraActions}
       </div>
+
+      {scheduleModalOpen && <ScheduleShowingModal onClose={() => setScheduleModalOpen(false)} />}
     </div>
   );
 }
