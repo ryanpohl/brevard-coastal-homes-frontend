@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { PROPERTY_TYPE_TO_SLUG, VIERA_BUILDERS_SUB_COMMUNITIES } from '@/lib/constants';
+import { PROPERTY_TYPE_TO_SLUG } from '@/lib/constants';
 import AuthPanel from './AuthPanel';
 
 /**
@@ -15,7 +15,7 @@ import AuthPanel from './AuthPanel';
  */
 export default function Nav({ cities = [], neighborhoods = [] }) {
   const { signedIn, user, signOut } = useAuth();
-  const [openMenu, setOpenMenu] = useState(null); // 'city' | 'neighborhood' | 'communities' | 'account' | 'signin' | 'join' | null
+  const [openMenu, setOpenMenu] = useState(null); // 'city' | 'neighborhood' | 'account' | 'signin' | 'join' | null
   const closeTimer = useRef(null);
 
   const openNow = useCallback((key) => {
@@ -138,29 +138,6 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                     style={gridLinkStyle}
                   >
                     {n.name}
-                  </Link>
-                ))}
-              </DropdownPanel>
-            )
-          }
-        />
-        <NavLink
-          label="Communities"
-          bare
-          active={openMenu === 'communities'}
-          onEnter={() => openNow('communities')}
-          panel={
-            openMenu === 'communities' && (
-              <DropdownPanel grid={3}>
-                {VIERA_BUILDERS_SUB_COMMUNITIES.map((c) => (
-                  <Link
-                    key={c.slug}
-                    href={`/neighborhoods/${c.slug}`}
-                    className="hero-search-item"
-                    style={{ ...gridLinkStyle, opacity: c.comingSoon ? 0.7 : 1 }}
-                  >
-                    {c.name}
-                    {c.comingSoon ? ' (Coming Soon)' : ''}
                   </Link>
                 ))}
               </DropdownPanel>
