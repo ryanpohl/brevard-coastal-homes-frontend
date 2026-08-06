@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import * as api from '@/lib/api';
-import { SLUG_TO_PROPERTY_TYPE, PROPERTY_TYPE_LABEL } from '@/lib/constants';
+import { SLUG_TO_PROPERTY_TYPE, PROPERTY_TYPE_LABEL, CONDO_PRICE_BANDS } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import ListingCard from '@/components/ListingCard';
 import ListingMap from '@/components/ListingMap';
@@ -124,6 +124,7 @@ export default async function CityListingsPage({ params, searchParams }) {
         waterfrontFlags={city.filters}
         showZoning={propertyType === 'Land'}
         excludeWaterfrontOptions={excludeWaterfrontOptions}
+        priceBands={propertyType === 'Condo' ? CONDO_PRICE_BANDS : undefined}
       />
 
       <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
