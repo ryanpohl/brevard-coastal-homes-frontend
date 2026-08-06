@@ -136,7 +136,7 @@ function RequestShowingForm({ listingId, dateOptions, user }) {
   return (
     <form onSubmit={submit} style={{ padding: '20px 24px 28px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 12, flexWrap: 'wrap', textAlign: 'center' }}>
-        <div style={{ fontSize: 13, color: 'var(--color-muted-dark)' }}>Select a preferred date &amp; time</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-muted-dark)' }}>Select a Preferred Date</div>
         {AGENT_INFO.phone && (
           <>
             <span style={{ fontSize: 11, color: 'var(--color-muted-light)', letterSpacing: 1, textTransform: 'uppercase' }}>Or</span>
