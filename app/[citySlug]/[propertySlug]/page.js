@@ -83,6 +83,15 @@ export default async function CityListingsPage({ params, searchParams }) {
     // Backend unreachable or no matches — render an empty grid rather than crashing.
   }
 
+  // Melbourne (per Ryan, 2026-08-06): drop Oceanfront from the Waterfront
+  // dropdown on its Homes and Condos pages specifically — Melbourne's
+  // mainland side only fronts the Indian River, not the ocean (unlike its
+  // barrier-island neighbors such as Indialantic/Melbourne Beach). Land
+  // wasn't mentioned, so it's left with the full Oceanfront+Riverfront set
+  // from city.filters. Same excludeWaterfrontOptions prop FilterBar already
+  // supports for Lansing Island/Tortoise Island on the neighborhood pages.
+  const excludeWaterfrontOptions = citySlug === 'melbourne' && propertyType !== 'Land' ? ['Oceanfront'] : undefined;
+
   const typeLabel = PROPERTY_TYPE_LABEL[propertyType] || 'Homes';
   const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const rangeEnd = Math.min(page * PAGE_SIZE, total);
@@ -108,7 +117,11 @@ export default async function CityListingsPage({ params, searchParams }) {
         )}
       </div>
 
-      <FilterBar waterfrontFlags={city.filters} showZoning={propertyType === 'Land'} />
+      <FilterBar
+        waterfrontFlags={city.filters}
+        showZoning={propertyType === 'Land'}
+        excludeWaterfrontOptions={excludeWaterfrontOptions}
+      />
 
       <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
         <div className="listing-page-layout">
