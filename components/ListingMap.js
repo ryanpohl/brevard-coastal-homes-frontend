@@ -98,11 +98,27 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
                         if (cancelled || !mapRef.current) return;
 
           if (!mapInstanceRef.current) {
+                    // Map/Satellite toggle (per Ryan, 2026-08-11) — the built-in
+                    // Google Maps type control, restricted to just Map + Satellite
+                    // (dropping Hybrid/Terrain, which Google shows by default) since
+                    // those two are all that were asked for. This is the ONE shared
+                    // map component behind every map on the site (city pages,
+                    // neighborhood pages, and the Property Detail page all render
+                    // this component), so enabling it here turns it on everywhere at
+                    // once. Property pins need no extra handling to show up on
+                    // Satellite too — markers are a separate overlay layer from the
+                    // base map tiles, so they render on top of whichever tile layer
+                    // (Map or Satellite) is currently active.
                     mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
                                 center: effectiveCenter,
                                 zoom: effectiveZoom,
                                 streetViewControl: false,
-                                mapTypeControl: false,
+                                mapTypeControl: true,
+                                mapTypeControlOptions: {
+                                            style: window.google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+                                            position: window.google.maps.ControlPosition.TOP_LEFT,
+                                            mapTypeIds: ['roadmap', 'satellite'],
+                                },
                                 fullscreenControl: false,
                                 clickableIcons: false,
                     });
