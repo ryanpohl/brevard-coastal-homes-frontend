@@ -243,6 +243,19 @@ textarea:focus {
   outline-offset: 1px;
 }
 
+/* Hides the native up/down spinner arrows on number inputs — added
+   2026-08-11 for the "Make an Offer" modal's Offer Price field (per
+   Ryan), but usable on any number input via this class. */
+.no-spinner::-webkit-inner-spin-button,
+.no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinner {
+  -moz-appearance: textfield;
+}
+
 .modal-overlay {
   position: fixed;
   inset: 0;
