@@ -291,7 +291,7 @@ function ModalShell({ onClose, maxWidth = 480, children }) {
 
 function MakeOfferModal({ listingId, onClose }) {
   const { user } = useAuth();
-  const [form, setForm] = useState({ name: user?.name || '', email: user?.email || '', phone: '', offerPrice: '' });
+  const [form, setForm] = useState({ name: user?.name || '', email: user?.email || '', phone: '', propertyAddress: '', offerPrice: '' });
   const [purchasePlan, setPurchasePlan] = useState(null); // 'cash' | 'financing'
   const [hasBuyerAgency, setHasBuyerAgency] = useState(null); // 'yes' | 'no'
   const [hasToured, setHasToured] = useState(null); // 'yes' | 'no'
@@ -343,6 +343,8 @@ function MakeOfferModal({ listingId, onClose }) {
               <input type="email" required value={form.email} onChange={(e) => update('email', e.target.value)} style={inputStyle} />
               <label style={{ fontSize: 13, color: 'var(--color-ink)' }}>Mobile Phone</label>
               <input type="tel" value={form.phone} onChange={(e) => update('phone', e.target.value)} style={inputStyle} />
+              <label style={{ fontSize: 13, color: 'var(--color-ink)' }}>Address of Property</label>
+              <input value={form.propertyAddress} onChange={(e) => update('propertyAddress', e.target.value)} style={inputStyle} />
               <label style={{ fontSize: 13, color: 'var(--color-ink)' }}>Offer Price</label>
               <input
                 type="number"
@@ -351,6 +353,7 @@ function MakeOfferModal({ listingId, onClose }) {
                 value={form.offerPrice}
                 onChange={(e) => update('offerPrice', e.target.value)}
                 style={inputStyle}
+                className="no-spinner"
               />
             </div>
 
