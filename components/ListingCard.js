@@ -112,7 +112,7 @@ export default function ListingCard({ listing, onHoverChange }) {
 {showRentalRestrictions ? ` · Rental Restrictions: ${listing.rentalRestrictions}` : ''}
 </p>
         )}
-{listing.waterfront && (
+{listing.waterfront && listing.waterfront !== 'None' && (
               <p style={{ fontSize: 11, color: 'var(--color-success)', marginTop: 6, fontWeight: 600 }}>{listing.waterfront}</p>
         )}
 </div>
