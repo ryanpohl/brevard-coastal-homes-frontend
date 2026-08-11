@@ -12,9 +12,9 @@ const FALLBACK_CENTER = { lat: 28.24, lng: -80.68 };
 const FALLBACK_ZOOM = 10;
 
 function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>"']/g, (c) => (
-      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
-        ));
+  return String(value ?? '').replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
 }
 
 // Google's official "dynamic library import" bootstrap loader — see
@@ -27,7 +27,7 @@ function escapeHtml(value) {
 // "google.maps.Map is not a constructor" crash. This bootstrap snippet is
 // the only supported way to get importLibrary, so don't swap it back out.
 function mapsBootstrapLoaderSrc(key) {
-    return `(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=\`https://maps.\${c}apis.com/maps/api/js?\`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({key:"${key}",v:"weekly"});`;
+  return `(g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=\`https://maps.\${c}apis.com/maps/api/js?\`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({key:"${key}",v:"weekly"});`;
 }
 
 /**
@@ -43,19 +43,19 @@ function mapsBootstrapLoaderSrc(key) {
  * map, so pages still work fine before that key is set up.
  */
 export default function ListingMap({ center, listings = [], zoom = 12, height = '100%', hoveredListingId = null }) {
-    const mapRef = useRef(null);
-    const mapInstanceRef = useRef(null);
-    // Each entry is { marker, listingId } — the listingId lets the
+  const mapRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  // Each entry is { marker, listingId } — the listingId lets the
   // hover-highlight effect below find and re-style the right marker
   // without rebuilding the whole marker set on every hover (see
   // ListingResultsLayout, which lifts hover state up from ListingCard).
   const markersRef = useRef([]);
-    const [scriptLoaded, setScriptLoaded] = useState(
-          () => typeof window !== 'undefined' && !!window.google?.maps?.importLibrary
-        );
+  const [scriptLoaded, setScriptLoaded] = useState(
+    () => typeof window !== 'undefined' && !!window.google?.maps?.importLibrary
+  );
 
   const effectiveCenter = center && center.lat != null && center.lng != null ? center : FALLBACK_CENTER;
-    const effectiveZoom = center && center.lat != null && center.lng != null ? zoom : FALLBACK_ZOOM;
+  const effectiveZoom = center && center.lat != null && center.lng != null ? zoom : FALLBACK_ZOOM;
 
   // Inject the bootstrap loader ourselves instead of relying on next/script's
   // `onLoad` — that callback does not reliably fire for inline
@@ -67,113 +67,119 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
   // executes — appending the script tag runs it immediately, so we can flip
   // scriptLoaded right after appending rather than waiting on a load event.
   useEffect(() => {
-        if (typeof window === 'undefined' || !GOOGLE_MAPS_API_KEY) return;
-        if (window.google?.maps?.importLibrary) {
-                setScriptLoaded(true);
-                return;
-        }
-        if (!window.__gmapsBootstrapInjected) {
-                window.__gmapsBootstrapInjected = true;
-                const script = document.createElement('script');
-                script.id = 'google-maps-js';
-                script.innerHTML = mapsBootstrapLoaderSrc(GOOGLE_MAPS_API_KEY);
-                document.head.appendChild(script);
-        }
-        setScriptLoaded(true);
+    if (typeof window === 'undefined' || !GOOGLE_MAPS_API_KEY) return;
+    if (window.google?.maps?.importLibrary) {
+      setScriptLoaded(true);
+      return;
+    }
+    if (!window.__gmapsBootstrapInjected) {
+      window.__gmapsBootstrapInjected = true;
+      const script = document.createElement('script');
+      script.id = 'google-maps-js';
+      script.innerHTML = mapsBootstrapLoaderSrc(GOOGLE_MAPS_API_KEY);
+      document.head.appendChild(script);
+    }
+    setScriptLoaded(true);
   }, []);
 
   useEffect(() => {
-        if (!scriptLoaded || !mapRef.current || !window.google?.maps?.importLibrary) return;
-        let cancelled = false;
+    if (!scriptLoaded || !mapRef.current || !window.google?.maps?.importLibrary) return;
+    let cancelled = false;
 
-                // Map/Marker/InfoWindow aren't defined until their libraries are
-                // explicitly imported through the bootstrap loader above — once
-                // imported, the classes are available directly off `google.maps` as
-                // used below (importLibrary populates the shared namespace).
-                async function init() {
-                        await Promise.all([
-                                  window.google.maps.importLibrary('maps'),
-                                  window.google.maps.importLibrary('marker'),
-                                ]);
-                        if (cancelled || !mapRef.current) return;
+    // Map/Marker/InfoWindow aren't defined until their libraries are
+    // explicitly imported through the bootstrap loader above — once
+    // imported, the classes are available directly off `google.maps` as
+    // used below (importLibrary populates the shared namespace).
+    async function init() {
+      await Promise.all([
+        window.google.maps.importLibrary('maps'),
+        window.google.maps.importLibrary('marker'),
+      ]);
+      if (cancelled || !mapRef.current) return;
 
-          if (!mapInstanceRef.current) {
-                    // Map/Satellite toggle (per Ryan, 2026-08-11) — the built-in
-                    // Google Maps type control, restricted to just Map + Satellite
-                    // (dropping Hybrid/Terrain, which Google shows by default) since
-                    // those two are all that were asked for. This is the ONE shared
-                    // map component behind every map on the site (city pages,
-                    // neighborhood pages, and the Property Detail page all render
-                    // this component), so enabling it here turns it on everywhere at
-                    // once. Property pins need no extra handling to show up on
-                    // Satellite too — markers are a separate overlay layer from the
-                    // base map tiles, so they render on top of whichever tile layer
-                    // (Map or Satellite) is currently active.
-                    mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
-                                center: effectiveCenter,
-                                zoom: effectiveZoom,
-                                streetViewControl: false,
-                                mapTypeControl: true,
-                                mapTypeControlOptions: {
-                                            style: window.google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-                                            position: window.google.maps.ControlPosition.TOP_LEFT,
-                                            mapTypeIds: ['roadmap', 'satellite'],
-                                },
-                                fullscreenControl: false,
-                                clickableIcons: false,
-                    });
-          }
-                        const map = mapInstanceRef.current;
+      if (!mapInstanceRef.current) {
+        mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
+          center: effectiveCenter,
+          zoom: effectiveZoom,
+          streetViewControl: false,
+          // Map/Satellite toggle (per Ryan, 2026-08-11) — the built-in
+          // Google Maps type control, restricted to just Map + Satellite
+          // (dropping Hybrid/Terrain, which Google shows by default) since
+          // those two are all that were asked for. This is the ONE shared
+          // map component behind every map on the site (city pages,
+          // neighborhood pages, and the Property Detail page all render
+          // this component — see ListingResultsLayout.js and
+          // app/listings/[id]/page.js), so enabling it here turns it on
+          // everywhere at once. Property pins need no extra handling to
+          // show up on Satellite too — markers are a separate overlay
+          // layer from the base map tiles, so they render on top of
+          // whichever tile layer (Map or Satellite) is currently active.
+          mapTypeControl: true,
+          mapTypeControlOptions: {
+            style: window.google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+            position: window.google.maps.ControlPosition.TOP_LEFT,
+            mapTypeIds: ['roadmap', 'satellite'],
+          },
+          fullscreenControl: false,
+          clickableIcons: false,
+        });
+      }
+      const map = mapInstanceRef.current;
 
-          // Clear any markers from a previous render (e.g. filters changed the result set).
-          markersRef.current.forEach(({ marker }) => marker.setMap(null));
-                        markersRef.current = [];
+      // Clear any markers from a previous render (e.g. filters changed the result set).
+      markersRef.current.forEach(({ marker }) => marker.setMap(null));
+      markersRef.current = [];
 
-          const points = listings.filter((l) => l.latitude != null && l.longitude != null);
+      const points = listings.filter((l) => l.latitude != null && l.longitude != null);
 
-          if (points.length === 0) {
-                    map.setCenter(effectiveCenter);
-                    map.setZoom(effectiveZoom);
-                    return;
-          }
+      if (points.length === 0) {
+        map.setCenter(effectiveCenter);
+        map.setZoom(effectiveZoom);
+        return;
+      }
 
-          const bounds = new window.google.maps.LatLngBounds();
-                        // A single InfoWindow instance shared across every marker (per Ryan,
-                        // 2026-08-11 — multiple pin popups were staying open on screen at
-                        // once, since each marker previously got its own InfoWindow and
-                        // nothing ever closed the others). Reusing one instance and just
-                        // moving/re-opening it on each click means opening a new one
-                        // automatically closes whichever was previously open.
-                        const sharedInfoWindow = new window.google.maps.InfoWindow();
-                        points.forEach((listing) => {
-                                  const position = { lat: listing.latitude, lng: listing.longitude };
-                                  const marker = new window.google.maps.Marker({ position, map, title: listing.address });
-                                  const content = `<div style="font-family: 'Jost', sans-serif; font-size: 13px; max-width: 190px;">
-                                                          <a href="/listings/${listing.id}" style="font-weight: 600; color: #1c2b30; text-decoration: none;">
-                                                                        ${escapeHtml(formatPrice(listing.price))}
-                                                                                    </a>
-                                                                                                <div style="color: #667377; margin-top: 2px;">${escapeHtml(listing.address)}</div>
-                                                                                                          </div>`;
-                                  marker.addListener('click', () => {
-                                            sharedInfoWindow.setContent(content);
-                                            sharedInfoWindow.open({ anchor: marker, map });
-                                  });
-                                  markersRef.current.push({ marker, listingId: listing.id });
-                                  bounds.extend(position);
-                        });
+      const bounds = new window.google.maps.LatLngBounds();
+      // A single InfoWindow instance shared across every marker (per Ryan,
+      // 2026-08-11 — multiple pin popups were staying open on screen at
+      // once, since each marker previously got its own InfoWindow and
+      // nothing ever closed the others). Reusing one instance and just
+      // moving/re-opening it on each click means opening a new one
+      // automatically closes whichever was previously open.
+      const sharedInfoWindow = new window.google.maps.InfoWindow();
+      points.forEach((listing) => {
+        const position = { lat: listing.latitude, lng: listing.longitude };
+        const marker = new window.google.maps.Marker({ position, map, title: listing.address });
+        // Thumbnail of the listing's first photo, shown above the price/
+        // address (per Ryan, 2026-08-11) — listings without any photos yet
+        // (e.g. mock/manual entries) just fall back to the text-only popup.
+        const thumbnailPhoto = listing.photos && listing.photos.length ? listing.photos[0] : null;
+        const content = `<div style="font-family: 'Jost', sans-serif; font-size: 13px; max-width: 200px;">
+            <a href="/listings/${listing.id}" style="display: block; color: #1c2b30; text-decoration: none;">
+              ${thumbnailPhoto ? `<img src="${escapeHtml(thumbnailPhoto)}" alt="${escapeHtml(listing.address)}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 4px; display: block; margin-bottom: 6px;" />` : ''}
+              <span style="font-weight: 600;">${escapeHtml(formatPrice(listing.price))}</span>
+              <div style="color: #667377; margin-top: 2px;">${escapeHtml(listing.address)}</div>
+            </a>
+          </div>`;
+        marker.addListener('click', () => {
+          sharedInfoWindow.setContent(content);
+          sharedInfoWindow.open({ anchor: marker, map });
+        });
+        markersRef.current.push({ marker, listingId: listing.id });
+        bounds.extend(position);
+      });
 
-          if (points.length > 1) {
-                    map.fitBounds(bounds);
-          } else {
-                    map.setCenter(bounds.getCenter());
-                    map.setZoom(15);
-          }
-                }
+      if (points.length > 1) {
+        map.fitBounds(bounds);
+      } else {
+        map.setCenter(bounds.getCenter());
+        map.setZoom(15);
+      }
+    }
 
-                init();
-        return () => {
-                cancelled = true;
-        };
+    init();
+    return () => {
+      cancelled = true;
+    };
   }, [scriptLoaded, effectiveCenter.lat, effectiveCenter.lng, effectiveZoom, listings]);
 
   // Hover highlight: re-styles just the matching marker (bigger gold dot,
@@ -181,47 +187,47 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
   // this cheap enough to run on every mouseenter/mouseleave as the visitor
   // moves through the card grid, and avoids re-triggering fitBounds/pan.
   useEffect(() => {
-        if (!window.google?.maps) return;
-        markersRef.current.forEach(({ marker, listingId }) => {
-                if (listingId === hoveredListingId) {
-                          marker.setIcon({
-                                      path: window.google.maps.SymbolPath.CIRCLE,
-                                      scale: 12,
-                                      fillColor: '#c9a15a', // var(--color-gold) — SVG symbol icons can't reference CSS custom properties
-                                      fillOpacity: 1,
-                                      strokeColor: '#ffffff',
-                                      strokeWeight: 2,
-                          });
-                          marker.setZIndex(999);
-                } else {
-                          marker.setIcon(null);
-                          marker.setZIndex(null);
-                }
+    if (!window.google?.maps) return;
+    markersRef.current.forEach(({ marker, listingId }) => {
+      if (listingId === hoveredListingId) {
+        marker.setIcon({
+          path: window.google.maps.SymbolPath.CIRCLE,
+          scale: 12,
+          fillColor: '#c9a15a', // var(--color-gold) — SVG symbol icons can't reference CSS custom properties
+          fillOpacity: 1,
+          strokeColor: '#ffffff',
+          strokeWeight: 2,
         });
+        marker.setZIndex(999);
+      } else {
+        marker.setIcon(null);
+        marker.setZIndex(null);
+      }
+    });
   }, [hoveredListingId]);
 
   if (!GOOGLE_MAPS_API_KEY) {
-        return (
-                <div
-            className="card"
-            style={{
-                        height,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'var(--color-muted)',
-                        background: 'var(--color-bg)',
-                        textAlign: 'center',
-                        padding: 20,
-            }}
-        >
-          Map coming soon
-            </div>
-      );
-}
+    return (
+      <div
+        className="card"
+        style={{
+          height,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--color-muted)',
+          background: 'var(--color-bg)',
+          textAlign: 'center',
+          padding: 20,
+        }}
+      >
+        Map coming soon
+      </div>
+    );
+  }
 
   return (
-        <div
+    <div
       ref={mapRef}
       style={{ width: '100%', height, minHeight: 320, borderRadius: 8, overflow: 'hidden', background: 'var(--color-border-light)' }}
     />
