@@ -122,18 +122,26 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
           }
 
           const bounds = new window.google.maps.LatLngBounds();
+                        // A single InfoWindow instance shared across every marker (per Ryan,
+                        // 2026-08-11 — multiple pin popups were staying open on screen at
+                        // once, since each marker previously got its own InfoWindow and
+                        // nothing ever closed the others). Reusing one instance and just
+                        // moving/re-opening it on each click means opening a new one
+                        // automatically closes whichever was previously open.
+                        const sharedInfoWindow = new window.google.maps.InfoWindow();
                         points.forEach((listing) => {
                                   const position = { lat: listing.latitude, lng: listing.longitude };
                                   const marker = new window.google.maps.Marker({ position, map, title: listing.address });
-                                  const infoWindow = new window.google.maps.InfoWindow({
-                                              content: `<div style="font-family: 'Jost', sans-serif; font-size: 13px; max-width: 190px;">
+                                  const content = `<div style="font-family: 'Jost', sans-serif; font-size: 13px; max-width: 190px;">
                                                           <a href="/listings/${listing.id}" style="font-weight: 600; color: #1c2b30; text-decoration: none;">
                                                                         ${escapeHtml(formatPrice(listing.price))}
                                                                                     </a>
                                                                                                 <div style="color: #667377; margin-top: 2px;">${escapeHtml(listing.address)}</div>
-                                                                                                          </div>`,
+                                                                                                          </div>`;
+                                  marker.addListener('click', () => {
+                                            sharedInfoWindow.setContent(content);
+                                            sharedInfoWindow.open({ anchor: marker, map });
                                   });
-                                  marker.addListener('click', () => infoWindow.open({ anchor: marker, map }));
                                   markersRef.current.push({ marker, listingId: listing.id });
                                   bounds.extend(position);
                         });
