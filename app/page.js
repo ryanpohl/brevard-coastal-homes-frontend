@@ -7,7 +7,7 @@ import SearchBar from '@/components/SearchBar';
 export const metadata = {
   title: 'Brevard Coastal Homes | Homes, Condos & Land For Sale in Brevard County, FL',
   description:
-    'Search homes, condos, and land for sale across Cocoa Beach, Melbourne Beach, Satellite Beach, Viera, and every coastal city and neighborhood in Brevard County, FL.',
+    'Search homes, condos, and land for sale across Cocoa Beach, Melbourne Beach, Satellite Beach, Viera East, and every coastal city and neighborhood in Brevard County, FL.',
 };
 
 // Per-city crop overrides for PlaceCard's cover photo. The default center
