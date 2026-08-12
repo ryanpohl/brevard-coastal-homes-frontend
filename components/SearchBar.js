@@ -153,9 +153,16 @@ export default function SearchBar({ cities, neighborhoods }) {
     setPropertyTypes((prev) => (prev.includes(pt) ? prev.filter((p) => p !== pt) : [...prev, pt]));
   }
 
-  function selectCity(slug) {
+  function selectCity(slug, propertyType) {
     setCitySlug(slug);
     setNeighborhoodSlug('');
+    // Clicking "Homes" or "Condos" under a city is a shortcut for picking
+    // both the city AND that single property type in one action — mirrors
+    // the top nav's Search by City dropdown (Nav.js), which links straight
+    // to /<city>/<type>. Here it just sets filter state instead of
+    // navigating immediately, so Price/Beds/Baths can still be combined in
+    // before the user clicks Search.
+    if (propertyType) setPropertyTypes([propertyType]);
     setOpenMenu(null);
   }
 
@@ -233,13 +240,24 @@ export default function SearchBar({ cities, neighborhoods }) {
                   <PanelHeading>Search by City</PanelHeading>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                     {cities.map((city) => (
-                      <div
-                        key={city.slug}
-                        className="hero-search-item"
-                        onClick={() => selectCity(city.slug)}
-                        style={LIST_ITEM_STYLE}
-                      >
-                        {city.name}
+                      <div key={city.slug}>
+                        <div style={CITY_LABEL_STYLE}>{city.name} Listings</div>
+                        <div
+                          className="hero-search-item"
+                          onClick={() => selectCity(city.slug, 'Home')}
+                          style={CITY_SUBLINK_STYLE}
+                        >
+                          Homes
+                        </div>
+                        {city.showCondosInNav !== false && (
+                          <div
+                            className="hero-search-item-secondary"
+                            onClick={() => selectCity(city.slug, 'Condo')}
+                            style={CITY_SUBLINK_STYLE}
+                          >
+                            Condos
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -570,6 +588,28 @@ const LIST_ITEM_STYLE = {
   fontWeight: 600,
   letterSpacing: 1,
   textTransform: 'uppercase',
+  cursor: 'pointer',
+};
+
+// City column header ("<City> Listings") + the "Homes"/"Condos" links
+// stacked beneath it — matches the top nav's "Search by City" dropdown
+// (see Nav.js's cityListingsLabelStyle/cityHomeLinkStyle/gridCondoLinkStyle)
+// so the hero search bar's location picker reads the same way.
+const CITY_LABEL_STYLE = {
+  fontSize: 13,
+  fontWeight: 700,
+  letterSpacing: 1,
+  textTransform: 'uppercase',
+  color: '#ffffff',
+  padding: '2px 6px 0',
+};
+const CITY_SUBLINK_STYLE = {
+  display: 'block',
+  fontSize: 12,
+  fontWeight: 600,
+  letterSpacing: 1,
+  textTransform: 'uppercase',
+  padding: '3px 6px',
   cursor: 'pointer',
 };
 
