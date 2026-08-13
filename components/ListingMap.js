@@ -45,14 +45,54 @@ function mapsBootstrapLoaderSrc(key) {
 export default function ListingMap({ center, listings = [], zoom = 12, height = '100%', hoveredListingId = null }) {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
-  // Each entry is { marker, listingId } — the listingId lets the
-  // hover-highlight effect below find and re-style the right marker
-  // without rebuilding the whole marker set on every hover (see
-  // ListingResultsLayout, which lifts hover state up from ListingCard).
+  // Each entry is { marker, listingId, listing } — the listingId/listing
+  // let the hover-highlight effect below find the right marker and build
+  // its popup content without rebuilding the whole marker set on every
+  // hover (see ListingResultsLayout, which lifts hover state up from
+  // ListingCard).
   const markersRef = useRef([]);
+  // One InfoWindow instance shared across every marker AND the
+  // sidebar-hover path below, stored in a ref (not a local variable inside
+  // the init effect) so both the marker mouseover/mouseout handlers and the
+  // hoveredListingId effect can open/close the same popup instead of each
+  // spawning their own.
+  const infoWindowRef = useRef(null);
+  // Popups now open on hover (per Ryan, 2026-08-13) instead of click, which
+  // means a marker's mouseout can fire the instant the cursor crosses from
+  // the pin into the popup itself (they're separate DOM elements), closing
+  // it before a visitor can click through to the listing. Debounce the
+  // close with a short timeout that mouseover/domready below can cancel —
+  // gives the cursor room to travel from pin to popup without an instant-close.
+  const closeTimeoutRef = useRef(null);
   const [scriptLoaded, setScriptLoaded] = useState(
     () => typeof window !== 'undefined' && !!window.google?.maps?.importLibrary
   );
+
+  function cancelPopupClose() {
+    clearTimeout(closeTimeoutRef.current);
+  }
+
+  function schedulePopupClose() {
+    clearTimeout(closeTimeoutRef.current);
+    closeTimeoutRef.current = setTimeout(() => {
+      infoWindowRef.current?.close();
+    }, 200);
+  }
+
+  // Shared by marker-hover (mouse directly over a pin) and the sidebar
+  // ListingCard-hover path (hoveredListingId prop) so both show the exact
+  // same popup — image thumbnail, price, address — rather than the old
+  // plain gold-dot marker highlight for the sidebar-hover case.
+  function buildPopupContent(listing) {
+    const thumbnailPhoto = listing.photos && listing.photos.length ? listing.photos[0] : null;
+    return `<div style="font-family: 'Jost', sans-serif; font-size: 13px; max-width: 200px;">
+        <a href="/listings/${listing.id}" style="display: block; color: #1c2b30; text-decoration: none;">
+          ${thumbnailPhoto ? `<img src="${escapeHtml(thumbnailPhoto)}" alt="${escapeHtml(listing.address)}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 4px; display: block; margin-bottom: 6px;" />` : ''}
+          <span style="font-weight: 600;">${escapeHtml(formatPrice(listing.price))}</span>
+          <div style="color: #667377; margin-top: 2px;">${escapeHtml(listing.address)}</div>
+        </a>
+      </div>`;
+  }
 
   const effectiveCenter = center && center.lat != null && center.lng != null ? center : FALLBACK_CENTER;
   const effectiveZoom = center && center.lat != null && center.lng != null ? zoom : FALLBACK_ZOOM;
@@ -143,29 +183,44 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
       // 2026-08-11 — multiple pin popups were staying open on screen at
       // once, since each marker previously got its own InfoWindow and
       // nothing ever closed the others). Reusing one instance and just
-      // moving/re-opening it on each click means opening a new one
-      // automatically closes whichever was previously open.
-      const sharedInfoWindow = new window.google.maps.InfoWindow();
+      // moving/re-opening it means opening a new one automatically closes
+      // whichever was previously open. Stored in a ref (see above) rather
+      // than a local var so the hoveredListingId effect further down can
+      // reuse the exact same instance.
+      if (!infoWindowRef.current) {
+        infoWindowRef.current = new window.google.maps.InfoWindow();
+      }
+      const sharedInfoWindow = infoWindowRef.current;
       points.forEach((listing) => {
         const position = { lat: listing.latitude, lng: listing.longitude };
         const marker = new window.google.maps.Marker({ position, map, title: listing.address });
-        // Thumbnail of the listing's first photo, shown above the price/
-        // address (per Ryan, 2026-08-11) — listings without any photos yet
-        // (e.g. mock/manual entries) just fall back to the text-only popup.
-        const thumbnailPhoto = listing.photos && listing.photos.length ? listing.photos[0] : null;
-        const content = `<div style="font-family: 'Jost', sans-serif; font-size: 13px; max-width: 200px;">
-            <a href="/listings/${listing.id}" style="display: block; color: #1c2b30; text-decoration: none;">
-              ${thumbnailPhoto ? `<img src="${escapeHtml(thumbnailPhoto)}" alt="${escapeHtml(listing.address)}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 4px; display: block; margin-bottom: 6px;" />` : ''}
-              <span style="font-weight: 600;">${escapeHtml(formatPrice(listing.price))}</span>
-              <div style="color: #667377; margin-top: 2px;">${escapeHtml(listing.address)}</div>
-            </a>
-          </div>`;
-        marker.addListener('click', () => {
-          sharedInfoWindow.setContent(content);
+        // Popup now opens on hover instead of requiring a click (per Ryan,
+        // 2026-08-13) — mouseover opens/refreshes it at this marker,
+        // mouseout schedules a debounced close (see schedulePopupClose)
+        // rather than closing instantly, so a visitor can move the cursor
+        // from the pin onto the popup itself and click through to the
+        // listing without it vanishing first.
+        marker.addListener('mouseover', () => {
+          cancelPopupClose();
+          sharedInfoWindow.setContent(buildPopupContent(listing));
           sharedInfoWindow.open({ anchor: marker, map });
         });
-        markersRef.current.push({ marker, listingId: listing.id });
+        marker.addListener('mouseout', () => {
+          schedulePopupClose();
+        });
+        markersRef.current.push({ marker, listingId: listing.id, listing });
         bounds.extend(position);
+      });
+
+      // Lets the cursor travel from the pin onto the popup's own DOM
+      // (a separate overlay from the marker) without the debounced close
+      // above firing partway through — domready fires each time the
+      // popup's content is (re)rendered, so re-attach on every open.
+      sharedInfoWindow.addListener('domready', () => {
+        const container = document.querySelector('.gm-style-iw');
+        if (!container) return;
+        container.addEventListener('mouseenter', cancelPopupClose);
+        container.addEventListener('mouseleave', schedulePopupClose);
       });
 
       if (points.length > 1) {
@@ -182,28 +237,35 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
     };
   }, [scriptLoaded, effectiveCenter.lat, effectiveCenter.lng, effectiveZoom, listings]);
 
-  // Hover highlight: re-styles just the matching marker (bigger gold dot,
-  // brought to front) instead of rebuilding the marker set above — keeps
-  // this cheap enough to run on every mouseenter/mouseleave as the visitor
-  // moves through the card grid, and avoids re-triggering fitBounds/pan.
+  // Hover highlight: hovering a ListingCard in the results list (which lifts
+  // its hover state up into `hoveredListingId` — see ListingResultsLayout)
+  // now opens the exact same image/price/address popup as hovering the pin
+  // directly, instead of the old plain gold-dot marker recolor (per Ryan,
+  // 2026-08-13 — "when a property is hovered under the listings, show the
+  // popup with the image instead of a gold circle"). Still brings the
+  // matching marker to the front via zIndex so it isn't hidden under a
+  // neighboring pin while its popup is open. Re-styling just the matching
+  // marker (rather than rebuilding the whole marker set) keeps this cheap
+  // enough to run on every mouseenter/mouseleave as the visitor moves
+  // through the card grid, and avoids re-triggering fitBounds/pan.
   useEffect(() => {
-    if (!window.google?.maps) return;
+    if (!window.google?.maps || !infoWindowRef.current) return;
+    const map = mapInstanceRef.current;
+
     markersRef.current.forEach(({ marker, listingId }) => {
-      if (listingId === hoveredListingId) {
-        marker.setIcon({
-          path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 12,
-          fillColor: '#c9a15a', // var(--color-gold) — SVG symbol icons can't reference CSS custom properties
-          fillOpacity: 1,
-          strokeColor: '#ffffff',
-          strokeWeight: 2,
-        });
-        marker.setZIndex(999);
-      } else {
-        marker.setIcon(null);
-        marker.setZIndex(null);
-      }
+      marker.setZIndex(listingId === hoveredListingId ? 999 : null);
     });
+
+    if (hoveredListingId == null) {
+      schedulePopupClose();
+      return;
+    }
+    const match = markersRef.current.find(({ listingId }) => listingId === hoveredListingId);
+    if (match) {
+      cancelPopupClose();
+      infoWindowRef.current.setContent(buildPopupContent(match.listing));
+      infoWindowRef.current.open({ anchor: match.marker, map });
+    }
   }, [hoveredListingId]);
 
   if (!GOOGLE_MAPS_API_KEY) {
