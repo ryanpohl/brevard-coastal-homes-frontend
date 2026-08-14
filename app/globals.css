@@ -208,6 +208,37 @@ h4 {
   color: rgba(255, 255, 255, 0.85);
 }
 
+/* Responsive grid for Nav.js's Search by City/Neighborhood dropdown
+   panels (2026-08-14, mobile-friendliness pass — see DropdownPanel in
+   Nav.js for the full writeup). Column count is set per-panel via the
+   --nav-grid-cols custom property (both panels currently pass grid={5}) so
+   desktop keeps its original 5-across layout unchanged; below that, this
+   collapses to fewer columns so items stay reachable without horizontal
+   scrolling. Same custom-property-driven pattern as .city-grid above,
+   needed here for the same reason: Nav.js sets --nav-grid-cols as an
+   inline style (since it varies per DropdownPanel instance), and an
+   inline gridTemplateColumns can't be overridden by a plain @media rule,
+   but a CSS custom property referenced via var() in a class rule can. */
+.nav-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  width: min(320px, calc(100vw - 32px));
+}
+
+@media (min-width: 480px) {
+  .nav-grid {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+    width: auto;
+  }
+}
+
+@media (min-width: 900px) {
+  .nav-grid {
+    grid-template-columns: repeat(var(--nav-grid-cols, 3), minmax(140px, 1fr));
+  }
+}
+
 /* Footer links reset `a { text-decoration: none }` above so they read as
    plain text — this underline makes it clear each one is a separate,
    clickable link (important where two links sit on one line, e.g.
@@ -217,6 +248,24 @@ h4 {
   text-decoration-color: rgba(255, 255, 255, 0.35);
   text-underline-offset: 3px;
   transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+/* Looking to Sell page's 3-up feature grid (app/looking-to-sell/page.js) —
+   was a hardcoded `gridTemplateColumns: repeat(3, 1fr)` inline style with
+   no responsive breakpoint, which squeezed 3 cards into any viewport width
+   including phones and pushed the third card 19px past the right edge at
+   375px wide (2026-08-14, mobile-friendliness pass). Single column below
+   640px, matching .city-grid's first breakpoint elsewhere in this file. */
+.sell-points-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
+  .sell-points-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .footer-link:hover {
