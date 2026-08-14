@@ -198,7 +198,7 @@ export default function FilterBar({
             <button
               key={band.label}
               type="button"
-              className="btn btn-outline"
+              className="btn btn-outline filter-menu-option"
               style={{ width: '100%', marginBottom: 6, justifyContent: 'flex-start' }}
               onClick={() => updateParams({ priceMin: band.priceMin, priceMax: band.priceMax })}
             >
@@ -218,7 +218,7 @@ export default function FilterBar({
           <button
             key={n}
             type="button"
-            className="btn btn-outline"
+            className="btn btn-outline filter-menu-option"
             style={{ width: '100%', marginBottom: 6 }}
             onClick={() => updateParams({ beds: n })}
           >
@@ -237,7 +237,7 @@ export default function FilterBar({
           <button
             key={n}
             type="button"
-            className="btn btn-outline"
+            className="btn btn-outline filter-menu-option"
             style={{ width: '100%', marginBottom: 6 }}
             onClick={() => updateParams({ baths: n })}
           >
@@ -274,7 +274,7 @@ export default function FilterBar({
           <button
             key={opt.value}
             type="button"
-            className="btn btn-outline"
+            className="btn btn-outline filter-menu-option"
             style={{
               width: '100%',
               marginBottom: 6,
@@ -382,7 +382,26 @@ function FilterTrigger({ label, children, active, onEnter, onToggle }) {
 
 function Checkbox({ label, checked, onChange }) {
   return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, marginBottom: 8, cursor: 'pointer' }}>
+    <label
+      className="filter-menu-option"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        fontSize: 13,
+        // Padding + negative margin (margin shorthand includes the 4px
+        // bottom gap that used to be a separate marginBottom: 8 — don't
+        // add marginBottom back alongside this, the shorthand overwrites
+        // it) so the hover highlight (see .filter-menu-option in
+        // globals.css) fills a proper row instead of just tightly hugging
+        // the checkbox+text, while keeping the text in the same visual
+        // position it was in before this was added.
+        padding: '4px 6px',
+        margin: '-4px -6px 4px -6px',
+        borderRadius: 'var(--radius-btn)',
+        cursor: 'pointer',
+      }}
+    >
       <input type="checkbox" checked={checked} onChange={onChange} style={{ width: 'auto' }} />
       {label}
     </label>
