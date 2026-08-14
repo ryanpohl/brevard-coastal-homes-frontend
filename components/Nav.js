@@ -125,6 +125,16 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           padding: '0 clamp(16px, 4vw, 56px) 16px',
         }}
       >
+        {/* Every Link inside these two DropdownPanels gets onClick={closeNow}
+            (added 2026-08-14, per Ryan: clicking e.g. Cocoa Beach's Condos
+            link navigated correctly but left the whole dropdown panel
+            sitting open on top of the new page). Root cause: Nav lives in
+            the root layout, so it persists across a client-side route
+            change instead of remounting — `openMenu` state just carries
+            over unchanged from before the click, and nothing was resetting
+            it back to null when a link inside the panel was the thing that
+            triggered the navigation (as opposed to tapping the trigger
+            again or tapping outside, both already handled above). */}
         <NavLink
           label="Search by City"
           bare
@@ -141,6 +151,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                       href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
                       className="hero-search-item"
                       style={cityHomeLinkStyle}
+                      onClick={closeNow}
                     >
                       Homes
                     </Link>
@@ -149,6 +160,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                         href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Condo}`}
                         className="hero-search-item-secondary"
                         style={gridCondoLinkStyle}
+                        onClick={closeNow}
                       >
                         Condos
                       </Link>
@@ -174,6 +186,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                     href={`/neighborhoods/${n.slug}`}
                     className="hero-search-item"
                     style={gridLinkStyle}
+                    onClick={closeNow}
                   >
                     {n.name}
                   </Link>
