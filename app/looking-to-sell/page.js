@@ -22,7 +22,7 @@ export default function LookingToSellPage() {
       </div>
 
       <div className="container" style={{ padding: '48px clamp(16px, 4vw, 56px)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginBottom: 48 }}>
+        <div className="sell-points-grid" style={{ marginBottom: 48 }}>
           <SellPoint title="Local Market Expertise" text="Pricing guidance based on real, up-to-date Space Coast MLS data — not guesswork." />
           <SellPoint title="Maximum Exposure" text="Your listing gets featured across our site and marketing channels targeting serious buyers." />
           <SellPoint title="Full-Service Support" text="From listing prep to closing, we handle the details so you don't have to." />
