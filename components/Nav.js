@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { PROPERTY_TYPE_TO_SLUG } from '@/lib/constants';
@@ -17,10 +17,23 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
   const { signedIn, user, signOut } = useAuth();
   const [openMenu, setOpenMenu] = useState(null); // 'city' | 'neighborhood' | 'account' | 'signin' | 'join' | null
   const closeTimer = useRef(null);
+  const containerRef = useRef(null);
 
   const openNow = useCallback((key) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
     setOpenMenu(key);
+  }, []);
+
+  // Tapping/clicking a trigger toggles it (open <-> closed) instead of just
+  // opening it — mirrors FilterBar.js's 2026-08-13 mobile-touch fix (see
+  // its own toggleOnClick for the full writeup of why this is needed:
+  // touch has no hover-out, so a trigger that only ever opens gets stuck
+  // open once tapped). Nav.js never received that same fix when
+  // FilterBar.js did — this closes that gap (2026-08-14, per Ryan: "make
+  // sure the website is very mobile friendly").
+  const toggleOnClick = useCallback((key) => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setOpenMenu((current) => (current === key ? null : key));
   }, []);
 
   const scheduleClose = useCallback(() => {
@@ -40,8 +53,31 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
     setOpenMenu(null);
   }, []);
 
+  // Second half of the 2026-08-14 mobile-touch fix (see toggleOnClick
+  // above): closes whatever menu is open when a tap/click lands outside
+  // the whole nav bar (a listing card, the hero, blank page space) —
+  // same as FilterBar.js's handleOutsideInteraction. Without this, tapping
+  // away from an open City/Neighborhood/Sign In/Join panel on a touch
+  // device would leave it stuck open, since there's no mouse to trigger
+  // onMouseLeave.
+  useEffect(() => {
+    if (!openMenu) return undefined;
+    function handleOutsideInteraction(event) {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setOpenMenu(null);
+      }
+    }
+    document.addEventListener('click', handleOutsideInteraction);
+    document.addEventListener('touchstart', handleOutsideInteraction);
+    return () => {
+      document.removeEventListener('click', handleOutsideInteraction);
+      document.removeEventListener('touchstart', handleOutsideInteraction);
+    };
+  }, [openMenu]);
+
   return (
     <div
+      ref={containerRef}
       style={{ background: 'var(--color-nav-bg)', position: 'relative', zIndex: 30 }}
       onMouseLeave={scheduleClose}
       onMouseEnter={cancelClose}
@@ -70,8 +106,8 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
             <NavLink label={`My Account`} href="/my-account" active={openMenu === 'account'} onEnter={() => openNow('account')} />
           ) : (
             <>
-              <NavLink label="Sign In" active={openMenu === 'signin'} onEnter={() => openNow('signin')} />
-              <NavLink label="Join" gold active={openMenu === 'join'} onEnter={() => openNow('join')} />
+              <NavLink label="Sign In" active={openMenu === 'signin'} onEnter={() => openNow('signin')} onToggle={() => toggleOnClick('signin')} />
+              <NavLink label="Join" gold active={openMenu === 'join'} onEnter={() => openNow('join')} onToggle={() => toggleOnClick('join')} />
             </>
           )}
         </div>
@@ -94,6 +130,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           bare
           active={openMenu === 'city'}
           onEnter={() => openNow('city')}
+          onToggle={() => toggleOnClick('city')}
           panel={
             openMenu === 'city' && (
               <DropdownPanel grid={5}>
@@ -127,6 +164,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           bare
           active={openMenu === 'neighborhood'}
           onEnter={() => openNow('neighborhood')}
+          onToggle={() => toggleOnClick('neighborhood')}
           panel={
             openMenu === 'neighborhood' && (
               <DropdownPanel grid={5}>
@@ -189,7 +227,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
   );
 }
 
-function NavLink({ label, href, bare, gold, active, onEnter, panel }) {
+function NavLink({ label, href, bare, gold, active, onEnter, onToggle, panel }) {
   const base = {
     color: '#fff',
     fontSize: 14,
@@ -229,7 +267,7 @@ function NavLink({ label, href, bare, gold, active, onEnter, panel }) {
         type="button"
         className={bare ? 'nav-link-bare' : undefined}
         style={{ ...style, cursor: 'pointer' }}
-        onClick={onEnter}
+        onClick={onToggle || onEnter}
       >
         {label}
       </button>
@@ -241,19 +279,53 @@ function NavLink({ label, href, bare, gold, active, onEnter, panel }) {
 // Anchored to its trigger's own position:relative wrapper (see NavLink)
 // so it opens directly underneath the link that triggered it, rather than
 // being right-aligned to the whole nav bar regardless of which item opened it.
+//
+// Mobile overflow fix (2026-08-14, per Ryan: "make sure the website is
+// very mobile friendly"). This used to be a hardcoded inline
+// `gridTemplateColumns: repeat(${grid}, minmax(140px, 1fr))` with no
+// responsive breakpoint at all — since minmax()'s 140px floor applies per
+// column, a 5-column grid has a 700px *minimum* content width regardless
+// of viewport size, which forced the whole panel (and the page) to
+// horizontal-scroll on any phone (measured: 882px of content squeezed
+// into a 375px-wide viewport, with 6 of the City dropdown's 10 entries
+// pushed off-screen and undiscoverable without scrolling). Fixed two ways:
+// (1) the column count now lives in a CSS custom property (--nav-grid-cols)
+// consumed by the .nav-grid class in globals.css, which collapses to a
+// single column below 480px and 2 columns below 900px — same
+// custom-property-driven pattern as this file's own .city-grid, chosen
+// because an *inline* gridTemplateColumns can never be overridden by an
+// external stylesheet's @media rule (inline styles always win the
+// cascade), so the responsive breakpoints have to live in the CSS class
+// instead; (2) leftOffset below nudges the panel left, same as
+// FilterBar.js's FilterTrigger fix, for cases where even a single-column
+// panel would still run past the right edge of the screen because of
+// where its trigger sits in the nav bar.
 function DropdownPanel({ children, grid }) {
+  const panelRef = useRef(null);
+  const [leftOffset, setLeftOffset] = useState(0);
+
+  useLayoutEffect(() => {
+    const panel = panelRef.current;
+    const wrap = panel?.parentElement; // the trigger's position:relative wrapper (see NavLink)
+    if (!panel || !wrap) return;
+    const wrapRect = wrap.getBoundingClientRect();
+    const margin = 16;
+    const overflowRight = wrapRect.left + panel.offsetWidth - (window.innerWidth - margin);
+    setLeftOffset(overflowRight > 0 ? -overflowRight : 0);
+  }, []);
+
   return (
     <div
-      className="nav-dropdown-panel"
+      ref={panelRef}
+      className="nav-dropdown-panel nav-grid"
       style={{
         position: 'absolute',
         top: '100%',
-        left: 0,
+        left: leftOffset,
         marginTop: 8,
         padding: 18,
-        display: 'grid',
-        gridTemplateColumns: `repeat(${grid}, minmax(140px, 1fr))`,
-        gap: 8,
+        maxWidth: 'calc(100vw - 32px)',
+        '--nav-grid-cols': grid,
         boxShadow: 'var(--shadow-nav-menu)',
         zIndex: 40,
       }}

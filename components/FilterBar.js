@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { SORT_OPTIONS, PRICE_BANDS, BED_OPTIONS, BATH_OPTIONS } from '@/lib/constants';
 import InquiryModals from './InquiryModals';
@@ -387,8 +387,35 @@ export default function FilterBar({
 }
 
 function FilterTrigger({ label, children, active, onEnter, onToggle }) {
+  const wrapRef = useRef(null);
+  const panelRef = useRef(null);
+  const [leftOffset, setLeftOffset] = useState(0);
+
+  // Mobile overflow fix (2026-08-14, per Ryan: "make sure the website is
+  // very mobile friendly"). The maxWidth clamp below (already in place)
+  // only bounds the panel's OWN width — it doesn't stop the panel from
+  // still running off the right edge of the screen when its trigger sits
+  // far enough right in the wrapped filter row (measured up to 71px of
+  // overflow on the Waterfront trigger at a 390px-wide viewport). This
+  // measures the trigger's actual on-screen position each time the panel
+  // opens and, only if the panel would overflow, shifts it left by just
+  // enough to stay on-screen — otherwise it keeps the normal left-aligned
+  // desktop position. useLayoutEffect (not useEffect) so this resolves
+  // before the browser paints, avoiding a one-frame flash at the
+  // overflowing position.
+  useLayoutEffect(() => {
+    if (!active) return;
+    const wrap = wrapRef.current;
+    const panel = panelRef.current;
+    if (!wrap || !panel) return;
+    const wrapRect = wrap.getBoundingClientRect();
+    const margin = 16;
+    const overflowRight = wrapRect.left + panel.offsetWidth - (window.innerWidth - margin);
+    setLeftOffset(overflowRight > 0 ? -overflowRight : 0);
+  }, [active]);
+
   return (
-    <div style={{ position: 'relative' }} onMouseEnter={onEnter}>
+    <div ref={wrapRef} style={{ position: 'relative' }} onMouseEnter={onEnter}>
       <button
         type="button"
         onClick={onToggle}
@@ -399,11 +426,12 @@ function FilterTrigger({ label, children, active, onEnter, onToggle }) {
       </button>
       {active && (
         <div
+          ref={panelRef}
           className="card"
           style={{
             position: 'absolute',
             top: '100%',
-            left: 0,
+            left: leftOffset,
             marginTop: 6,
             padding: 14,
             width: 220,
@@ -413,7 +441,9 @@ function FilterTrigger({ label, children, active, onEnter, onToggle }) {
             // push this fixed-220px panel partly off-screen. maxWidth alone
             // (not switching to right:0) keeps the same left-aligned
             // desktop appearance when there's room, and only shrinks when
-            // there isn't.
+            // there isn't. Combined with the leftOffset shift above (2026-08-14)
+            // for triggers positioned far enough right that width-shrinking
+            // alone still wasn't enough to keep the panel on-screen.
             maxWidth: 'calc(100vw - 32px)',
             boxShadow: 'var(--shadow-filter-menu)',
             zIndex: 35,
