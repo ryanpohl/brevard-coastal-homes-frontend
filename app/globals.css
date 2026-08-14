@@ -130,6 +130,19 @@ h4 {
   color: var(--color-ink);
 }
 
+/* Filter dropdown menu option hover (FilterBar.js) — per Ryan, 2026-08-14:
+   hovering an individual choice inside an open filter dropdown (a price
+   band like "Up to $2 Million", a Beds/Baths/Sort option, or a Property
+   Type/Waterfront/Neighborhood checkbox row) should turn light gray.
+   Scoped to its own class rather than adding :hover directly to
+   .btn-outline, since .btn-outline is shared by buttons elsewhere on the
+   site (Nav, Pagination, InquiryModals, my-account) that shouldn't pick up
+   this behavior — only applied to the actual selectable rows *inside* a
+   dropdown panel, not the "Price ▾"-style trigger pill that opens it. */
+.filter-menu-option:hover {
+  background-color: #f0f0f0;
+}
+
 /* Schedule a Showing / Ask a Question buttons in the listing-page filter bar
    (FilterBar.js, via InquiryModals) — a green/maroon pair per the design
    reference, distinct from the site's default navy .btn-primary so these
