@@ -36,9 +36,25 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
     setOpenMenu((current) => (current === key ? null : key));
   }, []);
 
+  // Sign In / Join / My Account are click-driven forms, not hover-driven
+  // navigation menus — unlike Search by City/Neighborhood, closing them
+  // just because the mouse drifted off the nav bar (e.g. to read a listing
+  // while typing) silently discards whatever the visitor had typed, since
+  // AuthPanel remounts with blank fields the next time it opens. Found
+  // 2026-08-14 (Ryan: "the pop up window for join/create account... keeps
+  // disappearing before I can fill out all the information") and
+  // reproduced directly: opening Join, typing into all three fields, then
+  // just moving the mouse off the nav bar (onto the map/listing area, as a
+  // real visitor's cursor naturally would while reading the page) closed
+  // the panel ~250ms later even mid-focus in the Password field. These
+  // three panels are still fully closable — via clicking their own trigger
+  // again (toggleOnClick), clicking anywhere outside the nav
+  // (handleOutsideInteraction below), or a successful sign-in/join/sign-out
+  // — just never via this hover-timeout.
   const scheduleClose = useCallback(() => {
+    if (openMenu === 'signin' || openMenu === 'join' || openMenu === 'account') return;
     closeTimer.current = setTimeout(() => setOpenMenu(null), 250);
-  }, []);
+  }, [openMenu]);
 
   const cancelClose = useCallback(() => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
