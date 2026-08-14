@@ -26,6 +26,7 @@ export default function FilterBar({
   hideWaterfront,
   extraActions,
   neighborhoodOptions,
+  show55Filter,
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -118,6 +119,12 @@ export default function FilterBar({
   const currentBaths = searchParams.get('baths') || '';
   const currentPriceMin = searchParams.get('priceMin') || '';
   const currentPriceMax = searchParams.get('priceMax') || '';
+  // "55+ Communities" (2026-08-14, Viera West Homes/Condos only — see
+  // show55Filter below). Tri-state, unlike everything else in this file:
+  // 'include' (the default — param absent) applies no filter at all,
+  // 'exclude' hides 55+ communities, 'only' shows just them. Mirrors the
+  // backend's buildWhereClause in listings.controller.js exactly.
+  const currentSeniorCommunity = searchParams.get('seniorCommunity') || 'include';
 
   const waterfrontOptions = [
     waterfrontFlags?.oceanfront && 'Oceanfront',
@@ -245,6 +252,45 @@ export default function FilterBar({
           </button>
         ))}
       </FilterTrigger>
+
+      {/* "55+ Communities" (2026-08-14, per Ryan) — Viera West Homes/Condos
+          pages only, see show55Filter passed from
+          app/[citySlug]/[propertySlug]/page.js. Placed here (between Baths
+          and Waterfront/Sort) per Ryan's request to put it "between baths &
+          sort" — Viera West never renders the Waterfront trigger below
+          (waterfrontOptions is empty for it, see seed.js), so on the pages
+          this actually shows on, it lands directly between Baths and Sort
+          exactly as asked. Three mutually-exclusive radio options (not
+          checkboxes, unlike Property Type/Waterfront/Neighborhood above) —
+          Include/Don't show/Only show are inherently exclusive states, not
+          independently toggleable ones. */}
+      {show55Filter && (
+        <FilterTrigger
+          label="55+ Communities"
+          active={openMenu === 'seniorCommunity'}
+          onEnter={() => openNow('seniorCommunity')}
+          onToggle={() => toggleOnClick('seniorCommunity')}
+        >
+          <RadioOption
+            name="seniorCommunity"
+            label="Include"
+            checked={currentSeniorCommunity === 'include'}
+            onChange={() => updateParams({ seniorCommunity: '' })}
+          />
+          <RadioOption
+            name="seniorCommunity"
+            label="Don't show"
+            checked={currentSeniorCommunity === 'exclude'}
+            onChange={() => updateParams({ seniorCommunity: 'exclude' })}
+          />
+          <RadioOption
+            name="seniorCommunity"
+            label="Only show"
+            checked={currentSeniorCommunity === 'only'}
+            onChange={() => updateParams({ seniorCommunity: 'only' })}
+          />
+        </FilterTrigger>
+      )}
 
       {!hideWaterfront && waterfrontOptions.length > 0 && (
         <FilterTrigger
@@ -377,6 +423,34 @@ function FilterTrigger({ label, children, active, onEnter, onToggle }) {
         </div>
       )}
     </div>
+  );
+}
+
+// Radio-button equivalent of Checkbox below, for tri-state single-select
+// filters (currently just "55+ Communities" — see show55Filter above).
+// Deliberately kept as a near-identical clone of Checkbox's exact
+// JSX/className/padding/margin rather than a shared generic component:
+// the two differ only in <input type>, and Checkbox is a well-established
+// pattern already reused in four places above — safer to duplicate a few
+// lines than risk an unrelated regression by refactoring it.
+function RadioOption({ label, name, checked, onChange }) {
+  return (
+    <label
+      className="filter-menu-option"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        fontSize: 13,
+        padding: '4px 6px',
+        margin: '-4px -6px 4px -6px',
+        borderRadius: 'var(--radius-btn)',
+        cursor: 'pointer',
+      }}
+    >
+      <input type="radio" name={name} checked={checked} onChange={onChange} style={{ width: 'auto' }} />
+      {label}
+    </label>
   );
 }
 
