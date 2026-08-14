@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { SORT_OPTIONS, PRICE_BANDS, BED_OPTIONS, BATH_OPTIONS } from '@/lib/constants';
 import InquiryModals from './InquiryModals';
@@ -33,10 +33,18 @@ export default function FilterBar({
   const [openMenu, setOpenMenu] = useState(null);
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const closeTimer = useRef(null);
+  const containerRef = useRef(null);
 
   const openNow = (key) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
     setOpenMenu(key);
+  };
+  // Tapping/clicking a trigger button toggles it (open <-> closed), unlike
+  // openNow above (hover-driven, always just opens — see the mobile fix
+  // note below for why the distinction matters).
+  const toggleOnClick = (key) => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setOpenMenu((current) => (current === key ? null : key));
   };
   const scheduleClose = () => {
     closeTimer.current = setTimeout(() => setOpenMenu(null), 250);
@@ -44,6 +52,41 @@ export default function FilterBar({
   const cancelClose = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
   };
+
+  // Mobile filter-dropdown fix (2026-08-13, per Ryan: "dropdown menus...
+  // don't seem to be working on mobile" — Property Type/Price/Beds/Baths/
+  // Waterfront/Sort). Root cause: every path that CLOSES a menu depended on
+  // onMouseLeave (scheduleClose above), which is real-mouse-only behavior.
+  // Touchscreens have no cursor and therefore never fire a genuine
+  // mouseleave after a tap — so once a menu opened (tapping a trigger does
+  // fire its onClick, which used to just call openNow), nothing could ever
+  // close it again: tapping the SAME trigger a second time just called
+  // openNow(key) again, which is idempotent (already open, stays open), and
+  // nothing was listening for taps elsewhere on the page either. The menu
+  // would appear to get stuck open, blocking taps on whatever was
+  // underneath it — reads exactly like "the dropdown menus aren't working."
+  // Fixed with two device-agnostic mechanisms, neither of which depends on
+  // hover: (1) the trigger's onClick now toggles instead of only opening
+  // (toggleOnClick above), so tapping an already-open trigger closes it;
+  // (2) this listens for any click/touchstart landing outside the whole
+  // filter bar and closes whatever menu is open — covers tapping a listing
+  // card, the map, or blank space to dismiss, same as clicking away does on
+  // desktop. Desktop's existing hover-to-open/hover-out-to-close behavior
+  // (openNow/scheduleClose/cancelClose) is left in place untouched.
+  useEffect(() => {
+    if (!openMenu) return undefined;
+    function handleOutsideInteraction(event) {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setOpenMenu(null);
+      }
+    }
+    document.addEventListener('click', handleOutsideInteraction);
+    document.addEventListener('touchstart', handleOutsideInteraction);
+    return () => {
+      document.removeEventListener('click', handleOutsideInteraction);
+      document.removeEventListener('touchstart', handleOutsideInteraction);
+    };
+  }, [openMenu]);
 
   const updateParams = useCallback(
     (updates) => {
@@ -88,6 +131,7 @@ export default function FilterBar({
 
   return (
     <div
+      ref={containerRef}
       className="container"
       style={{ display: 'flex', gap: 10, flexWrap: 'wrap', padding: '20px clamp(16px, 4vw, 56px)' }}
       onMouseLeave={scheduleClose}
@@ -105,6 +149,7 @@ export default function FilterBar({
           label={currentSubdivisions.length ? currentSubdivisions.join(', ') : 'Neighborhood'}
           active={openMenu === 'subdivision'}
           onEnter={() => openNow('subdivision')}
+          onToggle={() => toggleOnClick('subdivision')}
         >
           {neighborhoodOptions.map((name) => (
             <Checkbox
@@ -129,6 +174,7 @@ export default function FilterBar({
           label={currentPropertyTypes.length ? currentPropertyTypes.join(', ') : 'Property Type'}
           active={openMenu === 'propertyType'}
           onEnter={() => openNow('propertyType')}
+          onToggle={() => toggleOnClick('propertyType')}
         >
           {effectivePropertyTypes.map((pt) => (
             <Checkbox
@@ -146,6 +192,7 @@ export default function FilterBar({
           label={currentPriceMin || currentPriceMax ? 'Price' : 'Price'}
           active={openMenu === 'price'}
           onEnter={() => openNow('price')}
+          onToggle={() => toggleOnClick('price')}
         >
           {effectivePriceBands.map((band) => (
             <button
@@ -161,7 +208,12 @@ export default function FilterBar({
         </FilterTrigger>
       )}
 
-      <FilterTrigger label={currentBeds ? `${currentBeds}+ Beds` : 'Beds'} active={openMenu === 'beds'} onEnter={() => openNow('beds')}>
+      <FilterTrigger
+        label={currentBeds ? `${currentBeds}+ Beds` : 'Beds'}
+        active={openMenu === 'beds'}
+        onEnter={() => openNow('beds')}
+        onToggle={() => toggleOnClick('beds')}
+      >
         {effectiveBedOptions.map((n) => (
           <button
             key={n}
@@ -175,7 +227,12 @@ export default function FilterBar({
         ))}
       </FilterTrigger>
 
-      <FilterTrigger label={currentBaths ? `${currentBaths}+ Baths` : 'Baths'} active={openMenu === 'baths'} onEnter={() => openNow('baths')}>
+      <FilterTrigger
+        label={currentBaths ? `${currentBaths}+ Baths` : 'Baths'}
+        active={openMenu === 'baths'}
+        onEnter={() => openNow('baths')}
+        onToggle={() => toggleOnClick('baths')}
+      >
         {effectiveBathOptions.map((n) => (
           <button
             key={n}
@@ -194,6 +251,7 @@ export default function FilterBar({
           label={currentWaterfront.length ? currentWaterfront.join(', ') : 'Waterfront'}
           active={openMenu === 'waterfront'}
           onEnter={() => openNow('waterfront')}
+          onToggle={() => toggleOnClick('waterfront')}
         >
           {waterfrontOptions.map((opt) => (
             <Checkbox
@@ -206,7 +264,12 @@ export default function FilterBar({
         </FilterTrigger>
       )}
 
-      <FilterTrigger label="Sort" active={openMenu === 'sort'} onEnter={() => openNow('sort')}>
+      <FilterTrigger
+        label="Sort"
+        active={openMenu === 'sort'}
+        onEnter={() => openNow('sort')}
+        onToggle={() => toggleOnClick('sort')}
+      >
         {SORT_OPTIONS.map((opt) => (
           <button
             key={opt.value}
@@ -277,12 +340,12 @@ export default function FilterBar({
   );
 }
 
-function FilterTrigger({ label, children, active, onEnter }) {
+function FilterTrigger({ label, children, active, onEnter, onToggle }) {
   return (
     <div style={{ position: 'relative' }} onMouseEnter={onEnter}>
       <button
         type="button"
-        onClick={onEnter}
+        onClick={onToggle}
         className="btn btn-outline"
         style={{ background: '#fff', textTransform: 'none', letterSpacing: 0, fontSize: 13 }}
       >
@@ -298,6 +361,14 @@ function FilterTrigger({ label, children, active, onEnter }) {
             marginTop: 6,
             padding: 14,
             width: 220,
+            // Defensive clamp added alongside the mobile toggle/click-outside
+            // fix above: on a narrow phone viewport, a trigger that's
+            // wrapped onto the right side of the filter row could otherwise
+            // push this fixed-220px panel partly off-screen. maxWidth alone
+            // (not switching to right:0) keeps the same left-aligned
+            // desktop appearance when there's room, and only shrinks when
+            // there isn't.
+            maxWidth: 'calc(100vw - 32px)',
             boxShadow: 'var(--shadow-filter-menu)',
             zIndex: 35,
           }}
