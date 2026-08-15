@@ -27,6 +27,7 @@ export default function FilterBar({
   extraActions,
   neighborhoodOptions,
   show55Filter,
+  hideAcreageSort,
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -135,6 +136,18 @@ export default function FilterBar({
   const effectiveBedOptions = bedOptions || BED_OPTIONS;
   const effectiveBathOptions = bathOptions || BATH_OPTIONS;
   const effectivePropertyTypes = propertyTypeOptions || ['Home', 'Condo', 'Land'];
+  // "Acreage: Largest to Smallest" only makes sense on the dedicated Land
+  // pages (per Ryan, 2026-08-15: "delete the acreage option on all the
+  // pages other than the land pages") — acreage is null for every non-Land
+  // listing (see listingMapper.service.js's mapAcreage, only ever called
+  // for isLand), so it's a dead/no-op sort choice everywhere else. Passed
+  // in per-page: app/[citySlug]/[propertySlug]/page.js sets this to true
+  // for its Homes/Condos routes and false for its own Land route; every
+  // neighborhood page (app/neighborhoods/[slug]/page.js) sets it true
+  // unconditionally, since none of them are a dedicated Land-only page the
+  // way a city's /land-for-sale route is (Property Type there is just one
+  // filter among several, not baked into the URL).
+  const effectiveSortOptions = hideAcreageSort ? SORT_OPTIONS.filter((opt) => opt.value !== 'acreage_desc') : SORT_OPTIONS;
 
   return (
     <div
@@ -316,7 +329,7 @@ export default function FilterBar({
         onEnter={() => openNow('sort')}
         onToggle={() => toggleOnClick('sort')}
       >
-        {SORT_OPTIONS.map((opt) => (
+        {effectiveSortOptions.map((opt) => (
           <button
             key={opt.value}
             type="button"
