@@ -68,6 +68,22 @@ export default function ListingCard({ listing, onHoverChange }) {
   const isCondo = listing.propertyType === 'Condo';
   const showAssocFee = isCondo && listing.assocFee != null;
 
+  // Price-reduction indicator (2026-08-15, per Ryan, referencing two Zillow
+  // listing cards showing a "↓ $40k"-style price-drop marker next to the
+  // price, plus a Space Coast MLS History screenshot confirming the source
+  // field: "Original List Price" vs. the listing's current Price). Only
+  // shown when the MLS's real OriginalListPrice is on file AND is actually
+  // higher than the current price — a listing with no original price synced
+  // yet (older sync, or one that's never had a price change) simply shows
+  // no indicator, same "omit rather than show a placeholder" pattern as the
+  // Days on Market badge above. Ryan asked specifically for the reduction
+  // amount to render in red (`--color-error`) — not Zillow's own
+  // green/down-is-good convention.
+  const priceReduction =
+    listing.originalListPrice != null && listing.originalListPrice > listing.price
+      ? listing.originalListPrice - listing.price
+      : null;
+
   return (
     <Link
       href={`/listings/${listing.id}`}
@@ -141,7 +157,14 @@ export default function ListingCard({ listing, onHoverChange }) {
       </div>
 
       <div style={{ padding: 14 }}>
-        <p style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{formatPrice(listing.price)}</p>
+        <p style={{ display: 'flex', alignItems: 'baseline', gap: 6, fontSize: 18, fontWeight: 700, marginBottom: 4 }}>
+          {formatPrice(listing.price)}
+          {priceReduction != null && (
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-error)' }}>
+              ↓ {formatPrice(priceReduction)}
+            </span>
+          )}
+        </p>
         {showAssocFee && (
           <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-ink)', marginBottom: 4 }}>
             HOA {formatAssocFee(listing.assocFee, listing.assocFeeFrequency)}
