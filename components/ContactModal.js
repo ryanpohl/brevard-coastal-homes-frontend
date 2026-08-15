@@ -27,6 +27,14 @@ import ContactForm from './ContactForm';
  * is untouched and still works for anyone who lands on it directly (a
  * bookmark, a search result, a shared link) — this only changes what the
  * nav link does.
+ *
+ * Heading/intro sizing per Ryan, 2026-08-15: "Make the Contact Us on the
+ * top larger & just include the following text & make it larger too.
+ * 'Send us a message and we'll get back to you shortly.'" — bumped the
+ * "Contact Us" heading from 20px to 30px, dropped the intro paragraph's
+ * leading "Have a question about a listing..." sentence (the standalone
+ * /contact page keeps both sentences — this trim is popup-only, per the
+ * request), and sized the remaining sentence up from 14px to 18px.
  */
 export default function ContactModal({ onClose }) {
   const modal = (
@@ -52,7 +60,7 @@ export default function ContactModal({ onClose }) {
             borderBottom: '1px solid var(--color-border-light)',
           }}
         >
-          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 600, color: 'var(--color-ink)' }}>
+          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 30, fontWeight: 600, color: 'var(--color-ink)' }}>
             Contact Us
           </div>
           <button
@@ -66,9 +74,8 @@ export default function ContactModal({ onClose }) {
         </div>
 
         <div style={{ padding: '22px 26px 28px' }}>
-          <p style={{ color: 'var(--color-muted-dark)', marginBottom: 18, fontSize: 14 }}>
-            Have a question about a listing, or just getting started with your search? Send us a
-            message and we&apos;ll get back to you shortly.
+          <p style={{ color: 'var(--color-muted-dark)', marginBottom: 18, fontSize: 18 }}>
+            Send us a message and we&apos;ll get back to you shortly.
           </p>
 
           <ContactForm />
