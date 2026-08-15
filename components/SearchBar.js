@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PROPERTY_TYPE_TO_SLUG, BED_OPTIONS, BATH_OPTIONS } from '@/lib/constants';
+import { PROPERTY_TYPE_TO_SLUG, BED_OPTIONS } from '@/lib/constants';
 import ScheduleShowingModal from './ScheduleShowingModal';
 
 /**
@@ -10,12 +10,19 @@ import ScheduleShowingModal from './ScheduleShowingModal';
  * "hero search" component (design/design_files/Home.dc.html) — dark glass
  * pill buttons that each open a dropdown panel: City/Neighborhood (two-column
  * list, underlined headers), Property Type (checkboxes), Price (dual-handle
- * range slider + Min/Max selects), Beds, Baths — plus an address/MLS text
+ * range slider + Min/Max selects), Beds — plus an address/MLS text
  * field, a Search button, and a Schedule a Showing button.
  *
- * The mockup's Beds/Baths lists and price labels were display-only (no
+ * The mockup's Beds list and price labels were display-only (no
  * onClick/bound label in the exported prototype); here they're wired up for
  * real, since this is the production site, not a static mockup.
+ *
+ * The Baths dropdown that used to sit next to Beds was removed 2026-08-15
+ * per Ryan ("delete the baths dropdown menu in the hero section") — Beds
+ * naturally picked up its share of the row's width via the existing
+ * flex-grow layout below, no manual rebalancing needed. A `baths` URL param
+ * is still supported by the backend/city-page FilterBar if that's ever
+ * wanted back; this only removes it from the homepage hero bar.
  */
 
 const PRICE_STEPS = buildPriceSteps();
@@ -46,11 +53,10 @@ function maxLabelForIndex(idx) {
 }
 
 const BED_ITEMS = ['Any Beds', ...BED_OPTIONS.map((n) => `${n}+`)];
-const BATH_ITEMS = ['Any Baths', ...BATH_OPTIONS.map((n) => `${n}+`)];
 
 export default function SearchBar({ cities, neighborhoods }) {
   const router = useRouter();
-  const [openMenu, setOpenMenu] = useState(null); // 'location' | 'propertyType' | 'price' | 'beds' | 'baths' | null
+  const [openMenu, setOpenMenu] = useState(null); // 'location' | 'propertyType' | 'price' | 'beds' | null
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const closeTimer = useRef(null);
 
@@ -58,7 +64,6 @@ export default function SearchBar({ cities, neighborhoods }) {
   const [neighborhoodSlug, setNeighborhoodSlug] = useState('');
   const [propertyTypes, setPropertyTypes] = useState(['Home', 'Condo', 'Land']);
   const [beds, setBeds] = useState('');
-  const [baths, setBaths] = useState('');
   const [minIndex, setMinIndex] = useState(0);
   const [maxIndex, setMaxIndex] = useState(PRICE_STEPS.length);
   const [searchValue, setSearchValue] = useState('');
@@ -160,8 +165,8 @@ export default function SearchBar({ cities, neighborhoods }) {
     // both the city AND that single property type in one action — mirrors
     // the top nav's Search by City dropdown (Nav.js), which links straight
     // to /<city>/<type>. Here it just sets filter state instead of
-    // navigating immediately, so Price/Beds/Baths can still be combined in
-    // before the user clicks Search.
+    // navigating immediately, so Price/Beds can still be combined in before
+    // the user clicks Search.
     if (propertyType) setPropertyTypes([propertyType]);
     setOpenMenu(null);
   }
@@ -189,7 +194,6 @@ export default function SearchBar({ cities, neighborhoods }) {
     if (minIndex > 0) params.set('priceMin', String(PRICE_STEPS[minIndex - 1].value));
     if (maxIndex < PRICE_STEPS.length) params.set('priceMax', String(PRICE_STEPS[maxIndex].value));
     if (beds) params.set('beds', beds);
-    if (baths) params.set('baths', baths);
 
     const qs = params.toString();
     const primaryType = propertyTypes[0] || 'Home';
@@ -205,7 +209,6 @@ export default function SearchBar({ cities, neighborhoods }) {
   const selectedNeighborhood = neighborhoods.find((n) => n.slug === neighborhoodSlug);
   const locationLabel = selectedNeighborhood?.name || selectedCity?.name || 'City/Neighborhood';
   const bedsLabel = beds ? `${beds}+ Beds` : 'Beds';
-  const bathsLabel = baths ? `${baths}+ Baths` : 'Baths';
 
   const minPercent = (minIndex / PRICE_STEPS.length) * 100;
   const maxPercent = (maxIndex / PRICE_STEPS.length) * 100;
@@ -474,30 +477,6 @@ export default function SearchBar({ cities, neighborhoods }) {
                     className="hero-search-item"
                     onClick={() => {
                       setBeds(value);
-                      setOpenMenu(null);
-                    }}
-                    style={{ padding: '10px 20px', fontSize: 13, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', cursor: 'pointer' }}
-                  >
-                    {label}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </PillField>
-
-        <PillField style={{ flex: 0.7 }} onMouseEnter={() => openNow('baths')} onMouseLeave={scheduleClose}>
-          <PillTrigger label={bathsLabel} onClick={() => openNow('baths')} narrow />
-          {openMenu === 'baths' && (
-            <div className="hero-search-panel" style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, borderRadius: 4, padding: '8px 0', zIndex: 10 }}>
-              {BATH_ITEMS.map((label, i) => {
-                const value = i === 0 ? '' : String(BATH_OPTIONS[i - 1]);
-                return (
-                  <div
-                    key={label}
-                    className="hero-search-item"
-                    onClick={() => {
-                      setBaths(value);
                       setOpenMenu(null);
                     }}
                     style={{ padding: '10px 20px', fontSize: 13, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', cursor: 'pointer' }}
