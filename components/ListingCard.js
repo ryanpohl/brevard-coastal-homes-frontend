@@ -86,6 +86,39 @@ export default function ListingCard({ listing, onHoverChange }) {
         {photo && (
           <Image src={photo} alt={listing.address} fill sizes="(max-width: 768px) 100vw, 25vw" style={{ objectFit: 'cover' }} />
         )}
+        {/* CDOM badge (2026-08-15, per Ryan, referencing a Zillow listing
+            card's "742 days on Zillow" badge and his own MLS system's
+            DOM/CDOM field — explicitly "Do not show Zillow"; clarified same
+            day: "Just show the number for CDOM ... So if the CDOM shows 38
+            then it should say '38 Days on Market'" — exact wording/casing
+            below matches that, no singular/plural swap for "1").
+            listing.daysOnMarket is computed backend-side from the MLS
+            feed's OriginalOnMarketTimestamp, i.e. real CDOM semantics, not
+            plain DOM (see backend/src/utils/daysOnMarket.js and
+            schema.sql's comment on listings.on_market_date) — null for
+            listings with no on-market date on file (manually-entered
+            listings, or ones synced before this field existed), in which
+            case the badge is simply omitted rather than showing a
+            placeholder. Explicit `!= null` (not truthy) so a real "0 Days
+            on Market" listing (synced today) still shows the badge. */}
+        {listing.daysOnMarket != null && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 10,
+              left: 10,
+              padding: '6px 12px',
+              borderRadius: 999,
+              background: 'rgba(255,255,255,0.92)',
+              color: 'var(--color-ink)',
+              fontSize: 12,
+              fontWeight: 700,
+              boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+            }}
+          >
+            {listing.daysOnMarket} Days on Market
+          </div>
+        )}
         <button
           type="button"
           onClick={toggleFavorite}
