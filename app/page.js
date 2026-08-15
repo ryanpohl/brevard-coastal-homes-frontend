@@ -28,8 +28,24 @@ export default async function HomePage() {
     // Backend unreachable — render the page with empty search options rather than crashing.
   }
 
+  // Schema Markup for SEO (2026-08-15, per Ryan: "add a Schema Markup for
+  // SEO for the homepage") — Organization/RealEstateAgent + WebSite
+  // JSON-LD (see backend's getHomeSeo / buildOrganizationSchema /
+  // buildWebsiteSchema for what's in it). Fetched separately from
+  // cities/neighborhoods above, in its own try/catch — same "render the
+  // page rather than crash" pattern every other await here uses, so a
+  // temporarily-unreachable backend takes down just the JSON-LD block,
+  // not the whole homepage.
+  let jsonLd = null;
+  try {
+    ({ jsonLd } = await api.getHomeSeo());
+  } catch {
+    // No SEO data available — render the page without JSON-LD rather than crashing.
+  }
+
   return (
     <div>
+      {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
       <div style={{ position: 'relative', width: '100%', minHeight: 692, background: 'var(--color-nav-bg)' }}>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 692, overflow: 'hidden' }}>
           <Image
