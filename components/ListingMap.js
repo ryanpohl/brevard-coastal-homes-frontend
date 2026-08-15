@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { formatPrice } from '@/lib/constants';
+import { formatPrice, formatAssocFee } from '@/lib/constants';
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -81,15 +81,73 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
 
   // Shared by marker-hover (mouse directly over a pin) and the sidebar
   // ListingCard-hover path (hoveredListingId prop) so both show the exact
-  // same popup — image thumbnail, price, address — rather than the old
-  // plain gold-dot marker highlight for the sidebar-hover case.
+  // same popup. Originally just a photo/price/address summary (2026-08-11);
+  // rebuilt 2026-08-15 (per Ryan, with a screenshot of the map popup next to
+  // a full ListingCard and the ask "have the pop up window listing in the
+  // maps show exactly what the listing does on the right") to mirror
+  // ListingCard.js's full content — Days on Market badge, price + red price-
+  // reduction indicator, HOA fee (condos), address, beds/baths/sqft (or
+  // acreage/zoning for land) with Rental Restrictions, and the waterfront
+  // badge. The field-level logic below (RENTAL_RESTRICTIONS_EXCLUDED_SLUGS,
+  // the showAssocFee/priceReduction/waterfront-!=='None' guards) is
+  // deliberately kept in exact sync with ListingCard.js's own copies — this
+  // is plain HTML built for a Google Maps InfoWindow (not a React
+  // component), so it can't just import/reuse ListingCard directly.
+  // Deliberately omits the card's favorite-heart button: that's a stateful,
+  // auth-gated control (click handler calling the favorites API with the
+  // signed-in user's token) that isn't practical to wire up inside a raw
+  // InfoWindow string — the whole popup is already a click-through link to
+  // the listing, same as before. Colors are hardcoded hex (matching
+  // globals.css's design tokens) rather than var(--color-*), same
+  // convention the original version of this function already used.
   function buildPopupContent(listing) {
     const thumbnailPhoto = listing.photos && listing.photos.length ? listing.photos[0] : null;
-    return `<div style="font-family: 'Jost', sans-serif; font-size: 13px; max-width: 200px;">
+    const isLand = listing.propertyType === 'Land';
+    const isCondo = listing.propertyType === 'Condo';
+
+    const RENTAL_RESTRICTIONS_EXCLUDED_SLUGS = ['adelaide', 'aripeka', 'summer-lakes'];
+    const showRentalRestrictions =
+      listing.rentalRestrictions && !RENTAL_RESTRICTIONS_EXCLUDED_SLUGS.includes(listing.neighborhood?.slug);
+    const showAssocFee = isCondo && listing.assocFee != null;
+    const priceReduction =
+      listing.originalListPrice != null && listing.originalListPrice > listing.price
+        ? listing.originalListPrice - listing.price
+        : null;
+    const showWaterfront = listing.waterfront && listing.waterfront !== 'None';
+
+    const daysOnMarketBadge =
+      listing.daysOnMarket != null
+        ? `<div style="position: absolute; top: 8px; left: 8px; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,0.92); color: #1c2b30; font-size: 11px; font-weight: 700; box-shadow: 0 1px 4px rgba(0,0,0,0.25);">${listing.daysOnMarket} Days on Market</div>`
+        : '';
+
+    const priceReductionSpan =
+      priceReduction != null
+        ? `<span style="font-size: 12px; font-weight: 700; color: #c0392b; margin-left: 6px;">&darr; ${escapeHtml(formatPrice(priceReduction))}</span>`
+        : '';
+
+    const assocFeeLine = showAssocFee
+      ? `<div style="font-size: 12px; font-weight: 600; color: #1c2b30; margin-top: 2px;">HOA ${escapeHtml(formatAssocFee(listing.assocFee, listing.assocFeeFrequency))}</div>`
+      : '';
+
+    const statsLine = isLand
+      ? `${listing.acreage ? `${listing.acreage} acres` : ''}${listing.zoning ? ` &middot; ${escapeHtml(listing.zoning)}` : ''}`
+      : `${listing.beds ?? '&mdash;'} bd &middot; ${listing.baths ?? '&mdash;'} ba &middot; ${listing.sqft ? `${listing.sqft.toLocaleString()} sqft` : '&mdash;'}${showRentalRestrictions ? ` &middot; Rental Restrictions: ${escapeHtml(listing.rentalRestrictions)}` : ''}`;
+
+    const waterfrontLine = showWaterfront
+      ? `<div style="font-size: 10px; color: #2f7a4f; margin-top: 4px; font-weight: 600;">${escapeHtml(listing.waterfront)}</div>`
+      : '';
+
+    return `<div style="font-family: 'Jost', sans-serif; font-size: 13px; width: 220px;">
         <a href="/listings/${listing.id}" style="display: block; color: #1c2b30; text-decoration: none;">
-          ${thumbnailPhoto ? `<img src="${escapeHtml(thumbnailPhoto)}" alt="${escapeHtml(listing.address)}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 4px; display: block; margin-bottom: 6px;" />` : ''}
-          <span style="font-weight: 600;">${escapeHtml(formatPrice(listing.price))}</span>
-          <div style="color: #667377; margin-top: 2px;">${escapeHtml(listing.address)}</div>
+          <div style="position: relative; width: 100%; height: 130px; border-radius: 4px; overflow: hidden; margin-bottom: 8px; background: #e6e1d6;">
+            ${thumbnailPhoto ? `<img src="${escapeHtml(thumbnailPhoto)}" alt="${escapeHtml(listing.address)}" style="width: 100%; height: 100%; object-fit: cover; display: block;" />` : ''}
+            ${daysOnMarketBadge}
+          </div>
+          <div style="font-weight: 700; font-size: 15px;">${escapeHtml(formatPrice(listing.price))}${priceReductionSpan}</div>
+          ${assocFeeLine}
+          <div style="color: #667377; margin-top: 2px; font-size: 12px;">${escapeHtml(listing.address)}</div>
+          <div style="color: #445055; margin-top: 4px; font-size: 11px;">${statsLine}</div>
+          ${waterfrontLine}
         </a>
       </div>`;
   }
