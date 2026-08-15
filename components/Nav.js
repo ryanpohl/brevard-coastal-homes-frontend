@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { PROPERTY_TYPE_TO_SLUG } from '@/lib/constants';
 import AuthPanel from './AuthPanel';
+import ContactModal from './ContactModal';
 
 /**
  * Top nav. Matches the design spec's dropdown behavior: opens on hover/click,
@@ -16,6 +17,10 @@ import AuthPanel from './AuthPanel';
 export default function Nav({ cities = [], neighborhoods = [] }) {
   const { signedIn, user, signOut } = useAuth();
   const [openMenu, setOpenMenu] = useState(null); // 'city' | 'neighborhood' | 'account' | 'signin' | 'join' | null
+  // Separate from openMenu, same reasoning as SearchBar.js's scheduleModalOpen:
+  // this is a body-portaled modal (see ContactModal.js), not one of the
+  // nav-anchored dropdown panels openMenu tracks.
+  const [contactModalOpen, setContactModalOpen] = useState(false);
   const closeTimer = useRef(null);
   const containerRef = useRef(null);
 
@@ -212,7 +217,20 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           }
         />
         <NavLink label="Looking to Sell" href="/looking-to-sell" bare onEnter={closeNow} />
-        <NavLink label="Contact Us" href="/contact" bare onEnter={closeNow} />
+        {/* Was a Link to /contact — now opens ContactModal instead, per Ryan
+            2026-08-15: "make the Contact Us link ... a pop up window
+            instead of its own separate page". closeNow also runs first so
+            a dropdown left open from a sibling trigger (e.g. Search by
+            City) doesn't linger open behind the modal. */}
+        <NavLink
+          label="Contact Us"
+          bare
+          onEnter={closeNow}
+          onToggle={() => {
+            closeNow();
+            setContactModalOpen(true);
+          }}
+        />
       </div>
 
       {openMenu === 'account' && signedIn && (
@@ -252,6 +270,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
 
       {openMenu === 'signin' && <AuthPanel mode="signin" onClose={() => setOpenMenu(null)} />}
       {openMenu === 'join' && <AuthPanel mode="join" onClose={() => setOpenMenu(null)} />}
+      {contactModalOpen && <ContactModal onClose={() => setContactModalOpen(false)} />}
     </div>
   );
 }

@@ -1,0 +1,96 @@
+'use client';
+
+import { createPortal } from 'react-dom';
+import { AGENT_INFO } from '@/lib/constants';
+import ContactForm from './ContactForm';
+
+/**
+ * "Contact Us" nav link (components/Nav.js) opens this instead of
+ * navigating to the standalone /contact page — per Ryan, 2026-08-15:
+ * "Can you make the 'contact us' link in the main menu a pop up window
+ * instead of its own separate page."
+ *
+ * Mirrors the site's established modal pattern (see PropertyContactPanel.js's
+ * ModalShell and ScheduleShowingModal.js): portal straight to
+ * document.body — Nav lives in its own stacking context (z-index: 30,
+ * sibling of <main> in app/layout.js), so a plain absolutely-positioned
+ * dropdown panel can't reliably sit above page content the way the
+ * Sign In/Join panels do; a body-level `.modal-overlay` sidesteps that
+ * entirely, same reasoning ScheduleShowingModal.js documents. Closes on
+ * backdrop click or the × button; a click inside the panel itself is
+ * stopped from bubbling to the backdrop.
+ *
+ * Reuses the same ContactForm shown on the standalone /contact page, plus
+ * the agent's phone/email. The page's "Map placeholder" box is left out
+ * here — it's a literal placeholder with no real map wired up, and isn't
+ * worth the extra height in a popup. The standalone /contact page itself
+ * is untouched and still works for anyone who lands on it directly (a
+ * bookmark, a search result, a shared link) — this only changes what the
+ * nav link does.
+ */
+export default function ContactModal({ onClose }) {
+  const modal = (
+    <div className="modal-overlay" onClick={onClose}>
+      <div
+        style={{
+          background: '#fff',
+          borderRadius: 6,
+          width: 'min(480px, 100%)',
+          maxHeight: '90vh',
+          overflowY: 'auto',
+          boxShadow: '0 24px 60px rgba(0,0,0,0.4)',
+          position: 'relative',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '22px 26px',
+            borderBottom: '1px solid var(--color-border-light)',
+          }}
+        >
+          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 600, color: 'var(--color-ink)' }}>
+            Contact Us
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            style={{ cursor: 'pointer', fontSize: 20, color: 'var(--color-muted)', lineHeight: 1, background: 'none', border: 'none' }}
+          >
+            ×
+          </button>
+        </div>
+
+        <div style={{ padding: '22px 26px 28px' }}>
+          <p style={{ color: 'var(--color-muted-dark)', marginBottom: 18, fontSize: 14 }}>
+            Have a question about a listing, or just getting started with your search? Send us a
+            message and we&apos;ll get back to you shortly.
+          </p>
+
+          <ContactForm />
+
+          {(AGENT_INFO.phone || AGENT_INFO.email) && (
+            <div
+              style={{
+                marginTop: 18,
+                paddingTop: 16,
+                borderTop: '1px solid var(--color-border-light)',
+                fontSize: 13,
+                color: 'var(--color-muted-dark)',
+              }}
+            >
+              {AGENT_INFO.phone && <p style={{ marginBottom: 4 }}>{AGENT_INFO.phone}</p>}
+              {AGENT_INFO.email && <p>{AGENT_INFO.email}</p>}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  return createPortal(modal, document.body);
+}
