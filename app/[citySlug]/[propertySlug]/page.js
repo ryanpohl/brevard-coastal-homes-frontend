@@ -134,6 +134,11 @@ export default async function CityListingsPage({ params, searchParams }) {
         excludeWaterfrontOptions={excludeWaterfrontOptions}
         priceBands={propertyType === 'Condo' ? CONDO_PRICE_BANDS : undefined}
         show55Filter={show55Filter}
+        // "Acreage" sort option (per Ryan, 2026-08-15) — kept only on this
+        // city's own Land route; hidden on its Homes/Condos routes, where
+        // every listing's acreage is null anyway. See FilterBar.js's
+        // hideAcreageSort comment.
+        hideAcreageSort={propertyType !== 'Land'}
       />
 
       <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
