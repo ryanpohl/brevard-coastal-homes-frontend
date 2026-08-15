@@ -161,7 +161,13 @@ export default function ListingCard({ listing, onHoverChange }) {
           {formatPrice(listing.price)}
           {priceReduction != null && (
             <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-error)' }}>
-              ↓ {formatPrice(priceReduction)}
+              {/* Arrow enlarged (2026-08-15, per Ryan: "the red arrow ...
+                  hard to see") — its own span at a bigger font-size than
+                  the reduction amount next to it, so the glyph reads
+                  clearly at a glance without the whole indicator's text
+                  growing out of proportion with the price line it sits
+                  next to. */}
+              <span style={{ fontSize: 18, verticalAlign: -2 }}>↓</span> {formatPrice(priceReduction)}
             </span>
           )}
         </p>

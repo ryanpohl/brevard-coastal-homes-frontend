@@ -120,9 +120,13 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
         ? `<div style="position: absolute; top: 8px; left: 8px; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,0.92); color: #1c2b30; font-size: 11px; font-weight: 700; box-shadow: 0 1px 4px rgba(0,0,0,0.25);">${listing.daysOnMarket} Days on Market</div>`
         : '';
 
+    // Arrow enlarged (2026-08-15, per Ryan: "the red arrow ... hard to
+    // see") — kept in sync with ListingCard.js's own copy of this fix: the
+    // &darr; glyph gets its own bigger inline font-size than the reduction
+    // amount text next to it.
     const priceReductionSpan =
       priceReduction != null
-        ? `<span style="font-size: 12px; font-weight: 700; color: #c0392b; margin-left: 6px;">&darr; ${escapeHtml(formatPrice(priceReduction))}</span>`
+        ? `<span style="font-size: 12px; font-weight: 700; color: #c0392b; margin-left: 6px;"><span style="font-size: 17px; vertical-align: -2px;">&darr;</span> ${escapeHtml(formatPrice(priceReduction))}</span>`
         : '';
 
     const assocFeeLine = showAssocFee
