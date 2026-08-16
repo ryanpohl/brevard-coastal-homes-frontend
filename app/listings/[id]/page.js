@@ -185,7 +185,16 @@ export default async function ListingDetailPage({ params }) {
 
           <div style={{ marginTop: 32 }}>
             <h2 style={{ fontSize: 18, marginBottom: 12 }}>Location</h2>
-            <ListingMap center={mapCenter} listings={[listing]} height={320} zoom={15} />
+            {/* Height bumped 320 -> 440 (2026-08-16, per Ryan): the popup
+                that opens on hovering this page's single self-pin was
+                getting clipped to a tiny internal scrollbar (see the
+                domready fix in ListingMap.js) because 320px didn't leave
+                Google's InfoWindow autopan enough room above the pin to
+                fit the full price/address/stats content. A taller map
+                gives autopan the room it needs so the popup renders in
+                full without scrolling, matching the taller (and
+                scroll-free) maps on the city/neighborhood results pages. */}
+            <ListingMap center={mapCenter} listings={[listing]} height={440} zoom={15} />
           </div>
         </div>
 
