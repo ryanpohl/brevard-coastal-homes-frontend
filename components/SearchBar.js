@@ -158,16 +158,19 @@ export default function SearchBar({ cities, neighborhoods }) {
     setPropertyTypes((prev) => (prev.includes(pt) ? prev.filter((p) => p !== pt) : [...prev, pt]));
   }
 
-  function selectCity(slug, propertyType) {
+  function selectCity(slug) {
     setCitySlug(slug);
     setNeighborhoodSlug('');
-    // Clicking "Homes" or "Condos" under a city is a shortcut for picking
-    // both the city AND that single property type in one action — mirrors
-    // the top nav's Search by City dropdown (Nav.js), which links straight
-    // to /<city>/<type>. Here it just sets filter state instead of
-    // navigating immediately, so Price/Beds can still be combined in before
-    // the user clicks Search.
-    if (propertyType) setPropertyTypes([propertyType]);
+    // Deliberately does NOT touch propertyTypes (2026-08-16, per Ryan —
+    // removed the per-city "Homes"/"Condos" sub-links that used to live in
+    // the location dropdown, since the dedicated Property Type dropdown
+    // right next to this one already covers the exact same choice. Before
+    // this, clicking "Homes" or "Condos" under a city would silently
+    // overwrite whatever the user had already picked in Property Type —
+    // a real surprise in a "build up City + Property Type + Price + Beds,
+    // then click Search" tool, unlike the top nav's version of this
+    // dropdown (Nav.js), which navigates straight to /<city>/<type> and so
+    // has no separate Property Type control to conflict with.
     setOpenMenu(null);
   }
 
@@ -241,26 +244,21 @@ export default function SearchBar({ cities, neighborhoods }) {
               <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <PanelHeading>Search by City</PanelHeading>
+                  {/* Single clickable line per city (2026-08-16, per Ryan —
+                      see selectCity()'s comment above for why the old
+                      "Homes"/"Condos" sub-links were removed). Matches the
+                      Search by Neighborhood column's own single-line-item
+                      styling (LIST_ITEM_STYLE) for visual consistency now
+                      that both columns are the same shape. */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                     {cities.map((city) => (
-                      <div key={city.slug}>
-                        <div style={CITY_LABEL_STYLE}>{city.name} Listings</div>
-                        <div
-                          className="hero-search-item"
-                          onClick={() => selectCity(city.slug, 'Home')}
-                          style={CITY_SUBLINK_STYLE}
-                        >
-                          Homes
-                        </div>
-                        {city.showCondosInNav !== false && (
-                          <div
-                            className="hero-search-item-secondary"
-                            onClick={() => selectCity(city.slug, 'Condo')}
-                            style={CITY_SUBLINK_STYLE}
-                          >
-                            Condos
-                          </div>
-                        )}
+                      <div
+                        key={city.slug}
+                        className="hero-search-item"
+                        onClick={() => selectCity(city.slug)}
+                        style={LIST_ITEM_STYLE}
+                      >
+                        {city.name}
                       </div>
                     ))}
                   </div>
@@ -567,28 +565,6 @@ const LIST_ITEM_STYLE = {
   fontWeight: 600,
   letterSpacing: 1,
   textTransform: 'uppercase',
-  cursor: 'pointer',
-};
-
-// City column header ("<City> Listings") + the "Homes"/"Condos" links
-// stacked beneath it — matches the top nav's "Search by City" dropdown
-// (see Nav.js's cityListingsLabelStyle/cityHomeLinkStyle/gridCondoLinkStyle)
-// so the hero search bar's location picker reads the same way.
-const CITY_LABEL_STYLE = {
-  fontSize: 13,
-  fontWeight: 700,
-  letterSpacing: 1,
-  textTransform: 'uppercase',
-  color: '#ffffff',
-  padding: '2px 6px 0',
-};
-const CITY_SUBLINK_STYLE = {
-  display: 'block',
-  fontSize: 12,
-  fontWeight: 600,
-  letterSpacing: 1,
-  textTransform: 'uppercase',
-  padding: '3px 6px',
   cursor: 'pointer',
 };
 
