@@ -283,6 +283,27 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
         if (!container) return;
         container.addEventListener('mouseenter', cancelPopupClose);
         container.addEventListener('mouseleave', schedulePopupClose);
+
+        // Google auto-injects an inline max-height + overflow:auto onto
+        // the popup's content wrapper whenever it calculates there isn't
+        // enough room between the anchor and the map container's own
+        // visible edge — this shows up as an internal scrollbar forcing
+        // the visitor to scroll inside the tiny popup to see the
+        // price/address/stats below the photo (per Ryan, 2026-08-16,
+        // reported on the Property Detail page's shorter 320px map,
+        // where the single self-pin sits close to the map's edge). The
+        // exact class Google uses for this (gm-style-iw-d) is an
+        // undocumented internal name that can change between API
+        // versions (this loader pins "weekly"), so search broadly for
+        // any inline max-height Google added within the popup's outer
+        // wrapper and strip it, rather than hardcoding that class name —
+        // lets the popup render at its natural full height instead of a
+        // clipped, scrollable one.
+        const scope = container.closest('.gm-style-iw-a') || container.parentElement || container;
+        scope.querySelectorAll('[style*="max-height"]').forEach((el) => {
+          el.style.maxHeight = 'none';
+          el.style.overflow = 'visible';
+        });
       });
 
       if (points.length > 1) {
