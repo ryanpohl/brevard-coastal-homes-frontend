@@ -39,30 +39,47 @@ export default function PropertyContactPanel({ listingId }) {
         <div style={{ fontSize: 22, letterSpacing: 0.5, marginTop: 4 }}>{AGENT_INFO.businessName}</div>
         <div style={{ fontSize: 14, marginTop: 12, opacity: 0.9 }}>We are standing by to assist you.</div>
         <div style={{ fontSize: 13, marginTop: 16, opacity: 0.85 }}>
-          Want to make an offer or ask a question? Select one the buttons below.
+          {listingId != null
+            ? 'Want to make an offer or ask a question? Select one the buttons below.'
+            : 'Have a question? Select the button below.'}
         </div>
         <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-          <button
-            type="button"
-            onClick={() => setOfferOpen(true)}
-            style={{
-              flex: 1,
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              background: 'var(--color-gold)',
-              color: 'var(--color-ink-dark)',
-              fontSize: 14,
-              fontWeight: 600,
-              padding: '12px 20px',
-              borderRadius: 999,
-              border: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            ★ Make an Offer
-          </button>
+          {/* Make an Offer only ever makes sense tied to a specific
+              listing (the backend requires a listingId — see
+              MakeOfferModal's submit below). This panel is also rendered
+              with no listingId as a general "reach out to us" entry point
+              (the homepage's "Schedule a Showing" popup, ScheduleShowingModal.js,
+              and FilterBar.js's general contact modal) — Make an Offer used
+              to render there too and always failed with a confusing
+              "listingId is required" error on submit (per Ryan,
+              2026-08-16, who ran into this live and asked for it fixed by
+              removing the button rather than loosening the backend
+              requirement). Gated here instead of hiding it deeper in
+              MakeOfferModal so the button + intro copy above disappear
+              together. */}
+          {listingId != null && (
+            <button
+              type="button"
+              onClick={() => setOfferOpen(true)}
+              style={{
+                flex: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                background: 'var(--color-gold)',
+                color: 'var(--color-ink-dark)',
+                fontSize: 14,
+                fontWeight: 600,
+                padding: '12px 20px',
+                borderRadius: 999,
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              ★ Make an Offer
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setAskOpen(true)}
@@ -291,7 +308,13 @@ function ModalShell({ onClose, maxWidth = 480, children }) {
 
 function MakeOfferModal({ listingId, onClose }) {
   const { user } = useAuth();
-  const [form, setForm] = useState({ name: user?.name || '', email: user?.email || '', phone: '', propertyAddress: '', offerPrice: '' });
+  const [form, setForm] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: '',
+    propertyAddress: '',
+    offerPrice: '',
+  });
   const [purchasePlan, setPurchasePlan] = useState(null); // 'cash' | 'financing'
   const [hasBuyerAgency, setHasBuyerAgency] = useState(null); // 'yes' | 'no'
   const [hasToured, setHasToured] = useState(null); // 'yes' | 'no'
@@ -344,7 +367,11 @@ function MakeOfferModal({ listingId, onClose }) {
               <label style={{ fontSize: 13, color: 'var(--color-ink)' }}>Mobile Phone</label>
               <input type="tel" value={form.phone} onChange={(e) => update('phone', e.target.value)} style={inputStyle} />
               <label style={{ fontSize: 13, color: 'var(--color-ink)' }}>Address of Property</label>
-              <input value={form.propertyAddress} onChange={(e) => update('propertyAddress', e.target.value)} style={inputStyle} />
+              <input
+                value={form.propertyAddress}
+                onChange={(e) => update('propertyAddress', e.target.value)}
+                style={inputStyle}
+              />
               <label style={{ fontSize: 13, color: 'var(--color-ink)' }}>Offer Price</label>
               <input
                 type="number"
