@@ -16,7 +16,7 @@ const inputStyle = { border: '1px solid var(--color-border-warm)' };
  * grid + In Person/Virtual + contact fields — submits directly, no modal).
  * Matches design/design_files/Property Detail.dc.html.
  */
-export default function PropertyContactPanel({ listingId }) {
+export default function PropertyContactPanel({ listingId, listingAddress }) {
   const { user } = useAuth();
   const [offerOpen, setOfferOpen] = useState(false);
   const [askOpen, setAskOpen] = useState(false);
@@ -110,18 +110,26 @@ export default function PropertyContactPanel({ listingId }) {
         </div>
       </div>
 
-      <RequestShowingForm listingId={listingId} dateOptions={dateOptions} user={user} />
+      <RequestShowingForm listingId={listingId} listingAddress={listingAddress} dateOptions={dateOptions} user={user} />
 
-      {offerOpen && <MakeOfferModal listingId={listingId} onClose={() => setOfferOpen(false)} />}
+      {offerOpen && <MakeOfferModal listingId={listingId} listingAddress={listingAddress} onClose={() => setOfferOpen(false)} />}
       {askOpen && <AskQuestionModal listingId={listingId} user={user} onClose={() => setAskOpen(false)} />}
     </div>
   );
 }
 
-function RequestShowingForm({ listingId, dateOptions, user }) {
+function RequestShowingForm({ listingId, listingAddress, dateOptions, user }) {
   const [selectedDate, setSelectedDate] = useState(null); // iso string
   const [tourType, setTourType] = useState(null); // 'in_person' | 'virtual'
-  const [form, setForm] = useState({ propertyAddress: '', name: user?.name || '', email: user?.email || '', phone: '', message: '' });
+  // propertyAddress auto-fills from the actual listing's address when this
+  // form is rendered on that listing's own Property Detail page (per Ryan,
+  // 2026-08-17: "on the actual listing page is there a way to make the
+  // address of the property auto-populate... from the address of the
+  // actual listing") — still a normal editable input, not read-only, same
+  // as name/email already auto-filling from the signed-in user below.
+  // Falls back to '' when there's no listing (the general-inquiry popups),
+  // same as before this change.
+  const [form, setForm] = useState({ propertyAddress: listingAddress || '', name: user?.name || '', email: user?.email || '', phone: '', message: '' });
   const [status, setStatus] = useState({ submitting: false, error: '', success: '' });
 
   function update(field, value) {
@@ -306,13 +314,17 @@ function ModalShell({ onClose, maxWidth = 480, children }) {
   );
 }
 
-function MakeOfferModal({ listingId, onClose }) {
+function MakeOfferModal({ listingId, listingAddress, onClose }) {
   const { user } = useAuth();
+  // propertyAddress auto-fills from the actual listing's address (per
+  // Ryan, 2026-08-17 — see the matching comment in RequestShowingForm
+  // above) — still a normal editable input, same as name/email already
+  // auto-filling from the signed-in user.
   const [form, setForm] = useState({
     name: user?.name || '',
     email: user?.email || '',
     phone: '',
-    propertyAddress: '',
+    propertyAddress: listingAddress || '',
     offerPrice: '',
   });
   const [purchasePlan, setPurchasePlan] = useState(null); // 'cash' | 'financing'
