@@ -5,17 +5,35 @@ import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
 
 /**
- * Sign In / Join / Reset Password panel — all three render inside the same
- * dropdown-style panel, matching the design spec (email/password fields,
- * submit, inline error text, "forgot password" toggles to reset mode).
+ * Sign In/Register panel — combined into one entry point with a Log In /
+ * Register tab switcher (2026-08-16, per Ryan: "would it be smart to
+ * combine the Sign in & Join buttons... into Log in/Register button" and
+ * two reference screenshots showing a tabbed Log In/Register panel).
+ * Previously Nav.js rendered two separate AuthPanel instances (mode=
+ * 'signin'/'join', controlled by which of two separate nav buttons was
+ * clicked), with no way to switch between them short of closing and
+ * reopening via the OTHER nav button. Now there's a single "Sign
+ * In/Register" nav button and this panel owns its own tab state
+ * internally, defaulting to the Log In tab.
  *
- * `mode` is controlled by the parent (Nav) so opening "Sign In" vs "Join"
- * starts on the right form; the panel itself only manages the reset toggle.
+ * Styling note: Ryan's reference screenshots had a white background with
+ * light blue buttons — confirmed with him this was just to show the
+ * tab-switcher CONCEPT, and the panel should keep the site's own dark
+ * navy/gold theme rather than adopt those colors. `.nav-dropdown-panel`
+ * (globals.css) is unchanged from before this redesign.
  */
-export default function AuthPanel({ mode: initialMode, onClose }) {
+export default function AuthPanel({ onClose }) {
   const { login, register } = useAuth();
-  const [mode, setMode] = useState(initialMode); // 'signin' | 'join' | 'reset'
-  const [fields, setFields] = useState({ name: '', email: '', password: '' });
+  const [mode, setMode] = useState('signin'); // 'signin' | 'join' | 'reset'
+  const [fields, setFields] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    phone: '',
+    workingWithAgent: false,
+    remember: true,
+  });
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -24,17 +42,39 @@ export default function AuthPanel({ mode: initialMode, onClose }) {
     setFields((f) => ({ ...f, [key]: value }));
   }
 
+  // Switches tabs AND clears any error/notice left over from the other
+  // tab's last attempt — without this, a failed Log In error would still
+  // be showing after switching to Register (or vice versa).
+  function switchTab(nextMode) {
+    setMode(nextMode);
+    setError('');
+    setNotice('');
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     setNotice('');
+
+    // Confirm Password is a client-side-only check (2026-08-16, Register
+    // tab) — the backend never sees confirmPassword, just password.
+    if (mode === 'join' && fields.password !== fields.confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
     setSubmitting(true);
     try {
       if (mode === 'signin') {
-        await login(fields.email, fields.password);
+        // "Remember me on this machine" (2026-08-16) — see
+        // auth-context.js's persist()/login() for what this actually
+        // controls (localStorage vs. session-only sessionStorage).
+        await login(fields.email, fields.password, fields.remember);
         onClose();
       } else if (mode === 'join') {
-        await register(fields.name, fields.email, fields.password);
+        // phone/workingWithAgent are both optional — see backend's
+        // schema.sql comment on users.phone/users.working_with_agent.
+        await register(fields.name, fields.email, fields.password, fields.phone || undefined, fields.workingWithAgent);
         onClose();
       } else if (mode === 'reset') {
         const res = await api.requestPasswordReset(fields.email);
@@ -48,31 +88,32 @@ export default function AuthPanel({ mode: initialMode, onClose }) {
   }
 
   return (
-    <div
-      className="nav-dropdown-panel"
-      style={{
-        position: 'absolute',
-        top: '100%',
-        right: 0,
-        marginTop: 8,
-        padding: 20,
-        width: 300,
-        boxShadow: 'var(--shadow-nav-menu)',
-        zIndex: 40,
-      }}
-    >
-      <h3 style={{ fontSize: 18, marginBottom: 16 }}>
-        {mode === 'signin' ? 'Sign In' : mode === 'join' ? 'Join' : 'Reset Password'}
-      </h3>
+    <div className="nav-dropdown-panel" style={panelStyle}>
+      {mode === 'reset' ? (
+        <h3 style={{ fontSize: 18, marginBottom: 16 }}>Reset Password</h3>
+      ) : (
+        <div style={tabRowStyle}>
+          <button
+            type="button"
+            onClick={() => switchTab('signin')}
+            style={mode === 'signin' ? tabActiveStyle : tabInactiveStyle}
+          >
+            Sign In
+          </button>
+          <button
+            type="button"
+            onClick={() => switchTab('join')}
+            style={mode === 'join' ? tabActiveStyle : tabInactiveStyle}
+          >
+            Register
+          </button>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit}>
         {mode === 'join' && (
           <Field label="Name">
-            <input
-              required
-              value={fields.name}
-              onChange={(e) => update('name', e.target.value)}
-              type="text"
-            />
+            <input required value={fields.name} onChange={(e) => update('name', e.target.value)} type="text" />
           </Field>
         )}
         <Field label="Email">
@@ -89,8 +130,49 @@ export default function AuthPanel({ mode: initialMode, onClose }) {
             />
           </Field>
         )}
+        {mode === 'join' && (
+          <Field label="Confirm Password">
+            <input
+              required
+              minLength={8}
+              value={fields.confirmPassword}
+              onChange={(e) => update('confirmPassword', e.target.value)}
+              type="password"
+            />
+          </Field>
+        )}
+        {mode === 'join' && (
+          <Field label="Phone Number">
+            <input value={fields.phone} onChange={(e) => update('phone', e.target.value)} type="tel" />
+          </Field>
+        )}
 
-        {error && <p className="error-text" style={{ marginBottom: 12 }}>{error}</p>}
+        {mode === 'signin' && (
+          <label style={checkboxRowStyle}>
+            <input
+              type="checkbox"
+              checked={fields.remember}
+              onChange={(e) => update('remember', e.target.checked)}
+            />
+            Remember me on this machine
+          </label>
+        )}
+        {mode === 'join' && (
+          <label style={checkboxRowStyle}>
+            <input
+              type="checkbox"
+              checked={fields.workingWithAgent}
+              onChange={(e) => update('workingWithAgent', e.target.checked)}
+            />
+            I am working with an agent
+          </label>
+        )}
+
+        {error && (
+          <p className="error-text" style={{ marginBottom: 12 }}>
+            {error}
+          </p>
+        )}
         {notice && <p style={{ color: '#7bd8a0', fontSize: 13, marginBottom: 12 }}>{notice}</p>}
 
         <button type="submit" className="btn btn-primary" disabled={submitting} style={{ width: '100%' }}>
@@ -100,12 +182,12 @@ export default function AuthPanel({ mode: initialMode, onClose }) {
 
       <div style={{ marginTop: 14, fontSize: 12, textAlign: 'center' }}>
         {mode === 'signin' && (
-          <button type="button" onClick={() => setMode('reset')} style={linkBtnStyle}>
+          <button type="button" onClick={() => switchTab('reset')} style={linkBtnStyle}>
             Forgot password?
           </button>
         )}
         {mode === 'reset' && (
-          <button type="button" onClick={() => setMode('signin')} style={linkBtnStyle}>
+          <button type="button" onClick={() => switchTab('signin')} style={linkBtnStyle}>
             Back to sign in
           </button>
         )}
@@ -122,6 +204,53 @@ function Field({ label, children }) {
     </label>
   );
 }
+
+const panelStyle = {
+  position: 'absolute',
+  top: '100%',
+  right: 0,
+  marginTop: 8,
+  padding: 20,
+  width: 300,
+  boxShadow: 'var(--shadow-nav-menu)',
+  zIndex: 40,
+};
+
+// Log In / Register tab switcher (2026-08-16). Segmented-control look using
+// the site's existing gold/navy palette (--color-gold for the active tab,
+// matching the old standalone "Join" button's accent color) rather than the
+// reference screenshots' white/light-blue styling — see this file's top
+// comment for why.
+const tabRowStyle = {
+  display: 'flex',
+  marginBottom: 18,
+  borderRadius: 4,
+  overflow: 'hidden',
+  border: '1px solid rgba(255, 255, 255, 0.25)',
+};
+const tabBaseStyle = {
+  flex: 1,
+  padding: '10px 0',
+  fontSize: 12,
+  fontWeight: 700,
+  letterSpacing: 1,
+  textTransform: 'uppercase',
+  border: 'none',
+  cursor: 'pointer',
+  textAlign: 'center',
+};
+const tabActiveStyle = { ...tabBaseStyle, background: 'var(--color-gold)', color: 'var(--color-ink-dark)' };
+const tabInactiveStyle = { ...tabBaseStyle, background: 'transparent', color: 'rgba(255, 255, 255, 0.75)' };
+
+const checkboxRowStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  fontSize: 12,
+  color: 'rgba(255, 255, 255, 0.85)',
+  marginBottom: 14,
+  cursor: 'pointer',
+};
 
 const linkBtnStyle = {
   background: 'none',

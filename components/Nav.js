@@ -16,7 +16,9 @@ import ContactModal from './ContactModal';
  */
 export default function Nav({ cities = [], neighborhoods = [] }) {
   const { signedIn, user, signOut } = useAuth();
-  const [openMenu, setOpenMenu] = useState(null); // 'city' | 'neighborhood' | 'account' | 'signin' | 'join' | null
+  // 'signin'/'join' merged into a single 'auth' key (2026-08-16) — see the
+  // "Sign In/Register" NavLink below and AuthPanel.js's own top comment.
+  const [openMenu, setOpenMenu] = useState(null); // 'city' | 'neighborhood' | 'account' | 'auth' | null
   // Separate from openMenu, same reasoning as SearchBar.js's scheduleModalOpen:
   // this is a body-portaled modal (see ContactModal.js), not one of the
   // nav-anchored dropdown panels openMenu tracks.
@@ -41,7 +43,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
     setOpenMenu((current) => (current === key ? null : key));
   }, []);
 
-  // Sign In / Join / My Account are click-driven forms, not hover-driven
+  // Sign In/Register / My Account are click-driven forms, not hover-driven
   // navigation menus — unlike Search by City/Neighborhood, closing them
   // just because the mouse drifted off the nav bar (e.g. to read a listing
   // while typing) silently discards whatever the visitor had typed, since
@@ -52,12 +54,13 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
   // just moving the mouse off the nav bar (onto the map/listing area, as a
   // real visitor's cursor naturally would while reading the page) closed
   // the panel ~250ms later even mid-focus in the Password field. These
-  // three panels are still fully closable — via clicking their own trigger
-  // again (toggleOnClick), clicking anywhere outside the nav
+  // panels are still fully closable — via clicking their own trigger again
+  // (toggleOnClick), clicking anywhere outside the nav
   // (handleOutsideInteraction below), or a successful sign-in/join/sign-out
-  // — just never via this hover-timeout.
+  // — just never via this hover-timeout. ('signin'/'join' merged into
+  // 'auth' 2026-08-16, see the NavLink below.)
   const scheduleClose = useCallback(() => {
-    if (openMenu === 'signin' || openMenu === 'join' || openMenu === 'account') return;
+    if (openMenu === 'auth' || openMenu === 'account') return;
     closeTimer.current = setTimeout(() => setOpenMenu(null), 250);
   }, [openMenu]);
 
@@ -126,10 +129,20 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           {signedIn ? (
             <NavLink label={`My Account`} href="/my-account" active={openMenu === 'account'} onEnter={() => openNow('account')} />
           ) : (
-            <>
-              <NavLink label="Sign In" active={openMenu === 'signin'} onEnter={() => openNow('signin')} onToggle={() => toggleOnClick('signin')} />
-              <NavLink label="Join" gold active={openMenu === 'join'} onEnter={() => openNow('join')} onToggle={() => toggleOnClick('join')} />
-            </>
+            // Combined Sign In + Join into one entry point (2026-08-16, per
+            // Ryan) — AuthPanel now owns its own Log In/Register tab
+            // switcher internally (defaulting to Log In), so one button is
+            // enough instead of two separate buttons that opened two
+            // separately-configured copies of the same panel. Kept the gold
+            // styling the old "Join" button used, to keep a visible
+            // call-to-action in the nav rather than a plain outlined one.
+            <NavLink
+              label="Sign In/Register"
+              gold
+              active={openMenu === 'auth'}
+              onEnter={() => openNow('auth')}
+              onToggle={() => toggleOnClick('auth')}
+            />
           )}
         </div>
       </div>
@@ -268,8 +281,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
         </div>
       )}
 
-      {openMenu === 'signin' && <AuthPanel mode="signin" onClose={() => setOpenMenu(null)} />}
-      {openMenu === 'join' && <AuthPanel mode="join" onClose={() => setOpenMenu(null)} />}
+      {openMenu === 'auth' && <AuthPanel onClose={() => setOpenMenu(null)} />}
       {contactModalOpen && <ContactModal onClose={() => setContactModalOpen(false)} />}
     </div>
   );
