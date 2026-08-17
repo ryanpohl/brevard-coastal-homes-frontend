@@ -30,7 +30,24 @@ export default function InquiryModals({
 }) {
   const { user } = useAuth();
   const [open, setOpen] = useState(null); // 'schedule' | 'question' | null
-  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '', preferredDate: '', preferredTime: '' });
+  // propertyAddress: added 2026-08-17 per Ryan ("Can you add 'Address of
+  // Property' to all the ask a question pop up boxes in all the city &
+  // neighborhood pages so I know what property they potentially are asking
+  // a question about"). Unlike PropertyContactPanel.js's AskQuestionModal
+  // (which auto-fills from a real listing on the Property Detail page),
+  // this component's one real call site (FilterBar.js, on city/
+  // neighborhood results pages) never passes a listingId — there's no
+  // single listing to pull an address from here, so this is always a
+  // manual/free-text field the visitor fills in themselves.
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: '',
+    preferredDate: '',
+    preferredTime: '',
+    propertyAddress: '',
+  });
   const [status, setStatus] = useState({ submitting: false, error: '', success: '' });
 
   function openModal(kind) {
@@ -41,6 +58,7 @@ export default function InquiryModals({
       message: '',
       preferredDate: '',
       preferredTime: '',
+      propertyAddress: '',
     });
     setStatus({ submitting: false, error: '', success: '' });
     setOpen(kind);
@@ -99,6 +117,13 @@ export default function InquiryModals({
               <p style={{ color: 'var(--color-success)' }}>{status.success}</p>
             ) : (
               <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {open === 'question' && (
+                  <input
+                    placeholder="Address of Property"
+                    value={form.propertyAddress}
+                    onChange={(e) => update('propertyAddress', e.target.value)}
+                  />
+                )}
                 <input placeholder="Full name" required value={form.name} onChange={(e) => update('name', e.target.value)} />
                 <input
                   type="email"
