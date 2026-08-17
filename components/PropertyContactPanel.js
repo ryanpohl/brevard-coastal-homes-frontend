@@ -113,7 +113,7 @@ export default function PropertyContactPanel({ listingId, listingAddress }) {
       <RequestShowingForm listingId={listingId} listingAddress={listingAddress} dateOptions={dateOptions} user={user} />
 
       {offerOpen && <MakeOfferModal listingId={listingId} listingAddress={listingAddress} onClose={() => setOfferOpen(false)} />}
-      {askOpen && <AskQuestionModal listingId={listingId} user={user} onClose={() => setAskOpen(false)} />}
+      {askOpen && <AskQuestionModal listingId={listingId} listingAddress={listingAddress} user={user} onClose={() => setAskOpen(false)} />}
     </div>
   );
 }
@@ -474,9 +474,16 @@ function MakeOfferModal({ listingId, listingAddress, onClose }) {
   );
 }
 
-function AskQuestionModal({ listingId, user, onClose }) {
+function AskQuestionModal({ listingId, listingAddress, user, onClose }) {
   const [contactMethods, setContactMethods] = useState([]); // ['Call', 'Text', 'Email']
-  const [form, setForm] = useState({ name: user?.name || '', email: user?.email || '', phone: '', message: '' });
+  // propertyAddress auto-fills from the actual listing's address when this
+  // modal is opened on that listing's own Property Detail page (per Ryan,
+  // 2026-08-17: "Can you add a text box on the ask a question popup menu &
+  // have that auto populate also on the individual listings page") — same
+  // pattern as RequestShowingForm/MakeOfferModal above, still a normal
+  // editable input, not read-only. Falls back to '' when there's no listing
+  // (the general-inquiry popups), same as the other two forms.
+  const [form, setForm] = useState({ propertyAddress: listingAddress || '', name: user?.name || '', email: user?.email || '', phone: '', message: '' });
   const [status, setStatus] = useState({ submitting: false, error: '', success: '' });
 
   function update(field, value) {
@@ -550,6 +557,12 @@ function AskQuestionModal({ listingId, user, onClose }) {
                 </label>
               ))}
             </div>
+            <input
+              placeholder="Address of Property"
+              value={form.propertyAddress}
+              onChange={(e) => update('propertyAddress', e.target.value)}
+              style={{ ...inputStyle, marginBottom: 10 }}
+            />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10, marginBottom: 10 }}>
               <input placeholder="Name" required value={form.name} onChange={(e) => update('name', e.target.value)} style={inputStyle} />
               <input type="tel" placeholder="Phone" value={form.phone} onChange={(e) => update('phone', e.target.value)} style={inputStyle} />
