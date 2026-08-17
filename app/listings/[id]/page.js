@@ -198,8 +198,11 @@ export default async function ListingDetailPage({ params }) {
           </div>
         </div>
 
-        {/* RIGHT: contact panel (Call/Text + Make an Offer + Ask a Question + inline Request Showing) */}
-        <PropertyContactPanel listingId={listing.id} />
+        {/* RIGHT: contact panel (Call/Text + Make an Offer + Ask a Question + inline Request Showing).
+            listingAddress auto-fills the "Address of Property" field in
+            both the Make an Offer modal and the Request Showing form
+            below (per Ryan, 2026-08-17) — still editable, not read-only. */}
+        <PropertyContactPanel listingId={listing.id} listingAddress={listing.address} />
       </div>
     </>
   );
