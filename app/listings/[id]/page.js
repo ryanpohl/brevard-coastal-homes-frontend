@@ -5,6 +5,7 @@ import FavoriteButton from '@/components/FavoriteButton';
 import PropertyGallery from '@/components/PropertyGallery';
 import PropertyContactPanel from '@/components/PropertyContactPanel';
 import ListingMap from '@/components/ListingMap';
+import ViewTracker from '@/components/ViewTracker';
 
 // Status badge color — matches design/design_files/Property Detail.dc.html's
 // olive-green "ACTIVE" for the common case; the other statuses aren't shown
@@ -114,6 +115,11 @@ export default async function ListingDetailPage({ params }) {
       `}</style>
       <div className="listing-detail-grid">
         {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
+
+        {/* Fire-and-forget page-view tracking for signed-in users (added
+            2026-08-18, per Ryan — mirrors FavoriteButton below; see
+            components/ViewTracker.js). Renders nothing. */}
+        <ViewTracker listingId={listing.id} />
 
         {/* LEFT: photos, header, stats, description, map */}
         <div>
