@@ -7,6 +7,12 @@ import { PROPERTY_TYPE_TO_SLUG } from '@/lib/constants';
 import AuthPanel from './AuthPanel';
 import ContactModal from './ContactModal';
 
+// Neighborhoods whose "Search by Neighborhood" dropdown entry gets the
+// City-dropdown-style "<Name> Listings" + Homes/Condos treatment instead of
+// a single flat link (2026-08-20, per Ryan: "make harbor Island island
+// Beach Club & Aquarina look just like the Indialantic screenshot").
+const NEIGHBORHOOD_CONDO_PAGE_SLUGS = new Set(['harbor-island-beach-club', 'aquarina']);
+
 /**
  * Top nav. Matches the design spec's dropdown behavior: opens on hover/click,
  * closes on a ~250ms delay after the mouse leaves (so users can move
@@ -214,17 +220,49 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           panel={
             openMenu === 'neighborhood' && (
               <DropdownPanel grid={5}>
-                {neighborhoods.map((n) => (
-                  <Link
-                    key={n.slug}
-                    href={`/neighborhoods/${n.slug}`}
-                    className="hero-search-item"
-                    style={gridLinkStyle}
-                    onClick={closeNow}
-                  >
-                    {n.name}
-                  </Link>
-                ))}
+                {neighborhoods.map((n) =>
+                  // Harbor Island Beach Club + Aquarina restyled to match the
+                  // City dropdown's "<Name> Listings" + Homes/Condos format
+                  // (2026-08-20, per Ryan). The "Condos" link goes to the
+                  // same /neighborhoods/[slug] route every neighborhood
+                  // already uses, filtered via ?propertyType=Condo — this
+                  // route's listings-fetch and SEO metadata (getNeighborhoodSeo)
+                  // already fully support that query param for every
+                  // neighborhood (page_seo already has Condo-type rows
+                  // seeded for all 10), so no new route/page was needed.
+                  // Every other neighborhood keeps its original flat link.
+                  NEIGHBORHOOD_CONDO_PAGE_SLUGS.has(n.slug) ? (
+                    <div key={n.slug}>
+                      <div style={cityListingsLabelStyle}>{n.name} Listings</div>
+                      <Link
+                        href={`/neighborhoods/${n.slug}`}
+                        className="hero-search-item"
+                        style={cityHomeLinkStyle}
+                        onClick={closeNow}
+                      >
+                        Homes
+                      </Link>
+                      <Link
+                        href={`/neighborhoods/${n.slug}?propertyType=Condo`}
+                        className="hero-search-item-secondary"
+                        style={gridCondoLinkStyle}
+                        onClick={closeNow}
+                      >
+                        Condos
+                      </Link>
+                    </div>
+                  ) : (
+                    <Link
+                      key={n.slug}
+                      href={`/neighborhoods/${n.slug}`}
+                      className="hero-search-item"
+                      style={gridLinkStyle}
+                      onClick={closeNow}
+                    >
+                      {n.name}
+                    </Link>
+                  )
+                )}
               </DropdownPanel>
             )
           }
