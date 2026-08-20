@@ -234,8 +234,19 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                   NEIGHBORHOOD_CONDO_PAGE_SLUGS.has(n.slug) ? (
                     <div key={n.slug}>
                       <div style={cityListingsLabelStyle}>{n.name} Listings</div>
+                      {/* Explicitly filtered to ?propertyType=Home (2026-08-20
+                          follow-up, per Ryan: "only show single family homes
+                          and no condos" under this link). Without this param
+                          the neighborhood route's listings fetch applies no
+                          property-type filter at all and returns Home+Condo
+                          combined — that's the existing default behavior for
+                          every other neighborhood's single flat link, but
+                          wrong for this split Homes/Condos treatment, where
+                          "Homes" should mean Homes only, mirroring the City
+                          dropdown's Homes link (which always links to the
+                          Home-only URL segment, never the combined view). */}
                       <Link
-                        href={`/neighborhoods/${n.slug}`}
+                        href={`/neighborhoods/${n.slug}?propertyType=Home`}
                         className="hero-search-item"
                         style={cityHomeLinkStyle}
                         onClick={closeNow}
