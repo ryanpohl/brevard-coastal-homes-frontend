@@ -1,3 +1,4 @@
+import Script from 'next/script';
 import './globals.css';
 import { AuthProvider } from '@/lib/auth-context';
 import Nav from '@/components/Nav';
@@ -30,6 +31,21 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
+        {/* Google Ads conversion tracking (gtag.js), added 2026-08-20 per Ryan.
+            Loaded here in the root layout so it's present on every page. */}
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=AW-18381671560"
+          strategy="afterInteractive"
+        />
+        <Script id="google-ads-gtag" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'AW-18381671560');
+          `}
+        </Script>
         <AuthProvider>
           <Nav cities={cities} neighborhoods={neighborhoods} />
           <main>{children}</main>
