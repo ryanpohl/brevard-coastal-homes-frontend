@@ -444,10 +444,16 @@ function DropdownPanel({ children, grid }) {
   );
 }
 
+// Font sizes bumped 2026-08-20 per Ryan ("make the text in the drop down
+// menus larger on the homepage for search by city & search by
+// neighborhood") — these are plain module-level style objects (not
+// per-render inline styles keyed off state), so a direct fontSize bump
+// is sufficient here; no CSS-custom-property/@media indirection needed
+// like PlaceCard's label above, since this wasn't a mobile-specific ask.
 const gridLinkStyle = {
   display: 'block',
   padding: '8px 10px',
-  fontSize: 13,
+  fontSize: 15,
   borderRadius: 4,
 };
 
@@ -459,15 +465,15 @@ const gridLinkStyle = {
 // them.
 const cityListingsLabelStyle = {
   padding: '8px 10px 0',
-  fontSize: 13,
+  fontSize: 15,
   fontWeight: 700,
   color: '#fff',
 };
-const cityHomeLinkStyle = { ...gridLinkStyle, padding: '2px 10px 0', fontSize: 12 };
+const cityHomeLinkStyle = { ...gridLinkStyle, padding: '2px 10px 0', fontSize: 14 };
 const gridCondoLinkStyle = {
   display: 'block',
   padding: '2px 10px 8px',
-  fontSize: 12,
+  fontSize: 14,
   borderRadius: 4,
 };
 
