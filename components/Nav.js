@@ -7,10 +7,18 @@ import { PROPERTY_TYPE_TO_SLUG } from '@/lib/constants';
 import AuthPanel from './AuthPanel';
 import ContactModal from './ContactModal';
 
-// Neighborhoods whose "Search by Neighborhood" dropdown entry gets the
-// City-dropdown-style "<Name> Listings" + Homes/Condos treatment instead of
-// a single flat link (2026-08-20, per Ryan: "make harbor Island island
-// Beach Club & Aquarina look just like the Indialantic screenshot").
+// Neighborhoods whose "Search by Neighborhood" dropdown entry also gets a
+// "Condos" link, on top of the shared "<Name> Listings" + "Homes" treatment
+// every neighborhood now uses (see the map below). Originally added
+// 2026-08-20 per Ryan ("make harbor Island island Beach Club & Aquarina
+// look just like the Indialantic screenshot") when only these two had the
+// header/Homes/Condos format and every other neighborhood was a single flat
+// link. A same-day follow-up ("add the word Listings after each
+// Neighborhood that doesn't have it already... add home links under
+// [the other 8 neighborhoods]... Do not add condos link to any of those
+// though") extended the header + Homes treatment to every neighborhood, so
+// this set is now just the allowlist for the extra Condos link, not a gate
+// on the header/Homes treatment itself.
 const NEIGHBORHOOD_CONDO_PAGE_SLUGS = new Set(['harbor-island-beach-club', 'aquarina']);
 
 /**
@@ -220,39 +228,43 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           panel={
             openMenu === 'neighborhood' && (
               <DropdownPanel grid={5}>
-                {neighborhoods.map((n) =>
-                  // Harbor Island Beach Club + Aquarina restyled to match the
-                  // City dropdown's "<Name> Listings" + Homes/Condos format
-                  // (2026-08-20, per Ryan). The "Condos" link goes to the
-                  // same /neighborhoods/[slug] route every neighborhood
-                  // already uses, filtered via ?propertyType=Condo — this
-                  // route's listings-fetch and SEO metadata (getNeighborhoodSeo)
-                  // already fully support that query param for every
-                  // neighborhood (page_seo already has Condo-type rows
-                  // seeded for all 10), so no new route/page was needed.
-                  // Every other neighborhood keeps its original flat link.
-                  NEIGHBORHOOD_CONDO_PAGE_SLUGS.has(n.slug) ? (
-                    <div key={n.slug}>
-                      <div style={cityListingsLabelStyle}>{n.name} Listings</div>
-                      {/* Explicitly filtered to ?propertyType=Home (2026-08-20
-                          follow-up, per Ryan: "only show single family homes
-                          and no condos" under this link). Without this param
-                          the neighborhood route's listings fetch applies no
-                          property-type filter at all and returns Home+Condo
-                          combined — that's the existing default behavior for
-                          every other neighborhood's single flat link, but
-                          wrong for this split Homes/Condos treatment, where
-                          "Homes" should mean Homes only, mirroring the City
-                          dropdown's Homes link (which always links to the
-                          Home-only URL segment, never the combined view). */}
-                      <Link
-                        href={`/neighborhoods/${n.slug}?propertyType=Home`}
-                        className="hero-search-item"
-                        style={cityHomeLinkStyle}
-                        onClick={closeNow}
-                      >
-                        Homes
-                      </Link>
+                {/* Every neighborhood shows the City-dropdown-style "<Name>
+                    Listings" header + a "Homes" link (2026-08-20 follow-up,
+                    per Ryan: "add the word Listings after each Neighborhood
+                    that doesn't have it already. Also add home links under
+                    Adelaide, Aripeka, Summer lakes, Lansing Island, Tortoise
+                    island, Suntree, South Merritt Island, & Viera Builders
+                    communities. Do not add condos link to any of those
+                    though.") — this replaced the single flat link every
+                    neighborhood except Harbor Island Beach Club/Aquarina
+                    used before. Only the two slugs in
+                    NEIGHBORHOOD_CONDO_PAGE_SLUGS (see above) also get a
+                    "Condos" link; every other neighborhood intentionally
+                    stops at Homes, per Ryan's explicit "do not add condos
+                    link" instruction. "Homes" is explicitly filtered to
+                    ?propertyType=Home so it always means Homes only,
+                    mirroring the City dropdown's Homes link (which never
+                    links to the combined Home+Condo view) — without this
+                    param the neighborhood route's listings fetch applies no
+                    property-type filter and returns every type combined.
+                    "Condos" goes to the same /neighborhoods/[slug] route
+                    filtered via ?propertyType=Condo — the route's
+                    listings-fetch and SEO metadata (getNeighborhoodSeo)
+                    already fully support that query param for every
+                    neighborhood (page_seo already has Condo-type rows
+                    seeded for all 10), so no new route/page was needed. */}
+                {neighborhoods.map((n) => (
+                  <div key={n.slug}>
+                    <div style={cityListingsLabelStyle}>{n.name} Listings</div>
+                    <Link
+                      href={`/neighborhoods/${n.slug}?propertyType=Home`}
+                      className="hero-search-item"
+                      style={cityHomeLinkStyle}
+                      onClick={closeNow}
+                    >
+                      Homes
+                    </Link>
+                    {NEIGHBORHOOD_CONDO_PAGE_SLUGS.has(n.slug) && (
                       <Link
                         href={`/neighborhoods/${n.slug}?propertyType=Condo`}
                         className="hero-search-item-secondary"
@@ -261,19 +273,9 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                       >
                         Condos
                       </Link>
-                    </div>
-                  ) : (
-                    <Link
-                      key={n.slug}
-                      href={`/neighborhoods/${n.slug}`}
-                      className="hero-search-item"
-                      style={gridLinkStyle}
-                      onClick={closeNow}
-                    >
-                      {n.name}
-                    </Link>
-                  )
-                )}
+                    )}
+                  </div>
+                ))}
               </DropdownPanel>
             )
           }
