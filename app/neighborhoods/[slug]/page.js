@@ -218,8 +218,21 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // h1/generic fallback used by every other neighborhood page, plus two
   // extra CTA buttons — see HarborIslandInquiryModals.js, rendered via
   // FilterBar's extraActions prop.
+  //
+  // Split into a Home-specific and Condo-specific version (2026-08-20, per
+  // Ryan) instead of the one combined "Homes & Condos"/foreclosures H1 used
+  // for both — the Home version drops the foreclosures mention entirely
+  // (Ryan's own wording only paired "foreclosures" with the Condos text).
+  // Picked via primaryType (already computed above from
+  // searchParams.propertyType, defaulting to 'Home'), so the bare
+  // /neighborhoods/harbor-island-beach-club URL (no propertyType param)
+  // also gets the Home version, matching primaryType's own Home default.
+  const HARBOR_ISLAND_BEACH_CLUB_HOME_H1 =
+    'Harbor Island Beach Club, Melbourne Beach FL Homes for sale. Contact us about current off-market properties currently available in Harbor Island.';
+  const HARBOR_ISLAND_BEACH_CLUB_CONDO_H1 =
+    'Harbor Island Beach Club, Melbourne Beach FL Condos for sale. Contact us about current foreclosures & off-market properties currently available in Harbor Island.';
   const HARBOR_ISLAND_BEACH_CLUB_H1 =
-    'Harbor Island Beach Club, Melbourne Beach FL Homes & Condos for sale. Contact us about current foreclosures & off-market properties currently available in Harbor Island.';
+    primaryType === 'Condo' ? HARBOR_ISLAND_BEACH_CLUB_CONDO_H1 : HARBOR_ISLAND_BEACH_CLUB_HOME_H1;
   // Viera Builders Communities Viera West (per Ryan, 2026-08-05): drops a
   // new "Neighborhood" dropdown (before Property Type) listing its 6
   // sub-communities — see lib/constants.js's
