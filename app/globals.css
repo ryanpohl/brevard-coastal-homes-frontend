@@ -239,6 +239,38 @@ h4 {
   }
 }
 
+/* Search by City / Search by Neighborhood dropdown text (Nav.js's
+   .nav-grid panels above) — larger on mobile only (2026-08-20, per Ryan:
+   "make the text in search by city dropdown & the search by neighborhood
+   dropdowns larger but only on mobile"). Font size used to live directly
+   on Nav.js's inline style objects (cityListingsLabelStyle's "<Name>
+   Listings" header, cityHomeLinkStyle/gridCondoLinkStyle's Homes/Condos
+   links), but an inline style always wins the cascade over an external
+   stylesheet's @media rule (same issue documented for .nav-grid and
+   .place-card-label elsewhere in this file), so a mobile-only bump has to
+   live in a CSS class instead — Nav.js now applies these two classes
+   alongside its existing inline styles, with fontSize removed from the
+   inline objects so this class is what actually controls it. Desktop
+   size (15px/14px) matches what was already live; only the sub-640px
+   tier is new. */
+.nav-dropdown-label {
+  font-size: 15px;
+}
+
+.nav-dropdown-link {
+  font-size: 14px;
+}
+
+@media (max-width: 640px) {
+  .nav-dropdown-label {
+    font-size: 18px;
+  }
+
+  .nav-dropdown-link {
+    font-size: 17px;
+  }
+}
+
 /* Footer links reset `a { text-decoration: none }` above so they read as
    plain text — this underline makes it clear each one is a separate,
    clickable link (important where two links sit on one line, e.g.
