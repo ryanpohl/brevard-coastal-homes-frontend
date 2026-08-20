@@ -401,6 +401,25 @@ textarea:focus {
   transform: scale(1.08);
 }
 
+/* PlaceCard's name label (the <p> overlaid on the bottom of each photo
+   card) — font-size moved out of the inline style above into this class
+   so a @media breakpoint can size it up. Inline React styles always win
+   the cascade over an external stylesheet's media query, same reason
+   .nav-grid/.sell-points-grid exist elsewhere in this file — a plain
+   @media rule targeting the old inline fontSize:18 could never have
+   taken effect. Per Ryan (2026-08-20): the text looked small on mobile;
+   bumped a bit everywhere, and a bit more again below the 640px
+   breakpoint .city-grid's own first tier already uses. */
+.place-card-label {
+  font-size: 20px;
+}
+
+@media (max-width: 640px) {
+  .place-card-label {
+    font-size: 22px;
+  }
+}
+
 /* Plain-text top nav links (Search by City/Neighborhood, Looking to Sell,
    Contact Us) — no border/background box, just an opacity/underline hover
    cue so they still read as clickable. See components/Nav.js. */

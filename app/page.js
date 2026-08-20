@@ -163,6 +163,7 @@ function PlaceCard({ name, thumbnail, href, sizes, objectPosition = 'center' }) 
         }}
       />
       <p
+        className="place-card-label"
         style={{
           position: 'absolute',
           left: 0,
@@ -173,7 +174,6 @@ function PlaceCard({ name, thumbnail, href, sizes, objectPosition = 'center' }) 
           color: '#fff',
           fontFamily: 'var(--font-heading)',
           fontWeight: 600,
-          fontSize: 18,
           textAlign: 'center',
           lineHeight: 1.25,
           textShadow: '0 2px 10px rgba(0,0,0,0.5)',
