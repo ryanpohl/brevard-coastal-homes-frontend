@@ -408,15 +408,17 @@ textarea:focus {
    .nav-grid/.sell-points-grid exist elsewhere in this file — a plain
    @media rule targeting the old inline fontSize:18 could never have
    taken effect. Per Ryan (2026-08-20): the text looked small on mobile;
-   bumped a bit everywhere, and a bit more again below the 640px
-   breakpoint .city-grid's own first tier already uses. */
+   bumped a bit everywhere (18->20), and a bit more again below the 640px
+   breakpoint .city-grid's own first tier already uses (18->22). Bumped
+   again same day per Ryan's follow-up "make the text a little bit
+   larger" (20->22 desktop, 22->24 mobile). */
 .place-card-label {
-  font-size: 20px;
+  font-size: 22px;
 }
 
 @media (max-width: 640px) {
   .place-card-label {
-    font-size: 22px;
+    font-size: 24px;
   }
 }
 
