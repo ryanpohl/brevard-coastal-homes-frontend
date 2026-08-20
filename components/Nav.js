@@ -194,10 +194,12 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
               <DropdownPanel grid={5}>
                 {cities.map((city) => (
                   <div key={city.slug}>
-                    <div style={cityListingsLabelStyle}>{city.name} Listings</div>
+                    <div className="nav-dropdown-label" style={cityListingsLabelStyle}>
+                      {city.name} Listings
+                    </div>
                     <Link
                       href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
-                      className="hero-search-item"
+                      className="hero-search-item nav-dropdown-link"
                       style={cityHomeLinkStyle}
                       onClick={closeNow}
                     >
@@ -206,7 +208,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                     {city.showCondosInNav !== false && (
                       <Link
                         href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Condo}`}
-                        className="hero-search-item-secondary"
+                        className="hero-search-item-secondary nav-dropdown-link"
                         style={gridCondoLinkStyle}
                         onClick={closeNow}
                       >
@@ -255,10 +257,12 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                     seeded for all 10), so no new route/page was needed. */}
                 {neighborhoods.map((n) => (
                   <div key={n.slug}>
-                    <div style={cityListingsLabelStyle}>{n.name} Listings</div>
+                    <div className="nav-dropdown-label" style={cityListingsLabelStyle}>
+                      {n.name} Listings
+                    </div>
                     <Link
                       href={`/neighborhoods/${n.slug}?propertyType=Home`}
-                      className="hero-search-item"
+                      className="hero-search-item nav-dropdown-link"
                       style={cityHomeLinkStyle}
                       onClick={closeNow}
                     >
@@ -267,7 +271,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                     {NEIGHBORHOOD_CONDO_PAGE_SLUGS.has(n.slug) && (
                       <Link
                         href={`/neighborhoods/${n.slug}?propertyType=Condo`}
-                        className="hero-search-item-secondary"
+                        className="hero-search-item-secondary nav-dropdown-link"
                         style={gridCondoLinkStyle}
                         onClick={closeNow}
                       >
@@ -448,14 +452,25 @@ function DropdownPanel({ children, grid }) {
 
 // Font sizes bumped 2026-08-20 per Ryan ("make the text in the drop down
 // menus larger on the homepage for search by city & search by
-// neighborhood") — these are plain module-level style objects (not
+// neighborhood") — these were plain module-level style objects (not
 // per-render inline styles keyed off state), so a direct fontSize bump
-// is sufficient here; no CSS-custom-property/@media indirection needed
-// like PlaceCard's label above, since this wasn't a mobile-specific ask.
+// was sufficient at the time; no CSS-custom-property/@media indirection
+// was needed like PlaceCard's label above, since that ask wasn't
+// mobile-specific.
+//
+// Font size itself was later moved OUT of these objects entirely
+// (2026-08-20 follow-up, per Ryan: "make the text ... larger but only on
+// mobile") into the .nav-dropdown-label/.nav-dropdown-link classes in
+// globals.css — an inline style always wins the cascade over an external
+// stylesheet's @media rule (same reason .nav-grid/.place-card-label live
+// in globals.css instead of here), so a mobile-only bump can't be
+// expressed as a plain number on these objects. The base/desktop sizes
+// these objects used to set (15/14) now live as those classes' default,
+// non-media rule instead — see globals.css for the full value + the
+// mobile-tier bump.
 const gridLinkStyle = {
   display: 'block',
   padding: '8px 10px',
-  fontSize: 15,
   borderRadius: 4,
 };
 
@@ -467,15 +482,13 @@ const gridLinkStyle = {
 // them.
 const cityListingsLabelStyle = {
   padding: '8px 10px 0',
-  fontSize: 15,
   fontWeight: 700,
   color: '#fff',
 };
-const cityHomeLinkStyle = { ...gridLinkStyle, padding: '2px 10px 0', fontSize: 14 };
+const cityHomeLinkStyle = { ...gridLinkStyle, padding: '2px 10px 0' };
 const gridCondoLinkStyle = {
   display: 'block',
   padding: '2px 10px 8px',
-  fontSize: 14,
   borderRadius: 4,
 };
 
