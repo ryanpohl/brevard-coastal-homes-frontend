@@ -120,7 +120,12 @@ export default async function CityListingsPage({ params, searchParams }) {
       {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
 
       <div className="container" style={{ padding: '32px clamp(16px, 4vw, 56px) 0' }}>
-        <h1 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', marginBottom: 8 }}>
+        {/* fontFamily: Inter Tight (2026-08-21, per Ryan: "Change the font
+            to inter tight on all the pages city & neighborhood
+            descriptions") — this H1 is the only "description"-style text
+            on this page (no separate description paragraph exists, just
+            this heading + the "N results" line below it). */}
+        <h1 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', marginBottom: 8, fontFamily: 'var(--font-inter-tight)' }}>
           {seo?.h1 || `${PROPERTY_TYPE_LABEL[propertyType]} in ${city.name}, FL`}
         </h1>
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
