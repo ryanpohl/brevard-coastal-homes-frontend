@@ -276,6 +276,18 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // "Aripeka" nor "Viera" contain that substring — and it's a no-op on
   // the Home page's H1, which never contains "Land" to begin with.
   const ARIPEKA_H1 = seo?.h1 ? seo.h1.replace('Viera East', 'Viera').replace('Land', 'Lots') : seo?.h1;
+  // Adelaide/Summer Lakes' H1 (per Ryan, 2026-08-21: "Can you change Viera
+  // West to just Viera") — both neighborhoods are re-parented to
+  // citySlug 'viera-west' in seed.js (per Ryan's 2026-08-11 boundary
+  // extension), so the backend's SEO h1 interpolates their parent city's
+  // display name, "Viera West" — giving every Adelaide/Summer Lakes H1 a
+  // "— Viera West, FL" suffix. Ryan confirmed (via AskUserQuestion) this
+  // should be scoped to just these two neighborhood pages' displayed
+  // text, not a full "Viera West" city rename (nav, homepage grid, Viera
+  // West's own city pages, SEO titles all stay "Viera West") — so this
+  // follows the same frontend-only string-replace-on-seo.h1 pattern as
+  // ARIPEKA_H1 above, rather than touching the backend cities table.
+  const ADELAIDE_SUMMER_LAKES_H1 = seo?.h1 ? seo.h1.replace('Viera West', 'Viera') : seo?.h1;
   const h1Text = isHarborIslandBeachClub
     ? HARBOR_ISLAND_BEACH_CLUB_H1
     : isVieraBuildersCommunitiesVieraWest
@@ -284,7 +296,9 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
         ? `Homes for Sale in ${neighborhood.name}, FL (Coming Soon)`
         : isAripeka
           ? ARIPEKA_H1 || `Homes for Sale in ${neighborhood.name}, FL`
-          : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
+          : isAdelaide || isSummerLakes
+            ? ADELAIDE_SUMMER_LAKES_H1 || `Homes for Sale in ${neighborhood.name}, FL`
+            : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
   // Bold sans-serif H1 styling (per Ryan, 2026-08-05) — originally added for
   // Harbor Island Beach Club, now shared by Viera Builders Communities
   // Viera West per Ryan's follow-up request to match that same style. Every
