@@ -282,17 +282,18 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
           style={{
             fontSize: 'clamp(26px, 3.5vw, 38px)',
             marginBottom: 8,
-            // Bold sans-serif H1 (per Ryan, 2026-08-05), matching his "The
-            // Hamptons Luxury Homes" reference image, instead of the
-            // site-wide serif Playfair Display heading style — scoped via
-            // useBoldSansSerifH1 (Harbor Island Beach Club and Viera
-            // Builders Communities Viera West); every other neighborhood/
-            // city page's H1 is unaffected. Uses the site's existing Jost
-            // body font (now loaded with 700/800 weights too, see
-            // globals.css) rather than introducing a third typeface.
-            ...(useBoldSansSerifH1
-              ? { fontFamily: 'var(--font-body)', fontWeight: 800 }
-              : {}),
+            // fontFamily: Inter Tight (2026-08-21, per Ryan: "Change the
+            // font to inter tight on all the pages city & neighborhood
+            // descriptions") — this H1 is the only "description"-style
+            // text on this page. Applies to every neighborhood page,
+            // including Harbor Island Beach Club/Viera Builders
+            // Communities Viera West below — their bold treatment
+            // (per Ryan, 2026-08-05, matching his "The Hamptons Luxury
+            // Homes" reference image) previously swapped in the site's
+            // Jost body font; it now just adds the heavier weight on top
+            // of this same Inter Tight family instead.
+            fontFamily: 'var(--font-inter-tight)',
+            ...(useBoldSansSerifH1 ? { fontWeight: 800 } : {}),
           }}
         >
           {h1Text}
