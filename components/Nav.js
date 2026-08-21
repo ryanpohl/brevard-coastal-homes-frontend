@@ -21,6 +21,17 @@ import ContactModal from './ContactModal';
 // on the header/Homes treatment itself.
 const NEIGHBORHOOD_CONDO_PAGE_SLUGS = new Set(['harbor-island-beach-club', 'aquarina']);
 
+// Neighborhoods whose "Search by Neighborhood" dropdown entry also gets a
+// "Lots" link, filtered to that neighborhood's Land listings. Added
+// 2026-08-21 per Ryan ("under Aripeka add a 'Lots' link connected to a
+// Aripeka Lots page") — scoped to Aripeka only, not a general pattern.
+// Aripeka's neighborhood page already supports a Land-filtered view (see
+// lib/constants.js's ARIPEKA_PROPERTY_TYPE_OPTIONS, which includes 'Land'
+// alongside 'Home' — Aripeka drops Condos/Townhomes entirely, per Ryan,
+// 2026-08-05), so this reuses that existing route/filter rather than
+// building a new page.
+const NEIGHBORHOOD_LOTS_PAGE_SLUGS = new Set(['aripeka']);
+
 /**
  * Top nav. Matches the design spec's dropdown behavior: opens on hover/click,
  * closes on a ~250ms delay after the mouse leaves (so users can move
@@ -276,6 +287,16 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                         onClick={closeNow}
                       >
                         Condos
+                      </Link>
+                    )}
+                    {NEIGHBORHOOD_LOTS_PAGE_SLUGS.has(n.slug) && (
+                      <Link
+                        href={`/neighborhoods/${n.slug}?propertyType=Land`}
+                        className="hero-search-item-secondary nav-dropdown-link"
+                        style={gridCondoLinkStyle}
+                        onClick={closeNow}
+                      >
+                        Lots
                       </Link>
                     )}
                   </div>
