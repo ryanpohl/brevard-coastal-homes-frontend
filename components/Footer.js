@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { PROPERTY_TYPE_TO_SLUG } from '@/lib/constants';
 
@@ -16,6 +17,17 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
           <p style={{ fontSize: 13, lineHeight: 1.6 }}>
             Local expertise across Brevard County&apos;s coastal cities and neighborhoods.
           </p>
+          {/* Tropical Realty & Investments of Brevard logo (2026-08-21, per Ryan:
+              "put this logo under Brevard Coastal homes & the text on the homepage") */}
+          <div style={{ marginTop: 16, background: '#fff', display: 'inline-block', padding: 8, borderRadius: 6 }}>
+            <Image
+              src="/logos/tropical-realty-logo.jpg"
+              alt="Tropical Realty & Investments of Brevard"
+              width={140}
+              height={140}
+              style={{ display: 'block', width: 110, height: 'auto' }}
+            />
+          </div>
         </div>
 
         <div>
