@@ -249,13 +249,32 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // VIERA_BUILDERS_PROPERTY_TYPE_OPTIONS (drops Land) below, so every one
   // of these 7 pages gets the same Price/Property Type dropdown options.
   const isVieraBuilders = isVieraBuildersCommunitiesVieraWest || Boolean(subCommunity);
+  // Aripeka's H1 (per Ryan, 2026-08-21: "Its supposed to just be Viera,
+  // not Viera East. Can you delete the east on both aripeka pages.") —
+  // the backend's SEO h1 for every neighborhood interpolates its parent
+  // city's display name (see backend/src/services/seoContent.service.js's
+  // buildNeighborhoodSeo), and Aripeka's parent city ('viera') was
+  // renamed to "Viera East" as its display name on 2026-08-12/13 (see
+  // CLAUDE.md's "Viera renamed to Viera East" section) — so every
+  // Aripeka H1 picked up a "— Viera East, FL" suffix along with it.
+  // Scoped to Aripeka only via isAripeka (Adelaide/Summer Lakes are
+  // already re-parented to viera-west, so they're unaffected either
+  // way); a plain string swap on the backend's own generated H1 — for
+  // both the Home and Land pages, since it doesn't depend on
+  // primaryType — rather than a backend reseed, which would mean
+  // touching the same production DB this project's own incident history
+  // (see CLAUDE.md's "Apply changes" incident) has already flagged as
+  // risky to change casually.
+  const ARIPEKA_H1 = seo?.h1 ? seo.h1.replace('Viera East', 'Viera') : seo?.h1;
   const h1Text = isHarborIslandBeachClub
     ? HARBOR_ISLAND_BEACH_CLUB_H1
     : isVieraBuildersCommunitiesVieraWest
       ? VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_H1
       : subCommunity?.comingSoon
         ? `Homes for Sale in ${neighborhood.name}, FL (Coming Soon)`
-        : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
+        : isAripeka
+          ? ARIPEKA_H1 || `Homes for Sale in ${neighborhood.name}, FL`
+          : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
   // Bold sans-serif H1 styling (per Ryan, 2026-08-05) — originally added for
   // Harbor Island Beach Club, now shared by Viera Builders Communities
   // Viera West per Ryan's follow-up request to match that same style. Every
