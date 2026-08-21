@@ -271,8 +271,23 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                     <div className="nav-dropdown-label" style={cityListingsLabelStyle}>
                       {n.name} Listings
                     </div>
+                    {/* "Homes" normally means ?propertyType=Home only (see
+                        the comment above). Widened to Home+Land for
+                        neighborhoods in NEIGHBORHOOD_LOTS_PAGE_SLUGS (per
+                        Ryan, 2026-08-21: "also display the lots in the
+                        aripeka homes section. So on the Aripeka homes
+                        section display both homes & Lots") — currently
+                        Aripeka only. The standalone "Lots" link below still
+                        exists for a Land-only view; this just makes the
+                        Homes section itself include Land too, rather than
+                        requiring a visitor to combine them manually via the
+                        Property Type filter. */}
                     <Link
-                      href={`/neighborhoods/${n.slug}?propertyType=Home`}
+                      href={
+                        NEIGHBORHOOD_LOTS_PAGE_SLUGS.has(n.slug)
+                          ? `/neighborhoods/${n.slug}?propertyType=Home,Land`
+                          : `/neighborhoods/${n.slug}?propertyType=Home`
+                      }
                       className="hero-search-item nav-dropdown-link"
                       style={cityHomeLinkStyle}
                       onClick={closeNow}
