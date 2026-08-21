@@ -383,13 +383,22 @@ export default function SearchBar({ cities, neighborhoods }) {
                   }}
                 />
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#ffffff', marginBottom: 18 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  fontFamily: 'var(--font-inter-tight)',
+                  fontSize: 13,
+                  color: '#ffffff',
+                  marginBottom: 18,
+                }}
+              >
                 <span>{minLabelForIndex(minIndex)}</span>
                 <span>{maxLabelForIndex(maxIndex)}</span>
               </div>
               <div style={{ display: 'flex', gap: 14 }}>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#ffffff', marginBottom: 8 }}>MIN</div>
+                  <div style={{ fontFamily: 'var(--font-inter-tight)', fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#ffffff', marginBottom: 8 }}>MIN</div>
                   <div style={{ position: 'relative', display: 'flex', alignItems: 'center', background: '#1c1a17', border: '1px solid #55524c', borderRadius: 4, padding: '10px 8px', boxSizing: 'border-box' }}>
                     <select
                       value={minIndex}
@@ -401,7 +410,9 @@ export default function SearchBar({ cities, neighborhoods }) {
                         border: 'none',
                         outline: 'none',
                         color: '#ffffff',
-                        fontFamily: 'var(--font-body)',
+                        // Inter Tight (2026-08-21, per Ryan: "Use Inter
+                        // Tight font on all the text on the homepage").
+                        fontFamily: 'var(--font-inter-tight)',
                         fontSize: 12,
                         padding: '0 18px 0 0',
                         appearance: 'none',
@@ -424,7 +435,7 @@ export default function SearchBar({ cities, neighborhoods }) {
                   </div>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#ffffff', marginBottom: 8 }}>MAX</div>
+                  <div style={{ fontFamily: 'var(--font-inter-tight)', fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#ffffff', marginBottom: 8 }}>MAX</div>
                   <div style={{ position: 'relative', display: 'flex', alignItems: 'center', background: '#1c1a17', border: '1px solid #55524c', borderRadius: 4, padding: '10px 8px', boxSizing: 'border-box' }}>
                     <select
                       value={maxIndex}
@@ -436,7 +447,7 @@ export default function SearchBar({ cities, neighborhoods }) {
                         border: 'none',
                         outline: 'none',
                         color: '#ffffff',
-                        fontFamily: 'var(--font-body)',
+                        fontFamily: 'var(--font-inter-tight)',
                         fontSize: 12,
                         padding: '0 18px 0 0',
                         appearance: 'none',
@@ -477,7 +488,15 @@ export default function SearchBar({ cities, neighborhoods }) {
                       setBeds(value);
                       setOpenMenu(null);
                     }}
-                    style={{ padding: '10px 20px', fontSize: 13, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', cursor: 'pointer' }}
+                    style={{
+                      fontFamily: 'var(--font-inter-tight)',
+                      padding: '10px 20px',
+                      fontSize: 13,
+                      fontWeight: 600,
+                      letterSpacing: 1,
+                      textTransform: 'uppercase',
+                      cursor: 'pointer',
+                    }}
                   >
                     {label}
                   </div>
@@ -497,7 +516,7 @@ export default function SearchBar({ cities, neighborhoods }) {
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             className="hero-search-input"
-            style={{ flex: 1, border: 'none', outline: 'none', fontFamily: 'var(--font-body)', fontSize: 15, color: '#ffffff', background: 'transparent', padding: 0 }}
+            style={{ flex: 1, border: 'none', outline: 'none', fontFamily: 'var(--font-inter-tight)', fontSize: 15, color: '#ffffff', background: 'transparent', padding: 0 }}
           />
           {searchValue.length > 0 && (
             <span
@@ -520,7 +539,7 @@ export default function SearchBar({ cities, neighborhoods }) {
             border: 'none',
             borderRadius: 4,
             cursor: 'pointer',
-            fontFamily: 'var(--font-body)',
+            fontFamily: 'var(--font-inter-tight)',
             fontSize: 14,
             fontWeight: 600,
             letterSpacing: 1.5,
@@ -543,7 +562,7 @@ export default function SearchBar({ cities, neighborhoods }) {
             border: '1px solid rgba(139, 38, 38, 0.7)',
             borderRadius: 4,
             background: 'rgba(139, 38, 38, 0.65)',
-            fontFamily: 'var(--font-body)',
+            fontFamily: 'var(--font-inter-tight)',
             fontSize: 15,
             fontWeight: 600,
             letterSpacing: 1.2,
@@ -561,6 +580,7 @@ export default function SearchBar({ cities, neighborhoods }) {
 }
 
 const LIST_ITEM_STYLE = {
+  fontFamily: 'var(--font-inter-tight)',
   fontSize: 13,
   fontWeight: 600,
   letterSpacing: 1,
@@ -594,7 +614,7 @@ function PillTrigger({ label, onClick, narrow }) {
     >
       <span
         style={{
-          fontFamily: 'var(--font-body)',
+          fontFamily: 'var(--font-inter-tight)',
           fontSize: 13,
           fontWeight: 600,
           letterSpacing: 1.2,
@@ -616,7 +636,7 @@ function PanelHeading({ children }) {
   return (
     <div
       style={{
-        fontFamily: 'var(--font-body)',
+        fontFamily: 'var(--font-inter-tight)',
         fontSize: 17,
         fontWeight: 700,
         letterSpacing: 1.5,
@@ -635,7 +655,15 @@ function PropertyTypeCheckbox({ label, checked, onChange }) {
   return (
     <label
       className="hero-search-item"
-      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 6px', fontSize: 14, cursor: 'pointer' }}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '8px 6px',
+        fontFamily: 'var(--font-inter-tight)',
+        fontSize: 14,
+        cursor: 'pointer',
+      }}
     >
       <input type="checkbox" checked={checked} onChange={onChange} style={{ width: 'auto' }} />
       <span>{label}</span>
