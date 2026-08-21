@@ -77,7 +77,10 @@ export default async function HomePage() {
         >
           <h1
             style={{
-              fontFamily: 'var(--font-heading)',
+              // Inter Tight (2026-08-21, per Ryan: "Use Inter Tight font
+              // on all the text on the homepage") — was var(--font-heading)
+              // (Playfair Display).
+              fontFamily: 'var(--font-inter-tight)',
               fontWeight: 600,
               fontSize: 'clamp(28px, 5vw, 46px)',
               color: '#ffffff',
@@ -96,7 +99,7 @@ export default async function HomePage() {
 
       <div style={{ background: 'var(--color-nav-bg)', padding: '64px 0' }}>
         <section className="wide-container">
-          <h2 className="section-heading" style={{ color: '#fff' }}>
+          <h2 className="section-heading" style={{ color: '#fff', fontFamily: 'var(--font-inter-tight)' }}>
             Search By City
           </h2>
           <div className="city-grid">
@@ -116,7 +119,7 @@ export default async function HomePage() {
 
       <div style={{ background: 'var(--color-nav-bg)', padding: '0 0 64px' }}>
         <section className="wide-container">
-          <h2 className="section-heading" style={{ color: '#fff' }}>
+          <h2 className="section-heading" style={{ color: '#fff', fontFamily: 'var(--font-inter-tight)' }}>
             Search By Neighborhood
           </h2>
           <div className="city-grid">
@@ -172,7 +175,8 @@ function PlaceCard({ name, thumbnail, href, sizes, objectPosition = 'center' }) 
           margin: 0,
           padding: '10px 14px 16px',
           color: '#fff',
-          fontFamily: 'var(--font-heading)',
+          // Inter Tight (2026-08-21, per Ryan) — was var(--font-heading).
+          fontFamily: 'var(--font-inter-tight)',
           fontWeight: 600,
           textAlign: 'center',
           lineHeight: 1.25,
