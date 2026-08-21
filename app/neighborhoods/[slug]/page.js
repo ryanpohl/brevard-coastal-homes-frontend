@@ -265,7 +265,17 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // touching the same production DB this project's own incident history
   // (see CLAUDE.md's "Apply changes" incident) has already flagged as
   // risky to change casually.
-  const ARIPEKA_H1 = seo?.h1 ? seo.h1.replace('Viera East', 'Viera') : seo?.h1;
+  //
+  // Same-day follow-up (per Ryan: "Can you change 'land' to 'Lots'") —
+  // Aripeka's Land page H1 read "Aripeka Land For Sale — Viera, FL";
+  // swapping the backend's "Land" property-type label to "Lots" here
+  // too (Aripeka's nav dropdown link already says "Lots" — see Nav.js's
+  // NEIGHBORHOOD_LOTS_PAGE_SLUGS — so this keeps the H1 consistent with
+  // it). Safe as a blind .replace('Land', 'Lots') because "Land" only
+  // ever appears in this H1 as the property-type label — neither
+  // "Aripeka" nor "Viera" contain that substring — and it's a no-op on
+  // the Home page's H1, which never contains "Land" to begin with.
+  const ARIPEKA_H1 = seo?.h1 ? seo.h1.replace('Viera East', 'Viera').replace('Land', 'Lots') : seo?.h1;
   const h1Text = isHarborIslandBeachClub
     ? HARBOR_ISLAND_BEACH_CLUB_H1
     : isVieraBuildersCommunitiesVieraWest
