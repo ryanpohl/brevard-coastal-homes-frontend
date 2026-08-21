@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600;700;800&family=Inter+Tight:wght@400;500;600;700;800&display=swap');
 
 /* Design tokens — see design/README.md "Design Tokens" section. Keep these
    in sync with that file; it's the source of truth from the design handoff. */
@@ -28,6 +28,14 @@
 
   --font-heading: 'Playfair Display', serif;
   --font-body: 'Jost', sans-serif;
+  /* Added 2026-08-21 per Ryan ("Change the font to inter tight on all the
+     pages city & neighborhood descriptions") — used specifically on the
+     city/neighborhood listing pages' H1 (there's no separate visible
+     "description" paragraph on those pages, just the H1 + a small
+     "N results" line — the H1 is what Ryan's reference screenshots
+     showed). See app/[citySlug]/[propertySlug]/page.js and
+     app/neighborhoods/[slug]/page.js. */
+  --font-inter-tight: 'Inter Tight', sans-serif;
 }
 
 * {
