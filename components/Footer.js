@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { PROPERTY_TYPE_TO_SLUG } from '@/lib/constants';
 
@@ -18,14 +17,23 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
             Local expertise across Brevard County&apos;s coastal cities and neighborhoods.
           </p>
           {/* Tropical Realty & Investments of Brevard logo (2026-08-21, per Ryan:
-              "put this logo under Brevard Coastal homes & the text on the homepage") */}
+              "put this logo under Brevard Coastal homes & the text on the homepage").
+              Plain <img> instead of next/image's <Image> deliberately: this is a
+              small, fixed-size 200x200 static logo that doesn't need responsive
+              optimization, and going through next/image's /_next/image optimizer
+              endpoint routes it through an extra hop that this project's Hostinger
+              hosting has a well-documented history of intermittently corrupting
+              (see CLAUDE.md's "hcdn CDN corrupts/caches broken streamed responses"
+              sections) — confirmed live 2026-08-21: the optimizer-served <Image>
+              loaded with naturalWidth/naturalHeight 0 (a corrupted/empty response
+              that the browser still marked "complete"), while 8/8 direct fetches
+              of the plain static file under /logos/ loaded correctly at 200x200. */}
           <div style={{ marginTop: 16, background: '#fff', display: 'inline-block', padding: 8, borderRadius: 6 }}>
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src="/logos/tropical-realty-logo.jpg"
               alt="Tropical Realty & Investments of Brevard"
-              width={140}
-              height={140}
-              style={{ display: 'block', width: 110, height: 'auto' }}
+              style={{ display: 'block', width: 110, height: 110 }}
             />
           </div>
         </div>
