@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { PROPERTY_TYPE_TO_SLUG } from '@/lib/constants';
+import { PROPERTY_TYPE_TO_SLUG, OCEANFRONT_CITY_SLUGS, OCEANFRONT_PROPERTY_TYPE_TO_SLUG } from '@/lib/constants';
 import AuthPanel from './AuthPanel';
 import ContactModal from './ContactModal';
 
@@ -41,9 +41,16 @@ const NEIGHBORHOOD_LOTS_PAGE_SLUGS = new Set(['aripeka']);
  */
 export default function Nav({ cities = [], neighborhoods = [] }) {
   const { signedIn, user, signOut } = useAuth();
+  // "Search Oceanfront" (2026-08-22, per Ryan) — a dedicated top-level nav
+  // item, separate from "Search by City" above, listing only the 5
+  // barrier-island cities that actually get Oceanfront landing pages (see
+  // OCEANFRONT_CITY_SLUGS in lib/constants.js). Filtering the real
+  // `cities` prop (rather than hardcoding city objects) keeps this in
+  // sync with each city's real name/slug automatically.
+  const oceanfrontCities = cities.filter((city) => OCEANFRONT_CITY_SLUGS.includes(city.slug));
   // 'signin'/'join' merged into a single 'auth' key (2026-08-16) — see the
   // "Sign In/Register" NavLink below and AuthPanel.js's own top comment.
-  const [openMenu, setOpenMenu] = useState(null); // 'city' | 'neighborhood' | 'account' | 'auth' | null
+  const [openMenu, setOpenMenu] = useState(null); // 'city' | 'neighborhood' | 'oceanfront' | 'account' | 'auth' | null
   // Separate from openMenu, same reasoning as SearchBar.js's scheduleModalOpen:
   // this is a body-portaled modal (see ContactModal.js), not one of the
   // nav-anchored dropdown panels openMenu tracks.
@@ -314,6 +321,57 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                         Lots
                       </Link>
                     )}
+                  </div>
+                ))}
+              </DropdownPanel>
+            )
+          }
+        />
+        {/* "Search Oceanfront" (2026-08-22, per Ryan: "How would you
+            recommend also showing Oceanfront Condos & Homes in cities of
+            Cocoa Beach, Melbourne Beach, Satellite Beach, Indialantic, &
+            Indian Harbour Beach... Would you add 'Search Oceanfront' next
+            to 'Search by Neighborhood'"). A brand-new top-level nav item,
+            deliberately its own dropdown rather than folded into the
+            existing "Search by City" dropdown above — that dropdown has
+            its own carefully-tuned mobile-overflow-fix history (see
+            DropdownPanel's comment below), and a visitor looking
+            specifically for oceanfront property is better served by a
+            short, dedicated 5-city list than hunting for it inside the
+            full 10-city dropdown. Links to the dedicated Oceanfront
+            landing pages built in app/[citySlug]/[propertySlug]/page.js
+            (see OCEANFRONT_CITY_SLUGS/OCEANFRONT_PROPERTY_TYPE_TO_SLUG in
+            lib/constants.js). */}
+        <NavLink
+          label="Search Oceanfront"
+          bare
+          active={openMenu === 'oceanfront'}
+          onEnter={() => openNow('oceanfront')}
+          onToggle={() => toggleOnClick('oceanfront')}
+          panel={
+            openMenu === 'oceanfront' && (
+              <DropdownPanel grid={5}>
+                {oceanfrontCities.map((city) => (
+                  <div key={city.slug}>
+                    <div className="nav-dropdown-label" style={cityListingsLabelStyle}>
+                      {city.name} Listings
+                    </div>
+                    <Link
+                      href={`/${city.slug}/${OCEANFRONT_PROPERTY_TYPE_TO_SLUG.Home}`}
+                      className="hero-search-item nav-dropdown-link"
+                      style={cityHomeLinkStyle}
+                      onClick={closeNow}
+                    >
+                      Oceanfront Homes
+                    </Link>
+                    <Link
+                      href={`/${city.slug}/${OCEANFRONT_PROPERTY_TYPE_TO_SLUG.Condo}`}
+                      className="hero-search-item-secondary nav-dropdown-link"
+                      style={gridCondoLinkStyle}
+                      onClick={closeNow}
+                    >
+                      Oceanfront Condos
+                    </Link>
                   </div>
                 ))}
               </DropdownPanel>
