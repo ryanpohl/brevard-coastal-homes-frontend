@@ -1,6 +1,12 @@
 import { notFound } from 'next/navigation';
 import * as api from '@/lib/api';
-import { SLUG_TO_PROPERTY_TYPE, PROPERTY_TYPE_LABEL, CONDO_PRICE_BANDS } from '@/lib/constants';
+import {
+  SLUG_TO_PROPERTY_TYPE,
+  PROPERTY_TYPE_LABEL,
+  CONDO_PRICE_BANDS,
+  OCEANFRONT_SLUG_TO_PROPERTY_TYPE,
+  OCEANFRONT_CITY_SLUGS,
+} from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 
@@ -10,17 +16,30 @@ const PAGE_SIZE = 30;
 
 /**
  * City listing page — one route covers all 10 cities x 3 property types
- * (homes-for-sale / condos-for-sale / land-for-sale), e.g. /cocoa-beach/homes-for-sale.
+ * (homes-for-sale / condos-for-sale / land-for-sale), e.g. /cocoa-beach/homes-for-sale,
+ * PLUS the 5-city x 2-type Oceanfront variant added 2026-08-22 (per Ryan)
+ * — oceanfront-homes-for-sale/oceanfront-condos-for-sale, e.g.
+ * /cocoa-beach/oceanfront-homes-for-sale — reusing this same dynamic
+ * route rather than a separate one, since the URL shape
+ * (/{citySlug}/{propertySlug}) already fits. See
+ * OCEANFRONT_SLUG_TO_PROPERTY_TYPE/OCEANFRONT_CITY_SLUGS in
+ * lib/constants.js for the gating.
  * SEO metadata (title/description/canonical) comes from the backend's
- * pre-generated /api/seo/city/:slug endpoint — never hand-write per-page meta here.
+ * pre-generated /api/seo/city/:slug endpoint (or, for Oceanfront pages,
+ * the computed-on-the-fly /api/seo/oceanfront/:citySlug endpoint) —
+ * never hand-write per-page meta here.
  */
 export async function generateMetadata({ params }) {
   const { citySlug, propertySlug } = params;
-  const propertyType = SLUG_TO_PROPERTY_TYPE[propertySlug];
+  const isOceanfront = Boolean(OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug]);
+  const propertyType = isOceanfront ? OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug] : SLUG_TO_PROPERTY_TYPE[propertySlug];
   if (!propertyType) return {};
+  if (isOceanfront && !OCEANFRONT_CITY_SLUGS.includes(citySlug)) return {};
 
   try {
-    const { seo } = await api.getCitySeo(citySlug, propertyType);
+    const { seo } = isOceanfront
+      ? await api.getOceanfrontSeo(citySlug, propertyType)
+      : await api.getCitySeo(citySlug, propertyType);
     return {
       title: seo.title,
       description: seo.metaDescription,
@@ -34,8 +53,13 @@ export async function generateMetadata({ params }) {
 
 export default async function CityListingsPage({ params, searchParams }) {
   const { citySlug, propertySlug } = params;
-  const propertyType = SLUG_TO_PROPERTY_TYPE[propertySlug];
+  const isOceanfront = Boolean(OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug]);
+  const propertyType = isOceanfront ? OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug] : SLUG_TO_PROPERTY_TYPE[propertySlug];
   if (!propertyType) notFound();
+  // Oceanfront pages only exist for the 5 barrier-island cities named by
+  // Ryan (2026-08-22) — e.g. /melbourne/oceanfront-homes-for-sale 404s
+  // rather than silently rendering an unfiltered/mislabeled page.
+  if (isOceanfront && !OCEANFRONT_CITY_SLUGS.includes(citySlug)) notFound();
 
   let city;
   try {
@@ -47,7 +71,9 @@ export default async function CityListingsPage({ params, searchParams }) {
   let seo = null;
   let jsonLd = null;
   try {
-    ({ seo, jsonLd } = await api.getCitySeo(citySlug, propertyType));
+    ({ seo, jsonLd } = isOceanfront
+      ? await api.getOceanfrontSeo(citySlug, propertyType)
+      : await api.getCitySeo(citySlug, propertyType));
   } catch {
     // No SEO row yet (e.g. seed:seo hasn't run) — render with sensible fallbacks below.
   }
@@ -69,7 +95,12 @@ export default async function CityListingsPage({ params, searchParams }) {
       priceMax: searchParams.priceMax,
       beds: searchParams.beds,
       baths: searchParams.baths,
-      waterfront: searchParams.waterfront,
+      // Oceanfront pages (per Ryan, 2026-08-22) force the Waterfront
+      // filter to Oceanfront server-side, ignoring any ?waterfront= a
+      // visitor's URL might otherwise carry — there's no Waterfront
+      // dropdown on these pages to set it from anyway (see hideWaterfront
+      // on FilterBar below).
+      waterfront: isOceanfront ? 'Oceanfront' : searchParams.waterfront,
       // "55+ Communities" (2026-08-14) — the control only ever renders on
       // Viera West's Homes/Condos pages (see show55Filter below), so this
       // param will only be set there in practice. Forwarded unconditionally
@@ -106,7 +137,9 @@ export default async function CityListingsPage({ params, searchParams }) {
   // the plumbing.
   const show55Filter = citySlug === 'viera-west' && propertyType !== 'Land';
 
-  const typeLabel = PROPERTY_TYPE_LABEL[propertyType] || 'Homes';
+  const typeLabel = isOceanfront
+    ? `Oceanfront ${PROPERTY_TYPE_LABEL[propertyType] || 'Homes'}`
+    : PROPERTY_TYPE_LABEL[propertyType] || 'Homes';
   const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const rangeEnd = Math.min(page * PAGE_SIZE, total);
 
@@ -126,7 +159,10 @@ export default async function CityListingsPage({ params, searchParams }) {
             on this page (no separate description paragraph exists, just
             this heading + the "N results" line below it). */}
         <h1 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', marginBottom: 8, fontFamily: 'var(--font-inter-tight)' }}>
-          {seo?.h1 || `${PROPERTY_TYPE_LABEL[propertyType]} in ${city.name}, FL`}
+          {seo?.h1 ||
+            (isOceanfront
+              ? `Oceanfront ${PROPERTY_TYPE_LABEL[propertyType]} For Sale in ${city.name}, FL`
+              : `${PROPERTY_TYPE_LABEL[propertyType]} in ${city.name}, FL`)}
         </h1>
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
@@ -137,6 +173,17 @@ export default async function CityListingsPage({ params, searchParams }) {
         waterfrontFlags={city.filters}
         showZoning={propertyType === 'Land'}
         excludeWaterfrontOptions={excludeWaterfrontOptions}
+        // Oceanfront pages (per Ryan, 2026-08-22) lock the Waterfront
+        // filter to Oceanfront server-side (see the getListings call
+        // above) — showing a Waterfront dropdown that could uncheck the
+        // very filter defining the page wouldn't make sense, so it's
+        // hidden entirely rather than just pre-checked.
+        hideWaterfront={isOceanfront}
+        // Property Type stays visible (so a visitor can still narrow to
+        // just Homes or just Condos, or view both together) but Land is
+        // excluded from its options — Ryan's request was specifically
+        // "Oceanfront Condos & Homes," and Land isn't part of these pages.
+        propertyTypeOptions={isOceanfront ? ['Home', 'Condo'] : undefined}
         priceBands={propertyType === 'Condo' ? CONDO_PRICE_BANDS : undefined}
         show55Filter={show55Filter}
         // "Acreage" sort option (per Ryan, 2026-08-15) — kept only on this
