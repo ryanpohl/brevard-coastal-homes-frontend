@@ -9,6 +9,23 @@ import {
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
+import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
+
+// "Request Information on Property Management" CTA (per Ryan, 2026-08-26)
+// — the blue button/modal originally built for the Harbor Island Beach
+// Club neighborhood page (see HarborIslandInquiryModals.js), added here
+// (without its Harbor-Island-specific Foreclosures button) to the plain
+// (non-oceanfront) Condos pages for these 5 cities — the same 5
+// barrier-island cities as OCEANFRONT_CITY_SLUGS above, chosen after
+// confirming with Ryan that "Cape Canaveral" (not an actual city on this
+// site) meant Indialantic.
+const PROPERTY_MANAGEMENT_CTA_CITY_SLUGS = [
+  'cocoa-beach',
+  'melbourne-beach',
+  'satellite-beach',
+  'indian-harbour-beach',
+  'indialantic',
+];
 
 // Matches the reference design's "1-30 of 34 Homes" pagination — the
 // backend defaults to 24 if this isn't passed.
@@ -137,6 +154,11 @@ export default async function CityListingsPage({ params, searchParams }) {
   // the plumbing.
   const show55Filter = citySlug === 'viera-west' && propertyType !== 'Land';
 
+  // See PROPERTY_MANAGEMENT_CTA_CITY_SLUGS above — plain (non-oceanfront)
+  // Condos pages only, matching exactly what Ryan asked for.
+  const showPropertyManagementCTA =
+    !isOceanfront && propertyType === 'Condo' && PROPERTY_MANAGEMENT_CTA_CITY_SLUGS.includes(citySlug);
+
   const typeLabel = isOceanfront
     ? `Oceanfront ${PROPERTY_TYPE_LABEL[propertyType] || 'Homes'}`
     : PROPERTY_TYPE_LABEL[propertyType] || 'Homes';
@@ -191,6 +213,11 @@ export default async function CityListingsPage({ params, searchParams }) {
         // every listing's acreage is null anyway. See FilterBar.js's
         // hideAcreageSort comment.
         hideAcreageSort={propertyType !== 'Land'}
+        extraActions={
+          showPropertyManagementCTA ? (
+            <HarborIslandInquiryModals showForeclosures={false} areaLabel={city.name} />
+          ) : undefined
+        }
       />
 
       <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
