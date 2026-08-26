@@ -35,6 +35,18 @@ import ContactForm from './ContactForm';
  * leading "Have a question about a listing..." sentence (the standalone
  * /contact page keeps both sentences — this trim is popup-only, per the
  * request), and sized the remaining sentence up from 14px to 18px.
+ *
+ * "Call or Text Us - 321-350-7661" line added 2026-08-26, per Ryan, right
+ * under the "Contact Us" heading. Hardcoded rather than sourced from
+ * AGENT_INFO.phone (used by the phone displays elsewhere on this site,
+ * e.g. PropertyContactPanel.js) because AGENT_INFO.phone reads
+ * NEXT_PUBLIC_BUSINESS_PHONE, which is baked in at Next.js build time and
+ * has been confirmed empty on the live production bundle (see CLAUDE.md's
+ * 2026-08-04 note — that env var issue was flagged but never fixed) — a
+ * conditional render on it would have silently shown nothing. Ryan gave
+ * the exact number directly in this request, so it's hardcoded here
+ * instead of depending on that still-broken env var. Wrapped in a
+ * `tel:` link so it's tap-to-call on mobile.
  */
 export default function ContactModal({ onClose }) {
   const modal = (
@@ -74,6 +86,10 @@ export default function ContactModal({ onClose }) {
         </div>
 
         <div style={{ padding: '22px 26px 28px' }}>
+          <p style={{ color: 'var(--color-ink)', fontWeight: 600, marginBottom: 12, fontSize: 16 }}>
+            Call or Text Us - <a href="tel:+13213507661" style={{ color: 'var(--color-ink)' }}>321-350-7661</a>
+          </p>
+
           <p style={{ color: 'var(--color-muted-dark)', marginBottom: 18, fontSize: 18 }}>
             Send us a message and we&apos;ll get back to you shortly.
           </p>
