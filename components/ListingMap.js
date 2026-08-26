@@ -133,9 +133,13 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
       ? `<div style="font-size: 12px; font-weight: 600; color: #1c2b30; margin-top: 2px;">HOA ${escapeHtml(formatAssocFee(listing.assocFee, listing.assocFeeFrequency))}</div>`
       : '';
 
+    // "Year Built" (2026-08-26) — kept in sync with ListingCard.js's own
+    // copy of this same addition; see that file's comment.
+    const yearBuiltPart = listing.yearBuilt != null ? ` &middot; Year Built: ${listing.yearBuilt}` : '';
+
     const statsLine = isLand
       ? `${listing.acreage ? `${listing.acreage} acres` : ''}${listing.zoning ? ` &middot; ${escapeHtml(listing.zoning)}` : ''}`
-      : `${listing.beds ?? '&mdash;'} bd &middot; ${listing.baths ?? '&mdash;'} ba &middot; ${listing.sqft ? `${listing.sqft.toLocaleString()} sqft` : '&mdash;'}${showRentalRestrictions ? ` &middot; Rental Restrictions: ${escapeHtml(listing.rentalRestrictions)}` : ''}`;
+      : `${listing.beds ?? '&mdash;'} bd &middot; ${listing.baths ?? '&mdash;'} ba &middot; ${listing.sqft ? `${listing.sqft.toLocaleString()} sqft` : '&mdash;'}${yearBuiltPart}${showRentalRestrictions ? ` &middot; Rental Restrictions: ${escapeHtml(listing.rentalRestrictions)}` : ''}`;
 
     const waterfrontLine = showWaterfront
       ? `<div style="font-size: 10px; color: #2f7a4f; margin-top: 4px; font-weight: 600;">${escapeHtml(listing.waterfront)}</div>`

@@ -185,6 +185,14 @@ export default function ListingCard({ listing, onHoverChange }) {
         ) : (
           <p style={{ fontSize: 12, color: 'var(--color-muted-dark)' }}>
             {listing.beds ?? '—'} bd · {listing.baths ?? '—'} ba · {listing.sqft ? `${listing.sqft.toLocaleString()} sqft` : '—'}
+            {/* "Year Built" (2026-08-26, per Ryan, referencing a Space Coast
+                MLS listing screenshot showing "Year Built: 1995") — Homes
+                and Condos only (Land has no structure), same bd/ba/sqft
+                line as Rental Restrictions. Omitted when the MLS hasn't
+                populated it (older sync, or a manually-entered listing),
+                same "omit rather than show a placeholder" pattern used
+                elsewhere on this card. */}
+            {listing.yearBuilt != null ? ` · Year Built: ${listing.yearBuilt}` : ''}
             {showRentalRestrictions ? ` · Rental Restrictions: ${listing.rentalRestrictions}` : ''}
           </p>
         )}
