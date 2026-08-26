@@ -5,7 +5,6 @@ import FavoriteButton from '@/components/FavoriteButton';
 import PropertyGallery from '@/components/PropertyGallery';
 import PropertyContactPanel from '@/components/PropertyContactPanel';
 import ListingMap from '@/components/ListingMap';
-import ViewTracker from '@/components/ViewTracker';
 
 // Status badge color — matches design/design_files/Property Detail.dc.html's
 // olive-green "ACTIVE" for the common case; the other statuses aren't shown
@@ -116,11 +115,6 @@ export default async function ListingDetailPage({ params }) {
       <div className="listing-detail-grid">
         {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
 
-        {/* Fire-and-forget page-view tracking for signed-in users (added
-            2026-08-18, per Ryan — mirrors FavoriteButton below; see
-            components/ViewTracker.js). Renders nothing. */}
-        <ViewTracker listingId={listing.id} />
-
         {/* LEFT: photos, header, stats, description, map */}
         <div>
           <div style={{ position: 'relative' }}>
@@ -171,6 +165,12 @@ export default async function ListingDetailPage({ params }) {
               <StatItem value={PROPERTY_TYPE_LABEL[listing.propertyType] || listing.propertyType} label="Type" big />
             )}
             {!isLand && listing.sqft != null && <StatItem value={listing.sqft.toLocaleString()} label="Sq.Ft." />}
+            {/* "Year Built" (2026-08-26, per Ryan, referencing a Space Coast
+                MLS listing screenshot showing "Year Built: 1995"). Homes and
+                Condos only (Land has no structure) — see backend's
+                schema.sql comment on listings.year_built. Omitted when the
+                MLS hasn't populated it. */}
+            {!isLand && listing.yearBuilt != null && <StatItem value={listing.yearBuilt} label="Year Built" />}
             {/* Rental Restrictions, placed immediately after Sq.Ft. per Ryan
                 (2026-08-10) — e.g. "1 Week", "3 Months, No Lease 1st Year".
                 Sourced from the MLS feed's CustomFields (see
