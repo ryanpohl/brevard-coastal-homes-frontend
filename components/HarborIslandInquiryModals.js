@@ -7,11 +7,29 @@ const CONTACT_METHODS = ['Call', 'Text', 'Email'];
 
 /**
  * Harbor Island Beach Club-specific "Contact Us Here about Foreclosures"
- * (maroon) and "Request Information on Property Management" (gold) trigger
- * buttons + modals — per Ryan, 2026-08-05, matching three reference
- * screenshots for copy/fields/styling. Rendered via FilterBar's
- * `extraActions` prop, only on this one neighborhood page (see
+ * (maroon) and "Request Information on Property Management" (gold, later
+ * changed to blue) trigger buttons + modals — per Ryan, 2026-08-05,
+ * matching three reference screenshots for copy/fields/styling. Rendered
+ * via FilterBar's `extraActions` prop, originally only on the Harbor
+ * Island Beach Club neighborhood page (see
  * app/neighborhoods/[slug]/page.js's isHarborIslandBeachClub flag).
+ *
+ * Extended 2026-08-26 (per Ryan) to also render just the blue "Request
+ * Information on Property Management" button — without the
+ * Harbor-Island-specific Foreclosures button next to it — on the plain
+ * (non-oceanfront) Condos pages for Cocoa Beach, Melbourne Beach,
+ * Satellite Beach, Indian Harbour Beach, and Indialantic. Two new optional
+ * props control this:
+ *  - `showForeclosures` (default true) — set to false to render only the
+ *    Property Management button/modal, e.g. on a city Condos page.
+ *  - `areaLabel` (default 'Harbor Island Beach Club') — the area name
+ *    referenced in the Property Management modal's intro copy and CRM
+ *    message body, so a city page's modal reads e.g. "...within Cocoa
+ *    Beach as well as other areas of Brevard County" instead of Harbor
+ *    Island's own wording. Harbor Island's own usage is unaffected since
+ *    it relies on both props' defaults.
+ * See app/[citySlug]/[propertySlug]/page.js's showPropertyManagementCTA
+ * for the city-page wiring.
  *
  * Field layout differs from the site's other inquiry modals
  * (InquiryModals.js / PropertyManagementModal.js) — a "How would you like
@@ -34,7 +52,7 @@ const CONTACT_METHODS = ['Call', 'Text', 'Email'];
  *    /seller-inquiry webhook — so no data is silently dropped without
  *    needing a backend/schema change.
  */
-export default function HarborIslandInquiryModals() {
+export default function HarborIslandInquiryModals({ showForeclosures = true, areaLabel = 'Harbor Island Beach Club' }) {
   const [open, setOpen] = useState(null); // 'foreclosures' | 'propertyManagement' | null
   const [form, setForm] = useState(emptyForm());
   const [status, setStatus] = useState({ submitting: false, error: '', success: '' });
@@ -88,7 +106,7 @@ export default function HarborIslandInquiryModals() {
           name: form.name,
           email: form.email,
           phone: form.phone,
-          message: `${contactNote}${addressNote}Property Management inquiry — Harbor Island Beach Club and other Brevard County areas.`,
+          message: `${contactNote}${addressNote}Property Management inquiry — ${areaLabel} and other Brevard County areas.`,
         });
       }
       setStatus({ submitting: false, error: '', success: result.message || "Thanks — we'll be in touch shortly." });
@@ -99,26 +117,28 @@ export default function HarborIslandInquiryModals() {
 
   return (
     <>
-      <button
-        type="button"
-        className="btn"
-        onClick={() => openModal('foreclosures')}
-        style={{
-          maxWidth: 320,
-          whiteSpace: 'normal',
-          textAlign: 'center',
-          lineHeight: 1.25,
-          padding: '8px 20px',
-          // Darker yellow per Ryan (2026-08-05) — was btn-maroon, then
-          // changed to this deep gold/amber so it reads distinct from the
-          // blue Property Management button; lightened slightly per
-          // Ryan's follow-up ("a little lighter") from an initial #8a6a1f.
-          background: '#a8842c',
-          color: '#fff',
-        }}
-      >
-        Contact Us Here about Foreclosures in Harbor Island
-      </button>
+      {showForeclosures && (
+        <button
+          type="button"
+          className="btn"
+          onClick={() => openModal('foreclosures')}
+          style={{
+            maxWidth: 320,
+            whiteSpace: 'normal',
+            textAlign: 'center',
+            lineHeight: 1.25,
+            padding: '8px 20px',
+            // Darker yellow per Ryan (2026-08-05) — was btn-maroon, then
+            // changed to this deep gold/amber so it reads distinct from the
+            // blue Property Management button; lightened slightly per
+            // Ryan's follow-up ("a little lighter") from an initial #8a6a1f.
+            background: '#a8842c',
+            color: '#fff',
+          }}
+        >
+          Contact Us Here about Foreclosures in Harbor Island
+        </button>
+      )}
       <button
         type="button"
         className="btn"
@@ -157,7 +177,7 @@ export default function HarborIslandInquiryModals() {
             <p style={{ color: 'var(--color-muted-dark)', marginBottom: 16, lineHeight: 1.6 }}>
               {open === 'foreclosures'
                 ? 'Send us your contact information if you are interested in the current foreclosures in Harbor Island Beach Club. We will reach out shortly!'
-                : 'Let us know if you want information on Property Management services within Harbor Island Beach Club as well as other areas of Brevard County. We will reach out shortly!'}
+                : `Let us know if you want information on Property Management services within ${areaLabel} as well as other areas of Brevard County. We will reach out shortly!`}
             </p>
 
             {status.success ? (
