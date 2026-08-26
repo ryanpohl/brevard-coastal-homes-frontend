@@ -14,11 +14,12 @@ import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 // "Request Information on Property Management" CTA (per Ryan, 2026-08-26)
 // — the blue button/modal originally built for the Harbor Island Beach
 // Club neighborhood page (see HarborIslandInquiryModals.js), added here
-// (without its Harbor-Island-specific Foreclosures button) to the plain
-// (non-oceanfront) Condos pages for these 5 cities — the same 5
-// barrier-island cities as OCEANFRONT_CITY_SLUGS above, chosen after
-// confirming with Ryan that "Cape Canaveral" (not an actual city on this
-// site) meant Indialantic.
+// (without its Harbor-Island-specific Foreclosures button) to both the
+// plain Condos pages AND the Oceanfront Condos pages for these 5 cities
+// (the second, Oceanfront-Condos ask came as a same-day follow-up) — the
+// same 5 barrier-island cities as OCEANFRONT_CITY_SLUGS above, chosen
+// after confirming with Ryan that "Cape Canaveral" (not an actual city on
+// this site) meant Indialantic.
 const PROPERTY_MANAGEMENT_CTA_CITY_SLUGS = [
   'cocoa-beach',
   'melbourne-beach',
@@ -154,10 +155,13 @@ export default async function CityListingsPage({ params, searchParams }) {
   // the plumbing.
   const show55Filter = citySlug === 'viera-west' && propertyType !== 'Land';
 
-  // See PROPERTY_MANAGEMENT_CTA_CITY_SLUGS above — plain (non-oceanfront)
-  // Condos pages only, matching exactly what Ryan asked for.
-  const showPropertyManagementCTA =
-    !isOceanfront && propertyType === 'Condo' && PROPERTY_MANAGEMENT_CTA_CITY_SLUGS.includes(citySlug);
+  // See PROPERTY_MANAGEMENT_CTA_CITY_SLUGS above — every Condos page (both
+  // the plain city page and, per Ryan's 2026-08-26 follow-up, the
+  // Oceanfront Condos variant) for these 5 cities. Not gated on
+  // `!isOceanfront` — PROPERTY_MANAGEMENT_CTA_CITY_SLUGS is exactly the
+  // same 5-city set as OCEANFRONT_CITY_SLUGS, so this naturally covers
+  // both /condos-for-sale and /oceanfront-condos-for-sale for each.
+  const showPropertyManagementCTA = propertyType === 'Condo' && PROPERTY_MANAGEMENT_CTA_CITY_SLUGS.includes(citySlug);
 
   const typeLabel = isOceanfront
     ? `Oceanfront ${PROPERTY_TYPE_LABEL[propertyType] || 'Homes'}`
