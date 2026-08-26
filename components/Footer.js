@@ -1,7 +1,21 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import { PROPERTY_TYPE_TO_SLUG } from '@/lib/constants';
+import ContactModal from './ContactModal';
 
+// Footer's "Contact Us" link now opens the same popup as the top nav's
+// "Contact Us" button (2026-08-26, per Ryan: "Make the bottom Contact us
+// pop up window the same as the top Contact us pop up menu"). Previously
+// this linked to the standalone /contact page — that page is untouched
+// and still reachable directly (a bookmark, a search result, a shared
+// link), this just changes what the footer link itself does, matching
+// Nav.js's 2026-08-15 change (see CLAUDE.md). Converted to a Client
+// Component (it was a plain server-renderable component before) since
+// opening a modal needs local state — same reasoning as Nav.js/SearchBar.js.
 export default function Footer({ cities = [], neighborhoods = [] }) {
+  const [contactModalOpen, setContactModalOpen] = useState(false);
   return (
     <footer
       style={{
@@ -67,9 +81,14 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
 
         <div>
           <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Company</h4>
-          <Link href="/contact" className="footer-link" style={footerLinkStyle}>
+          <button
+            type="button"
+            onClick={() => setContactModalOpen(true)}
+            className="footer-link"
+            style={{ ...footerLinkStyle, background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left', font: 'inherit' }}
+          >
             Contact Us
-          </Link>
+          </button>
           <br />
           <Link href="/looking-to-sell" className="footer-link" style={footerLinkStyle}>
             Looking to Sell
@@ -80,6 +99,8 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', padding: '16px clamp(16px, 4vw, 56px)', fontSize: 12 }}>
         © {new Date().getFullYear()} Brevard Coastal Homes. All rights reserved.
       </div>
+
+      {contactModalOpen && <ContactModal onClose={() => setContactModalOpen(false)} />}
     </footer>
   );
 }
