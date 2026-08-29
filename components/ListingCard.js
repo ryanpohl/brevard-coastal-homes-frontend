@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
 
 export default function ListingCard({ listing, onHoverChange }) {
-  const { signedIn, token } = useAuth();
+  const { signedIn, token, promptSignIn } = useAuth();
   const [favorited, setFavorited] = useState(listing.isFavorited);
   const [busy, setBusy] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -30,9 +30,20 @@ export default function ListingCard({ listing, onHoverChange }) {
     onHoverChange?.(false);
   }
 
+  // Signed-out click (2026-08-29, per Ryan: clicking the heart while
+  // signed out did nothing — not even the FavoriteButton.js's tooltip,
+  // since this card's own copy of the heart never had one). Now pops open
+  // the site's Sign In/Register modal with a line explaining why, instead
+  // of silently no-op'ing. See lib/auth-context.js's promptSignIn() /
+  // AuthPromptModal.js for how that popup itself works. FavoriteButton.js
+  // (Property Detail page's standalone heart) gets the matching fix.
   async function toggleFavorite(e) {
     e.preventDefault();
-    if (!signedIn || busy) return;
+    if (busy) return;
+    if (!signedIn) {
+      promptSignIn('Sign in to save this property to your favorites.');
+      return;
+    }
     setBusy(true);
     try {
       if (favorited) {
@@ -139,6 +150,7 @@ export default function ListingCard({ listing, onHoverChange }) {
           type="button"
           onClick={toggleFavorite}
           aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
+          title={signedIn ? undefined : 'Sign in to save favorites'}
           style={{
             position: 'absolute',
             top: 10,
@@ -148,7 +160,7 @@ export default function ListingCard({ listing, onHoverChange }) {
             borderRadius: '50%',
             border: 'none',
             background: 'rgba(255,255,255,0.9)',
-            cursor: signedIn ? 'pointer' : 'not-allowed',
+            cursor: 'pointer',
             fontSize: 16,
           }}
         >

@@ -9,12 +9,21 @@ import * as api from '@/lib/api';
  * has its own inline copy of this same logic for the grid view).
  */
 export default function FavoriteButton({ listingId, initialFavorited, size = 40 }) {
-  const { signedIn, token } = useAuth();
+  const { signedIn, token, promptSignIn } = useAuth();
   const [favorited, setFavorited] = useState(!!initialFavorited);
   const [busy, setBusy] = useState(false);
 
+  // Signed-out click (2026-08-29, per Ryan) — see the matching comment in
+  // ListingCard.js's toggleFavorite() for the full writeup. Pops open the
+  // Sign In/Register modal instead of the previous no-op (this button
+  // already hinted at that via its `title` below, but clicking did
+  // nothing at all).
   async function toggle() {
-    if (!signedIn || busy) return;
+    if (busy) return;
+    if (!signedIn) {
+      promptSignIn('Sign in to save this property to your favorites.');
+      return;
+    }
     setBusy(true);
     try {
       if (favorited) {
@@ -42,7 +51,7 @@ export default function FavoriteButton({ listingId, initialFavorited, size = 40 
         borderRadius: '50%',
         border: 'none',
         background: 'rgba(255,255,255,0.92)',
-        cursor: signedIn ? 'pointer' : 'not-allowed',
+        cursor: 'pointer',
         fontSize: Math.round(size * 0.45),
         display: 'flex',
         alignItems: 'center',

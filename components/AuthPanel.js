@@ -21,8 +21,22 @@ import * as api from '@/lib/api';
  * tab-switcher CONCEPT, and the panel should keep the site's own dark
  * navy/gold theme rather than adopt those colors. `.nav-dropdown-panel`
  * (globals.css) is unchanged from before this redesign.
+ *
+ * `message` / `embedded` added 2026-08-29 so this same form can also be
+ * used by AuthPromptModal.js (the "sign in to save a property" popup
+ * triggered from a listing card's heart icon), not just Nav.js's own
+ * Sign In/Register dropdown:
+ *  - `message`, when set, renders a line of context above the tabs (e.g.
+ *    "Sign in to save this property to your favorites") explaining why
+ *    the panel appeared. Nav.js doesn't pass one, so its dropdown is
+ *    unchanged.
+ *  - `embedded`, when true, drops the dropdown-specific positioning
+ *    (`position: absolute` anchored under the nav's Sign In/Register
+ *    button) in favor of a plain block that fills whatever container it's
+ *    placed in — AuthPromptModal supplies its own centered `.modal-overlay`
+ *    positioning instead.
  */
-export default function AuthPanel({ onClose }) {
+export default function AuthPanel({ onClose, message, embedded = false }) {
   const { login, register } = useAuth();
   const [mode, setMode] = useState('signin'); // 'signin' | 'join' | 'reset'
   const [fields, setFields] = useState({
@@ -88,7 +102,12 @@ export default function AuthPanel({ onClose }) {
   }
 
   return (
-    <div className="nav-dropdown-panel" style={panelStyle}>
+    <div className="nav-dropdown-panel" style={embedded ? embeddedPanelStyle : panelStyle}>
+      {message && (
+        <p style={{ color: '#fff', fontSize: 14, fontWeight: 600, textAlign: 'center', marginBottom: 18, lineHeight: 1.4 }}>
+          {message}
+        </p>
+      )}
       {mode === 'reset' ? (
         <h3 style={{ fontSize: 18, marginBottom: 16 }}>Reset Password</h3>
       ) : (
@@ -214,6 +233,14 @@ const panelStyle = {
   width: 300,
   boxShadow: 'var(--shadow-nav-menu)',
   zIndex: 40,
+};
+
+// See the `embedded` prop doc comment above — used by AuthPromptModal.js,
+// which already provides its own centered/fixed positioning and shadow via
+// `.modal-overlay`, so this just needs to fill that container.
+const embeddedPanelStyle = {
+  padding: 24,
+  width: '100%',
 };
 
 // Log In / Register tab switcher (2026-08-16). Segmented-control look using
