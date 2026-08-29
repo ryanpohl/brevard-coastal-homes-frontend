@@ -79,7 +79,7 @@ export default function BuildingInquiryModal() {
             </div>
 
             <p style={{ color: 'var(--color-muted-dark)', marginBottom: 16, lineHeight: 1.6 }}>
-              Let us know if you are looking to build if you would like information on Home Builders in Brevard
+              Let us know if you are looking to build & if you would like information on Home Builders in Brevard
               County. We will reach out shortly!
             </p>
 
