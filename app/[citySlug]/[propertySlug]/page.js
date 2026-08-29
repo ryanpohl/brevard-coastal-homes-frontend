@@ -10,6 +10,7 @@ import {
 import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
+import BuildingInquiryModal from '@/components/BuildingInquiryModal';
 
 // "Request Information on Property Management" CTA (per Ryan, 2026-08-26)
 // — the blue button/modal originally built for the Harbor Island Beach
@@ -163,6 +164,15 @@ export default async function CityListingsPage({ params, searchParams }) {
   // both /condos-for-sale and /oceanfront-condos-for-sale for each.
   const showPropertyManagementCTA = propertyType === 'Condo' && PROPERTY_MANAGEMENT_CTA_CITY_SLUGS.includes(citySlug);
 
+  // "Interested in Building?" CTA (2026-08-29, per Ryan) — every city's
+  // dedicated Land ("Lot/Land") page, i.e. every /[citySlug]/land-for-sale
+  // route (this same dynamic route file handles all 10 cities x 3
+  // property types, so `propertyType === 'Land'` alone covers all of
+  // them — there's no separate Oceanfront Land variant to also check,
+  // per OCEANFRONT_SLUG_TO_PROPERTY_TYPE above only mapping Home/Condo).
+  // See BuildingInquiryModal.js.
+  const showBuildingCTA = propertyType === 'Land';
+
   const typeLabel = isOceanfront
     ? `Oceanfront ${PROPERTY_TYPE_LABEL[propertyType] || 'Homes'}`
     : PROPERTY_TYPE_LABEL[propertyType] || 'Homes';
@@ -220,6 +230,8 @@ export default async function CityListingsPage({ params, searchParams }) {
         extraActions={
           showPropertyManagementCTA ? (
             <HarborIslandInquiryModals showForeclosures={false} areaLabel={city.name} />
+          ) : showBuildingCTA ? (
+            <BuildingInquiryModal />
           ) : undefined
         }
       />
