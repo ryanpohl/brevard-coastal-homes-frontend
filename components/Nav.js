@@ -138,6 +138,34 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
       onMouseLeave={scheduleClose}
       onMouseEnter={cancelClose}
     >
+      {/* "Call or Text: 321-350-7661" utility strip (2026-08-29, per Ryan:
+          add the phone number to the top of the homepage — shown 3
+          placement options, Ryan picked this one: a thin bar spanning the
+          full width above the rest of the nav, rather than crowding it
+          into the top row next to Sign In/Register or squeezing it under
+          the logo). Hardcoded literal number, same reasoning as the
+          existing "Call or Text" lines in ContactModal.js/Footer.js —
+          AGENT_INFO.phone (NEXT_PUBLIC_BUSINESS_PHONE) is confirmed empty
+          on the live production bundle per CLAUDE.md's 2026-08-04 note, so
+          a conditional render on it would silently show nothing. Uses the
+          same --color-gold token as those two for visual consistency. */}
+      <div
+        style={{
+          textAlign: 'center',
+          padding: '6px 16px',
+          fontSize: 13,
+          fontWeight: 700,
+          color: 'var(--color-gold)',
+          letterSpacing: 0.3,
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
+        }}
+      >
+        Call or Text:{' '}
+        <a href="tel:+13213507661" style={{ color: 'inherit', textDecoration: 'none' }}>
+          321-350-7661
+        </a>
+      </div>
+
       <div
         className="container"
         style={{

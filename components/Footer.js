@@ -27,6 +27,18 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
       <div className="container" style={{ padding: '48px clamp(16px, 4vw, 56px)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32 }}>
         <div>
           <h4 style={{ color: '#fff', fontSize: 18, marginBottom: 16 }}>Brevard Coastal Homes</h4>
+          {/* "Call or Text: 321-350-7661" added 2026-08-29, per Ryan, directly
+              under the heading — hardcoded literal number, same reasoning as
+              ContactModal.js's phone line (AGENT_INFO.phone reads
+              NEXT_PUBLIC_BUSINESS_PHONE, confirmed empty on the live
+              production bundle per CLAUDE.md's 2026-08-04 note). Wrapped in a
+              tel: link for tap-to-call on mobile. */}
+          <p style={{ color: 'var(--color-gold, #c9a15a)', fontWeight: 700, fontSize: 14, margin: '6px 0 12px' }}>
+            Call or Text:{' '}
+            <a href="tel:+13213507661" style={{ color: 'inherit', textDecoration: 'none' }}>
+              321-350-7661
+            </a>
+          </p>
           <p style={{ fontSize: 13, lineHeight: 1.6 }}>
             Local expertise across Brevard County&apos;s coastal cities and neighborhoods.
           </p>
