@@ -3,6 +3,7 @@ import './globals.css';
 import { AuthProvider } from '@/lib/auth-context';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
+import AuthPromptHost from '@/components/AuthPromptHost';
 import * as api from '@/lib/api';
 
 export const metadata = {
@@ -50,6 +51,11 @@ export default async function RootLayout({ children }) {
           <Nav cities={cities} neighborhoods={neighborhoods} />
           <main>{children}</main>
           <Footer cities={cities} neighborhoods={neighborhoods} />
+          {/* Global "sign in to save a property" popup (2026-08-29) — see
+              AuthPromptHost.js/AuthPromptModal.js. Mounted once here,
+              inside AuthProvider, so any component in the tree can pop it
+              open via useAuth().promptSignIn(message). */}
+          <AuthPromptHost />
         </AuthProvider>
       </body>
     </html>
