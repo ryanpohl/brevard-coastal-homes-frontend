@@ -32,6 +32,19 @@ const NEIGHBORHOOD_CONDO_PAGE_SLUGS = new Set(['harbor-island-beach-club', 'aqua
 // building a new page.
 const NEIGHBORHOOD_LOTS_PAGE_SLUGS = new Set(['aripeka']);
 
+// Cities whose "Search by City" dropdown entry also gets a "Lots" link,
+// right next to Homes (and Condos, when shown) — added 2026-08-30 per
+// Ryan: "Add Lots link right next to Homes on the Merritt Island Listings,
+// Cocoa Beach Listings & Melbourne Beach Listings." Unlike
+// NEIGHBORHOOD_LOTS_PAGE_SLUGS above (which filters a neighborhood's one
+// combined listings route via ?propertyType=Land, since neighborhoods have
+// no dedicated Land route), every city already has its own real
+// /{citySlug}/land-for-sale page (see app/[citySlug]/[propertySlug]/page.js
+// and PROPERTY_TYPE_TO_SLUG.Land) — this just links straight to it, the
+// same way the Homes/Condos links below do for PROPERTY_TYPE_TO_SLUG.Home/
+// .Condo.
+const CITY_LOTS_NAV_SLUGS = new Set(['merritt-island', 'cocoa-beach', 'melbourne-beach']);
+
 /**
  * Top nav. Matches the design spec's dropdown behavior: opens on hover/click,
  * closes on a ~250ms delay after the mouse leaves (so users can move
@@ -255,10 +268,25 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                       <Link
                         href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Condo}`}
                         className="hero-search-item-secondary nav-dropdown-link"
-                        style={gridCondoLinkStyle}
+                        // Condos keeps its own bottom padding (gridCondoLinkStyle)
+                        // when it's the last link in the stack, same as before —
+                        // but for CITY_LOTS_NAV_SLUGS cities, Lots (below) is now
+                        // last instead, so Condos drops to the "middle link"
+                        // padding (cityHomeLinkStyle) it would otherwise never use.
+                        style={CITY_LOTS_NAV_SLUGS.has(city.slug) ? cityHomeLinkStyle : gridCondoLinkStyle}
                         onClick={closeNow}
                       >
                         Condos
+                      </Link>
+                    )}
+                    {CITY_LOTS_NAV_SLUGS.has(city.slug) && (
+                      <Link
+                        href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Land}`}
+                        className="hero-search-item-secondary nav-dropdown-link"
+                        style={gridCondoLinkStyle}
+                        onClick={closeNow}
+                      >
+                        Lots
                       </Link>
                     )}
                   </div>
