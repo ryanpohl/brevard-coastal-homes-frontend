@@ -20,6 +20,18 @@ import * as api from '@/lib/api';
  * 2026-08-06), which renders its own "Schedule a Showing" button that opens
  * the richer ScheduleShowingModal/PropertyContactPanel design instead, while
  * still using this component for "Ask a Question".
+ *
+ * "How would you like us to respond?" Call/Text/Email checkboxes added to
+ * the Ask a Question mode 2026-08-30, per Ryan (referencing a screenshot of
+ * this exact block) — every OTHER "Ask a Question" popup on the site
+ * already had it (PropertyContactPanel.js's AskQuestionModal on the
+ * Property Detail page's sidebar, HarborIslandInquiryModals.js's
+ * foreclosures variant); this was the one place it was missing, since it's
+ * this component's own simpler modal. Same `preferredContactMethod` field
+ * the backend's ask_question inquiry type already accepts (see
+ * AskQuestionModal's identical usage) — no backend change needed. Not
+ * shown for 'schedule' mode, matching every other implementation of this
+ * block, which is Ask-a-Question-specific.
  */
 export default function InquiryModals({
   listingId,
@@ -30,6 +42,7 @@ export default function InquiryModals({
 }) {
   const { user } = useAuth();
   const [open, setOpen] = useState(null); // 'schedule' | 'question' | null
+  const [contactMethods, setContactMethods] = useState([]); // ['Call', 'Text', 'Email'] — 'question' mode only
   // propertyAddress: added 2026-08-17 per Ryan ("Can you add 'Address of
   // Property' to all the ask a question pop up boxes in all the city &
   // neighborhood pages so I know what property they potentially are asking
@@ -60,6 +73,7 @@ export default function InquiryModals({
       preferredTime: '',
       propertyAddress: '',
     });
+    setContactMethods([]);
     setStatus({ submitting: false, error: '', success: '' });
     setOpen(kind);
   }
@@ -72,13 +86,22 @@ export default function InquiryModals({
     setForm((f) => ({ ...f, [field]: value }));
   }
 
+  function toggleContactMethod(method) {
+    setContactMethods((methods) => (methods.includes(method) ? methods.filter((m) => m !== method) : [...methods, method]));
+  }
+
   async function submit(e) {
     e.preventDefault();
     setStatus({ submitting: true, error: '', success: '' });
     try {
       const payload = { ...form, listingId };
       const result =
-        open === 'schedule' ? await api.submitScheduleShowing(payload) : await api.submitAskQuestion(payload);
+        open === 'schedule'
+          ? await api.submitScheduleShowing(payload)
+          : await api.submitAskQuestion({
+              ...payload,
+              preferredContactMethod: contactMethods.length ? contactMethods : undefined,
+            });
       setStatus({ submitting: false, error: '', success: result.message || "Thanks — we'll be in touch shortly." });
     } catch (err) {
       setStatus({ submitting: false, error: err.message || 'Something went wrong. Please try again.', success: '' });
@@ -118,11 +141,29 @@ export default function InquiryModals({
             ) : (
               <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {open === 'question' && (
-                  <input
-                    placeholder="Address of Property"
-                    value={form.propertyAddress}
-                    onChange={(e) => update('propertyAddress', e.target.value)}
-                  />
+                  <>
+                    <input
+                      placeholder="Address of Property"
+                      value={form.propertyAddress}
+                      onChange={(e) => update('propertyAddress', e.target.value)}
+                    />
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8 }}>How would you like us to respond?</div>
+                      <div style={{ display: 'flex', gap: 20 }}>
+                        {['Call', 'Text', 'Email'].map((method) => (
+                          <label key={method} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, cursor: 'pointer' }}>
+                            <input
+                              type="checkbox"
+                              checked={contactMethods.includes(method)}
+                              onChange={() => toggleContactMethod(method)}
+                              style={{ width: 'auto' }}
+                            />
+                            {method}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </>
                 )}
                 <input placeholder="Full name" required value={form.name} onChange={(e) => update('name', e.target.value)} />
                 <input
