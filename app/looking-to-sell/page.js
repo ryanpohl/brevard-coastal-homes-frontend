@@ -1,4 +1,5 @@
 import PropertyManagementModal from '@/components/PropertyManagementModal';
+import SellWithUsForm from '@/components/SellWithUsForm';
 
 export const metadata = {
   title: 'Looking to Sell Your Brevard County Home? | Brevard Coastal Homes',
@@ -26,6 +27,12 @@ export default function LookingToSellPage() {
           <SellPoint title="Local Market Expertise" text="Pricing guidance based on real, up-to-date Space Coast MLS data — not guesswork." />
           <SellPoint title="Maximum Exposure" text="Your listing gets featured across our site and marketing channels targeting serious buyers." />
           <SellPoint title="Full-Service Support" text="From listing prep to closing, we handle the details so you don't have to." />
+        </div>
+
+        {/* Lead-capture form for the free valuation this page's H1 already
+            promises (2026-08-30, per Ryan) — see SellWithUsForm.js. */}
+        <div style={{ marginBottom: 48 }}>
+          <SellWithUsForm />
         </div>
 
         <div className="card" style={{ padding: 32, textAlign: 'center' }}>
