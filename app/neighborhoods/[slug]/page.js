@@ -233,6 +233,24 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
     'Harbor Island Beach Club, Melbourne Beach FL Condos for sale. Contact us about current foreclosures & off-market properties currently available in Harbor Island.';
   const HARBOR_ISLAND_BEACH_CLUB_H1 =
     primaryType === 'Condo' ? HARBOR_ISLAND_BEACH_CLUB_CONDO_H1 : HARBOR_ISLAND_BEACH_CLUB_HOME_H1;
+  // Aquarina (per Ryan, 2026-09-01: "make it Aquarina Homes & Condos For
+  // Sale for the main Aquarina link") — one of only two neighborhoods with
+  // its own "Condos" sub-link (see Nav.js's NEIGHBORHOOD_CONDO_PAGE_SLUGS,
+  // Harbor Island Beach Club being the other). Its "<Name> Listings"
+  // header link (Nav.js) goes to the bare /neighborhoods/aquarina URL with
+  // no ?propertyType= param — the combined Home+Condo view — but that
+  // inherited the backend's Home-only SEO h1 ("Aquarina Homes For Sale —
+  // Melbourne Beach, FL") since primaryType defaults to 'Home' whenever no
+  // param is present (same limitation ARIPEKA_H1/ADELAIDE_SUMMER_LAKES_H1
+  // below already work around with a blind string replace on the
+  // backend's own generated h1, rather than a backend reseed — see those
+  // comments for why). Gated on hasExplicitPropertyTypeFilter so Aquarina's
+  // own "Homes" and "Condos" sub-links (which explicitly set
+  // ?propertyType=Home/Condo) still show their own correct single-type h1
+  // instead of this combined one.
+  const isAquarina = slug === 'aquarina';
+  const hasExplicitPropertyTypeFilter = Boolean(searchParams.propertyType);
+  const AQUARINA_COMBINED_H1 = seo?.h1 ? seo.h1.replace('Homes For Sale', 'Homes & Condos For Sale') : seo?.h1;
   // Viera Builders Communities Viera West (per Ryan, 2026-08-05): drops a
   // new "Neighborhood" dropdown (before Property Type) listing its 6
   // sub-communities — see lib/constants.js's
@@ -298,7 +316,9 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
           ? ARIPEKA_H1 || `Homes for Sale in ${neighborhood.name}, FL`
           : isAdelaide || isSummerLakes
             ? ADELAIDE_SUMMER_LAKES_H1 || `Homes for Sale in ${neighborhood.name}, FL`
-            : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
+            : isAquarina && !hasExplicitPropertyTypeFilter
+              ? AQUARINA_COMBINED_H1 || `Homes & Condos for Sale in ${neighborhood.name}, FL`
+              : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
   // Bold sans-serif H1 styling (per Ryan, 2026-08-05) — originally added for
   // Harbor Island Beach Club, now shared by Viera Builders Communities
   // Viera West per Ryan's follow-up request to match that same style. Every
