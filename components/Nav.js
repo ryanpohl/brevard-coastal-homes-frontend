@@ -673,16 +673,33 @@ const gridLinkStyle = {
   borderRadius: 4,
 };
 
-// City dropdown items show a non-link "<City> Listings" header, followed
-// by "Homes" and "Condos" links stacked beneath it — the three split the
-// padding gridLinkStyle uses for a single-link cell (header keeps its top
-// padding, the two links drop their top/bottom padding in turn) instead
-// of each keeping the full 8px and reading with an oversized gap between
-// them.
+// City/Neighborhood/Oceanfront dropdown items show a "<Name> Listings"
+// header link, followed by "Homes"/"Condos"/"Lots" links stacked beneath
+// it — the three split the padding gridLinkStyle uses for a single-link
+// cell (header keeps its top padding, the links below drop their top/
+// bottom padding in turn) instead of each keeping the full 8px and reading
+// with an oversized gap between them.
+//
+// display: 'block' + lineHeight (2026-09-01, per Ryan: "make the drop down
+// menu look cleaner... clean up the look when you hover over the links...
+// inconsistency in the coloring") — the header used to be a plain
+// non-interactive <div>, so it never needed display: 'block' (divs default
+// to it). Once it became a live <Link> (see the three dropdown panels
+// above), it rendered as an inline <a> by default — on the many names long
+// enough to wrap to 2-3 lines (e.g. "Viera Builders Communities Viera West
+// Listings"), the .hero-search-item:hover background-color painted one
+// separate, ragged box per text line instead of a single clean rectangle
+// behind the whole header, which is exactly the blotchy hover coloring
+// Ryan's screenshot showed. Matches every link below it (gridLinkStyle/
+// gridCondoLinkStyle), which were already block-level and never had this
+// problem.
 const cityListingsLabelStyle = {
+  display: 'block',
   padding: '8px 10px 0',
   fontWeight: 700,
   color: '#fff',
+  lineHeight: 1.3,
+  borderRadius: 4,
 };
 const cityHomeLinkStyle = { ...gridLinkStyle, padding: '2px 10px 0' };
 const gridCondoLinkStyle = {
