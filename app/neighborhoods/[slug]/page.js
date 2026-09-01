@@ -236,20 +236,21 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
     'Harbor Island Beach Club, Melbourne Beach FL Homes for sale. Contact us about current off-market properties currently available in Harbor Island.';
   const HARBOR_ISLAND_BEACH_CLUB_CONDO_H1 =
     'Harbor Island Beach Club, Melbourne Beach FL Condos for sale. Contact us about current foreclosures & off-market properties currently available in Harbor Island.';
-  // Combined H1 (2026-09-01, per Ryan, then extended same-day with the
-  // foreclosures/off-market sentence: "Add the following text to the
-  // harbor island text you just changed... Reach out for information on
-  // the Foreclosed Bank-Owned condos... or the off-market Single-Family
-  // homes...") — shown only for the "<Name> Listings" header link's own
-  // bare /neighborhoods/harbor-island-beach-club URL (no ?propertyType=
-  // param), the same hasExplicitPropertyTypeFilter distinction
-  // AQUARINA_COMBINED_H1 below uses. Before this, that bare URL fell
-  // through to the Home-specific H1 above (primaryType defaults to 'Home'
-  // whenever no param is present), which read as Homes-only even though
-  // the page itself shows every type combined. The "Homes"/"Condos"
-  // sub-links keep their own existing single-type H1s untouched.
+  // Combined H1 (2026-09-01, per Ryan; revised same-day twice more — first
+  // to add a foreclosures/off-market sentence, then trimmed back down to
+  // drop its "off-market Single-Family homes" clause, per Ryan's final
+  // wording: "Reach out for information on the Foreclosed Bank-Owned
+  // condos that are currently available in Harbor Island Beach Club.") —
+  // shown only for the "<Name> Listings" header link's own bare
+  // /neighborhoods/harbor-island-beach-club URL (no ?propertyType= param),
+  // the same hasExplicitPropertyTypeFilter distinction AQUARINA_COMBINED_H1
+  // below uses. Before this, that bare URL fell through to the
+  // Home-specific H1 above (primaryType defaults to 'Home' whenever no
+  // param is present), which read as Homes-only even though the page
+  // itself shows every type combined. The "Homes"/"Condos" sub-links keep
+  // their own existing single-type H1s untouched.
   const HARBOR_ISLAND_BEACH_CLUB_COMBINED_H1 =
-    'Harbor Island Beach Club Homes & Condos For Sale, Melbourne Beach, Florida. Reach out for information on the Foreclosed Bank-Owned condos that are currently available in Harbor Island Beach Club or the off-market Single-Family homes that are also currently available.';
+    'Harbor Island Beach Club Homes & Condos For Sale, Melbourne Beach, Florida. Reach out for information on the Foreclosed Bank-Owned condos that are currently available in Harbor Island Beach Club.';
   const HARBOR_ISLAND_BEACH_CLUB_H1 = !hasExplicitPropertyTypeFilter
     ? HARBOR_ISLAND_BEACH_CLUB_COMBINED_H1
     : primaryType === 'Condo'
