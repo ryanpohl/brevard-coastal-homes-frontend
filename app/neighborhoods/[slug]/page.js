@@ -100,6 +100,13 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   }
 
   const primaryType = (searchParams.propertyType || 'Home').split(',')[0];
+  // True only when a visitor (or a Nav.js sub-link like "Homes"/"Condos")
+  // explicitly set ?propertyType=; false for the bare /neighborhoods/{slug}
+  // URL a page's own "<Name> Listings" header link goes to (see Nav.js) —
+  // used below by both HARBOR_ISLAND_BEACH_CLUB_H1 and AQUARINA_COMBINED_H1
+  // to tell "the main combined-view link" apart from a single-type sub-link,
+  // since primaryType alone can't (it defaults to 'Home' in both cases).
+  const hasExplicitPropertyTypeFilter = Boolean(searchParams.propertyType);
 
   let seo = null;
   let jsonLd = null;
@@ -223,16 +230,28 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // Ryan) instead of the one combined "Homes & Condos"/foreclosures H1 used
   // for both — the Home version drops the foreclosures mention entirely
   // (Ryan's own wording only paired "foreclosures" with the Condos text).
-  // Picked via primaryType (already computed above from
-  // searchParams.propertyType, defaulting to 'Home'), so the bare
-  // /neighborhoods/harbor-island-beach-club URL (no propertyType param)
-  // also gets the Home version, matching primaryType's own Home default.
+  // Picked via primaryType for Nav.js's single-type "Homes"/"Condos"
+  // sub-links (which explicitly set ?propertyType=Home/Condo).
   const HARBOR_ISLAND_BEACH_CLUB_HOME_H1 =
     'Harbor Island Beach Club, Melbourne Beach FL Homes for sale. Contact us about current off-market properties currently available in Harbor Island.';
   const HARBOR_ISLAND_BEACH_CLUB_CONDO_H1 =
     'Harbor Island Beach Club, Melbourne Beach FL Condos for sale. Contact us about current foreclosures & off-market properties currently available in Harbor Island.';
-  const HARBOR_ISLAND_BEACH_CLUB_H1 =
-    primaryType === 'Condo' ? HARBOR_ISLAND_BEACH_CLUB_CONDO_H1 : HARBOR_ISLAND_BEACH_CLUB_HOME_H1;
+  // Combined H1 (2026-09-01, per Ryan: "change the text to Harbor Island
+  // Beach Club Homes & Condos For Sale, Melbourne Beach, Florida... For
+  // the main link") — shown only for the "<Name> Listings" header link's
+  // own bare /neighborhoods/harbor-island-beach-club URL (no
+  // ?propertyType= param), the same hasExplicitPropertyTypeFilter
+  // distinction AQUARINA_COMBINED_H1 below uses. Before this, that bare
+  // URL fell through to the Home-specific H1 above (primaryType defaults
+  // to 'Home' whenever no param is present), which read as Homes-only even
+  // though the page itself shows every type combined. The "Homes"/"Condos"
+  // sub-links keep their own existing single-type H1s untouched.
+  const HARBOR_ISLAND_BEACH_CLUB_COMBINED_H1 = 'Harbor Island Beach Club Homes & Condos For Sale, Melbourne Beach, Florida.';
+  const HARBOR_ISLAND_BEACH_CLUB_H1 = !hasExplicitPropertyTypeFilter
+    ? HARBOR_ISLAND_BEACH_CLUB_COMBINED_H1
+    : primaryType === 'Condo'
+      ? HARBOR_ISLAND_BEACH_CLUB_CONDO_H1
+      : HARBOR_ISLAND_BEACH_CLUB_HOME_H1;
   // Aquarina (per Ryan, 2026-09-01: "make it Aquarina Homes & Condos For
   // Sale for the main Aquarina link") — one of only two neighborhoods with
   // its own "Condos" sub-link (see Nav.js's NEIGHBORHOOD_CONDO_PAGE_SLUGS,
@@ -247,9 +266,10 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // comments for why). Gated on hasExplicitPropertyTypeFilter so Aquarina's
   // own "Homes" and "Condos" sub-links (which explicitly set
   // ?propertyType=Home/Condo) still show their own correct single-type h1
-  // instead of this combined one.
+  // instead of this combined one. (hasExplicitPropertyTypeFilter is
+  // declared once, near primaryType above, and shared with
+  // HARBOR_ISLAND_BEACH_CLUB_H1's identical combined-vs-single-type check.)
   const isAquarina = slug === 'aquarina';
-  const hasExplicitPropertyTypeFilter = Boolean(searchParams.propertyType);
   const AQUARINA_COMBINED_H1 = seo?.h1 ? seo.h1.replace('Homes For Sale', 'Homes & Condos For Sale') : seo?.h1;
   // Viera Builders Communities Viera West (per Ryan, 2026-08-05): drops a
   // new "Neighborhood" dropdown (before Property Type) listing its 6
