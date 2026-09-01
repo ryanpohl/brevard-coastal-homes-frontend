@@ -174,6 +174,16 @@ export default function HarborIslandInquiryModals({ showForeclosures = true, are
               </button>
             </div>
 
+            {/* "Call or Text Us: 321-350-7661" added 2026-09-01, per Ryan:
+                "Can you add 'Call or Text Us: 321-350-7661' to all the ask a
+                question buttons, Foreclosure, & Property management buttons
+                popups." Hardcoded (not AGENT_INFO.phone) for the same reason
+                as ContactModal.js's own copy of this line — that env var is
+                confirmed empty on the live production bundle. */}
+            <p style={{ color: 'var(--color-ink)', fontWeight: 600, marginBottom: 12, fontSize: 16 }}>
+              Call or Text Us: <a href="tel:+13213507661" style={{ color: 'var(--color-ink)' }}>321-350-7661</a>
+            </p>
+
             <p style={{ color: 'var(--color-muted-dark)', marginBottom: 16, lineHeight: 1.6 }}>
               {open === 'foreclosures'
                 ? 'Send us your contact information if you are interested in the current foreclosures in Harbor Island Beach Club. We will reach out shortly!'
