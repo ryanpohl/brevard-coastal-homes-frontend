@@ -230,7 +230,14 @@ h4 {
 .nav-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 8px;
+  /* Row gap bumped 8px -> 16px, column gap -> 20px (2026-09-01, per Ryan:
+     "make the drop down menu look cleaner & easier to read") — with the
+     "<Name> Listings" headers now live links that commonly wrap to 2-3
+     lines (see .nav-dropdown-label's min-height below), the old tight 8px
+     gap left neighboring items' text crowding each other with barely any
+     breathing room. Row gap is larger than column gap since a wrapped
+     header eats into vertical space specifically. */
+  gap: 16px 20px;
   width: min(320px, calc(100vw - 32px));
 }
 
@@ -261,8 +268,24 @@ h4 {
    inline objects so this class is what actually controls it. Desktop
    size (15px/14px) matches what was already live; only the sub-640px
    tier is new. */
+/* min-height added (2026-09-01, per Ryan: "make the drop down menu look
+   cleaner & easier to read") — sized for the longest header on the site,
+   "Viera Builders Communities Viera West Listings", which wraps to 3 lines
+   (3 lines * 15px * 1.3 line-height, from Nav.js's cityListingsLabelStyle,
+   + its 8px top padding). Without this, every item's header wraps to a
+   different number of lines (1-3, depending on how long that city's/
+   neighborhood's name is), so the Homes/Condos/Lots links stacked beneath
+   each header start at a different height across the row — this reserves
+   the same vertical space for every header regardless of its own wrap
+   count, so those links line up cleanly instead of reading as a ragged,
+   uneven grid. Applied to every dropdown (City/Neighborhood/Oceanfront)
+   via this one shared class rather than just Neighborhood (which has the
+   longest names) — City/Oceanfront headers commonly wrap to 2 lines too
+   (e.g. "Indian Harbour Beach Listings"), so they benefit from the same
+   consistent alignment. */
 .nav-dropdown-label {
   font-size: 15px;
+  min-height: 70px;
 }
 
 .nav-dropdown-link {
@@ -272,6 +295,7 @@ h4 {
 @media (max-width: 640px) {
   .nav-dropdown-label {
     font-size: 18px;
+    min-height: 80px;
   }
 
   .nav-dropdown-link {
