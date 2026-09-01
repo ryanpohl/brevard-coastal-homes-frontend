@@ -3,7 +3,12 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { PROPERTY_TYPE_TO_SLUG, OCEANFRONT_CITY_SLUGS, OCEANFRONT_PROPERTY_TYPE_TO_SLUG } from '@/lib/constants';
+import {
+  PROPERTY_TYPE_TO_SLUG,
+  OCEANFRONT_CITY_SLUGS,
+  OCEANFRONT_PROPERTY_TYPE_TO_SLUG,
+  OCEANFRONT_LISTINGS_SLUG,
+} from '@/lib/constants';
 import AuthPanel from './AuthPanel';
 import ContactModal from './ContactModal';
 
@@ -253,9 +258,22 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
               <DropdownPanel grid={5}>
                 {cities.map((city) => (
                   <div key={city.slug}>
-                    <div className="nav-dropdown-label" style={cityListingsLabelStyle}>
+                    {/* "<City> Listings" header made a live link (2026-09-01,
+                        per Ryan: "make the ... City Listings ... live
+                        links... When users click on the Listings page show
+                        all the listings which include Homes, Condos, & Lots")
+                        — goes to the new bare /{citySlug} route (see
+                        app/[citySlug]/page.js), which defaults to every
+                        property type combined instead of one type baked
+                        into the URL like the Homes/Condos/Lots links below. */}
+                    <Link
+                      href={`/${city.slug}`}
+                      className="hero-search-item nav-dropdown-label nav-dropdown-link"
+                      style={cityListingsLabelStyle}
+                      onClick={closeNow}
+                    >
                       {city.name} Listings
-                    </div>
+                    </Link>
                     <Link
                       href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
                       className="hero-search-item nav-dropdown-link"
@@ -331,9 +349,24 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                     seeded for all 10), so no new route/page was needed. */}
                 {neighborhoods.map((n) => (
                   <div key={n.slug}>
-                    <div className="nav-dropdown-label" style={cityListingsLabelStyle}>
+                    {/* "<Neighborhood> Listings" header made a live link
+                        (2026-09-01, per Ryan: "make the Neighborhood ...
+                        live links... When users click on the Listings page
+                        show all the listings which include Homes, Condos, &
+                        Lots") — goes to the plain /neighborhoods/{slug} URL
+                        with no ?propertyType= param, which this route
+                        already treats as "every type combined" (see this
+                        page's own top comment: "defaulting to showing all
+                        types"), so no new route was needed here unlike the
+                        City dropdown's header (see app/[citySlug]/page.js). */}
+                    <Link
+                      href={`/neighborhoods/${n.slug}`}
+                      className="hero-search-item nav-dropdown-label nav-dropdown-link"
+                      style={cityListingsLabelStyle}
+                      onClick={closeNow}
+                    >
                       {n.name} Listings
-                    </div>
+                    </Link>
                     {/* "Homes" normally means ?propertyType=Home only (see
                         the comment above). Widened to Home+Land for
                         neighborhoods in NEIGHBORHOOD_LOTS_PAGE_SLUGS (per
@@ -409,9 +442,25 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
               <DropdownPanel grid={5}>
                 {oceanfrontCities.map((city) => (
                   <div key={city.slug}>
-                    <div className="nav-dropdown-label" style={cityListingsLabelStyle}>
+                    {/* "<City> Listings" header made a live link (2026-09-01,
+                        per Ryan: "make ... Search Oceanfront live links ...
+                        Make ... 'Cocoa Beach Listings' Live... show all the
+                        listings") — goes to the new combined
+                        oceanfront-listings propertySlug (see
+                        OCEANFRONT_LISTINGS_SLUG in lib/constants.js and
+                        app/[citySlug]/[propertySlug]/page.js's
+                        isOceanfrontCombined), i.e. Oceanfront Homes +
+                        Oceanfront Condos together for this city — Oceanfront
+                        has no Land pages at all, so "every type" here means
+                        both of the two types that actually exist. */}
+                    <Link
+                      href={`/${city.slug}/${OCEANFRONT_LISTINGS_SLUG}`}
+                      className="hero-search-item nav-dropdown-label nav-dropdown-link"
+                      style={cityListingsLabelStyle}
+                      onClick={closeNow}
+                    >
                       {city.name} Listings
-                    </div>
+                    </Link>
                     <Link
                       href={`/${city.slug}/${OCEANFRONT_PROPERTY_TYPE_TO_SLUG.Home}`}
                       className="hero-search-item nav-dropdown-link"
