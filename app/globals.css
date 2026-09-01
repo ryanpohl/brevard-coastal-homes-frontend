@@ -268,24 +268,23 @@ h4 {
    inline objects so this class is what actually controls it. Desktop
    size (15px/14px) matches what was already live; only the sub-640px
    tier is new. */
-/* min-height added (2026-09-01, per Ryan: "make the drop down menu look
-   cleaner & easier to read") — sized for the longest header on the site,
-   "Viera Builders Communities Viera West Listings", which wraps to 3 lines
-   (3 lines * 15px * 1.3 line-height, from Nav.js's cityListingsLabelStyle,
-   + its 8px top padding). Without this, every item's header wraps to a
-   different number of lines (1-3, depending on how long that city's/
-   neighborhood's name is), so the Homes/Condos/Lots links stacked beneath
-   each header start at a different height across the row — this reserves
-   the same vertical space for every header regardless of its own wrap
-   count, so those links line up cleanly instead of reading as a ragged,
-   uneven grid. Applied to every dropdown (City/Neighborhood/Oceanfront)
-   via this one shared class rather than just Neighborhood (which has the
-   longest names) — City/Oceanfront headers commonly wrap to 2 lines too
-   (e.g. "Indian Harbour Beach Listings"), so they benefit from the same
-   consistent alignment. */
+/* min-height (2026-09-01 same-day follow-up, per Ryan: "move up the sub
+   links... There is too much space") — briefly tried a fixed min-height
+   here so the Homes/Condos/Lots links beneath every header lined up across
+   a row regardless of how many lines that header wrapped to (see git
+   history for that attempt). Reverted: sizing it for the longest header on
+   the site ("Viera Builders Communities Viera West Listings", 3 lines)
+   left every shorter, more-common 1-line header (Adelaide, Cocoa Beach,
+   etc.) with a large dead gap before its own Homes link — exactly the "too
+   much space" Ryan flagged. Each item's height is back to hugging its own
+   header's actual content again, so Homes/Condos/Lots sit right under
+   their own header — rows just won't all line up at exactly the same
+   height when their headers wrap a different number of times, which is
+   the trade-off Ryan chose over the dead space. The ragged/inconsistent
+   *hover coloring* this min-height was never what fixed, anyway — that's
+   cityListingsLabelStyle's `display: 'block'` in Nav.js, which stays. */
 .nav-dropdown-label {
   font-size: 15px;
-  min-height: 70px;
 }
 
 .nav-dropdown-link {
@@ -295,7 +294,6 @@ h4 {
 @media (max-width: 640px) {
   .nav-dropdown-label {
     font-size: 18px;
-    min-height: 80px;
   }
 
   .nav-dropdown-link {
