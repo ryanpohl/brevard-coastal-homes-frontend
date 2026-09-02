@@ -47,6 +47,14 @@ import ContactForm from './ContactForm';
  * the exact number directly in this request, so it's hardcoded here
  * instead of depending on that still-broken env var. Wrapped in a
  * `tel:` link so it's tap-to-call on mobile.
+ *
+ * "How would you like us to respond?" Call/Text/Email checkboxes added
+ * 2026-09-02, per Ryan (referencing a screenshot of that exact block):
+ * "add the options from the first screen shot to it like the rest of the
+ * popups" — every other Ask a Question/inquiry popup on the site already
+ * has this, so ContactForm.js grew a `showContactPreference` prop for it;
+ * passed true only here, not from the standalone /contact page's own
+ * ContactForm usage, since this request was specifically about the popup.
  */
 export default function ContactModal({ onClose }) {
   const modal = (
@@ -94,7 +102,7 @@ export default function ContactModal({ onClose }) {
             Send us a message and we&apos;ll get back to you shortly.
           </p>
 
-          <ContactForm />
+          <ContactForm showContactPreference />
 
           {(AGENT_INFO.phone || AGENT_INFO.email) && (
             <div
