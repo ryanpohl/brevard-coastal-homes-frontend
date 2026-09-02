@@ -104,8 +104,25 @@ export default function PropertyContactPanel({ listingId, listingAddress }) {
         </div>
       </div>
 
+      {/* "REQUEST SHOWING" label enlarged (per Ryan, 2026-09-02: "make the
+          REQUEST SHOWING text larger & on all the pages & make it stand out
+          more") — this is the one component rendering it, shared by every
+          Property Detail page's sidebar, so the change already applies
+          site-wide. Bumped from 13px/600 to 18px/700 with added
+          letter-spacing and a thicker 3px underline (up from 2px) so it
+          reads as a real section heading rather than small print. */}
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center', padding: '14px 0', fontSize: 13, fontWeight: 600, color: 'var(--color-ink)', borderBottom: '2px solid var(--color-ink)' }}>
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '16px 0',
+            fontSize: 18,
+            fontWeight: 700,
+            letterSpacing: '0.4px',
+            color: 'var(--color-ink)',
+            borderBottom: '3px solid var(--color-ink)',
+          }}
+        >
           REQUEST SHOWING
         </div>
       </div>
