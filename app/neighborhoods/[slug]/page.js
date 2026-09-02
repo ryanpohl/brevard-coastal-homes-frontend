@@ -318,6 +318,20 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // "Aripeka" nor "Viera" contain that substring — and it's a no-op on
   // the Home page's H1, which never contains "Land" to begin with.
   const ARIPEKA_H1 = seo?.h1 ? seo.h1.replace('Viera East', 'Viera').replace('Land', 'Lots') : seo?.h1;
+  // Aripeka's "Aripeka Listings" main link H1 (per Ryan, 2026-09-02: "Can
+  // you change the text to 'Aripeka Homes & Lots for sale - Viera,
+  // Florida' on the main Aripeka link in the search by neighborhoods
+  // dropdown menu") — the "main link" is the bare /neighborhoods/aripeka
+  // URL (Nav.js's "Aripeka Listings" header link, no ?propertyType= param),
+  // same hasExplicitPropertyTypeFilter gate used by
+  // AQUARINA_COMBINED_H1/HARBOR_ISLAND_BEACH_CLUB_H1 above, so Aripeka's
+  // own "Homes" (?propertyType=Home,Land) and "Lots" (?propertyType=Land)
+  // sub-links keep showing ARIPEKA_H1's existing backend-derived text,
+  // unaffected. Hand-written exact string per Ryan's wording, rather than
+  // a .replace() on the backend h1 like ARIPEKA_H1 above, since there's no
+  // single-type backend h1 that already contains "Homes & Lots" to derive
+  // it from.
+  const ARIPEKA_COMBINED_H1 = 'Aripeka Homes & Lots for sale - Viera, Florida';
   // Adelaide/Summer Lakes' H1 (per Ryan, 2026-08-21: "Can you change Viera
   // West to just Viera") — both neighborhoods are re-parented to
   // citySlug 'viera-west' in seed.js (per Ryan's 2026-08-11 boundary
@@ -337,7 +351,8 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
       : subCommunity?.comingSoon
         ? `Homes for Sale in ${neighborhood.name}, FL (Coming Soon)`
         : isAripeka
-          ? ARIPEKA_H1 || `Homes for Sale in ${neighborhood.name}, FL`
+          ? (hasExplicitPropertyTypeFilter ? ARIPEKA_H1 : ARIPEKA_COMBINED_H1) ||
+            `Homes for Sale in ${neighborhood.name}, FL`
           : isAdelaide || isSummerLakes
             ? ADELAIDE_SUMMER_LAKES_H1 || `Homes for Sale in ${neighborhood.name}, FL`
             : isAquarina && !hasExplicitPropertyTypeFilter
