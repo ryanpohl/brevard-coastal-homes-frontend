@@ -344,6 +344,14 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
   // follows the same frontend-only string-replace-on-seo.h1 pattern as
   // ARIPEKA_H1 above, rather than touching the backend cities table.
   const ADELAIDE_SUMMER_LAKES_H1 = seo?.h1 ? seo.h1.replace('Viera West', 'Viera') : seo?.h1;
+  // Adelaide's own H1 (per Ryan, 2026-09-02: "can you change the text to
+  // 'Adelaide Homes For Sale - Viera, Florida'") — hardcoded exact string
+  // per Ryan's wording (em dash -> hyphen, "FL" -> "Florida"), since a
+  // further .replace() on ADELAIDE_SUMMER_LAKES_H1 above would still leave
+  // the old em dash and "FL" abbreviation Ryan wants gone. Scoped to
+  // Adelaide only — Summer Lakes keeps using ADELAIDE_SUMMER_LAKES_H1
+  // unchanged below, since this request's screenshot was Adelaide-only.
+  const ADELAIDE_H1 = 'Adelaide Homes For Sale - Viera, Florida';
   const h1Text = isHarborIslandBeachClub
     ? HARBOR_ISLAND_BEACH_CLUB_H1
     : isVieraBuildersCommunitiesVieraWest
@@ -353,11 +361,13 @@ export default async function NeighborhoodListingsPage({ params, searchParams })
         : isAripeka
           ? (hasExplicitPropertyTypeFilter ? ARIPEKA_H1 : ARIPEKA_COMBINED_H1) ||
             `Homes for Sale in ${neighborhood.name}, FL`
-          : isAdelaide || isSummerLakes
-            ? ADELAIDE_SUMMER_LAKES_H1 || `Homes for Sale in ${neighborhood.name}, FL`
-            : isAquarina && !hasExplicitPropertyTypeFilter
-              ? AQUARINA_COMBINED_H1 || `Homes & Condos for Sale in ${neighborhood.name}, FL`
-              : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
+          : isAdelaide
+            ? ADELAIDE_H1
+            : isSummerLakes
+              ? ADELAIDE_SUMMER_LAKES_H1 || `Homes for Sale in ${neighborhood.name}, FL`
+              : isAquarina && !hasExplicitPropertyTypeFilter
+                ? AQUARINA_COMBINED_H1 || `Homes & Condos for Sale in ${neighborhood.name}, FL`
+                : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
   // Bold sans-serif H1 styling (per Ryan, 2026-08-05) — originally added for
   // Harbor Island Beach Club, now shared by Viera Builders Communities
   // Viera West per Ryan's follow-up request to match that same style. Every
