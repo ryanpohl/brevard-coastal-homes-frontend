@@ -145,8 +145,20 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
       ? `<div style="font-size: 10px; color: #2f7a4f; margin-top: 4px; font-weight: 600;">${escapeHtml(listing.waterfront)}</div>`
       : '';
 
+    // outline: none (2026-09-03, per Ryan: "get rid of the black border
+    // surrounding these popup images ... when you hover over the
+    // property") — the "black border" wasn't anything this component was
+    // drawing; it's Chrome's own default focus ring (outline: auto), which
+    // is a dark/near-black rectangle in this browser's default theme.
+    // Google's InfoWindow gives its content container tabindex for
+    // accessibility and focuses it when the popup opens, and that focus
+    // was inherited down to this <a> (the one focusable element inside),
+    // so the ring rendered snug around the whole card. Safe to disable
+    // here without hurting keyboard accessibility — Google's own outer
+    // InfoWindow container still gets its own focus outline separately;
+    // this only removes the second, redundant ring drawn on the inner link.
     return `<div style="font-family: 'Jost', sans-serif; font-size: 13px; width: 220px;">
-        <a href="/listings/${listing.id}" style="display: block; color: #1c2b30; text-decoration: none;">
+        <a href="/listings/${listing.id}" style="display: block; color: #1c2b30; text-decoration: none; outline: none;">
           <div style="position: relative; width: 100%; height: 130px; border-radius: 4px; overflow: hidden; margin-bottom: 8px; background: #e6e1d6;">
             ${thumbnailPhoto ? `<img src="${escapeHtml(thumbnailPhoto)}" alt="${escapeHtml(listing.address)}" style="width: 100%; height: 100%; object-fit: cover; display: block;" />` : ''}
             ${daysOnMarketBadge}
@@ -308,6 +320,22 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
           el.style.maxHeight = 'none';
           el.style.overflow = 'visible';
         });
+
+        // Force even padding around the popup content (2026-09-03, per
+        // Ryan: "center the images & property information better on the
+        // popups") — Google's own InfoWindow chrome (`.gm-style-iw-c`,
+        // which `container` already points at) sets its padding via
+        // several separate inline longhand properties
+        // (padding-inline-end/-top/-bottom) that it recalculates per open
+        // based on how close the anchor sits to the map container's edge;
+        // on this site's narrower sidebar maps that recalculation was
+        // zeroing out the top/right/bottom padding while leaving the
+        // left side at its 12px default, shoving the photo/price content
+        // into the top-right corner instead of centering it. Re-applying
+        // the shorthand after Google's own domready styling runs
+        // overrides all four sides uniformly regardless of which specific
+        // longhand properties it set.
+        container.style.padding = '12px';
       });
 
       if (points.length > 1) {
