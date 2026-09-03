@@ -49,7 +49,13 @@ const CITIES_EXCLUDING_OCEANFRONT = ['melbourne', 'rockledge'];
  * hand-written from the city's own name rather than fetched.
  */
 export async function generateMetadata({ params }) {
-  const { citySlug } = params;
+  // Next.js 15 upgrade (2026-09-03) — `params`/`searchParams` became async
+  // (Promises) in the App Router; await once at the top of each
+  // function and leave every downstream `citySlug`/`searchParams.x`
+  // reference in this file untouched, same pattern applied across every
+  // dynamic route this session (see the other three page.js files with
+  // this same comment).
+  const { citySlug } = await params;
   try {
     const { city } = await api.getCity(citySlug);
     return {
@@ -61,8 +67,12 @@ export async function generateMetadata({ params }) {
   }
 }
 
-export default async function CityAllListingsPage({ params, searchParams }) {
-  const { citySlug } = params;
+export default async function CityAllListingsPage({ params, searchParams: searchParamsPromise }) {
+  // Next.js 15 upgrade (2026-09-03) — see generateMetadata's identical
+  // comment above. Awaiting into the same `searchParams` name here keeps
+  // every `searchParams.x` reference below unchanged.
+  const { citySlug } = await params;
+  const searchParams = await searchParamsPromise;
 
   let city;
   try {
