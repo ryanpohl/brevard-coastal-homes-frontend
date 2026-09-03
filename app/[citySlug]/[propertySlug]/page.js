@@ -50,7 +50,11 @@ const PAGE_SIZE = 30;
  * never hand-write per-page meta here.
  */
 export async function generateMetadata({ params }) {
-  const { citySlug, propertySlug } = params;
+  // Next.js 15 upgrade (2026-09-03) — `params`/`searchParams` became async
+  // (Promises) in the App Router; await once at the top of each function
+  // and leave every downstream reference untouched, same pattern applied
+  // across every dynamic route this session.
+  const { citySlug, propertySlug } = await params;
   // Combined Oceanfront "Listings" page (2026-09-01, per Ryan) — see
   // OCEANFRONT_LISTINGS_SLUG in lib/constants.js. Checked before the normal
   // isOceanfront/propertyType lookups below since this slug isn't a key in
@@ -93,8 +97,12 @@ export async function generateMetadata({ params }) {
   }
 }
 
-export default async function CityListingsPage({ params, searchParams }) {
-  const { citySlug, propertySlug } = params;
+export default async function CityListingsPage({ params, searchParams: searchParamsPromise }) {
+  // Next.js 15 upgrade (2026-09-03) — see generateMetadata's identical
+  // comment above. Awaiting into the same `searchParams` name here keeps
+  // every `searchParams.x` reference below unchanged.
+  const { citySlug, propertySlug } = await params;
+  const searchParams = await searchParamsPromise;
   // Combined Oceanfront "Listings" page (2026-09-01, per Ryan) — see
   // OCEANFRONT_LISTINGS_SLUG in lib/constants.js and the matching
   // generateMetadata branch above.
