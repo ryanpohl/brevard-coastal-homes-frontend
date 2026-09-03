@@ -32,7 +32,13 @@ const PAGE_SIZE = 30;
  * baked into the URL segment; it's driven entirely by the FilterBar/query
  * string, defaulting to showing all types.
  */
-export async function generateMetadata({ params, searchParams }) {
+export async function generateMetadata({ params: paramsPromise, searchParams: searchParamsPromise }) {
+  // Next.js 15 upgrade (2026-09-03) — `params`/`searchParams` became async
+  // (Promises) in the App Router; await once at the top of each function
+  // into the same `params`/`searchParams` names and leave every downstream
+  // reference untouched, same pattern applied across every dynamic route
+  // this session.
+  const [params, searchParams] = await Promise.all([paramsPromise, searchParamsPromise]);
   const primaryType = (searchParams.propertyType || 'Home').split(',')[0];
   try {
     const { seo } = await api.getNeighborhoodSeo(params.slug, primaryType);
@@ -47,7 +53,11 @@ export async function generateMetadata({ params, searchParams }) {
   }
 }
 
-export default async function NeighborhoodListingsPage({ params, searchParams }) {
+export default async function NeighborhoodListingsPage({ params: paramsPromise, searchParams: searchParamsPromise }) {
+  // Next.js 15 upgrade (2026-09-03) — see generateMetadata's identical
+  // comment above. Awaiting into the same `params`/`searchParams` names
+  // keeps every reference in this large function body unchanged.
+  const [params, searchParams] = await Promise.all([paramsPromise, searchParamsPromise]);
   const { slug } = params;
 
   // Viera Builders Communities Viera West's 6 sub-communities (per Ryan,
