@@ -17,8 +17,12 @@ const STATUS_COLOR = {
 };
 
 export async function generateMetadata({ params }) {
+  // Next.js 15 upgrade (2026-09-03) — `params` became async (a Promise) in
+  // the App Router; await it before use, same pattern applied across
+  // every dynamic route this session.
+  const { id } = await params;
   try {
-    const { listing } = await api.getListing(params.id);
+    const { listing } = await api.getListing(id);
     const typeLabel = PROPERTY_TYPE_LABEL[listing.propertyType] || listing.propertyType;
     return {
       title: `${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`,
@@ -32,10 +36,13 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ListingDetailPage({ params }) {
+  // Next.js 15 upgrade (2026-09-03) — see generateMetadata's identical
+  // comment above.
+  const { id } = await params;
   let listing;
   let jsonLd;
   try {
-    ({ listing, jsonLd } = await api.getListing(params.id));
+    ({ listing, jsonLd } = await api.getListing(id));
   } catch {
     notFound();
   }
