@@ -157,8 +157,10 @@ export default async function HomePage() {
 // vs. below it in serif caps, matching a reference site he sent). Was:
 // name overlaid on the photo itself, white Inter Tight text over a dark
 // gradient scrim. Now: the photo runs uncropped by any overlay, and the
-// name sits underneath in Playfair Display caps with a thin gold rule,
-// echoing the header wordmark/rules from the 2026-09-04 header redesign.
+// name sits underneath in Playfair Display caps, echoing the header
+// wordmark from the 2026-09-04 header redesign. The gold rule that
+// originally sat between photo and name was removed the same day, per
+// Ryan: "delete the line ... between the pictures & the names."
 function PlaceCard({ name, thumbnail, href, sizes, objectPosition = 'center' }) {
   const src = placePhotoUrl(thumbnail);
   return (
@@ -176,7 +178,6 @@ function PlaceCard({ name, thumbnail, href, sizes, objectPosition = 'center' }) 
         )}
       </div>
       <div className="place-card-label-wrap">
-        <span className="place-card-rule" aria-hidden="true" />
         <p className="place-card-label">{name}</p>
       </div>
     </Link>

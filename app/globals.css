@@ -117,8 +117,8 @@ h4 {
    for Style B). Below 640px every card stacks in one column, so unlike
    the 3-/5-column grids above (where the next card is off to the side, not
    competing for the same vertical line), a name here sits directly between
-   two photos. The photo-to-its-own-name gap is ~25px (.place-card-photo's
-   14px top padding + rule + margin below); without this rule the grid's
+   two photos. The photo-to-its-own-name gap is ~24px (.place-card-label-wrap's
+   top padding — see that class below); without this rule the grid's
    plain 18px gap put the *next* card's photo closer to that name than its
    own photo was, inviting exactly that misread. 40px keeps every name
    closer to its own photo than to the next one down. */
@@ -579,21 +579,17 @@ textarea:focus {
   transform: scale(1.08);
 }
 
-/* Label area below the photo — thin gold rule + the name in Playfair
-   Display caps, matching the wordmark/rules from the header redesign.
-   Was var(--font-inter-tight) white text overlaid on the photo; see the
-   PlaceCard comment in app/page.js for the full history. */
+/* Label area below the photo — the name in Playfair Display caps. Was
+   var(--font-inter-tight) white text overlaid on the photo; see the
+   PlaceCard comment in app/page.js for the full history. Originally had a
+   thin gold rule above the name (echoing the header wordmark/rules), but
+   Ryan asked to remove it (2026-09-04: "delete the line ... between the
+   pictures & the names") — padding-top absorbs the ~24px of space the
+   rule + its margin used to take up, so the name sits the same distance
+   below the photo as before. */
 .place-card-label-wrap {
   text-align: center;
-  padding: 14px 6px 0;
-}
-
-.place-card-rule {
-  display: inline-block;
-  width: 28px;
-  height: 1px;
-  background: var(--color-gold);
-  margin-bottom: 10px;
+  padding: 24px 6px 0;
 }
 
 .place-card-label {
@@ -602,7 +598,7 @@ textarea:focus {
   font-weight: 600;
   /* Bumped from 15px (2026-09-04, per Ryan: "bump the size up and see how it
      looks" after asking whether city/neighborhood names should be larger or
-     bolder) — weight/letter-spacing/rule stay the same, just sized up for
+     bolder) — weight/letter-spacing stay the same, just sized up for
      easier scanning across the wide grid. */
   font-size: 16px;
   letter-spacing: 0.08em;
