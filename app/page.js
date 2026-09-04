@@ -77,17 +77,20 @@ export default async function HomePage() {
         >
           <h1
             style={{
-              // Inter Tight (2026-08-21, per Ryan: "Use Inter Tight font
-              // on all the text on the homepage") — was var(--font-heading)
-              // (Playfair Display).
-              fontFamily: 'var(--font-inter-tight)',
-              fontWeight: 600,
+              // Bodoni Moda (2026-09-04, per Ryan: "Use the second option"
+              // — picked from a mockup matching a reference site's
+              // high-contrast Didot-style serif) — was
+              // var(--font-inter-tight) (2026-08-21 sitewide-text change).
+              // This is the one homepage headline that's gone back to a
+              // serif; everything else on the homepage stays Inter Tight.
+              fontFamily: 'var(--font-didot)',
+              fontWeight: 500,
               fontSize: 'clamp(28px, 5vw, 46px)',
               color: '#ffffff',
               margin: '0 0 28px',
               textAlign: 'center',
               textShadow: '0 2px 18px rgba(0,0,0,0.35)',
-              letterSpacing: 1,
+              letterSpacing: 2,
             }}
           >
             Brevard County Listings

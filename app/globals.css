@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600;700;800&family=Inter+Tight:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600;700;800&family=Inter+Tight:wght@400;500;600;700;800&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&display=swap');
 
 /* Design tokens — see design/README.md "Design Tokens" section. Keep these
    in sync with that file; it's the source of truth from the design handoff. */
@@ -43,6 +43,15 @@
      showed). See app/[citySlug]/[propertySlug]/page.js and
      app/neighborhoods/[slug]/page.js. */
   --font-inter-tight: 'Inter Tight', sans-serif;
+  /* Added 2026-09-04 per Ryan: matched a reference site's hero headline
+     (high-contrast Didot-style serif, thin hairline serifs, tall
+     proportions) after comparing it against the homepage hero in a
+     mockup. Bodoni Moda is the closest well-supported web font to that
+     look — true Didot isn't available on Google Fonts. Used only for the
+     homepage hero H1 (app/page.js) — was var(--font-inter-tight) there,
+     everything else on the homepage stays Inter Tight per Ryan's
+     2026-08-21 sitewide-text decision. */
+  --font-didot: 'Bodoni Moda', 'Playfair Display', serif;
 }
 
 * {
