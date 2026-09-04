@@ -206,14 +206,83 @@ h4 {
 }
 
 /* Top nav dropdown panels (Search by City/Neighborhood, My Account,
-   Sign In/Join) — solid dark navy matching the nav bar's own background,
-   used instead of .card so these read consistently against the plain
-   light-cream body background on every non-homepage page. */
+   Sign In/Join) — solid dark navy, used instead of .card so these read
+   consistently against the plain light-cream body background on every
+   non-homepage page. Originally chosen to match the nav bar's own
+   (then-navy) background; kept dark navy on purpose after the 2026-09-04
+   white-header redesign below (see .nav-brand-row) — a dark flyout panel
+   still reads cleanly dropping down from a white bar, and redoing these
+   panels as light-on-white wasn't part of what Ryan asked to change. */
 .nav-dropdown-panel {
   background: var(--color-nav-bg);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-card);
   color: rgba(255, 255, 255, 0.85);
+}
+
+/* Centered wordmark header row (2026-09-04, per Ryan: match a reference
+   real-estate site's header — centered serif logo, hairline rules
+   underneath, Sign In/Register in its own top-right slot instead of
+   sitting directly beside the logo). .nav-brand-row is the positioning
+   context for .nav-brand-signin's absolute placement, same "relative row +
+   absolutely-positioned corner slot" pattern Nav.js already uses for its
+   My Account panel against the outer header container. */
+.nav-brand-row {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 26px clamp(16px, 4vw, 56px) 18px;
+}
+
+.nav-brand-center {
+  text-align: center;
+}
+
+.nav-brand-wordmark {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-size: clamp(22px, 4vw, 32px);
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  color: var(--color-ink);
+}
+
+.nav-brand-rule-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.nav-brand-rule {
+  height: 1px;
+  width: 90px;
+  max-width: 22vw;
+  background: var(--color-gold);
+}
+
+.nav-brand-signin {
+  position: absolute;
+  top: 26px;
+  right: clamp(16px, 4vw, 56px);
+}
+
+/* Below 640px the absolutely-positioned Sign In/Register slot would either
+   overlap the centered wordmark or run off-screen on narrow phones, so it
+   drops into normal flow beneath the logo instead — same breakpoint as
+   this file's other Nav.js-driven mobile fixes (.nav-dropdown-label etc.
+   above). */
+@media (max-width: 640px) {
+  .nav-brand-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .nav-brand-signin {
+    position: static;
+    margin-top: 14px;
+  }
 }
 
 /* Responsive grid for Nav.js's Search by City/Neighborhood dropdown
