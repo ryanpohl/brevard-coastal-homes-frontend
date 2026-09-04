@@ -3,7 +3,14 @@
 /* Design tokens — see design/README.md "Design Tokens" section. Keep these
    in sync with that file; it's the source of truth from the design handoff. */
 :root {
-  --color-nav-bg: #1c1b30;
+  /* Black (2026-09-04, per Ryan: liked the solid black dropdown panel on a
+     reference site, "Apply the black to everywhere on the site") — was
+     #1c1b30 (navy). This one token drives every dark surface on the site:
+     nav dropdown panels, the footer, the hero's photo-loading background,
+     and the dark bands on Looking to Sell / AuthPromptModal /
+     SellWithUsForm — changing it here keeps all of them in sync rather
+     than turning black in some places and staying navy in others. */
+  --color-nav-bg: #000000;
   --color-ink: #1c2b30;
   --color-ink-dark: #10242c;
   --color-gold: #c9a15a;
