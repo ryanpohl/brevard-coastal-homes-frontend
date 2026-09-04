@@ -600,7 +600,11 @@ textarea:focus {
   margin: 0;
   font-family: var(--font-heading);
   font-weight: 600;
-  font-size: 15px;
+  /* Bumped from 15px (2026-09-04, per Ryan: "bump the size up and see how it
+     looks" after asking whether city/neighborhood names should be larger or
+     bolder) — weight/letter-spacing/rule stay the same, just sized up for
+     easier scanning across the wide grid. */
+  font-size: 16px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-ink-dark);
@@ -609,7 +613,8 @@ textarea:focus {
 
 @media (max-width: 640px) {
   .place-card-label {
-    font-size: 16px;
+    /* Bumped from 16px alongside the desktop size above. */
+    font-size: 17px;
   }
 }
 
