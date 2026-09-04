@@ -336,6 +336,56 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
         // overrides all four sides uniformly regardless of which specific
         // longhand properties it set.
         container.style.padding = '12px';
+
+        // Collapse the wasted white space above the photo (2026-09-04, per
+        // Ryan: "delete some of the excess space above the picture... Maybe
+        // put the x in the top right hand corner"). Google renders the
+        // close button inside its own full-width "close row"
+        // (`.gm-style-iw-chr`) that sits in normal document flow directly
+        // above the content div — DOM inspection confirmed this row is
+        // ~48px tall with position: static, and that height (not the 12px
+        // padding above) is what pushes the photo down. `container`
+        // (`.gm-style-iw-c`) is already position: absolute, so pulling the
+        // row out of flow and pinning it to the container's top-right
+        // corner lets the photo start right at the padding edge instead.
+        const closeRow = container.querySelector('.gm-style-iw-chr');
+        if (closeRow) {
+          Object.assign(closeRow.style, {
+            position: 'absolute',
+            top: '4px',
+            right: '4px',
+            height: 'auto',
+            width: 'auto',
+            minWidth: '0',
+            margin: '0',
+            padding: '0',
+            zIndex: '10',
+          });
+          // The row's other child is just a spacer Google uses to shove the
+          // button to the right end of the full-width row — no longer
+          // needed once the row itself is shrink-wrapped to the button.
+          const spacer = closeRow.querySelector('.gm-style-iw-ch');
+          if (spacer) spacer.style.display = 'none';
+
+          // The close button now floats directly over the photo's corner,
+          // so give it a small white circular backdrop for contrast and
+          // scale it down slightly (anchored at its own top-right corner,
+          // so the click target stays put) — echoes the days-on-market
+          // badge's pill treatment elsewhere in this popup. Selected as
+          // the row's own button rather than by Google's internal class/
+          // aria names, which this file's other comments already flag as
+          // undocumented and version-pinned.
+          const closeBtn = closeRow.querySelector('button');
+          if (closeBtn) {
+            Object.assign(closeBtn.style, {
+              background: 'rgba(255,255,255,0.92)',
+              borderRadius: '50%',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+              transformOrigin: 'top right',
+              transform: 'scale(0.72)',
+            });
+          }
+        }
       });
 
       if (points.length > 1) {
