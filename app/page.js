@@ -97,9 +97,17 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <div style={{ background: 'var(--color-nav-bg)', padding: '64px 0' }}>
+      {/* Cream background (2026-09-04, per Ryan: picked "Style B" from a card
+          mockup) — was var(--color-nav-bg) (navy) with white heading text.
+          Switched together with PlaceCard's label move (see below): the
+          card labels moved off the photo to sit underneath it in dark
+          serif text, which isn't readable on the old navy band, so this
+          section (and Search By Neighborhood below) moved to the site's
+          cream body color instead. Bookends nicely with the still-navy
+          hero above and Footer below. */}
+      <div style={{ background: 'var(--color-bg)', padding: '64px 0' }}>
         <section className="wide-container">
-          <h2 className="section-heading" style={{ color: '#fff', fontFamily: 'var(--font-inter-tight)' }}>
+          <h2 className="section-heading" style={{ color: 'var(--color-ink-dark)', fontFamily: 'var(--font-inter-tight)' }}>
             Search By City
           </h2>
           <div className="city-grid">
@@ -117,9 +125,11 @@ export default async function HomePage() {
         </section>
       </div>
 
-      <div style={{ background: 'var(--color-nav-bg)', padding: '0 0 64px' }}>
+      {/* Cream background (2026-09-04, per Ryan) — see comment on the
+          Search By City section above; same reasoning applies here. */}
+      <div style={{ background: 'var(--color-bg)', padding: '0 0 64px' }}>
         <section className="wide-container">
-          <h2 className="section-heading" style={{ color: '#fff', fontFamily: 'var(--font-inter-tight)' }}>
+          <h2 className="section-heading" style={{ color: 'var(--color-ink-dark)', fontFamily: 'var(--font-inter-tight)' }}>
             Search By Neighborhood
           </h2>
           <div className="city-grid">
@@ -139,52 +149,33 @@ export default async function HomePage() {
   );
 }
 
+// Name-below-photo treatment (2026-09-04, per Ryan: "Let's do style B" —
+// picked from a comparison mockup showing the name overlaid on the photo
+// vs. below it in serif caps, matching a reference site he sent). Was:
+// name overlaid on the photo itself, white Inter Tight text over a dark
+// gradient scrim. Now: the photo runs uncropped by any overlay, and the
+// name sits underneath in Playfair Display caps with a thin gold rule,
+// echoing the header wordmark/rules from the 2026-09-04 header redesign.
 function PlaceCard({ name, thumbnail, href, sizes, objectPosition = 'center' }) {
   const src = placePhotoUrl(thumbnail);
   return (
-    <Link
-      href={href}
-      className="place-card"
-      style={{ position: 'relative', display: 'block', overflow: 'hidden', width: '100%', paddingTop: '75%', background: '#2a3942' }}
-    >
-      {src && (
-        <Image
-          src={src}
-          alt={name}
-          fill
-          sizes={sizes}
-          className="place-card-image"
-          style={{ objectFit: 'cover', objectPosition }}
-        />
-      )}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(8,18,23,0.82) 100%)',
-          pointerEvents: 'none',
-        }}
-      />
-      <p
-        className="place-card-label"
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          margin: 0,
-          padding: '10px 14px 16px',
-          color: '#fff',
-          // Inter Tight (2026-08-21, per Ryan) — was var(--font-heading).
-          fontFamily: 'var(--font-inter-tight)',
-          fontWeight: 600,
-          textAlign: 'center',
-          lineHeight: 1.25,
-          textShadow: '0 2px 10px rgba(0,0,0,0.5)',
-        }}
-      >
-        {name}
-      </p>
+    <Link href={href} className="place-card">
+      <div className="place-card-photo" style={{ background: '#2a3942' }}>
+        {src && (
+          <Image
+            src={src}
+            alt={name}
+            fill
+            sizes={sizes}
+            className="place-card-image"
+            style={{ objectFit: 'cover', objectPosition }}
+          />
+        )}
+      </div>
+      <div className="place-card-label-wrap">
+        <span className="place-card-rule" aria-hidden="true" />
+        <p className="place-card-label">{name}</p>
+      </div>
     </Link>
   );
 }

@@ -512,14 +512,28 @@ textarea:focus {
 }
 
 /* Homepage photo cards (Search By City / Search By Neighborhood grids —
-   app/page.js's PlaceCard). Card lifts with a shadow on hover and its
-   photo zooms in slightly; the card's own overflow:hidden clips the
-   zoomed photo so it never spills into neighboring cards. */
+   app/page.js's PlaceCard). Restructured 2026-09-04 (per Ryan: "Let's do
+   style B") from a single absolutely-positioned tile with the name
+   overlaid on the photo, to a photo tile plus a separate label area
+   below it — see .place-card-label-wrap etc. below. The hover lift +
+   photo zoom that used to live on .place-card itself now targets
+   .place-card-photo specifically, so only the image tile lifts/zooms on
+   hover and the label below stays put, rather than the whole card
+   (photo + text) lifting as one block. */
 .place-card {
+  display: block;
+}
+
+.place-card-photo {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding-top: 75%;
+  border-radius: 3px;
   transition: box-shadow 0.25s ease;
 }
 
-.place-card:hover {
+.place-card:hover .place-card-photo {
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
   z-index: 2;
 }
@@ -532,24 +546,37 @@ textarea:focus {
   transform: scale(1.08);
 }
 
-/* PlaceCard's name label (the <p> overlaid on the bottom of each photo
-   card) — font-size moved out of the inline style above into this class
-   so a @media breakpoint can size it up. Inline React styles always win
-   the cascade over an external stylesheet's media query, same reason
-   .nav-grid/.sell-points-grid exist elsewhere in this file — a plain
-   @media rule targeting the old inline fontSize:18 could never have
-   taken effect. Per Ryan (2026-08-20): the text looked small on mobile;
-   bumped a bit everywhere (18->20), and a bit more again below the 640px
-   breakpoint .city-grid's own first tier already uses (18->22). Bumped
-   again same day per Ryan's follow-up "make the text a little bit
-   larger" (20->22 desktop, 22->24 mobile). */
+/* Label area below the photo — thin gold rule + the name in Playfair
+   Display caps, matching the wordmark/rules from the header redesign.
+   Was var(--font-inter-tight) white text overlaid on the photo; see the
+   PlaceCard comment in app/page.js for the full history. */
+.place-card-label-wrap {
+  text-align: center;
+  padding: 14px 6px 0;
+}
+
+.place-card-rule {
+  display: inline-block;
+  width: 28px;
+  height: 1px;
+  background: var(--color-gold);
+  margin-bottom: 10px;
+}
+
 .place-card-label {
-  font-size: 22px;
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-dark);
+  line-height: 1.35;
 }
 
 @media (max-width: 640px) {
   .place-card-label {
-    font-size: 24px;
+    font-size: 16px;
   }
 }
 
