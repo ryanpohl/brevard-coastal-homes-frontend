@@ -152,7 +152,13 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
   return (
     <div
       ref={containerRef}
-      style={{ background: 'var(--color-nav-bg)', position: 'relative', zIndex: 30 }}
+      // White header redesign (2026-09-04, per Ryan: match a reference
+      // real-estate site's header — centered serif wordmark, hairline
+      // rules, a plain caps nav row, all on white instead of the previous
+      // solid navy bar). borderBottom replaces the navy bar's implicit
+      // separation from the cream body (--color-bg) below, since white on
+      // white needs an explicit line where navy on cream didn't.
+      style={{ background: '#fff', position: 'relative', zIndex: 30, borderBottom: '1px solid var(--color-border-light)' }}
       onMouseLeave={scheduleClose}
       onMouseEnter={cancelClose}
     >
@@ -166,7 +172,10 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           AGENT_INFO.phone (NEXT_PUBLIC_BUSINESS_PHONE) is confirmed empty
           on the live production bundle per CLAUDE.md's 2026-08-04 note, so
           a conditional render on it would silently show nothing. Uses the
-          same --color-gold token as those two for visual consistency. */}
+          same --color-gold token as those two for visual consistency.
+          borderBottom switched from a white-tinted rgba to
+          --color-border-light with the 2026-09-04 white-header redesign
+          (the old rgba(255,255,255,0.08) was invisible against white). */}
       <div
         style={{
           textAlign: 'center',
@@ -175,7 +184,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           fontWeight: 700,
           color: 'var(--color-gold)',
           letterSpacing: 0.3,
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          borderBottom: '1px solid var(--color-border-light)',
         }}
       >
         Call or Text:{' '}
@@ -184,39 +193,39 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
         </a>
       </div>
 
-      <div
-        className="container"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: 12,
-          padding: '16px clamp(16px, 4vw, 56px) 10px',
-        }}
-      >
-        <Link
-          href="/"
-          onMouseEnter={closeNow}
-          style={{ fontFamily: 'var(--font-heading)', fontSize: 26, fontWeight: 600, color: '#fff', letterSpacing: 0.5 }}
-        >
-          Brevard Coastal Homes
-        </Link>
+      {/* Centered wordmark + hairline rules, Sign In/Register moved into
+          its own top-right slot (2026-09-04 white-header redesign) instead
+          of sitting directly beside the logo in a space-between row — see
+          .nav-brand-row/.nav-brand-signin in globals.css for the
+          positioning (a relative row with an absolutely-positioned
+          top-right slot, same pattern as the "My Account" panel below
+          already used against the outer container). */}
+      <div className="container nav-brand-row">
+        <div className="nav-brand-center">
+          <Link href="/" onMouseEnter={closeNow} className="nav-brand-wordmark">
+            Brevard Coastal Homes
+          </Link>
+          <div className="nav-brand-rule-row" aria-hidden="true">
+            <span className="nav-brand-rule" />
+            <span className="nav-brand-rule" />
+          </div>
+        </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <div className="nav-brand-signin">
           {signedIn ? (
-            <NavLink label={`My Account`} href="/my-account" active={openMenu === 'account'} onEnter={() => openNow('account')} />
+            <NavLink label={`My Account`} href="/my-account" outline active={openMenu === 'account'} onEnter={() => openNow('account')} />
           ) : (
             // Combined Sign In + Join into one entry point (2026-08-16, per
             // Ryan) — AuthPanel now owns its own Log In/Register tab
             // switcher internally (defaulting to Log In), so one button is
             // enough instead of two separate buttons that opened two
-            // separately-configured copies of the same panel. Kept the gold
-            // styling the old "Join" button used, to keep a visible
-            // call-to-action in the nav rather than a plain outlined one.
+            // separately-configured copies of the same panel. Switched from
+            // solid gold to the outlined "clear" gold treatment (2026-09-04,
+            // per Ryan: "make the Sign In/Register button clear like the
+            // 3rd [header concept]") — see NavLink's `outline` branch below.
             <NavLink
               label="Sign In/Register"
-              gold
+              outline
               active={openMenu === 'auth'}
               onEnter={() => openNow('auth')}
               onToggle={() => toggleOnClick('auth')}
@@ -541,9 +550,16 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
   );
 }
 
-function NavLink({ label, href, bare, gold, active, onEnter, onToggle, panel }) {
+function NavLink({ label, href, bare, gold, outline, active, onEnter, onToggle, panel }) {
   const base = {
-    color: '#fff',
+    // Ink instead of white (2026-09-04 white-header redesign) — every
+    // NavLink now renders against the header's white background instead of
+    // the old navy bar. Doesn't affect the dropdown panels' own text (Search
+    // by City/Neighborhood, My Account, Sign In/Join all set their own
+    // explicit white text via separate style objects/CSS classes, since
+    // those panels intentionally stay dark navy for contrast — see
+    // .nav-dropdown-panel's comment in globals.css).
+    color: 'var(--color-ink)',
     fontSize: 14,
     fontWeight: 600,
     letterSpacing: 1,
@@ -560,6 +576,14 @@ function NavLink({ label, href, bare, gold, active, onEnter, onToggle, panel }) 
     style = { ...base, fontSize: 16, padding: '6px 4px', border: 'none', background: 'transparent', opacity: active ? 1 : 0.92 };
   } else if (gold) {
     style = { ...base, padding: '11px 20px', borderRadius: 3, border: 'none', background: 'var(--color-gold)', color: 'var(--color-ink-dark)' };
+  } else if (outline) {
+    // "Clear" gold button (2026-09-04, per Ryan: "make the Sign In/Register
+    // button clear like the 3rd [header concept]") — transparent
+    // background, gold border + text, used for Sign In/Register and My
+    // Account in the new white header. Replaces the old default (rgba
+    // white-outline) branch below, which relied on the header being dark;
+    // that branch is kept as-is for any future non-white usage.
+    style = { ...base, padding: '10px 22px', borderRadius: 2, border: '1px solid var(--color-gold)', background: 'transparent', color: 'var(--color-gold)' };
   } else {
     style = { ...base, padding: '11px 20px', borderRadius: 3, border: '1px solid rgba(255,255,255,0.5)', background: 'transparent' };
   }
