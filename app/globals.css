@@ -95,6 +95,23 @@ h4 {
   gap: 18px;
 }
 
+/* Extra row gap for the single-column mobile layout only (2026-09-04, per
+   Ryan: worried a city/neighborhood name could read as belonging to the
+   photo below it instead of above it, once names moved below their photos
+   for Style B). Below 640px every card stacks in one column, so unlike
+   the 3-/5-column grids above (where the next card is off to the side, not
+   competing for the same vertical line), a name here sits directly between
+   two photos. The photo-to-its-own-name gap is ~25px (.place-card-photo's
+   14px top padding + rule + margin below); without this rule the grid's
+   plain 18px gap put the *next* card's photo closer to that name than its
+   own photo was, inviting exactly that misread. 40px keeps every name
+   closer to its own photo than to the next one down. */
+@media (max-width: 639px) {
+  .city-grid {
+    gap: 40px;
+  }
+}
+
 @media (min-width: 640px) {
   .city-grid {
     grid-template-columns: repeat(3, 1fr);
