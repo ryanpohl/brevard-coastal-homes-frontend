@@ -179,9 +179,31 @@ h4 {
    .btn-outline, since .btn-outline is shared by buttons elsewhere on the
    site (Nav, Pagination, InquiryModals, my-account) that shouldn't pick up
    this behavior — only applied to the actual selectable rows *inside* a
-   dropdown panel, not the "Price ▾"-style trigger pill that opens it. */
-.filter-menu-option:hover {
-  background-color: #f0f0f0;
+   dropdown panel, not the "Price ▾"-style trigger pill that opens it.
+
+   Gated behind @media (hover: hover) (2026-09-07, per Ryan: "I have to
+   click every link twice ... make sure the website is mobile friendly").
+   Root cause: iOS Safari (and most touch browsers) treat a tap on any
+   element that could change appearance on :hover as two separate events —
+   the first tap only triggers the :hover style (to let the visitor see
+   it, same as a mouse "hovering" without clicking), and only a second tap
+   on the same spot actually fires the click/navigation. This happens
+   site-wide, not just on elements the visitor meant to hover, because
+   Safari's heuristic looks at whether the page uses :hover styles at all,
+   not just the specific element tapped. Every plain `:hover` rule in this
+   file (this one, .footer-link, .hero-search-item(-secondary),
+   .place-card, .nav-link-bare) got the same @media (hover: hover) gate —
+   it restricts these styles to devices that report real pointer-based
+   hovering (a mouse/trackpad), so touch devices never match a :hover
+   selector in the first place and every link/button goes back to
+   responding on the first tap. Desktop hover behavior is completely
+   unchanged. See ListingCard.js's handleMouseEnter/handleMouseLeave for
+   the equivalent fix on that component's JS-driven (not CSS :hover)
+   hover-highlight. */
+@media (hover: hover) {
+  .filter-menu-option:hover {
+    background-color: #f0f0f0;
+  }
 }
 
 /* Schedule a Showing / Ask a Question buttons in the listing-page filter bar
@@ -432,9 +454,14 @@ h4 {
   }
 }
 
-.footer-link:hover {
-  color: #fff;
-  text-decoration-color: rgba(255, 255, 255, 0.9);
+/* Gated behind @media (hover: hover) (2026-09-07, mobile double-tap fix)
+   — see the .filter-menu-option:hover comment above for the full
+   writeup. */
+@media (hover: hover) {
+  .footer-link:hover {
+    color: #fff;
+    text-decoration-color: rgba(255, 255, 255, 0.9);
+  }
 }
 
 .section-heading {
@@ -519,9 +546,14 @@ textarea:focus {
   transition: color 0.15s ease, background-color 0.15s ease;
 }
 
-.hero-search-item:hover {
-  color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.1);
+/* Gated behind @media (hover: hover) (2026-09-07, mobile double-tap fix)
+   — see the .filter-menu-option:hover comment further up for the full
+   writeup. */
+@media (hover: hover) {
+  .hero-search-item:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
 }
 
 /* Dimmer companion to .hero-search-item — used for secondary links stacked
@@ -535,9 +567,14 @@ textarea:focus {
   transition: color 0.15s ease, background-color 0.15s ease;
 }
 
-.hero-search-item-secondary:hover {
-  color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.1);
+/* Gated behind @media (hover: hover) (2026-09-07, mobile double-tap fix)
+   — see the .filter-menu-option:hover comment further up for the full
+   writeup. */
+@media (hover: hover) {
+  .hero-search-item-secondary:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
 }
 
 .hero-search-input::placeholder {
@@ -566,17 +603,26 @@ textarea:focus {
   transition: box-shadow 0.25s ease;
 }
 
-.place-card:hover .place-card-photo {
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
-  z-index: 2;
+/* Gated behind @media (hover: hover) (2026-09-07, mobile double-tap fix)
+   — see the .filter-menu-option:hover comment further up for the full
+   writeup. Without this gate, every homepage city/neighborhood photo
+   card (a full-card <Link>) needed two taps to navigate on touch
+   devices. */
+@media (hover: hover) {
+  .place-card:hover .place-card-photo {
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+    z-index: 2;
+  }
 }
 
 .place-card-image {
   transition: transform 0.35s ease;
 }
 
-.place-card:hover .place-card-image {
-  transform: scale(1.08);
+@media (hover: hover) {
+  .place-card:hover .place-card-image {
+    transform: scale(1.08);
+  }
 }
 
 /* Label area below the photo — the name in Playfair Display caps. Was
@@ -621,10 +667,17 @@ textarea:focus {
   transition: opacity 0.15s ease;
 }
 
-.nav-link-bare:hover {
-  opacity: 1 !important;
-  text-decoration: underline;
-  text-underline-offset: 4px;
+/* Gated behind @media (hover: hover) (2026-09-07, mobile double-tap fix)
+   — see the .filter-menu-option:hover comment further up for the full
+   writeup. Without this gate, the top nav's own links (Search by City/
+   Neighborhood, Looking to Sell, Contact Us) needed two taps to navigate
+   on touch devices. */
+@media (hover: hover) {
+  .nav-link-bare:hover {
+    opacity: 1 !important;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
 }
 
 .visually-hidden {
