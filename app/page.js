@@ -19,11 +19,44 @@ const CITY_IMAGE_POSITION = {
   'cocoa-beach': 'top',
 };
 
+// Homepage "Search By Neighborhood" display order (2026-09-07, per Ryan:
+// swap Harbor Island Beach Club <-> Summer Lakes, and Lansing Island <->
+// Suntree from the backend's default row order). There's no admin UI or
+// established deploy path from this session for reordering the backend's
+// neighborhoods table, so this reorders the API response purely for
+// display here instead — same "override in the frontend" pattern as
+// CITY_LOTS_NAV_SLUGS/NEIGHBORHOOD_CONDO_PAGE_SLUGS in Nav.js. Any
+// neighborhood not listed here (e.g. a newly added one the backend
+// returns later) falls back to wherever the backend put it, appended
+// after every explicitly-ordered slug — see sortByDisplayOrder below.
+const HOMEPAGE_NEIGHBORHOOD_ORDER = [
+  'adelaide',
+  'aripeka',
+  'harbor-island-beach-club',
+  'aquarina',
+  'suntree',
+  'tortoise-island',
+  'summer-lakes',
+  'viera-builders-communities-viera-west',
+  'lansing-island',
+  'south-merritt-island',
+];
+
+function sortByDisplayOrder(items, order) {
+  const orderIndex = new Map(order.map((slug, i) => [slug, i]));
+  return [...items].sort((a, b) => {
+    const ai = orderIndex.has(a.slug) ? orderIndex.get(a.slug) : order.length + items.indexOf(a);
+    const bi = orderIndex.has(b.slug) ? orderIndex.get(b.slug) : order.length + items.indexOf(b);
+    return ai - bi;
+  });
+}
+
 export default async function HomePage() {
   let cities = [];
   let neighborhoods = [];
   try {
     [{ cities }, { neighborhoods }] = await Promise.all([api.getCities(), api.getNeighborhoods()]);
+    neighborhoods = sortByDisplayOrder(neighborhoods, HOMEPAGE_NEIGHBORHOOD_ORDER);
   } catch {
     // Backend unreachable — render the page with empty search options rather than crashing.
   }
