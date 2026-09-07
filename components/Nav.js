@@ -550,7 +550,36 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
   );
 }
 
+// Gated hover-open (2026-09-07, per Ryan: "Search by city, search by
+// neighborhood, & search oceanfront all seem to respond on the 2nd click" —
+// "Looking to Sell"/"Contact Us" already respond on the first tap). Root
+// cause: every NavLink wraps its trigger in a <div onMouseEnter={onEnter}>,
+// and for the three dropdown triggers (plus My Account/Sign In-Register)
+// onEnter is openNow(key), which opens the dropdown panel — a visible change
+// in response to onMouseEnter. iOS Safari (and most touch browsers) fire a
+// synthetic mouseenter on the first tap of anything that could visibly react
+// to :hover/mouseenter, to let the visitor "see" the hover state the way a
+// real mouse would, and only send the actual click on a second tap of the
+// same spot. "Looking to Sell"/"Contact Us" don't have this problem because
+// their onEnter is closeNow, which is a no-op when nothing is already open
+// (setOpenMenu(null) on an already-null value doesn't re-render), so there's
+// no visible change for Safari to preview — nothing to gate there. Same
+// supportsHover()-gating pattern already used in ListingCard.js's
+// handleMouseEnter/handleMouseLeave for its own JS-driven (not CSS :hover)
+// hover effect; see that file's comment for the full writeup. Touch devices
+// have no real hover to preview in the first place, so skipping onEnter
+// there loses nothing — opening/closing a dropdown on touch is already fully
+// handled by toggleOnClick (the trigger's onClick) and the outside-tap
+// handler (handleOutsideInteraction), neither of which depends on onEnter.
+function supportsHover() {
+  return typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches;
+}
+
 function NavLink({ label, href, bare, gold, outline, active, onEnter, onToggle, panel }) {
+  const handleMouseEnter = () => {
+    if (!supportsHover()) return;
+    onEnter?.();
+  };
   const base = {
     // Ink instead of white (2026-09-04 white-header redesign) — every
     // NavLink now renders against the header's white background instead of
@@ -590,7 +619,7 @@ function NavLink({ label, href, bare, gold, outline, active, onEnter, onToggle, 
 
   if (href) {
     return (
-      <div style={{ position: 'relative' }} onMouseEnter={onEnter}>
+      <div style={{ position: 'relative' }} onMouseEnter={handleMouseEnter}>
         <Link href={href} className={bare ? 'nav-link-bare' : undefined} style={style}>
           {label}
         </Link>
@@ -600,7 +629,7 @@ function NavLink({ label, href, bare, gold, outline, active, onEnter, onToggle, 
   }
 
   return (
-    <div style={{ position: 'relative' }} onMouseEnter={onEnter}>
+    <div style={{ position: 'relative' }} onMouseEnter={handleMouseEnter}>
       <button
         type="button"
         className={bare ? 'nav-link-bare' : undefined}
