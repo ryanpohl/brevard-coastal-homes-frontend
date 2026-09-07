@@ -21,11 +21,28 @@ export default function ListingCard({ listing, onHoverChange }) {
   // city/neighborhood search-results pages) — it's undefined/unused
   // wherever ListingCard renders without a map next to it (e.g. My
   // Account's Favorites list), so this is a no-op there.
+  //
+  // Skipped entirely on touch devices (2026-09-07, per Ryan: "I have to
+  // click every link twice ... make sure the website is mobile friendly").
+  // This whole card is a <Link>, and the border/shadow above changes in
+  // response to onMouseEnter — iOS Safari (and most touch browsers) still
+  // fire a synthetic mouseenter on the first tap of a link to let the
+  // visitor see any hover-triggered visual change, same as a real mouse
+  // hovering without clicking, and hold the actual navigation for a
+  // second tap on the same spot. Since a touch device has no real "hover"
+  // to preview in the first place, there's nothing lost by skipping this
+  // on those devices, and every listing card (used on effectively every
+  // results page) goes back to navigating on the first tap. See
+  // globals.css's .filter-menu-option:hover comment for the equivalent
+  // fix on this file's plain CSS :hover rules.
+  const supportsHover = () => typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches;
   function handleMouseEnter() {
+    if (!supportsHover()) return;
     setIsHovering(true);
     onHoverChange?.(true);
   }
   function handleMouseLeave() {
+    if (!supportsHover()) return;
     setIsHovering(false);
     onHoverChange?.(false);
   }
