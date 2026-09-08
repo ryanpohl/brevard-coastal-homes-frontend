@@ -175,12 +175,14 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           same --color-gold token as those two for visual consistency.
           borderBottom switched from a white-tinted rgba to
           --color-border-light with the 2026-09-04 white-header redesign
-          (the old rgba(255,255,255,0.08) was invisible against white). */}
+          (the old rgba(255,255,255,0.08) was invisible against white).
+          fontSize bumped 13 -> 15 (2026-09-08, per Ryan: "make ... Call or
+          Text 321-350-7661 a little larger on the top of the homepage"). */}
       <div
         style={{
           textAlign: 'center',
           padding: '6px 16px',
-          fontSize: 13,
+          fontSize: 15,
           fontWeight: 700,
           color: 'var(--color-gold)',
           letterSpacing: 0.3,
