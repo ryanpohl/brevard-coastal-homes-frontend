@@ -296,11 +296,12 @@ h4 {
 .nav-brand-wordmark {
   display: inline-block;
   font-family: var(--font-heading);
-  /* Bumped up a step (2026-09-08, per Ryan: "make Brevard Coastal Homes
-     a little larger on the top of the homepage") — was clamp(22px, 4vw,
-     32px). Kept as a clamp (not a flat size) so it still scales down on
+  /* Bumped up another step (2026-09-08, per Ryan: "make Brevard Coastal
+     Homes a little larger again") — was clamp(24px, 4.5vw, 36px), which
+     itself was bumped from the original clamp(22px, 4vw, 32px) earlier the
+     same day. Kept as a clamp (not a flat size) so it still scales down on
      narrow phones instead of overflowing the header. */
-  font-size: clamp(24px, 4.5vw, 36px);
+  font-size: clamp(27px, 5vw, 40px);
   font-weight: 600;
   letter-spacing: 0.09em;
   color: var(--color-ink);
