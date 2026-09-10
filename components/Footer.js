@@ -26,7 +26,36 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
     >
       <div className="container" style={{ padding: '48px clamp(16px, 4vw, 56px)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 32 }}>
         <div>
-          <h4 style={{ color: '#fff', fontSize: 18, marginBottom: 16 }}>Brevard Coastal Homes</h4>
+          {/* Ryan's headshot (2026-09-10, per Ryan: "add this picture in the
+              footer where you think it looks best"). Placed beside the
+              brand heading, in the same "Brevard Coastal Homes" column as
+              the phone number and Tropical Realty logo below, so this whole
+              corner of the footer reads as "who you're calling". Plain
+              <img>, not next/image, matching the Tropical Realty logo just
+              below — see that logo's own comment for why (Hostinger's
+              optimizer has a documented history of corrupting <Image>
+              responses on this host). Source is a tall (400x674) portrait
+              crop; object-fit: cover + a below-center object-position keeps
+              the face framed nicely in the small circle rather than
+              cropping to the vertical middle (which would land on his
+              collar, not his face). */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/team/ryan-headshot.jpg"
+              alt="Ryan, Brevard Coastal Homes"
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                objectFit: 'cover',
+                objectPosition: '50% 25%',
+                flexShrink: 0,
+                border: '2px solid rgba(255,255,255,0.25)',
+              }}
+            />
+            <h4 style={{ color: '#fff', fontSize: 18, margin: 0 }}>Brevard Coastal Homes</h4>
+          </div>
           {/* "Call or Text: 321-350-7661" added 2026-08-29, per Ryan, directly
               under the heading — hardcoded literal number, same reasoning as
               ContactModal.js's phone line (AGENT_INFO.phone reads
