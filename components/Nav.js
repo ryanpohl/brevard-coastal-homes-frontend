@@ -122,7 +122,34 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
   // items (brand link, Looking to Sell, Contact Us) so hovering one of
   // those closes a dropdown left open from a sibling trigger, instead of
   // it lingering until the mouse leaves the whole nav bar.
+  //
+  // Same 'auth'/'account' exemption as scheduleClose above (2026-09-10, per
+  // Ryan: "the sign in/register popup disappears... as soon as I pass over
+  // the contact link"). Root cause: this fires on mere mouseenter of
+  // Looking to Sell/Contact Us/the brand link with no debounce, and had no
+  // guard at all — so simply moving the cursor from the Sign In/Register
+  // trigger down toward the email field, crossing over Contact Us on the
+  // way, killed the panel instantly (and wiped whatever the visitor had
+  // already typed). The 2026-08-14 fix on scheduleClose only covered
+  // leaving the whole nav bar; it missed this second, unconditional close
+  // path. Dropdown menus (city/neighborhood/oceanfront) still close
+  // immediately on a sibling hover as before — only the click-driven
+  // auth/account panels now survive it, consistent with them only ever
+  // closing via their own trigger, an outside click, or a successful
+  // sign-in/join/sign-out.
   const closeNow = useCallback(() => {
+    if (openMenu === 'auth' || openMenu === 'account') return;
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setOpenMenu(null);
+  }, [openMenu]);
+
+  // Unconditional version of closeNow, for the one spot (Contact Us's
+  // click handler below) that needs to close an open auth/account panel
+  // too — a deliberate click on Contact Us is a real "I'm done with that
+  // panel" signal, unlike closeNow's hover-triggered call, which is a
+  // false positive when the cursor is just passing over the link on its
+  // way somewhere else (see closeNow's comment above).
+  const forceClose = useCallback(() => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
     setOpenMenu(null);
   }, []);
@@ -497,15 +524,16 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
         <NavLink label="Looking to Sell" href="/looking-to-sell" bare onEnter={closeNow} />
         {/* Was a Link to /contact — now opens ContactModal instead, per Ryan
             2026-08-15: "make the Contact Us link ... a pop up window
-            instead of its own separate page". closeNow also runs first so
-            a dropdown left open from a sibling trigger (e.g. Search by
-            City) doesn't linger open behind the modal. */}
+            instead of its own separate page". forceClose (not closeNow —
+            see its comment) runs first so a dropdown, or an open Sign In/
+            Register or My Account panel, left open from a sibling trigger
+            doesn't linger open behind the modal. */}
         <NavLink
           label="Contact Us"
           bare
           onEnter={closeNow}
           onToggle={() => {
-            closeNow();
+            forceClose();
             setContactModalOpen(true);
           }}
         />
