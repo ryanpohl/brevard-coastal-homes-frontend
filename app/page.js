@@ -19,6 +19,27 @@ const CITY_IMAGE_POSITION = {
   'cocoa-beach': 'top',
 };
 
+// City-level thumbnail override (2026-09-10, per Ryan: "Replace the viera
+// west picture with this one under search by city" — a stadium photo for
+// the Viera West CITY card specifically). The backend's `viera-west` city
+// row and its `viera-builders-communities-viera-west` neighborhood row
+// happen to share the exact same thumbnail filename
+// (viera-builders-west.jpg) — that file was JUST changed (same day, per
+// Ryan) to his Viera entrance-sign photo for the NEIGHBORHOOD card, so
+// overwriting that shared file again here would silently undo that fix.
+// Asked Ryan directly (AskUserQuestion) and confirmed: keep the
+// neighborhood card on the Viera sign photo, give the city card its own
+// separate file instead of sharing one. viera-west-city.jpg is a new,
+// dedicated static asset — not something the backend sends — so this
+// override map is the only thing pointing PlaceCard at it; no backend
+// change needed. If a future thumbnail rename ever consolidates these
+// two rows onto different filenames upstream, this override stops being
+// necessary but stays harmless (falls back to whatever the backend sends
+// for any other city).
+const CITY_THUMBNAIL_OVERRIDE = {
+  'viera-west': 'viera-west-city.jpg',
+};
+
 // Homepage "Search By Neighborhood" display order (2026-09-07, per Ryan:
 // swap Harbor Island Beach Club <-> Summer Lakes, and Lansing Island <->
 // Suntree from the backend's default row order). There's no admin UI or
@@ -151,7 +172,7 @@ export default async function HomePage() {
               <PlaceCard
                 key={city.slug}
                 name={city.name}
-                thumbnail={city.thumbnail}
+                thumbnail={CITY_THUMBNAIL_OVERRIDE[city.slug] || city.thumbnail}
                 href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
                 sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 100vw"
                 objectPosition={CITY_IMAGE_POSITION[city.slug]}
