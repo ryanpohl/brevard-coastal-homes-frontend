@@ -137,6 +137,14 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
     // copy of this same addition; see that file's comment.
     const yearBuiltPart = listing.yearBuilt != null ? ` &middot; Year Built: ${listing.yearBuilt}` : '';
 
+    // MLS # (2026-09-10, per Ryan) — kept in sync with ListingCard.js's own
+    // copy of this same addition; see that file's comment on why this is
+    // listing.mlsNumber and not listing.mlsId.
+    const mlsNumberLine =
+      listing.mlsNumber != null
+        ? `<div style="color: #445055; margin-top: 2px; font-size: 10px;">MLS #: ${escapeHtml(String(listing.mlsNumber))}</div>`
+        : '';
+
     const statsLine = isLand
       ? `${listing.acreage ? `${listing.acreage} acres` : ''}${listing.zoning ? ` &middot; ${escapeHtml(listing.zoning)}` : ''}`
       : `${listing.beds ?? '&mdash;'} bd &middot; ${listing.baths ?? '&mdash;'} ba &middot; ${listing.sqft ? `${listing.sqft.toLocaleString()} sqft` : '&mdash;'}${yearBuiltPart}${showRentalRestrictions ? ` &middot; Rental Restrictions: ${escapeHtml(listing.rentalRestrictions)}` : ''}`;
@@ -166,6 +174,7 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
           <div style="font-weight: 700; font-size: 15px;">${escapeHtml(formatPrice(listing.price))}${priceReductionSpan}</div>
           ${assocFeeLine}
           <div style="color: #667377; margin-top: 2px; font-size: 12px;">${escapeHtml(listing.address)}</div>
+          ${mlsNumberLine}
           <div style="color: #445055; margin-top: 4px; font-size: 11px;">${statsLine}</div>
           ${waterfrontLine}
         </a>

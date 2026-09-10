@@ -206,6 +206,17 @@ export default function ListingCard({ listing, onHoverChange }) {
           </p>
         )}
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 8 }}>{listing.address}</p>
+        {/* MLS # on the card (2026-09-10, per Ryan). Same public listing.mlsNumber
+            field already shown on the Property Detail page (app/listings/[id]/page.js)
+            — NOT listing.mlsId, which is Spark's internal record id and not meant for
+            display (see that page's 2026-08-10 fix). Omitted rather than showing a
+            placeholder when the feed hasn't supplied it yet, same pattern as the rest
+            of this card. */}
+        {listing.mlsNumber != null && (
+          <p style={{ fontSize: 11, color: 'var(--color-muted-dark)', marginBottom: 8, marginTop: -4 }}>
+            MLS #: {listing.mlsNumber}
+          </p>
+        )}
 
         {isLand ? (
           <p style={{ fontSize: 12, color: 'var(--color-muted-dark)' }}>
