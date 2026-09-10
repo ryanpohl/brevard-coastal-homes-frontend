@@ -28,14 +28,15 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
         <div>
           {/* Ryan's headshot (2026-09-10, per Ryan: "add this picture in the
               footer where you think it looks best"; enlarged same day per
-              Ryan: "make the picture larger to show my blue shirt"). Stacked
-              above the brand heading, in the same "Brevard Coastal Homes"
-              column as the phone number and Tropical Realty logo below, so
-              this whole corner of the footer reads as "who you're calling".
-              Plain <img>, not next/image, matching the Tropical Realty logo
-              just below — see that logo's own comment for why (Hostinger's
-              optimizer has a documented history of corrupting <Image>
-              responses on this host).
+              Ryan: "make the picture larger to show my blue shirt"; shortened
+              same day per Ryan: "make my picture a little bit shorter").
+              Stacked above the brand heading, in the same "Brevard Coastal
+              Homes" column as the phone number and Tropical Realty logo
+              below, so this whole corner of the footer reads as "who you're
+              calling". Plain <img>, not next/image, matching the Tropical
+              Realty logo just below — see that logo's own comment for why
+              (Hostinger's optimizer has a documented history of corrupting
+              <Image> responses on this host).
               Source is a tall (400x674) portrait crop. It was first tried as
               a small 56px circle, but a circle forces a 1:1 crop and, at any
               size, a 1:1 crop can only ever show the top ~59% of this
@@ -44,7 +45,15 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               for was cropped out no matter how large the circle got. Fixed
               by sizing the box to (approximately) the source's own aspect
               ratio instead of forcing a square, so almost nothing is
-              cropped and the shirt is simply in frame. */}
+              cropped and the shirt is simply in frame.
+              Height trimmed from 219 to 180 (width unchanged at 130) for the
+              "a little bit shorter" request — object-fit:cover scales the
+              130-wide box to 130x219 first (width is the binding dimension),
+              then a 180-tall box crops ~39px total off that, split evenly
+              top/bottom by the default centered object-position. Previewed
+              locally before deploying: face and hair stay fully in frame,
+              collar/top of the blue shirt still clearly visible, just a
+              tighter crop overall. */}
           <div style={{ marginBottom: 16 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -53,7 +62,7 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               style={{
                 display: 'block',
                 width: 130,
-                height: 219,
+                height: 180,
                 borderRadius: 12,
                 objectFit: 'cover',
                 marginBottom: 12,
