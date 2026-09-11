@@ -49,11 +49,17 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               Height trimmed from 219 to 180 (width unchanged at 130) for the
               "a little bit shorter" request — object-fit:cover scales the
               130-wide box to 130x219 first (width is the binding dimension),
-              then a 180-tall box crops ~39px total off that, split evenly
-              top/bottom by the default centered object-position. Previewed
-              locally before deploying: face and hair stay fully in frame,
-              collar/top of the blue shirt still clearly visible, just a
-              tighter crop overall. */}
+              then a 180-tall box crops ~39px total off that. That crop
+              defaulted to centered object-position, which split the 39px
+              evenly top/bottom — cropping into the top of Ryan's hair, per
+              his follow-up: "it cuts off part of my head". Fixed by
+              switching objectPosition to 'top': all ~39px now comes off the
+              BOTTOM (shirt/chest) instead, so the crop starts flush with the
+              top of the scaled image and the whole head clears with room to
+              spare. Trades a little more of the shirt for a guaranteed
+              full head — the right trade since the head, not the shirt, is
+              what a headshot needs uncropped. Previewed locally (PIL,
+              simulating the exact cover-scale + top-crop) before deploying. */}
           <div style={{ marginBottom: 16 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -65,6 +71,7 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
                 height: 180,
                 borderRadius: 12,
                 objectFit: 'cover',
+                objectPosition: 'top',
                 marginBottom: 12,
                 border: '2px solid rgba(255,255,255,0.25)',
               }}
