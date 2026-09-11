@@ -93,7 +93,25 @@ export async function generateMetadata({ params }) {
       alternates: { canonical: seo.canonicalUrl || seo.canonicalPath },
     };
   } catch {
-    return {};
+    // Backend SEO endpoint unreachable (2026-09-11 SEO audit finding — the
+    // live backend deploy predates this route entirely, see sitemap.js's
+    // comment for the full story). Hand-write a reasonable per-page
+    // fallback instead of returning {}, which would silently inherit the
+    // generic sitewide "Brevard Coastal Homes" title/description from the
+    // root layout on every city/oceanfront page site-wide — confirmed live
+    // on /cocoa-beach/homes-for-sale before this fix, which rendered that
+    // bare sitewide title instead of anything Cocoa-Beach- or Homes-specific.
+    try {
+      const { city } = await api.getCity(citySlug);
+      const typeLabel = PROPERTY_TYPE_LABEL[propertyType] || propertyType;
+      const oceanPrefix = isOceanfront ? 'Oceanfront ' : '';
+      return {
+        title: `${oceanPrefix}${typeLabel} For Sale in ${city.name}, FL | Brevard Coastal Homes`,
+        description: `Browse ${oceanPrefix.toLowerCase()}${typeLabel.toLowerCase()} for sale in ${city.name}, FL — updated from the MLS.`,
+      };
+    } catch {
+      return {};
+    }
   }
 }
 
