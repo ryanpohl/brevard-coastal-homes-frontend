@@ -6,9 +6,43 @@ import Footer from '@/components/Footer';
 import AuthPromptHost from '@/components/AuthPromptHost';
 import * as api from '@/lib/api';
 
+// Sitewide SEO defaults (2026-09-11) — metadataBase resolves every page's
+// relative image/canonical URLs (e.g. a page's `alternates.canonical: '/foo'`
+// or an og:image path) into absolute ones without each page having to spell
+// out the domain; openGraph/twitter give every page a real preview card when
+// shared on Facebook/iMessage/Slack/X instead of a blank one, since a page
+// that doesn't set its own `openGraph`/`twitter` fields inherits these in
+// full (Next.js only replaces fields a child page actually sets, it doesn't
+// need to declare all of them). Deliberately NOT adding a `title.template`
+// here — every page below (homepage, city/neighborhood/listing pages) already
+// hand-builds its own full "X | Brevard Coastal Homes"-style title string
+// (or gets one verbatim from the backend's page_seo table), so a template
+// would double up the suffix instead of applying it once.
 export const metadata = {
+  metadataBase: new URL('https://brevardcoastalhomes.com'),
   title: 'Brevard Coastal Homes',
   description: 'Real estate search across Brevard County, FL — homes, condos, and land for sale.',
+  openGraph: {
+    type: 'website',
+    siteName: 'Brevard Coastal Homes',
+    title: 'Brevard Coastal Homes',
+    description: 'Real estate search across Brevard County, FL — homes, condos, and land for sale.',
+    url: 'https://brevardcoastalhomes.com',
+    images: [
+      {
+        url: '/hero/brevard-hero.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Brevard Coastal Homes',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Brevard Coastal Homes',
+    description: 'Real estate search across Brevard County, FL — homes, condos, and land for sale.',
+    images: ['/hero/brevard-hero.jpg'],
+  },
 };
 
 // Cities/neighborhoods barely change, so this is safe to cache for a while

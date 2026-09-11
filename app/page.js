@@ -4,10 +4,20 @@ import * as api from '@/lib/api';
 import { PROPERTY_TYPE_TO_SLUG, placePhotoUrl } from '@/lib/constants';
 import SearchBar from '@/components/SearchBar';
 
+// Title shortened 2026-09-11 (SEO audit finding: the previous 75-character
+// title got truncated by Google around the ~60-char mark, per Google's
+// documented SERP title-pixel-width behavior) — trimmed the redundant ", FL"
+// (Brevard County only exists in Florida) to land at 56 characters, keeping
+// the leading brand name and the primary "Homes & Condos" keyword phrase
+// intact. Added a homepage canonical for the same reason every other
+// backend-driven page already sets `alternates.canonical` — without one,
+// Google is left to guess the canonical URL among any tracking-param or
+// trailing-slash variants that get linked to or crawled.
 export const metadata = {
-  title: 'Brevard Coastal Homes | Homes, Condos & Land For Sale in Brevard County, FL',
+  title: 'Brevard Coastal Homes | Homes & Condos in Brevard County',
   description:
     'Search homes, condos, and land for sale across Cocoa Beach, Melbourne Beach, Satellite Beach, Viera East, and every coastal city and neighborhood in Brevard County, FL.',
+  alternates: { canonical: '/' },
 };
 
 // Per-city crop overrides for PlaceCard's cover photo. The default center
