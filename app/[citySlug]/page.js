@@ -61,6 +61,7 @@ export async function generateMetadata({ params }) {
     return {
       title: `${city.name} Real Estate Listings — Homes, Condos & Land For Sale | Brevard Coastal Homes`,
       description: `Browse every available listing in ${city.name}, FL in one place — single-family homes, condos, and land, updated from the MLS.`,
+      alternates: { canonical: `/${citySlug}` },
     };
   } catch {
     return {};
