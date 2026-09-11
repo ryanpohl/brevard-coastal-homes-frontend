@@ -16,6 +16,30 @@ const STATUS_COLOR = {
   'Off Market': 'var(--color-muted)',
 };
 
+// Meta description target range per Google's own truncation behavior
+// (~155-160 characters on desktop) — see the SEO audit's quality-gates
+// reference. The previous `.slice(0, 155)` truncation could cut mid-word
+// (e.g. "...oversized gara" instead of "...oversized garage") and had no
+// floor, so a short MLS description (or one that happened to just repeat
+// the address) produced a thin, unhelpful snippet. This builds a
+// description that's long enough to be useful, never cuts mid-word, and
+// falls back to a hand-written sentence (rather than a bare truncation)
+// when the MLS description is missing or too short to be worth using.
+const META_DESCRIPTION_MAX = 158;
+const META_DESCRIPTION_MIN_USABLE = 80;
+
+function buildListingMetaDescription(listing, typeLabel) {
+  const mlsDescription = (listing.description || '').trim();
+  const fallback = `${typeLabel} for sale in ${listing.city.name}, FL — ${listing.address}. Listed at ${formatPrice(listing.price)}.`;
+  const source = mlsDescription.length >= META_DESCRIPTION_MIN_USABLE ? mlsDescription : fallback;
+
+  if (source.length <= META_DESCRIPTION_MAX) return source;
+
+  const truncated = source.slice(0, META_DESCRIPTION_MAX - 1);
+  const lastSpace = truncated.lastIndexOf(' ');
+  return `${truncated.slice(0, lastSpace > 0 ? lastSpace : META_DESCRIPTION_MAX - 1)}…`;
+}
+
 export async function generateMetadata({ params }) {
   // Next.js 15 upgrade (2026-09-03) — `params` became async (a Promise) in
   // the App Router; await it before use, same pattern applied across
@@ -26,9 +50,8 @@ export async function generateMetadata({ params }) {
     const typeLabel = PROPERTY_TYPE_LABEL[listing.propertyType] || listing.propertyType;
     return {
       title: `${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`,
-      description: listing.description
-        ? listing.description.slice(0, 155)
-        : `${typeLabel} for sale in ${listing.city.name}, FL — ${listing.address}.`,
+      description: buildListingMetaDescription(listing, typeLabel),
+      alternates: { canonical: `/listings/${id}` },
     };
   } catch {
     return {};
