@@ -49,7 +49,31 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
       alternates: { canonical: seo.canonicalUrl || seo.canonicalPath },
     };
   } catch {
-    return {};
+    // The SEO call fails two different ways here: the backend endpoint
+    // itself is unreachable (2026-09-11 audit finding — see sitemap.js's
+    // comment for the full story), OR — for the 6 Viera Builders Communities
+    // Viera West sub-community pages — there's simply no backend row to
+    // begin with, since those aren't real `neighborhoods` table entries (see
+    // VIERA_BUILDERS_SUB_COMMUNITIES's comment in lib/constants.js). Either
+    // way, hand-write a reasonable per-page fallback instead of returning
+    // {}, which would otherwise inherit the generic sitewide title/
+    // description from the root layout.
+    const subCommunity = VIERA_BUILDERS_SUB_COMMUNITIES.find((c) => c.slug === params.slug);
+    if (subCommunity) {
+      return {
+        title: `${subCommunity.name} | Viera West, FL | Brevard Coastal Homes`,
+        description: `Browse listings in ${subCommunity.name}, a Viera Builders community in Viera West, FL.`,
+      };
+    }
+    try {
+      const { neighborhood } = await api.getNeighborhood(params.slug);
+      return {
+        title: `${neighborhood.name} Real Estate | Brevard Coastal Homes`,
+        description: `Browse homes, condos, and land for sale in ${neighborhood.name}, FL — updated from the MLS.`,
+      };
+    } catch {
+      return {};
+    }
   }
 }
 
