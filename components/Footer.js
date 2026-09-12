@@ -31,12 +31,17 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               Ryan: "make the picture larger to show my blue shirt"; shortened
               same day per Ryan: "make my picture a little bit shorter").
               Stacked above the brand heading, in the same "Brevard Coastal
-              Homes" column as the phone number and Tropical Realty logo
-              below, so this whole corner of the footer reads as "who you're
-              calling". Plain <img>, not next/image, matching the Tropical
-              Realty logo just below — see that logo's own comment for why
-              (Hostinger's optimizer has a documented history of corrupting
-              <Image> responses on this host).
+              Homes" column as the phone number below, so this corner of the
+              footer reads as "who you're calling". (The Tropical Realty logo
+              used to sit at the bottom of this same column — moved to the
+              Company column on 2026-09-12, per Ryan: "move the tropical
+              realty logo over under contact us & looking to sell", which
+              also shortens this column since it was this column's tallest
+              content — see that logo's own comment, now down in the Company
+              column, for the rest of its history.) Plain <img>, not
+              next/image — see that same comment for why (Hostinger's
+              optimizer has a documented history of corrupting <Image>
+              responses on this host).
               Source is a tall (400x674) portrait crop. It was first tried as
               a small 56px circle, but a circle forces a 1:1 crop and, at any
               size, a 1:1 crop can only ever show the top ~59% of this
@@ -99,26 +104,6 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
           <p style={{ fontSize: 13, lineHeight: 1.6 }}>
             Local expertise across Brevard County&apos;s coastal cities and neighborhoods.
           </p>
-          {/* Tropical Realty & Investments of Brevard logo (2026-08-21, per Ryan:
-              "put this logo under Brevard Coastal homes & the text on the homepage").
-              Plain <img> instead of next/image's <Image> deliberately: this is a
-              small, fixed-size 200x200 static logo that doesn't need responsive
-              optimization, and going through next/image's /_next/image optimizer
-              endpoint routes it through an extra hop that this project's Hostinger
-              hosting has a well-documented history of intermittently corrupting
-              (see CLAUDE.md's "hcdn CDN corrupts/caches broken streamed responses"
-              sections) — confirmed live 2026-08-21: the optimizer-served <Image>
-              loaded with naturalWidth/naturalHeight 0 (a corrupted/empty response
-              that the browser still marked "complete"), while 8/8 direct fetches
-              of the plain static file under /logos/ loaded correctly at 200x200. */}
-          <div style={{ marginTop: 16, background: '#fff', display: 'inline-block', padding: 8, borderRadius: 6 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logos/tropical-realty-logo.jpg"
-              alt="Tropical Realty & Investments of Brevard"
-              style={{ display: 'block', width: 110, height: 110 }}
-            />
-          </div>
         </div>
 
         <div>
@@ -162,6 +147,32 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
           <Link href="/looking-to-sell" className="footer-link" style={footerLinkStyle}>
             Looking to Sell
           </Link>
+          {/* Tropical Realty & Investments of Brevard logo (2026-08-21, per Ryan:
+              "put this logo under Brevard Coastal homes & the text on the homepage").
+              Moved here from the Brevard Coastal Homes column on 2026-09-12,
+              per Ryan: "move the tropical realty logo over under contact us &
+              looking to sell" — that column was the footer's tallest (headshot +
+              heading + name + phone + blurb + this logo), so moving the logo out
+              of it shortens the whole footer to roughly the height of the
+              Cities/Neighborhoods columns instead.
+              Plain <img> instead of next/image's <Image> deliberately: this is a
+              small, fixed-size 200x200 static logo that doesn't need responsive
+              optimization, and going through next/image's /_next/image optimizer
+              endpoint routes it through an extra hop that this project's Hostinger
+              hosting has a well-documented history of intermittently corrupting
+              (see CLAUDE.md's "hcdn CDN corrupts/caches broken streamed responses"
+              sections) — confirmed live 2026-08-21: the optimizer-served <Image>
+              loaded with naturalWidth/naturalHeight 0 (a corrupted/empty response
+              that the browser still marked "complete"), while 8/8 direct fetches
+              of the plain static file under /logos/ loaded correctly at 200x200. */}
+          <div style={{ marginTop: 16, background: '#fff', display: 'inline-block', padding: 8, borderRadius: 6 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logos/tropical-realty-logo.jpg"
+              alt="Tropical Realty & Investments of Brevard"
+              style={{ display: 'block', width: 110, height: 110 }}
+            />
+          </div>
         </div>
       </div>
 
