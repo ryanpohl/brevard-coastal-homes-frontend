@@ -77,6 +77,12 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               }}
             />
             <h4 style={{ color: '#fff', fontSize: 18, margin: 0 }}>Brevard Coastal Homes</h4>
+            {/* Agent name (2026-09-12, per Ryan: "add my name Ryan Pohl below
+                Brevard coastal Homes & above the phone number") — sits right
+                under the brand heading, above the "Call or Text" line below. */}
+            <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14, fontWeight: 600, margin: '4px 0 0' }}>
+              Ryan Pohl
+            </p>
           </div>
           {/* "Call or Text: 321-350-7661" added 2026-08-29, per Ryan, directly
               under the heading — hardcoded literal number, same reasoning as
