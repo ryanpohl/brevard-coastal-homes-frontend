@@ -147,6 +147,7 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
           <Link href="/looking-to-sell" className="footer-link" style={footerLinkStyle}>
             Looking to Sell
           </Link>
+          <br />
           {/* Tropical Realty & Investments of Brevard logo (2026-08-21, per Ryan:
               "put this logo under Brevard Coastal homes & the text on the homepage").
               Moved here from the Brevard Coastal Homes column on 2026-09-12,
