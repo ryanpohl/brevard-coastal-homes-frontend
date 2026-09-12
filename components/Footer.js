@@ -80,7 +80,7 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
             {/* Agent name (2026-09-12, per Ryan: "add my name Ryan Pohl below
                 Brevard coastal Homes & above the phone number") — sits right
                 under the brand heading, above the "Call or Text" line below. */}
-            <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14, fontWeight: 600, margin: '4px 0 0' }}>
+            <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 17, fontWeight: 600, margin: '10px 0 0' }}>
               Ryan Pohl
             </p>
           </div>
@@ -90,7 +90,7 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               NEXT_PUBLIC_BUSINESS_PHONE, confirmed empty on the live
               production bundle per CLAUDE.md's 2026-08-04 note). Wrapped in a
               tel: link for tap-to-call on mobile. */}
-          <p style={{ color: 'var(--color-gold, #c9a15a)', fontWeight: 700, fontSize: 14, margin: '6px 0 12px' }}>
+          <p style={{ color: 'var(--color-gold, #c9a15a)', fontWeight: 700, fontSize: 17, margin: '6px 0 12px' }}>
             Call or Text:{' '}
             <a href="tel:+13213507661" style={{ color: 'inherit', textDecoration: 'none' }}>
               321-350-7661
