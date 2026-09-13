@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PROPERTY_TYPE_TO_SLUG, BED_OPTIONS } from '@/lib/constants';
+import * as api from '@/lib/api';
 import ScheduleShowingModal from './ScheduleShowingModal';
 
 /**
@@ -54,6 +55,18 @@ function maxLabelForIndex(idx) {
 
 const BED_ITEMS = ['Any Beds', ...BED_OPTIONS.map((n) => `${n}+`)];
 
+// Address typeahead (2026-09-13, per Ryan: "Is there a way to have the
+// search prepopulate as you are entering in an address? So when I start
+// entering in 3739 Lake Adelaide Place it shows all the addresses that
+// start with 3739 & Lake adelaide auto fills along with any other address
+// that starts with 3739?"). MIN_LENGTH mirrors the backend's own
+// SUGGESTION_MIN_LENGTH (listings.controller.js's suggestAddresses) —
+// no point firing a request the backend will just return empty for.
+// DEBOUNCE_MS waits for a pause in typing before hitting the network, same
+// idea as any address/search autocomplete (Zillow, Google Places, etc.).
+const SUGGESTION_MIN_LENGTH = 3;
+const SUGGESTION_DEBOUNCE_MS = 250;
+
 export default function SearchBar({ cities, neighborhoods }) {
   const router = useRouter();
   const [openMenu, setOpenMenu] = useState(null); // 'location' | 'propertyType' | 'price' | 'beds' | null
@@ -67,15 +80,26 @@ export default function SearchBar({ cities, neighborhoods }) {
   const [minIndex, setMinIndex] = useState(0);
   const [maxIndex, setMaxIndex] = useState(PRICE_STEPS.length);
   const [searchValue, setSearchValue] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+  const [activeSuggestion, setActiveSuggestion] = useState(-1);
 
   const trackRef = useRef(null);
   const draggingRef = useRef(null);
   const rangeRef = useRef({ min: 0, max: PRICE_STEPS.length });
   const formRef = useRef(null);
+  // Bumped on every keystroke so an in-flight request that resolves after a
+  // newer one (out-of-order network responses) can recognize it's stale and
+  // no-op instead of clobbering the newer, more-correct suggestion list.
+  const suggestRequestIdRef = useRef(0);
 
   const openNow = useCallback((key) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
     setOpenMenu(key);
+    // Only one dropdown open at a time, same as the rest of this bar —
+    // opening a City/Property Type/Price/Beds panel should dismiss any
+    // address suggestion list left open from the text field.
+    setSuggestionsOpen(false);
   }, []);
   const scheduleClose = useCallback(() => {
     closeTimer.current = setTimeout(() => setOpenMenu(null), 250);
@@ -86,17 +110,73 @@ export default function SearchBar({ cities, neighborhoods }) {
 
   // Property Type and Price don't auto-close on selection (multi-select /
   // continuous controls), so give click/touch users a way to dismiss them
-  // by clicking anywhere outside the search bar.
+  // — and the address suggestions dropdown below — by clicking anywhere
+  // outside the search bar.
   useEffect(() => {
-    if (!openMenu) return undefined;
+    if (!openMenu && !suggestionsOpen) return undefined;
     function handleDocClick(e) {
       if (formRef.current && !formRef.current.contains(e.target)) {
         setOpenMenu(null);
+        setSuggestionsOpen(false);
       }
     }
     document.addEventListener('mousedown', handleDocClick);
     return () => document.removeEventListener('mousedown', handleDocClick);
-  }, [openMenu]);
+  }, [openMenu, suggestionsOpen]);
+
+  // Debounced address-suggestion fetch — see SUGGESTION_MIN_LENGTH/
+  // SUGGESTION_DEBOUNCE_MS comment above and lib/api.js's
+  // getAddressSuggestions for the backend call this wraps.
+  useEffect(() => {
+    const trimmed = searchValue.trim();
+    if (trimmed.length < SUGGESTION_MIN_LENGTH) {
+      setSuggestions([]);
+      setSuggestionsOpen(false);
+      return undefined;
+    }
+
+    const requestId = ++suggestRequestIdRef.current;
+    const timer = setTimeout(async () => {
+      try {
+        const data = await api.getAddressSuggestions(trimmed);
+        if (requestId !== suggestRequestIdRef.current) return; // superseded by a newer keystroke
+        setSuggestions(data?.results || []);
+        setSuggestionsOpen(true);
+        setActiveSuggestion(-1);
+      } catch {
+        // Backend hiccup — fail quietly, same as the full search's catch in
+        // app/search/page.js. Not worth surfacing an error for a dropdown.
+        if (requestId === suggestRequestIdRef.current) setSuggestions([]);
+      }
+    }, SUGGESTION_DEBOUNCE_MS);
+
+    return () => clearTimeout(timer);
+  }, [searchValue]);
+
+  function selectSuggestion(listing) {
+    setSuggestionsOpen(false);
+    setSuggestions([]);
+    router.push(`/listings/${listing.id}`);
+  }
+
+  function handleSearchInputKeyDown(e) {
+    if (!suggestionsOpen || suggestions.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveSuggestion((i) => (i + 1) % suggestions.length);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveSuggestion((i) => (i <= 0 ? suggestions.length - 1 : i - 1));
+    } else if (e.key === 'Enter' && activeSuggestion >= 0) {
+      // Only hijack Enter when a suggestion is actually highlighted —
+      // otherwise Enter falls through to the form's normal onSubmit, same
+      // "search for whatever's typed" behavior as clicking Search.
+      e.preventDefault();
+      selectSuggestion(suggestions[activeSuggestion]);
+    } else if (e.key === 'Escape') {
+      setSuggestionsOpen(false);
+    }
+  }
 
   const posToIndex = useCallback((clientX) => {
     if (!trackRef.current) return 0;
@@ -182,6 +262,7 @@ export default function SearchBar({ cities, neighborhoods }) {
 
   function handleSubmit(e) {
     e.preventDefault();
+    setSuggestionsOpen(false);
 
     // Address/MLS# search (2026-09-13, per Ryan: "When I search by MLS
     // number on the home page nothing happens. When i type in an address
@@ -528,23 +609,99 @@ export default function SearchBar({ cities, neighborhoods }) {
       </div>
 
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'rgba(20, 35, 40, 0.55)', border: '1px solid rgba(255,255,255,0.35)', borderRadius: 4, padding: '0 18px', height: 66 }}>
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            position: 'relative',
+            background: 'rgba(20, 35, 40, 0.55)',
+            border: '1px solid rgba(255,255,255,0.35)',
+            borderRadius: 4,
+            padding: '0 18px',
+            height: 66,
+          }}
+        >
           <span style={{ fontSize: 16, color: '#ffffff', marginRight: 12 }}>&#128269;</span>
           <input
             type="text"
             placeholder="Address, City, or MLS Number"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
+            onKeyDown={handleSearchInputKeyDown}
+            onFocus={() => {
+              setOpenMenu(null);
+              if (suggestions.length > 0) setSuggestionsOpen(true);
+            }}
+            autoComplete="off"
             className="hero-search-input"
             style={{ flex: 1, border: 'none', outline: 'none', fontFamily: 'var(--font-inter-tight)', fontSize: 15, color: '#ffffff', background: 'transparent', padding: 0 }}
           />
           {searchValue.length > 0 && (
             <span
               style={{ fontSize: 16, color: '#ffffff', cursor: 'pointer', opacity: 0.75, marginLeft: 10 }}
-              onClick={() => setSearchValue('')}
+              onClick={() => {
+                setSearchValue('');
+                setSuggestionsOpen(false);
+              }}
             >
               &#10005;
             </span>
+          )}
+
+          {/* Address typeahead dropdown — see the debounced fetch effect
+              above and lib/api.js's getAddressSuggestions. Reuses the same
+              .hero-search-panel/.hero-search-item styling as every other
+              pill's dropdown for visual consistency. */}
+          {suggestionsOpen && suggestions.length > 0 && (
+            <div
+              className="hero-search-panel"
+              style={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                right: 0,
+                marginTop: 4,
+                borderRadius: 4,
+                padding: '8px 0',
+                zIndex: 20,
+                maxHeight: 340,
+                overflowY: 'auto',
+              }}
+            >
+              {suggestions.map((listing, i) => (
+                <div
+                  key={listing.id}
+                  className="hero-search-item"
+                  // onMouseDown (not onClick), with preventDefault, so this
+                  // fires before the input would otherwise blur and close
+                  // the dropdown out from under the click.
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    selectSuggestion(listing);
+                  }}
+                  onMouseEnter={() => setActiveSuggestion(i)}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'baseline',
+                    gap: 12,
+                    padding: '10px 20px',
+                    fontFamily: 'var(--font-inter-tight)',
+                    fontSize: 14,
+                    cursor: 'pointer',
+                    color: i === activeSuggestion ? '#ffffff' : undefined,
+                    backgroundColor: i === activeSuggestion ? 'rgba(255,255,255,0.1)' : 'transparent',
+                  }}
+                >
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{listing.address}</span>
+                  <span style={{ fontSize: 12, opacity: 0.7, flexShrink: 0 }}>
+                    {listing.cityName}
+                    {listing.mlsNumber ? ` · MLS# ${listing.mlsNumber}` : ''}
+                  </span>
+                </div>
+              ))}
+            </div>
           )}
         </div>
         <button
