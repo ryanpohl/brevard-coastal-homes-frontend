@@ -183,6 +183,26 @@ export default function SearchBar({ cities, neighborhoods }) {
   function handleSubmit(e) {
     e.preventDefault();
 
+    // Address/MLS# search (2026-09-13, per Ryan: "When I search by MLS
+    // number on the home page nothing happens. When i type in an address
+    // nothing happens either when I push search"). Root cause: `searchValue`
+    // above was wired up to the text field's onChange, but nothing ever
+    // read it back out on submit — the field looked functional but was
+    // dead code. A specific address or MLS# is a lookup for one exact
+    // property, independent of whatever City/Neighborhood/Property
+    // Type/Price/Beds happen to be set in the other pills (those are for
+    // browsing many listings), so this takes priority and skips that logic
+    // entirely when there's text here. Routes to /search, which resolves
+    // the query server-side (see app/search/page.js) and redirects
+    // straight to the listing when exactly one match is found — the same
+    // "type an MLS# or address, land on that one property" behavior sites
+    // like Zillow/Realtor.com give.
+    const trimmedSearch = searchValue.trim();
+    if (trimmedSearch) {
+      router.push(`/search?q=${encodeURIComponent(trimmedSearch)}`);
+      return;
+    }
+
     if (!citySlug && !neighborhoodSlug) {
       // Nothing to route to yet — prompt the location picker instead of
       // silently doing nothing.
