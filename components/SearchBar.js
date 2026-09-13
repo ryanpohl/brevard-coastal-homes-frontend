@@ -33,24 +33,24 @@ const PRICE_STEPS = buildPriceSteps();
 // $4M up to the $8M ceiling. Same array backs both the Min and Max
 // selects/slider handles.
 function buildPriceSteps() {
-  const values = [];
-  for (let v = 100000; v <= 1000000; v += 100000) values.push(v);
-  for (let v = 1500000; v <= 4000000; v += 500000) values.push(v);
-  for (let v = 5000000; v <= 8000000; v += 1000000) values.push(v);
-  return values.map((v) => ({
-    value: v,
-    label: v >= 1000000 ? `$${(v / 1000000).toFixed(v % 1000000 === 0 ? 0 : 1)}M` : `$${(v / 1000).toFixed(0)}K`,
-  }));
+    const values = [];
+    for (let v = 100000; v <= 1000000; v += 100000) values.push(v);
+    for (let v = 1500000; v <= 4000000; v += 500000) values.push(v);
+    for (let v = 5000000; v <= 8000000; v += 1000000) values.push(v);
+    return values.map((v) => ({
+          value: v,
+          label: v >= 1000000 ? `$${(v / 1000000).toFixed(v % 1000000 === 0 ? 0 : 1)}M` : `$${(v / 1000).toFixed(0)}K`,
+    }));
 }
 
 function minLabelForIndex(idx) {
-  if (idx <= 0) return 'No Min';
-  return PRICE_STEPS[idx - 1].label;
+    if (idx <= 0) return 'No Min';
+    return PRICE_STEPS[idx - 1].label;
 }
 
 function maxLabelForIndex(idx) {
-  if (idx >= PRICE_STEPS.length) return 'No Max';
-  return PRICE_STEPS[idx].label;
+    if (idx >= PRICE_STEPS.length) return 'No Max';
+    return PRICE_STEPS[idx].label;
 }
 
 const BED_ITEMS = ['Any Beds', ...BED_OPTIONS.map((n) => `${n}+`)];
@@ -68,338 +68,491 @@ const SUGGESTION_MIN_LENGTH = 3;
 const SUGGESTION_DEBOUNCE_MS = 250;
 
 export default function SearchBar({ cities, neighborhoods }) {
-  const router = useRouter();
-  const [openMenu, setOpenMenu] = useState(null); // 'location' | 'propertyType' | 'price' | 'beds' | null
+    const router = useRouter();
+    const [openMenu, setOpenMenu] = useState(null); // 'location' | 'propertyType' | 'price' | 'beds' | null
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
-  const closeTimer = useRef(null);
+    const closeTimer = useRef(null);
 
   const [citySlug, setCitySlug] = useState('');
-  const [neighborhoodSlug, setNeighborhoodSlug] = useState('');
-  const [propertyTypes, setPropertyTypes] = useState(['Home', 'Condo', 'Land']);
-  const [beds, setBeds] = useState('');
-  const [minIndex, setMinIndex] = useState(0);
-  const [maxIndex, setMaxIndex] = useState(PRICE_STEPS.length);
-  const [searchValue, setSearchValue] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
-  const [activeSuggestion, setActiveSuggestion] = useState(-1);
+    const [neighborhoodSlug, setNeighborhoodSlug] = useState('');
+    const [propertyTypes, setPropertyTypes] = useState(['Home', 'Condo', 'Land']);
+    const [beds, setBeds] = useState('');
+    const [minIndex, setMinIndex] = useState(0);
+    const [maxIndex, setMaxIndex] = useState(PRICE_STEPS.length);
+    const [searchValue, setSearchValue] = useState('');
+    const [suggestions, setSuggestions] = useState([]);
+    const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+    const [activeSuggestion, setActiveSuggestion] = useState(-1);
 
   const trackRef = useRef(null);
-  const draggingRef = useRef(null);
-  const rangeRef = useRef({ min: 0, max: PRICE_STEPS.length });
-  const formRef = useRef(null);
-  // Bumped on every keystroke so an in-flight request that resolves after a
+    const draggingRef = useRef(null);
+    const rangeRef = useRef({ min: 0, max: PRICE_STEPS.length });
+    const formRef = useRef(null);
+    // Bumped on every keystroke so an in-flight request that resolves after a
   // newer one (out-of-order network responses) can recognize it's stale and
   // no-op instead of clobbering the newer, more-correct suggestion list.
   const suggestRequestIdRef = useRef(0);
 
   const openNow = useCallback((key) => {
-    if (closeTimer.current) clearTimeout(closeTimer.current);
-    setOpenMenu(key);
-    // Only one dropdown open at a time, same as the rest of this bar —
-    // opening a City/Property Type/Price/Beds panel should dismiss any
-    // address suggestion list left open from the text field.
-    setSuggestionsOpen(false);
+        if (closeTimer.current) clearTimeout(closeTimer.current);
+        setOpenMenu(key);
+        // Only one dropdown open at a time, same as the rest of this bar —
+                                  // opening a City/Property Type/Price/Beds panel should dismiss any
+                                  // address suggestion list left open from the text field.
+                                  setSuggestionsOpen(false);
   }, []);
-  const scheduleClose = useCallback(() => {
-    closeTimer.current = setTimeout(() => setOpenMenu(null), 250);
-  }, []);
-  const cancelClose = useCallback(() => {
-    if (closeTimer.current) clearTimeout(closeTimer.current);
-  }, []);
+    const scheduleClose = useCallback(() => {
+          closeTimer.current = setTimeout(() => setOpenMenu(null), 250);
+    }, []);
+    const cancelClose = useCallback(() => {
+          if (closeTimer.current) clearTimeout(closeTimer.current);
+    }, []);
 
   // Property Type and Price don't auto-close on selection (multi-select /
   // continuous controls), so give click/touch users a way to dismiss them
   // — and the address suggestions dropdown below — by clicking anywhere
   // outside the search bar.
   useEffect(() => {
-    if (!openMenu && !suggestionsOpen) return undefined;
-    function handleDocClick(e) {
-      if (formRef.current && !formRef.current.contains(e.target)) {
-        setOpenMenu(null);
-        setSuggestionsOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleDocClick);
-    return () => document.removeEventListener('mousedown', handleDocClick);
+        if (!openMenu && !suggestionsOpen) return undefined;
+        function handleDocClick(e) {
+                if (formRef.current && !formRef.current.contains(e.target)) {
+                          setOpenMenu(null);
+                          setSuggestionsOpen(false);
+                }
+        }
+        document.addEventListener('mousedown', handleDocClick);
+        return () => document.removeEventListener('mousedown', handleDocClick);
   }, [openMenu, suggestionsOpen]);
 
   // Debounced address-suggestion fetch — see SUGGESTION_MIN_LENGTH/
   // SUGGESTION_DEBOUNCE_MS comment above and lib/api.js's
   // getAddressSuggestions for the backend call this wraps.
   useEffect(() => {
-    const trimmed = searchValue.trim();
-    if (trimmed.length < SUGGESTION_MIN_LENGTH) {
-      setSuggestions([]);
-      setSuggestionsOpen(false);
-      return undefined;
-    }
+        const trimmed = searchValue.trim();
+        if (trimmed.length < SUGGESTION_MIN_LENGTH) {
+                setSuggestions([]);
+                setSuggestionsOpen(false);
+                return undefined;
+        }
 
-    const requestId = ++suggestRequestIdRef.current;
-    const timer = setTimeout(async () => {
-      try {
-        const data = await api.getAddressSuggestions(trimmed);
-        if (requestId !== suggestRequestIdRef.current) return; // superseded by a newer keystroke
-        setSuggestions(data?.results || []);
-        setSuggestionsOpen(true);
-        setActiveSuggestion(-1);
-      } catch {
-        // Backend hiccup — fail quietly, same as the full search's catch in
-        // app/search/page.js. Not worth surfacing an error for a dropdown.
-        if (requestId === suggestRequestIdRef.current) setSuggestions([]);
-      }
-    }, SUGGESTION_DEBOUNCE_MS);
+                const requestId = ++suggestRequestIdRef.current;
+        const timer = setTimeout(async () => {
+                try {
+                          const data = await api.getAddressSuggestions(trimmed);
+                          if (requestId !== suggestRequestIdRef.current) return; // superseded by a newer keystroke
+                  setSuggestions(data?.results || []);
+                          setSuggestionsOpen(true);
+                          setActiveSuggestion(-1);
+                } catch {
+                          // Backend hiccup — fail quietly, same as the full search's catch in
+                  // app/search/page.js. Not worth surfacing an error for a dropdown.
+                  if (requestId === suggestRequestIdRef.current) setSuggestions([]);
+                }
+        }, SUGGESTION_DEBOUNCE_MS);
 
-    return () => clearTimeout(timer);
+                return () => clearTimeout(timer);
   }, [searchValue]);
 
   function selectSuggestion(listing) {
-    setSuggestionsOpen(false);
-    setSuggestions([]);
-    router.push(`/listings/${listing.id}`);
+        setSuggestionsOpen(false);
+        setSuggestions([]);
+        router.push(`/listings/${listing.id}`);
   }
 
   function handleSearchInputKeyDown(e) {
-    if (!suggestionsOpen || suggestions.length === 0) return;
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setActiveSuggestion((i) => (i + 1) % suggestions.length);
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setActiveSuggestion((i) => (i <= 0 ? suggestions.length - 1 : i - 1));
-    } else if (e.key === 'Enter' && activeSuggestion >= 0) {
-      // Only hijack Enter when a suggestion is actually highlighted —
-      // otherwise Enter falls through to the form's normal onSubmit, same
-      // "search for whatever's typed" behavior as clicking Search.
-      e.preventDefault();
-      selectSuggestion(suggestions[activeSuggestion]);
-    } else if (e.key === 'Escape') {
-      setSuggestionsOpen(false);
-    }
+        if (!suggestionsOpen || suggestions.length === 0) return;
+        if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setActiveSuggestion((i) => (i + 1) % suggestions.length);
+        } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setActiveSuggestion((i) => (i <= 0 ? suggestions.length - 1 : i - 1));
+        } else if (e.key === 'Enter' && activeSuggestion >= 0) {
+                // Only hijack Enter when a suggestion is actually highlighted —
+          // otherwise Enter falls through to the form's normal onSubmit, same
+          // "search for whatever's typed" behavior as clicking Search.
+          e.preventDefault();
+                selectSuggestion(suggestions[activeSuggestion]);
+        } else if (e.key === 'Escape') {
+                setSuggestionsOpen(false);
+        }
   }
 
   const posToIndex = useCallback((clientX) => {
-    if (!trackRef.current) return 0;
-    const rect = trackRef.current.getBoundingClientRect();
-    let percent = (clientX - rect.left) / rect.width;
-    percent = Math.max(0, Math.min(1, percent));
-    return Math.round(percent * PRICE_STEPS.length);
+        if (!trackRef.current) return 0;
+        const rect = trackRef.current.getBoundingClientRect();
+        let percent = (clientX - rect.left) / rect.width;
+        percent = Math.max(0, Math.min(1, percent));
+        return Math.round(percent * PRICE_STEPS.length);
   }, []);
 
   // Drag handling lives outside React state updates (via refs) so the
   // mousemove listener — registered once — always clamps against the
   // *other* handle's latest position without going stale.
   useEffect(() => {
-    function handleMove(e) {
-      if (!draggingRef.current) return;
-      const idx = posToIndex(e.clientX);
-      if (draggingRef.current === 'min') {
-        const nextMin = Math.min(idx, rangeRef.current.max);
-        rangeRef.current.min = nextMin;
-        setMinIndex(nextMin);
-      } else if (draggingRef.current === 'max') {
-        const nextMax = Math.max(idx, rangeRef.current.min);
-        rangeRef.current.max = nextMax;
-        setMaxIndex(nextMax);
-      }
-    }
-    function handleUp() {
-      draggingRef.current = null;
-    }
-    window.addEventListener('mousemove', handleMove);
-    window.addEventListener('mouseup', handleUp);
-    return () => {
-      window.removeEventListener('mousemove', handleMove);
-      window.removeEventListener('mouseup', handleUp);
-    };
+        function handleMove(e) {
+                if (!draggingRef.current) return;
+                const idx = posToIndex(e.clientX);
+                if (draggingRef.current === 'min') {
+                          const nextMin = Math.min(idx, rangeRef.current.max);
+                          rangeRef.current.min = nextMin;
+                          setMinIndex(nextMin);
+                } else if (draggingRef.current === 'max') {
+                          const nextMax = Math.max(idx, rangeRef.current.min);
+                          rangeRef.current.max = nextMax;
+                          setMaxIndex(nextMax);
+                }
+        }
+        function handleUp() {
+                draggingRef.current = null;
+        }
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('mouseup', handleUp);
+        return () => {
+                window.removeEventListener('mousemove', handleMove);
+                window.removeEventListener('mouseup', handleUp);
+        };
   }, [posToIndex]);
 
   function startDrag(which, e) {
-    e.preventDefault();
-    e.stopPropagation();
-    draggingRef.current = which;
+        e.preventDefault();
+        e.stopPropagation();
+        draggingRef.current = which;
   }
 
   function onMinSelectChange(e) {
-    const idx = parseInt(e.target.value, 10);
-    const nextMin = Math.min(idx, rangeRef.current.max);
-    rangeRef.current.min = nextMin;
-    setMinIndex(nextMin);
+        const idx = parseInt(e.target.value, 10);
+        const nextMin = Math.min(idx, rangeRef.current.max);
+        rangeRef.current.min = nextMin;
+        setMinIndex(nextMin);
   }
 
   function onMaxSelectChange(e) {
-    const idx = parseInt(e.target.value, 10);
-    const nextMax = Math.max(idx, rangeRef.current.min);
-    rangeRef.current.max = nextMax;
-    setMaxIndex(nextMax);
+        const idx = parseInt(e.target.value, 10);
+        const nextMax = Math.max(idx, rangeRef.current.min);
+        rangeRef.current.max = nextMax;
+        setMaxIndex(nextMax);
   }
 
   function togglePropertyType(pt) {
-    setPropertyTypes((prev) => (prev.includes(pt) ? prev.filter((p) => p !== pt) : [...prev, pt]));
+        setPropertyTypes((prev) => (prev.includes(pt) ? prev.filter((p) => p !== pt) : [...prev, pt]));
   }
 
   function selectCity(slug) {
-    setCitySlug(slug);
-    setNeighborhoodSlug('');
-    // Deliberately does NOT touch propertyTypes (2026-08-16, per Ryan —
-    // removed the per-city "Homes"/"Condos" sub-links that used to live in
-    // the location dropdown, since the dedicated Property Type dropdown
-    // right next to this one already covers the exact same choice. Before
-    // this, clicking "Homes" or "Condos" under a city would silently
-    // overwrite whatever the user had already picked in Property Type —
-    // a real surprise in a "build up City + Property Type + Price + Beds,
-    // then click Search" tool, unlike the top nav's version of this
-    // dropdown (Nav.js), which navigates straight to /<city>/<type> and so
-    // has no separate Property Type control to conflict with.
-    setOpenMenu(null);
+        setCitySlug(slug);
+        setNeighborhoodSlug('');
+        // Deliberately does NOT touch propertyTypes (2026-08-16, per Ryan —
+      // removed the per-city "Homes"/"Condos" sub-links that used to live in
+      // the location dropdown, since the dedicated Property Type dropdown
+      // right next to this one already covers the exact same choice. Before
+      // this, clicking "Homes" or "Condos" under a city would silently
+      // overwrite whatever the user had already picked in Property Type —
+      // a real surprise in a "build up City + Property Type + Price + Beds,
+      // then click Search" tool, unlike the top nav's version of this
+      // dropdown (Nav.js), which navigates straight to /<city>/<type> and so
+      // has no separate Property Type control to conflict with.
+      setOpenMenu(null);
   }
 
   function selectNeighborhood(slug) {
-    setNeighborhoodSlug(slug);
-    setCitySlug('');
-    setOpenMenu(null);
+        setNeighborhoodSlug(slug);
+        setCitySlug('');
+        setOpenMenu(null);
   }
 
   function handleSubmit(e) {
-    e.preventDefault();
-    setSuggestionsOpen(false);
+        e.preventDefault();
+        setSuggestionsOpen(false);
 
-    // Address/MLS# search (2026-09-13, per Ryan: "When I search by MLS
-    // number on the home page nothing happens. When i type in an address
-    // nothing happens either when I push search"). Root cause: `searchValue`
-    // above was wired up to the text field's onChange, but nothing ever
-    // read it back out on submit — the field looked functional but was
-    // dead code. A specific address or MLS# is a lookup for one exact
-    // property, independent of whatever City/Neighborhood/Property
-    // Type/Price/Beds happen to be set in the other pills (those are for
-    // browsing many listings), so this takes priority and skips that logic
-    // entirely when there's text here. Routes to /search, which resolves
-    // the query server-side (see app/search/page.js) and redirects
-    // straight to the listing when exactly one match is found — the same
-    // "type an MLS# or address, land on that one property" behavior sites
-    // like Zillow/Realtor.com give.
-    const trimmedSearch = searchValue.trim();
-    if (trimmedSearch) {
-      router.push(`/search?q=${encodeURIComponent(trimmedSearch)}`);
-      return;
-    }
+      // Address/MLS# search (2026-09-13, per Ryan: "When I search by MLS
+      // number on the home page nothing happens. When i type in an address
+      // nothing happens either when I push search"). Root cause: `searchValue`
+      // above was wired up to the text field's onChange, but nothing ever
+      // read it back out on submit — the field looked functional but was
+      // dead code. A specific address or MLS# is a lookup for one exact
+      // property, independent of whatever City/Neighborhood/Property
+      // Type/Price/Beds happen to be set in the other pills (those are for
+      // browsing many listings), so this takes priority and skips that logic
+      // entirely when there's text here. Routes to /search, which resolves
+      // the query server-side (see app/search/page.js) and redirects
+      // straight to the listing when exactly one match is found — the same
+      // "type an MLS# or address, land on that one property" behavior sites
+      // like Zillow/Realtor.com give.
+      const trimmedSearch = searchValue.trim();
+        if (trimmedSearch) {
+                router.push(`/search?q=${encodeURIComponent(trimmedSearch)}`);
+                return;
+        }
 
-    if (!citySlug && !neighborhoodSlug) {
-      // Nothing to route to yet — prompt the location picker instead of
-      // silently doing nothing.
-      openNow('location');
-      return;
-    }
+      if (!citySlug && !neighborhoodSlug) {
+              // Nothing to route to yet — prompt the location picker instead of
+          // silently doing nothing.
+          openNow('location');
+              return;
+      }
 
-    const params = new URLSearchParams();
-    if (propertyTypes.length > 0 && propertyTypes.length < 3) {
-      params.set('propertyType', propertyTypes.join(','));
-    }
-    if (minIndex > 0) params.set('priceMin', String(PRICE_STEPS[minIndex - 1].value));
-    if (maxIndex < PRICE_STEPS.length) params.set('priceMax', String(PRICE_STEPS[maxIndex].value));
-    if (beds) params.set('beds', beds);
+      const params = new URLSearchParams();
+        if (propertyTypes.length > 0 && propertyTypes.length < 3) {
+                params.set('propertyType', propertyTypes.join(','));
+        }
+        if (minIndex > 0) params.set('priceMin', String(PRICE_STEPS[minIndex - 1].value));
+        if (maxIndex < PRICE_STEPS.length) params.set('priceMax', String(PRICE_STEPS[maxIndex].value));
+        if (beds) params.set('beds', beds);
 
-    const qs = params.toString();
-    const primaryType = propertyTypes[0] || 'Home';
+      const qs = params.toString();
+        const primaryType = propertyTypes[0] || 'Home';
 
-    if (neighborhoodSlug) {
-      router.push(`/neighborhoods/${neighborhoodSlug}${qs ? `?${qs}` : ''}`);
-    } else {
-      router.push(`/${citySlug}/${PROPERTY_TYPE_TO_SLUG[primaryType]}${qs ? `?${qs}` : ''}`);
-    }
+      if (neighborhoodSlug) {
+              router.push(`/neighborhoods/${neighborhoodSlug}${qs ? `?${qs}` : ''}`);
+      } else {
+              router.push(`/${citySlug}/${PROPERTY_TYPE_TO_SLUG[primaryType]}${qs ? `?${qs}` : ''}`);
+      }
   }
 
   const selectedCity = cities.find((c) => c.slug === citySlug);
-  const selectedNeighborhood = neighborhoods.find((n) => n.slug === neighborhoodSlug);
-  const locationLabel = selectedNeighborhood?.name || selectedCity?.name || 'City/Neighborhood';
-  const bedsLabel = beds ? `${beds}+ Beds` : 'Beds';
+    const selectedNeighborhood = neighborhoods.find((n) => n.slug === neighborhoodSlug);
+    const locationLabel = selectedNeighborhood?.name || selectedCity?.name || 'City/Neighborhood';
+    const bedsLabel = beds ? `${beds}+ Beds` : 'Beds';
 
   const minPercent = (minIndex / PRICE_STEPS.length) * 100;
-  const maxPercent = (maxIndex / PRICE_STEPS.length) * 100;
-  const maxPercentInverse = 100 - maxPercent;
+    const maxPercent = (maxIndex / PRICE_STEPS.length) * 100;
+    const maxPercentInverse = 100 - maxPercent;
 
   return (
-    <form
-      ref={formRef}
-      onSubmit={handleSubmit}
-      style={{ width: 'min(1000px, 92vw)', display: 'flex', flexDirection: 'column', gap: 12, margin: '0 auto' }}
+        <form
+        ref={formRef}
+        onSubmit={handleSubmit}
+        style={{ width: 'min(1000px, 92vw)', display: 'flex', flexDirection: 'column', gap: 12, margin: '0 auto' }}
     >
+{/* Address/City/MLS search moved above the filter pill row (2026-09-13,
+            per Ryan: dropdown panels opening from the pill row — especially
+            the tall City/Neighborhood two-column list — were landing directly
+            on top of this text field, since it used to sit in the very next
+            row with only a 12px gap between them. Swapping the two rows means
+            every pill dropdown now opens downward into empty space (the hero
+            image / cream section below) instead of over an interactive
+            field). Pure reorder — no logic changes; nothing in globals.css
+            keyed .hero-search-item(-secondary)/.hero-search-panel to row
+            order, so this is safe. */}
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+        <div
+          style={{
+                        flex: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        position: 'relative',
+                        background: 'rgba(20, 35, 40, 0.55)',
+                        border: '1px solid rgba(255,255,255,0.35)',
+                        borderRadius: 4,
+                        padding: '0 18px',
+                        height: 66,
+          }}
+        >
+          <span style={{ fontSize: 16, color: '#ffffff', marginRight: 12 }}>&#128269;</span>
+          <input
+            type="text"
+            placeholder="Address, City, or MLS Number"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onKeyDown={handleSearchInputKeyDown}
+            onFocus={() => {
+                            setOpenMenu(null);
+                            if (suggestions.length > 0) setSuggestionsOpen(true);
+            }}
+            autoComplete="off"
+            className="hero-search-input"
+            style={{ flex: 1, border: 'none', outline: 'none', fontFamily: 'var(--font-inter-tight)', fontSize: 15, color: '#ffffff', background: 'transparent', padding: 0 }}
+          />
+{searchValue.length > 0 && (
+              <span
+               style={{ fontSize: 16, color: '#ffffff', cursor: 'pointer', opacity: 0.75, marginLeft: 10 }}
+              onClick={() => {
+                                setSearchValue('');
+                                setSuggestionsOpen(false);
+              }}
+            >
+                              &#10005;
+</span>
+          )}
+
+{/* Address typeahead dropdown — see the debounced fetch effect
+                above and lib/api.js's getAddressSuggestions. Reuses the same
+                .hero-search-panel/.hero-search-item styling as every other
+                pill's dropdown for visual consistency. */}
+{suggestionsOpen && suggestions.length > 0 && (
+              <div
+               className="hero-search-panel"
+               style={{
+                                 position: 'absolute',
+                                 top: '100%',
+                                 left: 0,
+                                 right: 0,
+                                 marginTop: 4,
+                                 borderRadius: 4,
+                                 padding: '8px 0',
+                                 zIndex: 20,
+                                 maxHeight: 340,
+                                 overflowY: 'auto',
+               }}
+            >
+{suggestions.map((listing, i) => (
+                  <div
+                                   key={listing.id}
+                  className="hero-search-item"
+                  // onMouseDown (not onClick), with preventDefault, so this
+                  // fires before the input would otherwise blur and close
+                  // the dropdown out from under the click.
+                  onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        selectSuggestion(listing);
+                  }}
+                  onMouseEnter={() => setActiveSuggestion(i)}
+                  style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'baseline',
+                                        gap: 12,
+                                        padding: '10px 20px',
+                                        fontFamily: 'var(--font-inter-tight)',
+                                        fontSize: 14,
+                                        cursor: 'pointer',
+                                        color: i === activeSuggestion ? '#ffffff' : undefined,
+                                        backgroundColor: i === activeSuggestion ? 'rgba(255,255,255,0.1)' : 'transparent',
+                  }}
+                >
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{listing.address}</span>
+                  <span style={{ fontSize: 12, opacity: 0.7, flexShrink: 0 }}>
+{listing.cityName}
+{listing.mlsNumber ? ` · MLS# ${listing.mlsNumber}` : ''}
+</span>
+  </div>
+              ))}
+                </div>
+          )}
+</div>
+        <button
+          type="submit"
+          style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '0 34px',
+                        height: 66,
+                        background: 'var(--color-ink-dark)',
+                        border: 'none',
+                        borderRadius: 4,
+                        cursor: 'pointer',
+                        fontFamily: 'var(--font-inter-tight)',
+                        fontSize: 14,
+                        fontWeight: 600,
+                        letterSpacing: 1.5,
+                        textTransform: 'uppercase',
+                        color: '#ffffff',
+          }}
+        >
+          Search
+            </button>
+        <button
+          type="button"
+          onClick={() => setScheduleModalOpen(true)}
+          style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '0 22px',
+                        height: 66,
+                        cursor: 'pointer',
+                        border: '1px solid rgba(139, 38, 38, 0.7)',
+                        borderRadius: 4,
+                        background: 'rgba(139, 38, 38, 0.65)',
+                        fontFamily: 'var(--font-inter-tight)',
+                        fontSize: 15,
+                        fontWeight: 600,
+                        letterSpacing: 1.2,
+                        textTransform: 'uppercase',
+                        color: '#ffffff',
+          }}
+        >
+          Schedule a Showing
+            </button>
+            </div>
+
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         <PillField style={{ flex: 1 }} onMouseEnter={() => openNow('location')} onMouseLeave={scheduleClose}>
-          <PillTrigger label={locationLabel} onClick={() => openNow('location')} />
-          {openMenu === 'location' && (
-            <div
-              className="hero-search-panel"
-              style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                marginTop: 4,
-                borderRadius: 4,
-                padding: '26px 28px 30px',
-                zIndex: 10,
-                width: 620,
-                maxWidth: '85vw',
-              }}
+                      <PillTrigger label={locationLabel} onClick={() => openNow('location')} />
+{openMenu === 'location' && (
+              <div
+               className="hero-search-panel"
+               style={{
+                                 position: 'absolute',
+                                 top: '100%',
+                                 left: 0,
+                                 marginTop: 4,
+                                 borderRadius: 4,
+                                 padding: '26px 28px 30px',
+                                 zIndex: 10,
+                                 width: 620,
+                                 maxWidth: '85vw',
+               }}
             >
               <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <PanelHeading>Search by City</PanelHeading>
-                  {/* Single clickable line per city (2026-08-16, per Ryan —
-                      see selectCity()'s comment above for why the old
-                      "Homes"/"Condos" sub-links were removed). Matches the
-                      Search by Neighborhood column's own single-line-item
-                      styling (LIST_ITEM_STYLE) for visual consistency now
-                      that both columns are the same shape. */}
+{/* Single clickable line per city (2026-08-16, per Ryan —
+                        see selectCity()'s comment above for why the old
+                        "Homes"/"Condos" sub-links were removed). Matches the
+                        Search by Neighborhood column's own single-line-item
+                        styling (LIST_ITEM_STYLE) for visual consistency now
+                        that both columns are the same shape. */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                    {cities.map((city) => (
-                      <div
-                        key={city.slug}
+{cities.map((city) => (
+                        <div
+                                    key={city.slug}
                         className="hero-search-item"
                         onClick={() => selectCity(city.slug)}
                         style={LIST_ITEM_STYLE}
                       >
                         {city.name}
-                      </div>
+</div>
                     ))}
-                  </div>
-                </div>
+                      </div>
+                      </div>
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <PanelHeading>Search by Neighborhood</PanelHeading>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                    {neighborhoods.map((hood) => (
-                      <div
-                        key={hood.slug}
+{neighborhoods.map((hood) => (
+                        <div
+                                           key={hood.slug}
                         className="hero-search-item"
                         onClick={() => selectNeighborhood(hood.slug)}
                         style={LIST_ITEM_STYLE}
                       >
                         {hood.name}
-                      </div>
+</div>
                     ))}
-                  </div>
-                </div>
-              </div>
-            </div>
+                      </div>
+                      </div>
+                      </div>
+                      </div>
           )}
-        </PillField>
+</PillField>
 
         <PillField style={{ flex: 1 }} onMouseEnter={() => openNow('propertyType')} onMouseLeave={scheduleClose}>
-          <PillTrigger label="Property Type" onClick={() => openNow('propertyType')} />
-          {openMenu === 'propertyType' && (
-            <div
-              className="hero-search-panel"
-              style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                right: 0,
-                marginTop: 4,
-                borderRadius: 4,
-                padding: '14px 16px',
-                zIndex: 10,
-                width: 'min(240px, 80vw)',
-              }}
+                      <PillTrigger label="Property Type" onClick={() => openNow('propertyType')} />
+{openMenu === 'propertyType' && (
+              <div
+               className="hero-search-panel"
+               style={{
+                                 position: 'absolute',
+                                 top: '100%',
+                                 left: 0,
+                                 right: 0,
+                                 marginTop: 4,
+                                 borderRadius: 4,
+                                 padding: '14px 16px',
+                                 zIndex: 10,
+                                 width: 'min(240px, 80vw)',
+               }}
             >
               <PropertyTypeCheckbox
                 label="Single-Family Homes"
@@ -412,9 +565,9 @@ export default function SearchBar({ cities, neighborhoods }) {
                 onChange={() => togglePropertyType('Condo')}
               />
               <PropertyTypeCheckbox label="Land" checked={propertyTypes.includes('Land')} onChange={() => togglePropertyType('Land')} />
-            </div>
+                </div>
           )}
-        </PillField>
+</PillField>
 
         <PillField
           style={{ flex: 1 }}
@@ -424,79 +577,79 @@ export default function SearchBar({ cities, neighborhoods }) {
           }}
         >
           <PillTrigger label="Price" onClick={() => openNow('price')} />
-          {openMenu === 'price' && (
-            <div
-              style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                marginTop: 4,
-                background: '#2b2723',
-                borderRadius: 4,
-                boxShadow: '0 12px 32px rgba(0,0,0,0.32)',
-                padding: '22px 20px 24px',
-                zIndex: 10,
-                width: 'min(380px, 92vw)',
-                boxSizing: 'border-box',
-              }}
+{openMenu === 'price' && (
+              <div
+               style={{
+                                 position: 'absolute',
+                                 top: '100%',
+                                 left: 0,
+                                 marginTop: 4,
+                                 background: '#2b2723',
+                                 borderRadius: 4,
+                                 boxShadow: '0 12px 32px rgba(0,0,0,0.32)',
+                                 padding: '22px 20px 24px',
+                                 zIndex: 10,
+                                 width: 'min(380px, 92vw)',
+                                 boxSizing: 'border-box',
+               }}
             >
               <div ref={trackRef} style={{ position: 'relative', height: 4, background: '#6b6a66', borderRadius: 2, margin: '4px 6px 14px' }}>
                 <div
                   style={{
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    left: `${minPercent}%`,
-                    right: `${maxPercentInverse}%`,
-                    background: '#ffffff',
+                                        position: 'absolute',
+                                        top: 0,
+                                        bottom: 0,
+                                        left: `${minPercent}%`,
+                                        right: `${maxPercentInverse}%`,
+                                        background: '#ffffff',
                   }}
                 />
                 <div
                   onMouseDown={(e) => startDrag('min', e)}
                   style={{
-                    position: 'absolute',
-                    left: `${minPercent}%`,
-                    top: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: 14,
-                    height: 14,
-                    borderRadius: '50%',
-                    background: '#ffffff',
-                    cursor: 'pointer',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.5)',
-                    zIndex: 2,
+                                        position: 'absolute',
+                                        left: `${minPercent}%`,
+                                        top: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        width: 14,
+                                        height: 14,
+                                        borderRadius: '50%',
+                                        background: '#ffffff',
+                                        cursor: 'pointer',
+                                        boxShadow: '0 1px 4px rgba(0,0,0,0.5)',
+                                        zIndex: 2,
                   }}
                 />
                 <div
                   onMouseDown={(e) => startDrag('max', e)}
                   style={{
-                    position: 'absolute',
-                    left: `${maxPercent}%`,
-                    top: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: 14,
-                    height: 14,
-                    borderRadius: '50%',
-                    background: '#ffffff',
-                    cursor: 'pointer',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.5)',
-                    zIndex: 2,
+                                        position: 'absolute',
+                                        left: `${maxPercent}%`,
+                                        top: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        width: 14,
+                                        height: 14,
+                                        borderRadius: '50%',
+                                        background: '#ffffff',
+                                        cursor: 'pointer',
+                                        boxShadow: '0 1px 4px rgba(0,0,0,0.5)',
+                                        zIndex: 2,
                   }}
                 />
-              </div>
+                  </div>
               <div
                 style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  fontFamily: 'var(--font-inter-tight)',
-                  fontSize: 13,
-                  color: '#ffffff',
-                  marginBottom: 18,
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    fontFamily: 'var(--font-inter-tight)',
+                                    fontSize: 13,
+                                    color: '#ffffff',
+                                    marginBottom: 18,
                 }}
               >
                 <span>{minLabelForIndex(minIndex)}</span>
                 <span>{maxLabelForIndex(maxIndex)}</span>
-              </div>
+                </div>
               <div style={{ display: 'flex', gap: 14 }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontFamily: 'var(--font-inter-tight)', fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#ffffff', marginBottom: 8 }}>MIN</div>
@@ -505,36 +658,36 @@ export default function SearchBar({ cities, neighborhoods }) {
                       value={minIndex}
                       onChange={onMinSelectChange}
                       style={{
-                        width: '100%',
-                        boxSizing: 'border-box',
-                        background: 'transparent',
-                        border: 'none',
-                        outline: 'none',
-                        color: '#ffffff',
-                        // Inter Tight (2026-08-21, per Ryan: "Use Inter
-                        // Tight font on all the text on the homepage").
-                        fontFamily: 'var(--font-inter-tight)',
-                        fontSize: 12,
-                        padding: '0 18px 0 0',
-                        appearance: 'none',
-                        WebkitAppearance: 'none',
-                        MozAppearance: 'none',
+                                                width: '100%',
+                                                boxSizing: 'border-box',
+                                                background: 'transparent',
+                                                border: 'none',
+                                                outline: 'none',
+                                                color: '#ffffff',
+                                                // Inter Tight (2026-08-21, per Ryan: "Use Inter
+                                                // Tight font on all the text on the homepage").
+                                                fontFamily: 'var(--font-inter-tight)',
+                                                fontSize: 12,
+                                                padding: '0 18px 0 0',
+                                                appearance: 'none',
+                                                WebkitAppearance: 'none',
+                                                MozAppearance: 'none',
                       }}
                     >
                       <option value={0} style={{ color: '#1c2b30' }}>
                         No min
-                      </option>
-                      {PRICE_STEPS.map((p, i) => (
-                        <option key={p.value} value={i + 1} style={{ color: '#1c2b30' }}>
-                          {p.label}
-                        </option>
+                          </option>
+{PRICE_STEPS.map((p, i) => (
+                          <option key={p.value} value={i + 1} style={{ color: '#1c2b30' }}>
+{p.label}
+</option>
                       ))}
-                    </select>
+                        </select>
                     <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', fontSize: 10, color: '#b9b6ae', pointerEvents: 'none' }}>
                       &#9662;
-                    </span>
-                  </div>
-                </div>
+</span>
+  </div>
+  </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontFamily: 'var(--font-inter-tight)', fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#ffffff', marginBottom: 8 }}>MAX</div>
                   <div style={{ position: 'relative', display: 'flex', alignItems: 'center', background: '#1c1a17', border: '1px solid #55524c', borderRadius: 4, padding: '10px 8px', boxSizing: 'border-box' }}>
@@ -542,308 +695,165 @@ export default function SearchBar({ cities, neighborhoods }) {
                       value={maxIndex}
                       onChange={onMaxSelectChange}
                       style={{
-                        width: '100%',
-                        boxSizing: 'border-box',
-                        background: 'transparent',
-                        border: 'none',
-                        outline: 'none',
-                        color: '#ffffff',
-                        fontFamily: 'var(--font-inter-tight)',
-                        fontSize: 12,
-                        padding: '0 18px 0 0',
-                        appearance: 'none',
-                        WebkitAppearance: 'none',
-                        MozAppearance: 'none',
+                                                width: '100%',
+                                                boxSizing: 'border-box',
+                                                background: 'transparent',
+                                                border: 'none',
+                                                outline: 'none',
+                                                color: '#ffffff',
+                                                fontFamily: 'var(--font-inter-tight)',
+                                                fontSize: 12,
+                                                padding: '0 18px 0 0',
+                                                appearance: 'none',
+                                                WebkitAppearance: 'none',
+                                                MozAppearance: 'none',
                       }}
                     >
-                      {PRICE_STEPS.map((p, i) => (
-                        <option key={p.value} value={i} style={{ color: '#1c2b30' }}>
-                          {p.label}
-                        </option>
+{PRICE_STEPS.map((p, i) => (
+                          <option key={p.value} value={i} style={{ color: '#1c2b30' }}>
+{p.label}
+</option>
                       ))}
                       <option value={PRICE_STEPS.length} style={{ color: '#1c2b30' }}>
                         No limit
-                      </option>
-                    </select>
+                          </option>
+                          </select>
                     <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', fontSize: 10, color: '#b9b6ae', pointerEvents: 'none' }}>
                       &#9662;
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+</span>
+  </div>
+  </div>
+  </div>
+  </div>
           )}
-        </PillField>
+</PillField>
 
         <PillField style={{ flex: 0.7 }} onMouseEnter={() => openNow('beds')} onMouseLeave={scheduleClose}>
-          <PillTrigger label={bedsLabel} onClick={() => openNow('beds')} narrow />
+                      <PillTrigger label={bedsLabel} onClick={() => openNow('beds')} narrow />
           {openMenu === 'beds' && (
-            <div className="hero-search-panel" style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, borderRadius: 4, padding: '8px 0', zIndex: 10 }}>
-              {BED_ITEMS.map((label, i) => {
-                const value = i === 0 ? '' : String(BED_OPTIONS[i - 1]);
-                return (
-                  <div
-                    key={label}
-                    className="hero-search-item"
-                    onClick={() => {
-                      setBeds(value);
-                      setOpenMenu(null);
-                    }}
-                    style={{
-                      fontFamily: 'var(--font-inter-tight)',
-                      padding: '10px 20px',
-                      fontSize: 13,
-                      fontWeight: 600,
-                      letterSpacing: 1,
-                      textTransform: 'uppercase',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {label}
-                  </div>
-                );
-              })}
+                        <div className="hero-search-panel" style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, borderRadius: 4, padding: '8px 0', zIndex: 10 }}>
+          {BED_ITEMS.map((label, i) => {
+                            const value = i === 0 ? '' : String(BED_OPTIONS[i - 1]);
+                            return (
+                                                <div
+                                key={label}
+                                className="hero-search-item"
+                                onClick={() => {
+                                                        setBeds(value);
+                                                        setOpenMenu(null);
+                                }}
+                                style={{
+                                                        fontFamily: 'var(--font-inter-tight)',
+                                                        padding: '10px 20px',
+                                                        fontSize: 13,
+                                                        fontWeight: 600,
+                                                        letterSpacing: 1,
+                                                        textTransform: 'uppercase',
+                                                        cursor: 'pointer',
+                                }}
+                                           >
+                         {label}
+                         </div>
+                                         );
+          })}
+</div>
+          )}
+</PillField>
             </div>
-          )}
-        </PillField>
-      </div>
 
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            position: 'relative',
-            background: 'rgba(20, 35, 40, 0.55)',
-            border: '1px solid rgba(255,255,255,0.35)',
-            borderRadius: 4,
-            padding: '0 18px',
-            height: 66,
-          }}
-        >
-          <span style={{ fontSize: 16, color: '#ffffff', marginRight: 12 }}>&#128269;</span>
-          <input
-            type="text"
-            placeholder="Address, City, or MLS Number"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            onKeyDown={handleSearchInputKeyDown}
-            onFocus={() => {
-              setOpenMenu(null);
-              if (suggestions.length > 0) setSuggestionsOpen(true);
-            }}
-            autoComplete="off"
-            className="hero-search-input"
-            style={{ flex: 1, border: 'none', outline: 'none', fontFamily: 'var(--font-inter-tight)', fontSize: 15, color: '#ffffff', background: 'transparent', padding: 0 }}
-          />
-          {searchValue.length > 0 && (
-            <span
-              style={{ fontSize: 16, color: '#ffffff', cursor: 'pointer', opacity: 0.75, marginLeft: 10 }}
-              onClick={() => {
-                setSearchValue('');
-                setSuggestionsOpen(false);
-              }}
-            >
-              &#10005;
-            </span>
-          )}
-
-          {/* Address typeahead dropdown — see the debounced fetch effect
-              above and lib/api.js's getAddressSuggestions. Reuses the same
-              .hero-search-panel/.hero-search-item styling as every other
-              pill's dropdown for visual consistency. */}
-          {suggestionsOpen && suggestions.length > 0 && (
-            <div
-              className="hero-search-panel"
-              style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                right: 0,
-                marginTop: 4,
-                borderRadius: 4,
-                padding: '8px 0',
-                zIndex: 20,
-                maxHeight: 340,
-                overflowY: 'auto',
-              }}
-            >
-              {suggestions.map((listing, i) => (
-                <div
-                  key={listing.id}
-                  className="hero-search-item"
-                  // onMouseDown (not onClick), with preventDefault, so this
-                  // fires before the input would otherwise blur and close
-                  // the dropdown out from under the click.
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    selectSuggestion(listing);
-                  }}
-                  onMouseEnter={() => setActiveSuggestion(i)}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'baseline',
-                    gap: 12,
-                    padding: '10px 20px',
-                    fontFamily: 'var(--font-inter-tight)',
-                    fontSize: 14,
-                    cursor: 'pointer',
-                    color: i === activeSuggestion ? '#ffffff' : undefined,
-                    backgroundColor: i === activeSuggestion ? 'rgba(255,255,255,0.1)' : 'transparent',
-                  }}
-                >
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{listing.address}</span>
-                  <span style={{ fontSize: 12, opacity: 0.7, flexShrink: 0 }}>
-                    {listing.cityName}
-                    {listing.mlsNumber ? ` · MLS# ${listing.mlsNumber}` : ''}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        <button
-          type="submit"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '0 34px',
-            height: 66,
-            background: 'var(--color-ink-dark)',
-            border: 'none',
-            borderRadius: 4,
-            cursor: 'pointer',
-            fontFamily: 'var(--font-inter-tight)',
-            fontSize: 14,
-            fontWeight: 600,
-            letterSpacing: 1.5,
-            textTransform: 'uppercase',
-            color: '#ffffff',
-          }}
-        >
-          Search
-        </button>
-        <button
-          type="button"
-          onClick={() => setScheduleModalOpen(true)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '0 22px',
-            height: 66,
-            cursor: 'pointer',
-            border: '1px solid rgba(139, 38, 38, 0.7)',
-            borderRadius: 4,
-            background: 'rgba(139, 38, 38, 0.65)',
-            fontFamily: 'var(--font-inter-tight)',
-            fontSize: 15,
-            fontWeight: 600,
-            letterSpacing: 1.2,
-            textTransform: 'uppercase',
-            color: '#ffffff',
-          }}
-        >
-          Schedule a Showing
-        </button>
-      </div>
-
-      {scheduleModalOpen && <ScheduleShowingModal onClose={() => setScheduleModalOpen(false)} />}
-    </form>
+{scheduleModalOpen && <ScheduleShowingModal onClose={() => setScheduleModalOpen(false)} />}
+</form>
   );
 }
 
 const LIST_ITEM_STYLE = {
-  fontFamily: 'var(--font-inter-tight)',
-  fontSize: 13,
-  fontWeight: 600,
-  letterSpacing: 1,
-  textTransform: 'uppercase',
-  cursor: 'pointer',
+    fontFamily: 'var(--font-inter-tight)',
+    fontSize: 13,
+    fontWeight: 600,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    cursor: 'pointer',
 };
 
 function PillField({ children, style, onMouseEnter, onMouseLeave }) {
-  return (
-    <div style={{ position: 'relative', ...style }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-      {children}
-    </div>
+    return (
+          <div style={{ position: 'relative', ...style }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+{children}
+  </div>
   );
 }
 
 function PillTrigger({ label, onClick, narrow }) {
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        background: 'rgba(20, 35, 40, 0.55)',
-        border: '1px solid rgba(255,255,255,0.35)',
-        borderRadius: 4,
-        padding: narrow ? '0 14px' : '0 20px',
-        height: 60,
-        cursor: 'pointer',
-      }}
+    return (
+          <div
+        onClick={onClick}
+        style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: 'rgba(20, 35, 40, 0.55)',
+                  border: '1px solid rgba(255,255,255,0.35)',
+                  borderRadius: 4,
+                  padding: narrow ? '0 14px' : '0 20px',
+                  height: 60,
+                  cursor: 'pointer',
+        }}
     >
       <span
         style={{
-          fontFamily: 'var(--font-inter-tight)',
-          fontSize: 13,
-          fontWeight: 600,
-          letterSpacing: 1.2,
-          textTransform: 'uppercase',
-          color: '#ffffff',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
+                    fontFamily: 'var(--font-inter-tight)',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    letterSpacing: 1.2,
+                    textTransform: 'uppercase',
+                    color: '#ffffff',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
         }}
       >
-        {label}
-      </span>
+{label}
+</span>
       <span style={{ fontSize: 11, color: '#ffffff', marginLeft: 8, flexShrink: 0 }}>&#9662;</span>
-    </div>
+  </div>
   );
 }
 
 function PanelHeading({ children }) {
-  return (
-    <div
-      style={{
-        fontFamily: 'var(--font-inter-tight)',
-        fontSize: 17,
-        fontWeight: 700,
-        letterSpacing: 1.5,
-        textTransform: 'uppercase',
-        color: '#ffffff',
-        marginBottom: 16,
-        textDecoration: 'underline',
-      }}
+    return (
+          <div
+        style={{
+                  fontFamily: 'var(--font-inter-tight)',
+                  fontSize: 17,
+                  fontWeight: 700,
+                  letterSpacing: 1.5,
+                  textTransform: 'uppercase',
+                  color: '#ffffff',
+                  marginBottom: 16,
+                  textDecoration: 'underline',
+        }}
     >
-      {children}
-    </div>
+{children}
+</div>
   );
 }
 
 function PropertyTypeCheckbox({ label, checked, onChange }) {
-  return (
-    <label
-      className="hero-search-item"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 10,
-        padding: '8px 6px',
-        fontFamily: 'var(--font-inter-tight)',
-        fontSize: 14,
-        cursor: 'pointer',
-      }}
+    return (
+          <label
+        className="hero-search-item"
+        style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: '8px 6px',
+                  fontFamily: 'var(--font-inter-tight)',
+                  fontSize: 14,
+                  cursor: 'pointer',
+        }}
     >
       <input type="checkbox" checked={checked} onChange={onChange} style={{ width: 'auto' }} />
       <span>{label}</span>
-    </label>
+      </label>
   );
 }
