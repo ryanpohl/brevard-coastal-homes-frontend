@@ -491,20 +491,31 @@ export default function SearchBar({ cities, neighborhoods }) {
                                  borderRadius: 4,
                                  padding: '26px 28px 30px',
                                  zIndex: 10,
-                                 width: 620,
-                                 maxWidth: '85vw',
+                                 width: 760,
+                                 maxWidth: '92vw',
                }}
             >
               <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
-                <div style={{ flex: 1, minWidth: 200 }}>
+                <div style={{ flex: 1, minWidth: 280 }}>
                   <PanelHeading>Search by City</PanelHeading>
-{/* Single clickable line per city (2026-08-16, per Ryan —
-                        see selectCity()'s comment above for why the old
-                        "Homes"/"Condos" sub-links were removed). Matches the
-                        Search by Neighborhood column's own single-line-item
-                        styling (LIST_ITEM_STYLE) for visual consistency now
-                        that both columns are the same shape. */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+{/* Two-column grid instead of one long single-file list (2026-09-14,
+                        per Ryan: "list 2 rows of cities with 5 & 5 instead of
+                        10 in the same row" — 10 cities stacked one-per-line
+                        pushed the panel's bottom edge to (or past) the fold,
+                        forcing a scroll before the rest of the homepage was
+                        visible). Auto-flows row-major (item 1/2 share row 1,
+                        3/4 share row 2, ...) so with today's 10 cities this
+                        renders as 5 rows x 2 columns — same total row count
+                        either way you count it, but visually reads as the
+                        "5 & 5" split Ryan asked for since it's two columns
+                        side by side. Panel widened 620->760 (and its
+                        min-width per section 200->280) alongside this so
+                        the longer names (e.g. "Indian Harbour Beach") still
+                        fit on one line at roughly half the previous column
+                        width — see the matching Search by Neighborhood grid
+                        below for the same reasoning applied to a list with
+                        even longer entries. */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', columnGap: 20, rowGap: 12 }}>
 {cities.map((city) => (
                         <div
                                     key={city.slug}
@@ -517,9 +528,15 @@ export default function SearchBar({ cities, neighborhoods }) {
                     ))}
                       </div>
                       </div>
-                <div style={{ flex: 1, minWidth: 200 }}>
+                <div style={{ flex: 1, minWidth: 280 }}>
                   <PanelHeading>Search by Neighborhood</PanelHeading>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  {/* Same two-column grid as Search by City above. A few
+                      neighborhood names (e.g. "Viera Builders Communities
+                      Viera West") still wrap to 2 lines even at the wider
+                      panel width — they already did in the old single-column
+                      layout too, so this isn't a regression, just not fully
+                      solved by the width bump alone. */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', columnGap: 20, rowGap: 12 }}>
 {neighborhoods.map((hood) => (
                         <div
                                            key={hood.slug}
