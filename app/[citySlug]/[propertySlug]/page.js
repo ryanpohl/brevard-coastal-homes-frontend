@@ -34,6 +34,27 @@ const PROPERTY_MANAGEMENT_CTA_CITY_SLUGS = [
 // backend defaults to 24 if this isn't passed.
 const PAGE_SIZE = 30;
 
+// Oceanfront page exclusions (2026-09-14, per Ryan) — 320 Las Olas Drive
+// (MLS #1081189) and 3220 River Villa Way #121 (MLS #1084560), both
+// Melbourne Beach, were showing up under Search Oceanfront > Melbourne
+// Beach even though both actually front the river/Intracoastal (a canal
+// lagoon and a literal "River Villa" building, not the Atlantic) — the
+// MLS feed's WaterfrontFeatures data for these two apparently says
+// otherwise, and mapWaterfront() in the backend's listingMapper.service.js
+// just trusts that. No admin UI or established deploy path from this
+// session for correcting the backend's per-listing `waterfront` value
+// directly (same "override in the frontend" situation as
+// HOMEPAGE_NEIGHBORHOOD_ORDER in app/page.js), so this filters them out of
+// Oceanfront results here instead — same "Recommended" scope Ryan chose:
+// they're only hidden from the dedicated Oceanfront pages/dropdown, not
+// from Melbourne Beach's regular Homes/Condos pages, and the "Oceanfront"
+// badge on their own cards there is unchanged. Keyed by mlsNumber (the
+// public MLS#, not Spark's internal mls_id) since that's what's visible
+// and stable from this side. If the MLS feed's own data is ever corrected
+// upstream (or the backend gains a real per-listing override), this list
+// stops being necessary but stays harmless — it just won't match anything.
+const OCEANFRONT_PAGE_EXCLUDED_MLS_NUMBERS = ['1081189', '1084560'];
+
 /**
  * City listing page — one route covers all 10 cities x 3 property types
  * (homes-for-sale / condos-for-sale / land-for-sale), e.g. /cocoa-beach/homes-for-sale,
@@ -200,6 +221,23 @@ export default async function CityListingsPage({ params, searchParams: searchPar
     results = data.results || [];
     total = data.total ?? results.length;
     totalPages = data.totalPages || 1;
+
+    // See OCEANFRONT_PAGE_EXCLUDED_MLS_NUMBERS above. Only applied on the
+    // Oceanfront-filtered pages themselves — a plain city Homes/Condos page
+    // still shows these two normally. `total`/`totalPages` are adjusted by
+    // however many were excluded from *this* page's results; with only two
+    // known exclusions and PAGE_SIZE=30, both will realistically land on
+    // page 1 of any city's Oceanfront results, so this stays accurate in
+    // practice even though it isn't a true sitewide recount.
+    if (isOceanfront || isOceanfrontCombined) {
+      const beforeCount = results.length;
+      results = results.filter((listing) => !OCEANFRONT_PAGE_EXCLUDED_MLS_NUMBERS.includes(String(listing.mlsNumber)));
+      const excludedCount = beforeCount - results.length;
+      if (excludedCount > 0) {
+        total = Math.max(0, total - excludedCount);
+        totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      }
+    }
   } catch {
     // Backend unreachable or no matches — render an empty grid rather than crashing.
   }
