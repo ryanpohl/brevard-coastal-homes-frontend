@@ -99,6 +99,9 @@ export default async function ListingDetailPage({ params }) {
   // Design shows the address on two lines ("street" / "city, state zip");
   // this project's `address` field is one string (e.g. "154 Shorebreak
   // Lane, Melbourne Beach, FL 32951"), so split on the first comma.
+  // Both lines bolded (fontWeight 400 -> 700) 2026-09-14 per Ryan: "put the
+  // addresses in Bold too" (asked alongside the Schools tile readability fix
+  // below).
   const [streetLine, ...restOfAddress] = listing.address.split(',');
     const cityStateZip = restOfAddress.join(',').trim();
 
@@ -162,11 +165,11 @@ export default async function ListingDetailPage({ params }) {
 
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginTop: 20 }}>
             <div>
-                        <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 400, color: 'var(--color-ink)' }}>
+                        <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 700, color: 'var(--color-ink)' }}>
 {streetLine}
 </div>
 {cityStateZip && (
-                  <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 400, color: 'var(--color-ink)' }}>
+                  <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 700, color: 'var(--color-ink)' }}>
 {cityStateZip}
 </div>
               )}
@@ -298,6 +301,12 @@ function StatItem({ value, label, big }) {
 // three-line shape stays stable — hasSchoolData (see this file's main
 // component) already keeps the whole tile from rendering at all when none
 // of the three are set.
+//
+// Font size bumped 13px/1.6 line-height -> 16px/1.8 (2026-09-14, per Ryan:
+// "make this section larger. It is hard to read") — the original size was
+// noticeably smaller than the page's own body copy (15px), which is what
+// made it feel cramped next to the bold 22px value/11px label styling of
+// the other stat tiles.
 function SchoolsStatItem({ elementary, middle, high }) {
     const rows = [
           ['Elem School', elementary],
@@ -307,7 +316,7 @@ function SchoolsStatItem({ elementary, middle, high }) {
     return (
           <div style={{ textAlign: 'left' }}>
 {rows.map(([label, value]) => (
-          <div key={label} style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--color-ink)' }}>
+          <div key={label} style={{ fontSize: 16, lineHeight: 1.8, color: 'var(--color-ink)' }}>
           <span style={{ fontWeight: 700 }}>{label}:</span> <span style={{ fontWeight: 400 }}>{value || '—'}</span>
           </div>
                 ))}
