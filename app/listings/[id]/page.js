@@ -10,10 +10,10 @@ import ListingMap from '@/components/ListingMap';
 // olive-green "ACTIVE" for the common case; the other statuses aren't shown
 // in that mockup, so these are reasonable extensions in the same spirit.
 const STATUS_COLOR = {
-  Active: '#7c8a4c',
-  Pending: 'var(--color-gold)',
-  Sold: 'var(--color-muted)',
-  'Off Market': 'var(--color-muted)',
+    Active: '#7c8a4c',
+    Pending: 'var(--color-gold)',
+    Sold: 'var(--color-muted)',
+    'Off Market': 'var(--color-muted)',
 };
 
 // Meta description target range per Google's own truncation behavior
@@ -29,50 +29,50 @@ const META_DESCRIPTION_MAX = 158;
 const META_DESCRIPTION_MIN_USABLE = 80;
 
 function buildListingMetaDescription(listing, typeLabel) {
-  const mlsDescription = (listing.description || '').trim();
-  const fallback = `${typeLabel} for sale in ${listing.city.name}, FL — ${listing.address}. Listed at ${formatPrice(listing.price)}.`;
-  const source = mlsDescription.length >= META_DESCRIPTION_MIN_USABLE ? mlsDescription : fallback;
+    const mlsDescription = (listing.description || '').trim();
+    const fallback = `${typeLabel} for sale in ${listing.city.name}, FL — ${listing.address}. Listed at ${formatPrice(listing.price)}.`;
+    const source = mlsDescription.length >= META_DESCRIPTION_MIN_USABLE ? mlsDescription : fallback;
 
   if (source.length <= META_DESCRIPTION_MAX) return source;
 
   const truncated = source.slice(0, META_DESCRIPTION_MAX - 1);
-  const lastSpace = truncated.lastIndexOf(' ');
-  return `${truncated.slice(0, lastSpace > 0 ? lastSpace : META_DESCRIPTION_MAX - 1)}…`;
+    const lastSpace = truncated.lastIndexOf(' ');
+    return `${truncated.slice(0, lastSpace > 0 ? lastSpace : META_DESCRIPTION_MAX - 1)}…`;
 }
 
 export async function generateMetadata({ params }) {
-  // Next.js 15 upgrade (2026-09-03) — `params` became async (a Promise) in
+    // Next.js 15 upgrade (2026-09-03) — `params` became async (a Promise) in
   // the App Router; await it before use, same pattern applied across
   // every dynamic route this session.
   const { id } = await params;
-  try {
-    const { listing } = await api.getListing(id);
-    const typeLabel = PROPERTY_TYPE_LABEL[listing.propertyType] || listing.propertyType;
-    return {
-      title: `${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`,
-      description: buildListingMetaDescription(listing, typeLabel),
-      alternates: { canonical: `/listings/${id}` },
-    };
-  } catch {
-    return {};
-  }
+    try {
+          const { listing } = await api.getListing(id);
+          const typeLabel = PROPERTY_TYPE_LABEL[listing.propertyType] || listing.propertyType;
+          return {
+                  title: `${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`,
+                  description: buildListingMetaDescription(listing, typeLabel),
+                  alternates: { canonical: `/listings/${id}` },
+          };
+    } catch {
+          return {};
+    }
 }
 
 export default async function ListingDetailPage({ params }) {
-  // Next.js 15 upgrade (2026-09-03) — see generateMetadata's identical
+    // Next.js 15 upgrade (2026-09-03) — see generateMetadata's identical
   // comment above.
   const { id } = await params;
-  let listing;
-  let jsonLd;
-  try {
-    ({ listing, jsonLd } = await api.getListing(id));
-  } catch {
-    notFound();
-  }
+    let listing;
+    let jsonLd;
+    try {
+          ({ listing, jsonLd } = await api.getListing(id));
+    } catch {
+          notFound();
+    }
 
   const photos = listing.photos && listing.photos.length ? listing.photos : [];
-  const isLand = listing.propertyType === 'Land';
-  // Per Ryan (2026-08-14): on condo/townhome listings, the Assoc Fee /
+    const isLand = listing.propertyType === 'Land';
+    // Per Ryan (2026-08-14): on condo/townhome listings, the Assoc Fee /
   // Assoc Fee Freq stats are more useful than the redundant "Type: Condos/
   // Townhomes" tile (the page heading and URL already say it's a condo
   // page), so they replace it in that slot. Falls back to showing Type as
@@ -80,175 +80,237 @@ export default async function ListingDetailPage({ params }) {
   // synced/populated by the MLS feed), so the stat row never renders an
   // empty gap.
   const isCondo = listing.propertyType === 'Condo';
-  const hasAssocFeeData = listing.assocFee != null || Boolean(listing.assocFeeFrequency);
-  const showAssocFeeStats = isCondo && hasAssocFeeData;
+    const hasAssocFeeData = listing.assocFee != null || Boolean(listing.assocFeeFrequency);
+    const showAssocFeeStats = isCondo && hasAssocFeeData;
+
+  // Schools (2026-09-14, per Ryan) — the combined Elem/Middle/High tile
+  // below only renders when at least one of the three is actually set,
+  // same "don't render an empty gap" convention as every other conditional
+  // StatItem on this page.
+  const hasSchoolData = Boolean(listing.elementarySchool || listing.middleSchool || listing.highSchool);
 
   // MLS full-bath/half-bath counts aren't stored separately — `baths` is a
   // single value like 4.5 (4 full + 1 half), which is how MLS feeds
   // typically report it. Split it back out for the design's separate
   // "FULL BATHS" / "PARTIAL BATHS" stat tiles.
   const fullBaths = listing.baths != null ? Math.floor(listing.baths) : null;
-  const partialBaths = listing.baths != null ? Math.round(listing.baths - Math.floor(listing.baths)) : null;
+    const partialBaths = listing.baths != null ? Math.round(listing.baths - Math.floor(listing.baths)) : null;
 
   // Design shows the address on two lines ("street" / "city, state zip");
   // this project's `address` field is one string (e.g. "154 Shorebreak
   // Lane, Melbourne Beach, FL 32951"), so split on the first comma.
   const [streetLine, ...restOfAddress] = listing.address.split(',');
-  const cityStateZip = restOfAddress.join(',').trim();
+    const cityStateZip = restOfAddress.join(',').trim();
 
   const mapCenter = listing.latitude != null && listing.longitude != null ? { lat: listing.latitude, lng: listing.longitude } : null;
 
   return (
-    <>
-      {/* Two-column split for the property detail layout, widened 1.25in
-          (120px) toward the LEFT (photos/details) at the RIGHT (scheduling/
-          contact panel)'s expense, per Ryan (2026-08-10, bumped up from an
-          initial 1in/96px per a follow-up request). Plain CSS Grid instead
-          of flexbox: flexbox's percentage flex-basis doesn't account for
-          `gap`, and the contact panel's date-picker grid has enough
-          intrinsic min-content width to force an unwanted wrap once its
-          basis is trimmed. Grid's `fr` unit *does* auto-subtract gap
-          (confirmed: 1fr 1fr with a 24px gap splits evenly, no overflow),
-          but mixing fr with px inside calc() (`calc(1fr + 120px)`) turned
-          out to be broken in this browser (both tracks rendered at 100%
-          width) — verified locally with Playwright before relying on it.
-          So the 120px shift is done with percentages instead, with the
-          24px gap manually pre-subtracted (12px off each side) since,
-          unlike fr, percentage tracks do NOT auto-subtract gap (also
-          confirmed via the same test — a naive `calc(50% + 120px)` /
-          `calc(50% - 120px)` pair would overflow the container by exactly
-          the gap width). Below 1050px this collapses to one column — same
-          stacking behavior as the previous grid's auto-fit/minmax, just
-          re-expressed as an explicit breakpoint since minmax() can't do
-          an asymmetric split. 1050px (bumped up from 1000px along with the
-          96px→120px change) is where the narrower RIGHT column stays at
-          least ~340px right up to the breakpoint — verified with
-          Playwright at a range of widths so the contact panel's date-grid
-          doesn't get uncomfortably squeezed just before the layout flips
-          to single-column. */}
-      <style>{`
-        .listing-detail-grid {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr);
-          gap: 24px;
-          max-width: 1500px;
-          margin: 0 auto;
-          padding: 24px clamp(16px, 4vw, 56px) 88px;
-          align-items: start;
-        }
-        @media (min-width: 1050px) {
-          .listing-detail-grid {
-            grid-template-columns: calc(50% + 108px) calc(50% - 132px);
-          }
-        }
-      `}</style>
+        <>
+  {/* Two-column split for the property detail layout, widened 1.25in
+              (120px) toward the LEFT (photos/details) at the RIGHT (scheduling/
+              contact panel)'s expense, per Ryan (2026-08-10, bumped up from an
+              initial 1in/96px per a follow-up request). Plain CSS Grid instead
+              of flexbox: flexbox's percentage flex-basis doesn't account for
+              `gap`, and the contact panel's date-picker grid has enough
+              intrinsic min-content width to force an unwanted wrap once its
+              basis is trimmed. Grid's `fr` unit *does* auto-subtract gap
+              (confirmed: 1fr 1fr with a 24px gap splits evenly, no overflow),
+              but mixing fr with px inside calc() (`calc(1fr + 120px)`) turned
+              out to be broken in this browser (both tracks rendered at 100%
+              width) — verified locally with Playwright before relying on it.
+              So the 120px shift is done with percentages instead, with the
+              24px gap manually pre-subtracted (12px off each side) since,
+              unlike fr, percentage tracks do NOT auto-subtract gap (also
+              confirmed via the same test — a naive `calc(50% + 120px)` /
+              `calc(50% - 120px)` pair would overflow the container by exactly
+              the gap width). Below 1050px this collapses to one column — same
+              stacking behavior as the previous grid's auto-fit/minmax, just
+              re-expressed as an explicit breakpoint since minmax() can't do
+              an asymmetric split. 1050px (bumped up from 1000px along with the
+              96px→120px change) is where the narrower RIGHT column stays at
+              least ~340px right up to the breakpoint — verified with
+              Playwright at a range of widths so the contact panel's date-grid
+              doesn't get uncomfortably squeezed just before the layout flips
+              to single-column. */}
+          <style>{`
+                  .listing-detail-grid {
+                            display: grid;
+                                      grid-template-columns: minmax(0, 1fr);
+                                                gap: 24px;
+                                                          max-width: 1500px;
+                                                                    margin: 0 auto;
+                                                                              padding: 24px clamp(16px, 4vw, 56px) 88px;
+                                                                                        align-items: start;
+                                                                                                }
+                                                                                                        @media (min-width: 1050px) {
+                                                                                                                  .listing-detail-grid {
+                                                                                                                              grid-template-columns: calc(50% + 108px) calc(50% - 132px);
+                                                                                                                                        }
+                                                                                                                                                }
+                                                                                                                                                      `}</style>
       <div className="listing-detail-grid">
-        {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
+{jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
 
-        {/* LEFT: photos, header, stats, description, map */}
+{/* LEFT: photos, header, stats, description, map */}
         <div>
-          <div style={{ position: 'relative' }}>
+                    <div style={{ position: 'relative' }}>
             <PropertyGallery photos={photos} address={listing.address} />
             <div style={{ position: 'absolute', top: 14, right: 14 }}>
               <FavoriteButton listingId={listing.id} initialFavorited={listing.isFavorited} size={44} />
-            </div>
+          </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginTop: 20 }}>
             <div>
-              <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 400, color: 'var(--color-ink)' }}>
-                {streetLine}
-              </div>
-              {cityStateZip && (
-                <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 400, color: 'var(--color-ink)' }}>
-                  {cityStateZip}
-                </div>
+                        <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 400, color: 'var(--color-ink)' }}>
+{streetLine}
+</div>
+{cityStateZip && (
+                  <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 400, color: 'var(--color-ink)' }}>
+{cityStateZip}
+</div>
               )}
               <div style={{ fontSize: 12, letterSpacing: 0.8, fontWeight: 600, marginTop: 8, color: STATUS_COLOR[listing.status] || 'var(--color-muted)' }}>
-                {listing.status?.toUpperCase()}
-              </div>
-            </div>
+{listing.status?.toUpperCase()}
+</div>
+  </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 600, color: 'var(--color-ink)' }}>{formatPrice(listing.price)}</div>
-            </div>
-          </div>
+  </div>
+  </div>
 
           <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', padding: '22px 0', borderBottom: '1px solid var(--color-border-light)' }}>
-            {isLand ? (
-              <>
-                {listing.acreage != null && <StatItem value={listing.acreage} label="Acres" />}
-                {listing.zoning && <StatItem value={listing.zoning} label="Zoning" big />}
-              </>
+{isLand ? (
+                <>
+{listing.acreage != null && <StatItem value={listing.acreage} label="Acres" />}
+{listing.zoning && <StatItem value={listing.zoning} label="Zoning" big />}
+  </>
             ) : (
-              <>
-                {listing.beds != null && <StatItem value={listing.beds} label="Beds" />}
-                {fullBaths != null && <StatItem value={fullBaths} label="Full Baths" />}
-                {partialBaths != null && <StatItem value={partialBaths} label="Partial Baths" />}
+                            <>
+              {listing.beds != null && <StatItem value={listing.beds} label="Beds" />}
+            {fullBaths != null && <StatItem value={fullBaths} label="Full Baths" />}
+             {partialBaths != null && <StatItem value={partialBaths} label="Partial Baths" />}
               </>
-            )}
-            {showAssocFeeStats ? (
-              <>
-                {listing.assocFee != null && <StatItem value={formatPrice(listing.assocFee)} label="Assoc Fee" big />}
-                {listing.assocFeeFrequency && <StatItem value={listing.assocFeeFrequency} label="Assoc Fee Freq" big />}
-              </>
-            ) : (
-              <StatItem value={PROPERTY_TYPE_LABEL[listing.propertyType] || listing.propertyType} label="Type" big />
-            )}
-            {!isLand && listing.sqft != null && <StatItem value={listing.sqft.toLocaleString()} label="Sq.Ft." />}
+                          )}
+             {showAssocFeeStats ? (
+                             <>
+               {listing.assocFee != null && <StatItem value={formatPrice(listing.assocFee)} label="Assoc Fee" big />}
+               {listing.assocFeeFrequency && <StatItem value={listing.assocFeeFrequency} label="Assoc Fee Freq" big />}
+               </>
+                           ) : (
+                             <StatItem value={PROPERTY_TYPE_LABEL[listing.propertyType] || listing.propertyType} label="Type" big />
+                           )}
+             {!isLand && listing.sqft != null && <StatItem value={listing.sqft.toLocaleString()} label="Sq.Ft." />}
+            {/* List Price/SqFt (2026-09-14, per Ryan: "pull the information
+                              from the Space Coast MLS & add in the following categories:
+                              List Price/SqFt: & Lot Size Acres: ..."). Placed right after
+                              Sq.Ft. since it's derived from it. Computed server-side from
+                              price/sqft rather than read as its own MLS field — see the
+                              backend's listings.controller.js serializeListing comment.
+                              Land-gated same as Sq.Ft. itself (Land has no sqft to divide
+                              by, so the backend already sends null there). */}
+            {!isLand && listing.listPricePerSqft != null && (
+                            <StatItem value={`${formatPrice(listing.listPricePerSqft)}/SqFt`} label="List Price/SqFt" />
+                          )}
             {/* "Year Built" (2026-08-26, per Ryan, referencing a Space Coast
-                MLS listing screenshot showing "Year Built: 1995"). Homes and
-                Condos only (Land has no structure) — see backend's
-                schema.sql comment on listings.year_built. Omitted when the
-                MLS hasn't populated it. */}
+                              MLS listing screenshot showing "Year Built: 1995"). Homes and
+                              Condos only (Land has no structure) — see backend's
+                              schema.sql comment on listings.year_built. Omitted when the
+                              MLS hasn't populated it. */}
             {!isLand && listing.yearBuilt != null && <StatItem value={listing.yearBuilt} label="Year Built" />}
+            {/* Lot Size Acres (2026-09-14, per Ryan — same request as List
+                              Price/SqFt above). Home/Condo only: Land already shows its
+                              own "Acres" stat above (listing.acreage) as its primary size
+                              — this is a separate backend field (listing.lotSizeAcres) so
+                              that Land-only stat's meaning/usage elsewhere (see
+                              schemaOrg.service.js's floorSize) isn't disturbed. */}
+            {!isLand && listing.lotSizeAcres != null && <StatItem value={listing.lotSizeAcres} label="Lot Size Acres" />}
             {/* Rental Restrictions, placed immediately after Sq.Ft. per Ryan
-                (2026-08-10) — e.g. "1 Week", "3 Months, No Lease 1st Year".
-                Sourced from the MLS feed's CustomFields (see
-                mapRentalRestrictions() in the backend's
-                listingMapper.service.js); null/omitted when not set. */}
+                              (2026-08-10) — e.g. "1 Week", "3 Months, No Lease 1st Year".
+                              Sourced from the MLS feed's CustomFields (see
+                              mapRentalRestrictions() in the backend's
+                              listingMapper.service.js); null/omitted when not set. */}
             {listing.rentalRestrictions && <StatItem value={listing.rentalRestrictions} label="Rental Restrictions" />}
             {/* mlsNumber is the public MLS# (e.g. "1075392") — fixed 2026-08-10
-                per Ryan (was previously showing mlsId, Spark's internal
-                ListingKey, by mistake — see backend's schema.sql comment). */}
+                              per Ryan (was previously showing mlsId, Spark's internal
+                              ListingKey, by mistake — see backend's schema.sql comment). */}
             {listing.mlsNumber && <StatItem value={listing.mlsNumber} label="MLS #" />}
-          </div>
+            {/* Schools (2026-09-14, per Ryan: "put Elem School: Middle
+                              School: High School: as one category and place the 3 of the
+                              them in a list from top to bottom") — deliberately ONE
+                              combined tile (not three separate StatItems) per Ryan's
+                              explicit "as one category" instruction, listing whichever of
+                              the three the MLS actually populated; the tile itself is
+                              omitted only when none of the three are set. */}
+            {hasSchoolData && (
+                            <SchoolsStatItem elementary={listing.elementarySchool} middle={listing.middleSchool} high={listing.highSchool} />
+            )}
+</div>
 
-          {listing.waterfront && listing.waterfront !== 'None' && (
-            <p style={{ fontSize: 13, color: 'var(--color-success)', fontWeight: 600, marginTop: 16 }}>{listing.waterfront}</p>
+{listing.waterfront && listing.waterfront !== 'None' && (
+              <p style={{ fontSize: 13, color: 'var(--color-success)', fontWeight: 600, marginTop: 16 }}>{listing.waterfront}</p>
           )}
 
-          {listing.description && <p style={{ fontSize: 15, lineHeight: 1.75, color: 'var(--color-muted-dark)', marginTop: 20 }}>{listing.description}</p>}
+{listing.description && <p style={{ fontSize: 15, lineHeight: 1.75, color: 'var(--color-muted-dark)', marginTop: 20 }}>{listing.description}</p>}
 
           <div style={{ marginTop: 32 }}>
             <h2 style={{ fontSize: 18, marginBottom: 12 }}>Location</h2>
-            {/* Height bumped 320 -> 440 (2026-08-16, per Ryan): the popup
-                that opens on hovering this page's single self-pin was
-                getting clipped to a tiny internal scrollbar (see the
-                domready fix in ListingMap.js) because 320px didn't leave
-                Google's InfoWindow autopan enough room above the pin to
-                fit the full price/address/stats content. A taller map
-                gives autopan the room it needs so the popup renders in
-                full without scrolling, matching the taller (and
-                scroll-free) maps on the city/neighborhood results pages. */}
+{/* Height bumped 320 -> 440 (2026-08-16, per Ryan): the popup
+                  that opens on hovering this page's single self-pin was
+                  getting clipped to a tiny internal scrollbar (see the
+                  domready fix in ListingMap.js) because 320px didn't leave
+                  Google's InfoWindow autopan enough room above the pin to
+                  fit the full price/address/stats content. A taller map
+                  gives autopan the room it needs so the popup renders in
+                  full without scrolling, matching the taller (and
+                  scroll-free) maps on the city/neighborhood results pages. */}
             <ListingMap center={mapCenter} listings={[listing]} height={440} zoom={15} />
-          </div>
-        </div>
+              </div>
+              </div>
 
-        {/* RIGHT: contact panel (Call/Text + Make an Offer + Ask a Question + inline Request Showing).
-            listingAddress auto-fills the "Address of Property" field in
-            both the Make an Offer modal and the Request Showing form
-            below (per Ryan, 2026-08-17) — still editable, not read-only. */}
+{/* RIGHT: contact panel (Call/Text + Make an Offer + Ask a Question + inline Request Showing).
+              listingAddress auto-fills the "Address of Property" field in
+              both the Make an Offer modal and the Request Showing form
+              below (per Ryan, 2026-08-17) — still editable, not read-only. */}
         <PropertyContactPanel listingId={listing.id} listingAddress={listing.address} />
-      </div>
-    </>
+          </div>
+          </>
   );
 }
 
 function StatItem({ value, label, big }) {
-  return (
-    <div style={{ textAlign: 'center' }}>
+    return (
+          <div style={{ textAlign: 'center' }}>
       <div style={{ fontSize: big ? 18 : 22, fontWeight: 700, color: 'var(--color-ink)' }}>{value}</div>
       <div style={{ fontSize: 11, letterSpacing: 0.5, color: 'var(--color-muted-light)', textTransform: 'uppercase' }}>{label}</div>
-    </div>
+  </div>
+  );
+}
+
+// Schools (2026-09-14, per Ryan: "put Elem School: Middle School: High
+// School: as one category and place the 3 of the them in a list from top to
+// bottom"). Unlike the other stat tiles (one big value + one label below),
+// this is one tile holding a 3-row "Label: Value" list — left-aligned
+// (centering each line independently, like StatItem does, would look
+// lopsided across three different-length school names) but sized/colored to
+// still read as part of the same stat row. A row whose school wasn't
+// populated by the MLS shows "—" rather than being dropped, so the tile's
+// three-line shape stays stable — hasSchoolData (see this file's main
+// component) already keeps the whole tile from rendering at all when none
+// of the three are set.
+function SchoolsStatItem({ elementary, middle, high }) {
+    const rows = [
+          ['Elem School', elementary],
+          ['Middle School', middle],
+          ['High School', high],
+        ];
+    return (
+          <div style={{ textAlign: 'left' }}>
+{rows.map(([label, value]) => (
+          <div key={label} style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--color-ink)' }}>
+          <span style={{ fontWeight: 700 }}>{label}:</span> <span style={{ fontWeight: 400 }}>{value || '—'}</span>
+          </div>
+                ))}
+</div>
   );
 }
