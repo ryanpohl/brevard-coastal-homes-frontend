@@ -278,12 +278,12 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // from the previous single-string H1s below — only where the sentence
   // break falls (heading vs. subtext) is new.
   const HARBOR_ISLAND_BEACH_CLUB_HOME_HEADING = 'Harbor Island Beach Club, Melbourne Beach FL Homes for sale.';
-  // "properties" -> "Single Family Homes" (2026-09-15, per Ryan: "replace
+  // "properties" -> "SINGLE FAMILY HOMES" (2026-09-15, per Ryan: "replace
   // properties with Single family Homes in the first bullet point in
-  // Harbor Island beach club homes page") — capitalization normalized to
-  // title case for consistency with the rest of the sentence.
+  // Harbor Island beach club homes page", then follow-up: "Single family
+  // Homes....make them all caps").
   const HARBOR_ISLAND_BEACH_CLUB_HOME_SUBTEXT =
-    'Contact us about current off-market Single Family Homes currently available in Harbor Island.';
+    'Contact us about current off-market SINGLE FAMILY HOMES currently available in Harbor Island.';
   const HARBOR_ISLAND_BEACH_CLUB_CONDO_HEADING = 'Harbor Island Beach Club, Melbourne Beach FL Condos for sale.';
   // Reworded (2026-09-15, per Ryan: "do this exact same thing for the ...
   // Condos page too" / "make it look exactly the same as the other page")
