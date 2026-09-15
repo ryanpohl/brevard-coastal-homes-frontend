@@ -564,6 +564,42 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             </li>
           </ul>
         )}
+        {/* Adelaide builder note (2026-09-15, per Ryan: "Add similar text to
+            the Adelaide pages. The first line will be 'In Adelaide there
+            are three custom home builders to choose from.' In the last
+            sentence just replace Aripeka with Adelaide.") — same 3-bullet
+            pattern as the Aripeka block above: bullet 1 uses Ryan's exact
+            given wording (three builders, no "award-winning" qualifier —
+            Aripeka's has one, Ryan didn't ask for one here, so none added);
+            bullet 2 is verbatim identical to Aripeka's (it never names the
+            neighborhood, so "similar text" needed no edit there); bullet 3
+            is Aripeka's third bullet with "Aripeka" swapped for "Adelaide"
+            per Ryan's instruction. Same 18px/muted-dark <ul> styling.
+            Scoped to Adelaide only via isAdelaide — Summer Lakes (which
+            shares some of Adelaide's other overrides elsewhere on this
+            page) is untouched, since Ryan's request named Adelaide only. */}
+        {isAdelaide && (
+          <ul
+            style={{
+              fontSize: 18,
+              lineHeight: 1.6,
+              color: 'var(--color-muted-dark)',
+              marginBottom: 12,
+              paddingLeft: 22,
+            }}
+          >
+            <li style={{ marginBottom: 8 }}>In Adelaide there are three custom home builders to choose from.</li>
+            <li style={{ marginBottom: 8 }}>
+              Looking for an agent to be there every step of the way & guide you through the whole home building
+              process from setting up private showings at the different model homes, negotiating with the builders,
+              & being there at closing? We are here to help.
+            </li>
+            <li>
+              If you are looking to buy an existing home in Adelaide, we can help with that too. Reach out when you
+              are ready to start touring properties & we will take care of all the arrangements & meet you there.
+            </li>
+          </ul>
+        )}
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
