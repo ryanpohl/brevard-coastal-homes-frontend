@@ -266,30 +266,54 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // (Ryan's own wording only paired "foreclosures" with the Condos text).
   // Picked via primaryType for Nav.js's single-type "Homes"/"Condos"
   // sub-links (which explicitly set ?propertyType=Home/Condo).
-  const HARBOR_ISLAND_BEACH_CLUB_HOME_H1 =
-    'Harbor Island Beach Club, Melbourne Beach FL Homes for sale. Contact us about current off-market properties currently available in Harbor Island.';
-  const HARBOR_ISLAND_BEACH_CLUB_CONDO_H1 =
-    'Harbor Island Beach Club, Melbourne Beach FL Condos for sale. Contact us about current foreclosures & off-market properties currently available in Harbor Island.';
-  // Combined H1 (2026-09-01, per Ryan; revised same-day twice more — first
-  // to add a foreclosures/off-market sentence, then trimmed back down to
-  // drop its "off-market Single-Family homes" clause, per Ryan's final
-  // wording: "Reach out for information on the Foreclosed Bank-Owned
-  // condos that are currently available in Harbor Island Beach Club.") —
-  // shown only for the "<Name> Listings" header link's own bare
+  //
+  // Each variant is now split into a HEADING (rendered in the big bold H1)
+  // and a SUBTEXT (rendered as a smaller normal-weight line below, same
+  // treatment as the Aripeka builder note below) instead of one combined
+  // H1 string (2026-09-15, per Ryan: "make the pages for harbor island
+  // beach club look similar to [Aripeka] with the formatting" — applied to
+  // all three variants per Ryan's follow-up confirmation, keeping each
+  // variant's existing wording, just visually split). Wording is unchanged
+  // from the previous single-string H1s below — only where the sentence
+  // break falls (heading vs. subtext) is new.
+  const HARBOR_ISLAND_BEACH_CLUB_HOME_HEADING = 'Harbor Island Beach Club, Melbourne Beach FL Homes for sale.';
+  const HARBOR_ISLAND_BEACH_CLUB_HOME_SUBTEXT =
+    'Contact us about current off-market properties currently available in Harbor Island.';
+  const HARBOR_ISLAND_BEACH_CLUB_CONDO_HEADING = 'Harbor Island Beach Club, Melbourne Beach FL Condos for sale.';
+  const HARBOR_ISLAND_BEACH_CLUB_CONDO_SUBTEXT =
+    'Contact us about current foreclosures & off-market properties currently available in Harbor Island.';
+  // Combined heading/subtext (2026-09-01, per Ryan; revised same-day twice
+  // more — first to add a foreclosures/off-market sentence, then trimmed
+  // back down to drop its "off-market Single-Family homes" clause, per
+  // Ryan's final wording: "Reach out for information on the Foreclosed
+  // Bank-Owned condos that are currently available in Harbor Island Beach
+  // Club.") — shown only for the "<Name> Listings" header link's own bare
   // /neighborhoods/harbor-island-beach-club URL (no ?propertyType= param),
   // the same hasExplicitPropertyTypeFilter distinction AQUARINA_COMBINED_H1
   // below uses. Before this, that bare URL fell through to the
-  // Home-specific H1 above (primaryType defaults to 'Home' whenever no
+  // Home-specific heading above (primaryType defaults to 'Home' whenever no
   // param is present), which read as Homes-only even though the page
   // itself shows every type combined. The "Homes"/"Condos" sub-links keep
-  // their own existing single-type H1s untouched.
-  const HARBOR_ISLAND_BEACH_CLUB_COMBINED_H1 =
-    'Harbor Island Beach Club Homes & Condos For Sale, Melbourne Beach, Florida. Reach out for information on the Foreclosed Bank-Owned condos that are currently available in Harbor Island Beach Club.';
-  const HARBOR_ISLAND_BEACH_CLUB_H1 = !hasExplicitPropertyTypeFilter
-    ? HARBOR_ISLAND_BEACH_CLUB_COMBINED_H1
+  // their own existing single-type heading/subtext pairs untouched.
+  const HARBOR_ISLAND_BEACH_CLUB_COMBINED_HEADING =
+    'Harbor Island Beach Club Homes & Condos For Sale, Melbourne Beach, Florida';
+  const HARBOR_ISLAND_BEACH_CLUB_COMBINED_SUBTEXT =
+    'Reach out for information on the Foreclosed Bank-Owned condos that are currently available in Harbor Island Beach Club.';
+  const HARBOR_ISLAND_BEACH_CLUB_HEADING = !hasExplicitPropertyTypeFilter
+    ? HARBOR_ISLAND_BEACH_CLUB_COMBINED_HEADING
     : primaryType === 'Condo'
-      ? HARBOR_ISLAND_BEACH_CLUB_CONDO_H1
-      : HARBOR_ISLAND_BEACH_CLUB_HOME_H1;
+      ? HARBOR_ISLAND_BEACH_CLUB_CONDO_HEADING
+      : HARBOR_ISLAND_BEACH_CLUB_HOME_HEADING;
+  const HARBOR_ISLAND_BEACH_CLUB_SUBTEXT = !hasExplicitPropertyTypeFilter
+    ? HARBOR_ISLAND_BEACH_CLUB_COMBINED_SUBTEXT
+    : primaryType === 'Condo'
+      ? HARBOR_ISLAND_BEACH_CLUB_CONDO_SUBTEXT
+      : HARBOR_ISLAND_BEACH_CLUB_HOME_SUBTEXT;
+  // HARBOR_ISLAND_BEACH_CLUB_H1 kept as the heading-only value so every
+  // other reference to "the H1" below (h1Text's ternary chain) needs no
+  // further changes — the subtext is rendered separately, right below the
+  // Aripeka note block.
+  const HARBOR_ISLAND_BEACH_CLUB_H1 = HARBOR_ISLAND_BEACH_CLUB_HEADING;
   // Aquarina (per Ryan, 2026-09-01: "make it Aquarina Homes & Condos For
   // Sale for the main Aquarina link") — one of only two neighborhoods with
   // its own "Condos" sub-link (see Nav.js's NEIGHBORHOOD_CONDO_PAGE_SLUGS,
@@ -444,6 +468,17 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         >
           {h1Text}
         </h1>
+        {/* Harbor Island Beach Club subtext (2026-09-15, per Ryan — split out
+            of the combined H1 above into its own smaller line, same styling
+            as the Aripeka note below it). Picks the matching variant's
+            subtext (combined/Home/Condo) via HARBOR_ISLAND_BEACH_CLUB_SUBTEXT
+            above — wording unchanged from the previous single-string H1s,
+            only the heading/subtext split is new. */}
+        {isHarborIslandBeachClub && (
+          <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+            {HARBOR_ISLAND_BEACH_CLUB_SUBTEXT}
+          </p>
+        )}
         {/* Aripeka builder note (2026-09-15, per Ryan — revised wording:
             "Choose From Four Custom Builders in Aripeka. Have questions
             about the building process? We are here to help."; fontSize
