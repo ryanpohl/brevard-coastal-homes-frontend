@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as api from '@/lib/api';
+import { HARBOR_ISLAND_OPEN_FORECLOSURES_EVENT } from './HarborIslandForeclosuresTrigger';
 
 const CONTACT_METHODS = ['Call', 'Text', 'Email'];
 
@@ -66,6 +67,22 @@ export default function HarborIslandInquiryModals({ showForeclosures = true, are
     setStatus({ submitting: false, error: '', success: '' });
     setOpen(kind);
   }
+
+  // Listens for the underlined "Foreclosed Bank-Owned Condos" text in the
+  // page's subtext (HarborIslandForeclosuresTrigger.js, a separate Client
+  // Component the Server Component page can't call this component's state
+  // setters directly from) — see that file's comment for the full why.
+  // Registered unconditionally (not gated on showForeclosures) since the
+  // trigger text/link only exists on pages that also render this component
+  // with its default showForeclosures=true, so the two are never mounted
+  // without each other.
+  useEffect(() => {
+    function handleOpenForeclosuresEvent() {
+      openModal('foreclosures');
+    }
+    window.addEventListener(HARBOR_ISLAND_OPEN_FORECLOSURES_EVENT, handleOpenForeclosuresEvent);
+    return () => window.removeEventListener(HARBOR_ISLAND_OPEN_FORECLOSURES_EVENT, handleOpenForeclosuresEvent);
+  }, []);
 
   function closeModal() {
     setOpen(null);
