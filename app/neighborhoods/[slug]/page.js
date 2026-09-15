@@ -446,11 +446,12 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         </h1>
         {/* Aripeka builder note (2026-09-15, per Ryan — revised wording:
             "Choose From Four Custom Builders in Aripeka. Have questions
-            about the building process? We are here to help."). Scoped to
-            Aripeka only via isAripeka — every other neighborhood page keeps
-            just the H1 + result count, unaffected. */}
+            about the building process? We are here to help."; fontSize
+            bumped 15 -> 18 same day per Ryan: "make the text larger").
+            Scoped to Aripeka only via isAripeka — every other neighborhood
+            page keeps just the H1 + result count, unaffected. */}
         {isAripeka && (
-          <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+          <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
             Choose From Four Custom Builders in Aripeka.
             <br />
             Have questions about the building process? We are here to help.
