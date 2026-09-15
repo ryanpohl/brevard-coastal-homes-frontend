@@ -550,8 +550,24 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           <ul
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              maxWidth: 620,
+              // Column min-width bumped 200px -> 340px (and maxWidth 620 ->
+              // 720 to match) on 2026-09-15's 2nd follow-up, per Ryan: "move
+              // the 2nd column more to the right so the 3 rows each only
+              // take up one line" — at the original 200px minimum, the
+              // longest entry ("Atlin Cove (Coming Soon)") wrapped onto 2
+              // lines at this font size (measured ~306px of text alone,
+              // wider than the ~279px column that resulted), which both
+              // wrapped that one row and left the 2nd column sitting closer
+              // to the 1st than Ryan wanted. 340px comfortably fits that
+              // longest entry on one line with room to spare, and pushes
+              // column 2 further right as a result. Still auto-fit (not a
+              // hardcoded repeat(2, ...)), so it keeps collapsing to a
+              // single column on narrow/mobile screens with no media query
+              // needed — see the 2-column-grid comment above for that
+              // mechanism; it just now needs a bit more width available
+              // before it switches to 2 columns.
+              gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+              maxWidth: 720,
               columnGap: 40,
               rowGap: 14,
               fontSize: 'clamp(19px, 3vw, 26px)',
