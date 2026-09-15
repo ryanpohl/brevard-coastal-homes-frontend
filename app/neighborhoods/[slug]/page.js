@@ -527,18 +527,35 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             )}
           </p>
         )}
-        {/* Aripeka builder note (2026-09-15, per Ryan — revised wording:
-            "Choose From Four Custom Builders in Aripeka. Have questions
-            about the building process? We are here to help."; fontSize
-            bumped 15 -> 18 same day per Ryan: "make the text larger").
-            Scoped to Aripeka only via isAripeka — every other neighborhood
-            page keeps just the H1 + result count, unaffected. */}
+        {/* Aripeka builder note (2026-09-15, per Ryan — rewritten and
+            switched from a 2-line paragraph to a real bulleted list per
+            Ryan's follow-up: "Let me know how this sounds? ... Id like to
+            separate the different options with the dot bullet points." —
+            replaces the prior "Choose From Four Custom Builders in
+            Aripeka." / "Have questions about the building process? We are
+            here to help." wording entirely. Kept the same 18px/muted-dark
+            styling as before, just moved onto a <ul> so the browser's
+            default disc bullets do the separating (globals.css has no
+            list-style reset). Scoped to Aripeka only via isAripeka — every
+            other neighborhood page keeps just the H1 + result count,
+            unaffected. */}
         {isAripeka && (
-          <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
-            Choose From Four Custom Builders in Aripeka.
-            <br />
-            Have questions about the building process? We are here to help.
-          </p>
+          <ul
+            style={{
+              fontSize: 18,
+              lineHeight: 1.6,
+              color: 'var(--color-muted-dark)',
+              marginBottom: 12,
+              paddingLeft: 22,
+            }}
+          >
+            <li style={{ marginBottom: 8 }}>In Aripeka there are four award-winning custom home builders to choose from.</li>
+            <li>
+              Looking for an agent to be there every step of the way & guide you through the whole home building
+              process from setting up private showings at the different model homes, negotiating with the builders,
+              & being there at closing? We are here to help.
+            </li>
+          </ul>
         )}
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
