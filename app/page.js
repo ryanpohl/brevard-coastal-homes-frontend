@@ -46,8 +46,31 @@ const CITY_IMAGE_POSITION = {
 // two rows onto different filenames upstream, this override stops being
 // necessary but stays harmless (falls back to whatever the backend sends
 // for any other city).
+// Viera East (2026-09-15, per Ryan: "Can you replace the Viera east
+// picture on the home page with this one" — a night photo of the actual
+// "Viera East" monument entrance sign, same style of real-world signage
+// photo he's used for the other Viera-related cards above). The backend's
+// `viera` city row (display name "Viera East" — see
+// app/neighborhoods/[slug]/page.js's ARIPEKA_H1 comment on the
+// Viera -> "Viera East" rename) currently points its thumbnail at
+// viera.avif; rather than overwrite that file directly (its extension
+// implies the backend expects real AVIF-encoded bytes there, and there's
+// no way from this frontend-only session to confirm nothing else upstream
+// also reads that exact filename), this follows the same safer pattern as
+// the viera-west override just above: a new dedicated static file
+// (viera-east-sign.jpg, not something the backend sends) plus an override
+// entry here, so PlaceCard uses it for this one card without touching the
+// backend-controlled file at all. Source photo was a tall portrait
+// (1024x1536) — cropped to a 1024x768 (4:3) landscape framing centered on
+// the sign face (the "V" logo mark plus "VIERA"/"EAST" text) to match
+// PlaceCard's fixed 4:3 tile (.place-card-photo's padding-top: 75% in
+// globals.css), so the default center objectPosition shows the full sign
+// with no further CITY_IMAGE_POSITION override needed, and re-exported as
+// a ~115KB JPEG (in line with this folder's other photos) rather than
+// keeping the multi-MB source.
 const CITY_THUMBNAIL_OVERRIDE = {
   'viera-west': 'viera-west-city.jpg',
+  viera: 'viera-east-sign.jpg',
 };
 
 // Homepage "Search By Neighborhood" display order (2026-09-07, per Ryan:
