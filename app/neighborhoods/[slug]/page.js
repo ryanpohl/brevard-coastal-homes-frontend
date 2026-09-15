@@ -533,12 +533,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             separate the different options with the dot bullet points." —
             replaces the prior "Choose From Four Custom Builders in
             Aripeka." / "Have questions about the building process? We are
-            here to help." wording entirely. Kept the same 18px/muted-dark
-            styling as before, just moved onto a <ul> so the browser's
-            default disc bullets do the separating (globals.css has no
-            list-style reset). Scoped to Aripeka only via isAripeka — every
-            other neighborhood page keeps just the H1 + result count,
-            unaffected. */}
+            here to help." wording entirely. 3rd bullet added same day, per
+            Ryan, covering existing-home resale buyers (this page's listings
+            aren't only new-construction builder lots) — one comma added
+            after "Aripeka" for readability, wording otherwise exactly as
+            given. Kept the same 18px/muted-dark styling as before, on a
+            <ul> so the browser's default disc bullets do the separating
+            (globals.css has no list-style reset). Scoped to Aripeka only
+            via isAripeka — every other neighborhood page keeps just the H1
+            + result count, unaffected. */}
         {isAripeka && (
           <ul
             style={{
@@ -550,10 +553,14 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             }}
           >
             <li style={{ marginBottom: 8 }}>In Aripeka there are four award-winning custom home builders to choose from.</li>
-            <li>
+            <li style={{ marginBottom: 8 }}>
               Looking for an agent to be there every step of the way & guide you through the whole home building
               process from setting up private showings at the different model homes, negotiating with the builders,
               & being there at closing? We are here to help.
+            </li>
+            <li>
+              If you are looking to buy an existing home in Aripeka, we can help with that too. Reach out when you
+              are ready to start touring properties & we will take care of all the arrangements & meet you there.
             </li>
           </ul>
         )}
