@@ -583,7 +583,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             <li style={{ marginBottom: 8 }}>
               Looking for an agent to be there every step of the way & guide you through the whole home building
               process from setting up private showings at the different model homes, negotiating with the builders,
-              & being there at closing? We are here to help.
+              & being there all the way through closing? We are here to help.
             </li>
             <li>
               If you are looking for an agent to help guide you through the buying process of an existing home in
@@ -625,7 +625,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             <li style={{ marginBottom: 8 }}>
               Looking for an agent to be there every step of the way & guide you through the whole home building
               process from setting up private showings at the different model homes, negotiating with the builders,
-              & being there at closing? We are here to help.
+              & being there all the way through closing? We are here to help.
             </li>
             <li>
               If you are looking for an agent to help guide you through the buying process of an existing home in
