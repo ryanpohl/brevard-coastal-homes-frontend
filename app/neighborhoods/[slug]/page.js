@@ -298,7 +298,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   const HARBOR_ISLAND_BEACH_CLUB_COMBINED_HEADING =
     'Harbor Island Beach Club Homes & Condos For Sale, Melbourne Beach, Florida';
   const HARBOR_ISLAND_BEACH_CLUB_COMBINED_SUBTEXT =
-    'Reach out for information on the Foreclosed Bank-Owned condos that are currently available in Harbor Island Beach Club.';
+    'Reach out for information on the Foreclosed Bank-Owned Condos that are currently available in Harbor Island Beach Club.';
   const HARBOR_ISLAND_BEACH_CLUB_HEADING = !hasExplicitPropertyTypeFilter
     ? HARBOR_ISLAND_BEACH_CLUB_COMBINED_HEADING
     : primaryType === 'Condo'
@@ -477,7 +477,12 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             text, short of the H1's full bold treatment). Picks the matching
             variant's subtext (combined/Home/Condo) via
             HARBOR_ISLAND_BEACH_CLUB_SUBTEXT above — wording unchanged from
-            the previous single-string H1s, only styling is new here. */}
+            the previous single-string H1s, only styling is new here.
+            "Foreclosed Bank-Owned Condos" underlined + "Condos" capitalized
+            (2026-09-15, per Ryan) — only on the combined/bare-URL variant,
+            since that's the only one of the three with this exact phrase;
+            Home/Condo variants keep rendering their own plain-text
+            HARBOR_ISLAND_BEACH_CLUB_SUBTEXT untouched below. */}
         {isHarborIslandBeachClub && (
           <p
             style={{
@@ -488,7 +493,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               marginBottom: 16,
             }}
           >
-            {HARBOR_ISLAND_BEACH_CLUB_SUBTEXT}
+            {!hasExplicitPropertyTypeFilter ? (
+              <>
+                Reach out for information on the{' '}
+                <span style={{ textDecoration: 'underline' }}>Foreclosed Bank-Owned Condos</span> that are currently
+                available in Harbor Island Beach Club.
+              </>
+            ) : (
+              HARBOR_ISLAND_BEACH_CLUB_SUBTEXT
+            )}
           </p>
         )}
         {/* Aripeka builder note (2026-09-15, per Ryan — revised wording:
