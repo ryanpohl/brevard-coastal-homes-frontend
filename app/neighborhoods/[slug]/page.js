@@ -355,8 +355,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // (isVieraBuildersCommunitiesVieraWest itself is declared earlier, above
   // the listings fetch, since that fetch's subdivision/neighborhood param
   // choice needs it too.)
+  // Parenthetical "(Pangea Park, Laurasia, ...)" list dropped from the end
+  // of this H1 (2026-09-15, per Ryan: "separate the neighborhoods into a
+  // separate bullet point & keep the links below") — those 6 names now
+  // duplicated the live bulleted link list rendered right below the H1
+  // (added earlier the same day), so trimming this here removes that
+  // redundancy rather than naming them twice. Original full sentence
+  // (with the parenthetical) preserved in git history if ever needed.
   const VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_H1 =
-    'Viera Builders Communities located in Viera West, FL Real Estate & Homes for Sale include the following neighborhoods (Pangea Park, Laurasia, Reeling Park, Farallon Fields, Atlin Cove, & Crossmolina)';
+    'Viera Builders Communities located in Viera West, FL Real Estate & Homes for Sale include the following neighborhoods';
   // True on the wrapper page AND all 6 individual sub-community pages (per
   // Ryan, 2026-08-05) — drives the shared VIERA_BUILDERS_PRICE_BANDS /
   // VIERA_BUILDERS_PROPERTY_TYPE_OPTIONS (drops Land) below, so every one
@@ -485,10 +492,10 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             (2026-09-15, per Ryan: "I would also like to create live links
             for each neighborhood by Viera Builders... list the
             neighborhoods by bullet point & make the links live") — the H1
-            above already names all 6 sub-communities in parentheses as
-            plain text; this adds a real bulleted list directly below it,
-            each name a live <Link> to that sub-community's own page (e.g.
-            /neighborhoods/pangea-park) — same 6 pages driven by
+            used to name all 6 sub-communities in parentheses as plain
+            text; this renders a real bulleted list directly below it
+            instead, each name a live <Link> to that sub-community's own
+            page (e.g. /neighborhoods/pangea-park) — same 6 pages driven by
             VIERA_BUILDERS_SUB_COMMUNITIES in lib/constants.js, which
             already existed and already work (built 2026-08-05, same
             NeighborhoodListingsPage template as every other neighborhood,
@@ -501,24 +508,56 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             VIERA_BUILDERS_SUB_COMMUNITIES reference), so this list is
             what actually makes them reachable/"live" for a visitor. Listed
             alphabetically, matching the array's existing order (and the
-            H1's own listing order). Atlin Cove keeps its "(Coming Soon)"
-            suffix, matching the comingSoon flag's existing "Homes for Sale
-            in Atlin Cove, FL (Coming Soon)" H1 treatment on its own page —
-            still linked (not disabled), just labeled, since Ryan didn't
-            ask for it to be excluded. Styled like the Aripeka/Adelaide
-            bullet lists (18px/muted-dark <ul>) for a plain, readable list;
-            links use the brand gold underline so they read as clickable
-            against that body-text color. Scoped to the wrapper page only
-            via isVieraBuildersCommunitiesVieraWest — the 6 sub-community
-            pages themselves don't render this (they're leaf pages, not
-            hubs). */}
+            H1's own former listing order). Atlin Cove keeps its "(Coming
+            Soon)" suffix, matching the comingSoon flag's existing "Homes
+            for Sale in Atlin Cove, FL (Coming Soon)" H1 treatment on its
+            own page — still linked (not disabled), just labeled, since
+            Ryan didn't ask for it to be excluded.
+            Restyled same day, per Ryan's follow-up ("separate the
+            neighborhoods into a separate bullet point & keep the links
+            below. Can you do the links in black & put them in 2 columns of
+            3 & make the links a lot larger") — that follow-up also
+            dropped the now-redundant parenthetical names from the H1
+            itself (see VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_H1 above), so
+            this <ul> is now the only place the 6 names appear. 2-column
+            grid (auto-flows into 3 rows for 6 items, i.e. 2 columns of 3,
+            without hardcoding row breaks that would need updating if a
+            7th community is ever added), black link text (literal #000 —
+            "in black", not the brand's near-black --color-ink tokens used
+            elsewhere on this page), well above every other body/bullet
+            text on this page for emphasis as the page's main set of calls
+            to action.
+            Refined again same day per Ryan's next follow-up ("make all the
+            text & links look very professional & clean" + "easy to
+            navigate on mobile too"): grid columns switched from a fixed
+            "repeat(2, ...)" to "repeat(auto-fit, minmax(200px, 1fr))" with
+            a maxWidth cap — this holds the 2-column/3-row desktop layout
+            (two ~290px-wide columns fit under the 620px cap) but lets the
+            grid collapse to a single column on narrow phone screens with
+            no media query needed, the same no-media-query responsive
+            trick already used by this page's H1 font-size and the
+            container padding right above (both via clamp()). Font size
+            likewise switched from a fixed 28px to
+            clamp(19px, 3vw, 26px) so it scales down on small screens
+            instead of forcing a 2-column layout to squeeze into one; font
+            weight eased from 700 to 600 and the underline given a touch
+            of textUnderlineOffset for a cleaner, less clunky look while
+            staying clearly identifiable as links now that they're plain
+            black instead of gold. Scoped to the wrapper page only via
+            isVieraBuildersCommunitiesVieraWest — the 6 sub-community pages
+            themselves don't render this (they're leaf pages, not hubs). */}
         {isVieraBuildersCommunitiesVieraWest && (
           <ul
             style={{
-              fontSize: 18,
-              lineHeight: 1.8,
-              color: 'var(--color-muted-dark)',
-              marginBottom: 16,
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              maxWidth: 620,
+              columnGap: 40,
+              rowGap: 14,
+              fontSize: 'clamp(19px, 3vw, 26px)',
+              fontWeight: 600,
+              lineHeight: 1.4,
+              marginBottom: 20,
               paddingLeft: 22,
             }}
           >
@@ -526,7 +565,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               <li key={c.slug}>
                 <Link
                   href={`/neighborhoods/${c.slug}`}
-                  style={{ color: 'var(--color-gold)', textDecoration: 'underline', fontWeight: 600 }}
+                  style={{ color: '#000', textDecoration: 'underline', textUnderlineOffset: 3 }}
                 >
                   {c.name}
                 </Link>
