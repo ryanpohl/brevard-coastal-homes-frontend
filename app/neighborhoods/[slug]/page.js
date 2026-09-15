@@ -505,27 +505,45 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             FilterBar's extraActions prop), via a small window CustomEvent
             bridge since this Server Component can't call that Client
             Component's state setters directly — see
-            HarborIslandForeclosuresTrigger.js for the full explanation. */}
+            HarborIslandForeclosuresTrigger.js for the full explanation.
+            Switched from a single <p> to a <ul> (2026-09-15, per Ryan: "use
+            bullet points similar to Aripeka" — see the Aripeka block below)
+            with a new 2nd bullet giving general buying-process guidance for
+            all three HIBC variants (Ryan's given text tidied: "island"
+            capitalized, a comma added before "reach out", and a closing
+            period added, matching the light copy-edits made to Aripeka's
+            bullets). Kept the existing 21px/600-weight styling from the
+            "make it look professional" request rather than matching
+            Aripeka's plainer 18px/400 — Ryan asked for bullet POINTS like
+            Aripeka, not a full style match, and reverting the earlier
+            enlarge/bold work wasn't asked for. */}
         {isHarborIslandBeachClub && (
-          <p
+          <ul
             style={{
               fontSize: 21,
               lineHeight: 1.5,
               fontWeight: 600,
               color: 'var(--color-muted-dark)',
               marginBottom: 16,
+              paddingLeft: 24,
             }}
           >
-            {!hasExplicitPropertyTypeFilter || primaryType === 'Condo' ? (
-              <>
-                Reach out for information on the{' '}
-                <HarborIslandForeclosuresTrigger>Foreclosed Bank-Owned Condos</HarborIslandForeclosuresTrigger> that
-                are currently available in Harbor Island Beach Club.
-              </>
-            ) : (
-              HARBOR_ISLAND_BEACH_CLUB_SUBTEXT
-            )}
-          </p>
+            <li style={{ marginBottom: 8 }}>
+              {!hasExplicitPropertyTypeFilter || primaryType === 'Condo' ? (
+                <>
+                  Reach out for information on the{' '}
+                  <HarborIslandForeclosuresTrigger>Foreclosed Bank-Owned Condos</HarborIslandForeclosuresTrigger> that
+                  are currently available in Harbor Island Beach Club.
+                </>
+              ) : (
+                HARBOR_ISLAND_BEACH_CLUB_SUBTEXT
+              )}
+            </li>
+            <li>
+              If you are looking for an agent to help guide you through the buying process in Harbor Island Beach
+              Club, reach out when you are ready to start the search & we will take care of all the arrangements.
+            </li>
+          </ul>
         )}
         {/* Aripeka builder note (2026-09-15, per Ryan — rewritten and
             switched from a 2-line paragraph to a real bulleted list per
