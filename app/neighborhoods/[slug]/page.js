@@ -566,8 +566,16 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               // needed — see the 2-column-grid comment above for that
               // mechanism; it just now needs a bit more width available
               // before it switches to 2 columns.
+              // maxWidth is 760, not the "720" you'd expect from
+              // 2*340px-columns + 40px gap — this <ul>'s own paddingLeft:22
+              // (below) is subtracted from that box under this site's
+              // global border-box sizing, so a 720 cap left only 698px of
+              // actual content width for the grid tracks, just short of the
+              // 720px two 340px-columns need, and silently collapsed to 1
+              // column. 760 leaves enough room for the padding plus a
+              // little slack.
               gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-              maxWidth: 720,
+              maxWidth: 760,
               columnGap: 40,
               rowGap: 14,
               fontSize: 'clamp(19px, 3vw, 26px)',
