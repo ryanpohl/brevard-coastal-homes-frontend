@@ -20,6 +20,7 @@ import {
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
+import HarborIslandForeclosuresTrigger from '@/components/HarborIslandForeclosuresTrigger';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 
 // Matches the reference design's "1-30 of 34 Homes" pagination — the
@@ -494,7 +495,17 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             one exactly, so both branches render identically here). The
             Home-only variant keeps rendering its own plain-text
             HARBOR_ISLAND_BEACH_CLUB_SUBTEXT untouched below, since it never
-            mentions foreclosures/condos. */}
+            mentions foreclosures/condos.
+            "Foreclosed Bank-Owned Condos" made an active link (2026-09-15,
+            per Ryan: "make the underlined ... an active link & when
+            someone clicks on the link can you have this popup box come
+            up") — clicking it opens the same "Send Us a Message" modal as
+            the maroon/gold "Contact Us Here about Foreclosures in Harbor
+            Island" button below (rendered by HarborIslandInquiryModals via
+            FilterBar's extraActions prop), via a small window CustomEvent
+            bridge since this Server Component can't call that Client
+            Component's state setters directly — see
+            HarborIslandForeclosuresTrigger.js for the full explanation. */}
         {isHarborIslandBeachClub && (
           <p
             style={{
@@ -508,8 +519,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             {!hasExplicitPropertyTypeFilter || primaryType === 'Condo' ? (
               <>
                 Reach out for information on the{' '}
-                <span style={{ textDecoration: 'underline' }}>Foreclosed Bank-Owned Condos</span> that are currently
-                available in Harbor Island Beach Club.
+                <HarborIslandForeclosuresTrigger>Foreclosed Bank-Owned Condos</HarborIslandForeclosuresTrigger> that
+                are currently available in Harbor Island Beach Club.
               </>
             ) : (
               HARBOR_ISLAND_BEACH_CLUB_SUBTEXT
