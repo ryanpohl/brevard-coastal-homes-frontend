@@ -280,8 +280,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   const HARBOR_ISLAND_BEACH_CLUB_HOME_SUBTEXT =
     'Contact us about current off-market properties currently available in Harbor Island.';
   const HARBOR_ISLAND_BEACH_CLUB_CONDO_HEADING = 'Harbor Island Beach Club, Melbourne Beach FL Condos for sale.';
+  // Reworded (2026-09-15, per Ryan: "do this exact same thing for the ...
+  // Condos page too" / "make it look exactly the same as the other page")
+  // to match HARBOR_ISLAND_BEACH_CLUB_COMBINED_SUBTEXT's wording exactly —
+  // was "Contact us about current foreclosures & off-market properties
+  // currently available in Harbor Island." Rendered with the same
+  // underlined "Foreclosed Bank-Owned Condos" treatment below (see
+  // isCondoOrCombinedSubtext in the render section).
   const HARBOR_ISLAND_BEACH_CLUB_CONDO_SUBTEXT =
-    'Contact us about current foreclosures & off-market properties currently available in Harbor Island.';
+    'Reach out for information on the Foreclosed Bank-Owned Condos that are currently available in Harbor Island Beach Club.';
   // Combined heading/subtext (2026-09-01, per Ryan; revised same-day twice
   // more — first to add a foreclosures/off-market sentence, then trimmed
   // back down to drop its "off-market Single-Family homes" clause, per
@@ -479,10 +486,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             HARBOR_ISLAND_BEACH_CLUB_SUBTEXT above — wording unchanged from
             the previous single-string H1s, only styling is new here.
             "Foreclosed Bank-Owned Condos" underlined + "Condos" capitalized
-            (2026-09-15, per Ryan) — only on the combined/bare-URL variant,
-            since that's the only one of the three with this exact phrase;
-            Home/Condo variants keep rendering their own plain-text
-            HARBOR_ISLAND_BEACH_CLUB_SUBTEXT untouched below. */}
+            (2026-09-15, per Ryan) — shown on both the combined/bare-URL
+            variant and the Condos-only variant (2026-09-15 follow-up, per
+            Ryan: "do this exact same thing for the ... Condos page too" /
+            "make it look exactly the same as the other page" — the
+            Condos-only subtext was reworded above to match the combined
+            one exactly, so both branches render identically here). The
+            Home-only variant keeps rendering its own plain-text
+            HARBOR_ISLAND_BEACH_CLUB_SUBTEXT untouched below, since it never
+            mentions foreclosures/condos. */}
         {isHarborIslandBeachClub && (
           <p
             style={{
@@ -493,7 +505,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               marginBottom: 16,
             }}
           >
-            {!hasExplicitPropertyTypeFilter ? (
+            {!hasExplicitPropertyTypeFilter || primaryType === 'Condo' ? (
               <>
                 Reach out for information on the{' '}
                 <span style={{ textDecoration: 'underline' }}>Foreclosed Bank-Owned Condos</span> that are currently
