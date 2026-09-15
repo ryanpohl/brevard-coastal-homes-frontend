@@ -559,7 +559,12 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             Ryan, covering existing-home resale buyers (this page's listings
             aren't only new-construction builder lots) — one comma added
             after "Aripeka" for readability, wording otherwise exactly as
-            given. Kept the same 18px/muted-dark styling as before, on a
+            given. 3rd bullet reworded again same day per Ryan, replacing
+            the original "we can help with that too... & meet you there"
+            resale-buyer wording with an agent-guidance framing that also
+            mentions sending property updates (matching the pasted text
+            verbatim, applied identically to the Adelaide block below).
+            Kept the same 18px/muted-dark styling as before, on a
             <ul> so the browser's default disc bullets do the separating
             (globals.css has no list-style reset). Scoped to Aripeka only
             via isAripeka — every other neighborhood page keeps just the H1
@@ -581,8 +586,10 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               & being there at closing? We are here to help.
             </li>
             <li>
-              If you are looking to buy an existing home in Aripeka, we can help with that too. Reach out when you
-              are ready to start touring properties & we will take care of all the arrangements & meet you there.
+              If you are looking for an agent to help guide you through the buying process of an existing home in
+              Aripeka, we can help with that too. Reach out when you are ready to start your home search & we can
+              start sending you property updates as well as take care of all the arrangements when you are ready to
+              start touring properties in person.
             </li>
           </ul>
         )}
@@ -596,7 +603,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             bullet 2 is verbatim identical to Aripeka's (it never names the
             neighborhood, so "similar text" needed no edit there); bullet 3
             is Aripeka's third bullet with "Aripeka" swapped for "Adelaide"
-            per Ryan's instruction. Same 18px/muted-dark <ul> styling.
+            per Ryan's instruction. Bullet 3 reworded again 2026-09-15 (same
+            change as the Aripeka block above, per Ryan's follow-up pasting
+            new wording for "the 3rd section down" on both pages) to the
+            agent-guidance framing that also mentions sending property
+            updates. Same 18px/muted-dark <ul> styling.
             Scoped to Adelaide only via isAdelaide — Summer Lakes (which
             shares some of Adelaide's other overrides elsewhere on this
             page) is untouched, since Ryan's request named Adelaide only. */}
@@ -617,8 +628,10 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               & being there at closing? We are here to help.
             </li>
             <li>
-              If you are looking to buy an existing home in Adelaide, we can help with that too. Reach out when you
-              are ready to start touring properties & we will take care of all the arrangements & meet you there.
+              If you are looking for an agent to help guide you through the buying process of an existing home in
+              Adelaide, we can help with that too. Reach out when you are ready to start your home search & we can
+              start sending you property updates as well as take care of all the arrangements when you are ready to
+              start touring properties in person.
             </li>
           </ul>
         )}
