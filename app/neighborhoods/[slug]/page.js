@@ -598,6 +598,64 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             ))}
           </ul>
         )}
+        {/* Sibling-community cross-links on each individual Viera Builders
+            page (2026-09-15, per Ryan — follow-up to the hub page's link
+            list above: "Would you advise keeping the 6 neighborhood page
+            link on all the individual pages for Viera Builders?" ->
+            "Yes.....and do links add enough for SEO or is it better to
+            list all the neighborhoods too"). Two reasons for adding this:
+            (1) these are small subdivisions that can easily show 0 active
+            listings at any given time (confirmed live on Farallon Fields
+            the day this was added) — without a way to jump to a sibling
+            community, a visitor landing here from search/an ad with no
+            results hits a dead end and leaves; (2) internal links between
+            the 6 pages help search engines crawl/associate them as one
+            cluster and pass authority between them.
+            On the SEO question specifically: NOT duplicating the 6 names
+            again as plain non-linked text — a <Link>'s own visible text
+            (the neighborhood name) already IS the keyword-relevant anchor
+            text search engines use, so repeating the same names a second
+            time as plain text next to the links would just be redundant
+            boilerplate, especially since this exact block repeats
+            verbatim across all 6 pages. Instead this adds one short,
+            genuine sentence of context ("part of the Viera Builders
+            communities in Viera West") around the links, which is the
+            part that actually reads as real content rather than a
+            keyword list.
+            Deliberately a lighter/secondary treatment than the hub page's
+            large bold black link list (which is that page's main call to
+            action) — here the page's own listings are the priority, so
+            this is smaller (16px) and muted, sitting quietly below the
+            result count rather than competing with the H1. Excludes the
+            current page's own community from the list via .filter (no
+            reason to link Farallon Fields back to itself). Reuses the
+            same auto-fit responsive wrapping approach isn't needed here
+            since it's an inline sentence, not a grid, and comfortably
+            wraps on its own at any screen width. Scoped via subCommunity
+            (truthy only for the 6 leaf pages — the hub page itself uses
+            isVieraBuildersCommunitiesVieraWest above instead, so the two
+            blocks never both render). */}
+        {subCommunity && (
+          <p
+            style={{
+              fontSize: 16,
+              lineHeight: 1.6,
+              color: 'var(--color-muted-dark)',
+              marginBottom: 16,
+            }}
+          >
+            {subCommunity.name} is one of the Viera Builders communities in Viera West, FL. See also:{' '}
+            {VIERA_BUILDERS_SUB_COMMUNITIES.filter((c) => c.slug !== subCommunity.slug).map((c, i, arr) => (
+              <span key={c.slug}>
+                <Link href={`/neighborhoods/${c.slug}`} style={{ color: '#000', textDecoration: 'underline' }}>
+                  {c.name}
+                </Link>
+                {c.comingSoon ? ' (Coming Soon)' : ''}
+                {i < arr.length - 1 ? ', ' : '.'}
+              </span>
+            ))}
+          </p>
+        )}
         {/* Harbor Island Beach Club subtext (2026-09-15, per Ryan — split out
             of the combined H1 above into its own line; enlarged same day
             per Ryan: "make the text larger. Make it look professional &
