@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import * as api from '@/lib/api';
 import {
   ADELAIDE_PRICE_BANDS,
@@ -480,6 +481,60 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         >
           {h1Text}
         </h1>
+        {/* Viera Builders Communities Viera West sub-community links
+            (2026-09-15, per Ryan: "I would also like to create live links
+            for each neighborhood by Viera Builders... list the
+            neighborhoods by bullet point & make the links live") — the H1
+            above already names all 6 sub-communities in parentheses as
+            plain text; this adds a real bulleted list directly below it,
+            each name a live <Link> to that sub-community's own page (e.g.
+            /neighborhoods/pangea-park) — same 6 pages driven by
+            VIERA_BUILDERS_SUB_COMMUNITIES in lib/constants.js, which
+            already existed and already work (built 2026-08-05, same
+            NeighborhoodListingsPage template as every other neighborhood,
+            filtering listings by the subdivision matching that
+            sub-community's name — see the subCommunity handling above).
+            Ryan's message also asked to "create an individual page for
+            each of the subdivisions" — those pages were already built
+            then, just never linked to from anywhere on the site (Nav.js
+            has no entry for them, per its own lack of any
+            VIERA_BUILDERS_SUB_COMMUNITIES reference), so this list is
+            what actually makes them reachable/"live" for a visitor. Listed
+            alphabetically, matching the array's existing order (and the
+            H1's own listing order). Atlin Cove keeps its "(Coming Soon)"
+            suffix, matching the comingSoon flag's existing "Homes for Sale
+            in Atlin Cove, FL (Coming Soon)" H1 treatment on its own page —
+            still linked (not disabled), just labeled, since Ryan didn't
+            ask for it to be excluded. Styled like the Aripeka/Adelaide
+            bullet lists (18px/muted-dark <ul>) for a plain, readable list;
+            links use the brand gold underline so they read as clickable
+            against that body-text color. Scoped to the wrapper page only
+            via isVieraBuildersCommunitiesVieraWest — the 6 sub-community
+            pages themselves don't render this (they're leaf pages, not
+            hubs). */}
+        {isVieraBuildersCommunitiesVieraWest && (
+          <ul
+            style={{
+              fontSize: 18,
+              lineHeight: 1.8,
+              color: 'var(--color-muted-dark)',
+              marginBottom: 16,
+              paddingLeft: 22,
+            }}
+          >
+            {VIERA_BUILDERS_SUB_COMMUNITIES.map((c) => (
+              <li key={c.slug}>
+                <Link
+                  href={`/neighborhoods/${c.slug}`}
+                  style={{ color: 'var(--color-gold)', textDecoration: 'underline', fontWeight: 600 }}
+                >
+                  {c.name}
+                </Link>
+                {c.comingSoon ? ' (Coming Soon)' : ''}
+              </li>
+            ))}
+          </ul>
+        )}
         {/* Harbor Island Beach Club subtext (2026-09-15, per Ryan — split out
             of the combined H1 above into its own line; enlarged same day
             per Ryan: "make the text larger. Make it look professional &
