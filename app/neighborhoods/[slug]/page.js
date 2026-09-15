@@ -469,13 +469,25 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           {h1Text}
         </h1>
         {/* Harbor Island Beach Club subtext (2026-09-15, per Ryan — split out
-            of the combined H1 above into its own smaller line, same styling
-            as the Aripeka note below it). Picks the matching variant's
-            subtext (combined/Home/Condo) via HARBOR_ISLAND_BEACH_CLUB_SUBTEXT
-            above — wording unchanged from the previous single-string H1s,
-            only the heading/subtext split is new. */}
+            of the combined H1 above into its own line; enlarged same day
+            per Ryan: "make the text larger. Make it look professional &
+            easy to read. Use your best judgement" — bumped 18px -> 21px,
+            added medium weight (600) and slightly tighter line-height for a
+            more polished, readable look than the plain 400-weight body
+            text, short of the H1's full bold treatment). Picks the matching
+            variant's subtext (combined/Home/Condo) via
+            HARBOR_ISLAND_BEACH_CLUB_SUBTEXT above — wording unchanged from
+            the previous single-string H1s, only styling is new here. */}
         {isHarborIslandBeachClub && (
-          <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+          <p
+            style={{
+              fontSize: 21,
+              lineHeight: 1.5,
+              fontWeight: 600,
+              color: 'var(--color-muted-dark)',
+              marginBottom: 16,
+            }}
+          >
             {HARBOR_ISLAND_BEACH_CLUB_SUBTEXT}
           </p>
         )}
