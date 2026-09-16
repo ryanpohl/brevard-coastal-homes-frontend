@@ -51,6 +51,17 @@ export default function AuthPanel({ onClose, message, embedded = false }) {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  // Show/hide password toggle (2026-09-16, per Ryan, pasting screenshots of
+  // both the Sign In and Register tabs of this same panel: "Can you add the
+  // eye icon next to the passwords on these so if the person clicks on the
+  // icon they can see their password to make sure they are entering it in
+  // correct.") — two independent booleans since Password and Confirm
+  // Password (Register tab only) should toggle separately; a person
+  // double-checking a typo in one shouldn't be forced to also reveal the
+  // other. Both default to false (masked), matching how every browser's own
+  // native password-reveal control starts.
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   function update(key, value) {
     setFields((f) => ({ ...f, [key]: value }));
@@ -140,24 +151,49 @@ export default function AuthPanel({ onClose, message, embedded = false }) {
         </Field>
         {mode !== 'reset' && (
           <Field label="Password">
-            <input
-              required
-              minLength={8}
-              value={fields.password}
-              onChange={(e) => update('password', e.target.value)}
-              type="password"
-            />
+            <div style={passwordFieldWrapperStyle}>
+              <input
+                required
+                minLength={8}
+                value={fields.password}
+                onChange={(e) => update('password', e.target.value)}
+                type={showPassword ? 'text' : 'password'}
+                style={passwordInputStyle}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                style={passwordToggleBtnStyle}
+                // No visible label of its own (icon-only button) — aria-label
+                // is the accessible name a screen reader announces, and it
+                // flips with the toggle state same as the icon does.
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+              </button>
+            </div>
           </Field>
         )}
         {mode === 'join' && (
           <Field label="Confirm Password">
-            <input
-              required
-              minLength={8}
-              value={fields.confirmPassword}
-              onChange={(e) => update('confirmPassword', e.target.value)}
-              type="password"
-            />
+            <div style={passwordFieldWrapperStyle}>
+              <input
+                required
+                minLength={8}
+                value={fields.confirmPassword}
+                onChange={(e) => update('confirmPassword', e.target.value)}
+                type={showConfirmPassword ? 'text' : 'password'}
+                style={passwordInputStyle}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((v) => !v)}
+                style={passwordToggleBtnStyle}
+                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+              >
+                {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+              </button>
+            </div>
           </Field>
         )}
         {mode === 'join' && (
@@ -224,6 +260,31 @@ function Field({ label, children }) {
   );
 }
 
+// Eye / eye-with-slash icons for the password show/hide toggle above —
+// plain inline SVGs (Feather-icon style: 24x24 viewBox, stroke=currentColor,
+// no fill) rather than a new icon library dependency, matching how
+// FavoriteButton.js's heart uses a simple inline glyph instead of pulling in
+// an icon package for one icon. `currentColor` picks up passwordToggleBtnStyle's
+// `color` below, so both icons inherit the same muted-ink tone as the rest
+// of the form's labels without needing their own color prop.
+function EyeIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function EyeOffIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.3 20.3 0 0 1 5.06-6.06M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 8 11 8a20.32 20.32 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+      <path d="M1 1l22 22" />
+    </svg>
+  );
+}
+
 const panelStyle = {
   position: 'absolute',
   top: '100%',
@@ -268,6 +329,35 @@ const tabBaseStyle = {
 };
 const tabActiveStyle = { ...tabBaseStyle, background: 'var(--color-gold)', color: 'var(--color-ink-dark)' };
 const tabInactiveStyle = { ...tabBaseStyle, background: 'transparent', color: 'rgba(255, 255, 255, 0.75)' };
+
+// Password show/hide toggle layout — the input keeps the same global
+// input/select/textarea styling as every other field (app/globals.css)
+// except for extra right padding (passwordInputStyle below) to leave room
+// for the icon button, which sits absolutely positioned inside the same
+// relative wrapper rather than beside the input, so the field keeps its
+// full 100% width instead of shrinking to make room for a sibling element.
+const passwordFieldWrapperStyle = {
+  position: 'relative',
+};
+const passwordInputStyle = {
+  paddingRight: 38,
+};
+const passwordToggleBtnStyle = {
+  position: 'absolute',
+  right: 4,
+  top: '50%',
+  transform: 'translateY(-50%)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 30,
+  height: 30,
+  padding: 0,
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  color: 'var(--color-muted)',
+};
 
 const checkboxRowStyle = {
   display: 'flex',
