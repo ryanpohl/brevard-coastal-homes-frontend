@@ -671,13 +671,19 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             (HarborIslandInquiryModals.js, via FilterBar's extraActions
             prop below) still opens that same modal directly, so the
             foreclosures inquiry flow itself isn't lost, just this one
-            inline text entry point into it. */}
+            inline text entry point into it.
+            "bank-owned condos" -> "Foreclosed bank-owned condos", bolded
+            (2026-09-16 follow-up, per Ryan: "Can you put 'Foreclosed
+            bank-owned condos' in bold & add Foreclosed") — plain <strong>
+            emphasis, not a link (the foreclosures modal link on this phrase
+            was intentionally dropped just above; this only restores the
+            word "Foreclosed" and bolds the phrase, no click behavior). */}
         {isHarborIslandBeachClub && (
           <div style={{ marginBottom: 12 }}>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
               Looking for a home or condo in Harbor Island Beach Club? We can help you find available properties,
-              including bank-owned condos, arrange private showings, negotiate on your behalf, and guide you through
-              the entire purchase process from start to closing.
+              including <strong>Foreclosed bank-owned condos</strong>, arrange private showings, negotiate on your
+              behalf, and guide you through the entire purchase process from start to closing.
             </p>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
               <ContactUsTrigger>Contact Us Today</ContactUsTrigger> to begin your search.
