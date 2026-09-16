@@ -308,6 +308,30 @@ export default async function CityListingsPage({ params, searchParams: searchPar
     : isOceanfront
       ? `Oceanfront ${PROPERTY_TYPE_LABEL[propertyType] || 'Homes'}`
       : PROPERTY_TYPE_LABEL[propertyType] || 'Homes';
+
+  // Intro copy word choice for the 5-city Oceanfront pages (2026-09-16, per
+  // Ryan, pasting a screenshot of the Search Oceanfront nav dropdown —
+  // "<City> Listings" plus each city's "Oceanfront Homes"/"Oceanfront
+  // Condos" sub-links: "Can you do these changes for all of the search
+  // oceanfront pages also.") — same CITY_PAGE_TYPE_NOUN/CITY_PAGE_SEARCH_NOUN
+  // maps as the plain city pages, just prefixed with "oceanfront " so the
+  // copy correctly says "oceanfront homes"/"oceanfront condos" rather than
+  // plain "homes"/"condos" on a page that's specifically about waterfront
+  // listings. The combined "Listings" view (isOceanfrontCombined) has no
+  // single propertyType of its own (always Home+Condo together — see
+  // effectivePropertyTypes above), so it reuses the same "properties"/
+  // "property" wording the sibling combined city-Listings page
+  // (app/[citySlug]/page.js) already uses for the identical reason.
+  const introTypeNoun = isOceanfrontCombined
+    ? 'oceanfront properties'
+    : isOceanfront
+      ? `oceanfront ${CITY_PAGE_TYPE_NOUN[propertyType]}`
+      : CITY_PAGE_TYPE_NOUN[propertyType];
+  const introSearchNoun = isOceanfrontCombined
+    ? 'oceanfront property'
+    : isOceanfront
+      ? `oceanfront ${CITY_PAGE_SEARCH_NOUN[propertyType]}`
+      : CITY_PAGE_SEARCH_NOUN[propertyType];
   const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const rangeEnd = Math.min(page * PAGE_SIZE, total);
 
@@ -335,40 +359,38 @@ export default async function CityListingsPage({ params, searchParams: searchPar
                 : `${PROPERTY_TYPE_LABEL[propertyType]} in ${city.name}, FL`)}
         </h1>
         {/* Intro copy — see CITY_PAGE_TYPE_NOUN/CITY_PAGE_SEARCH_NOUN's
-            comment above for the full request. Scoped to just the 3 plain
-            city routes (Homes/Condos/Land — i.e. !isOceanfront &&
-            !isOceanfrontCombined) since Ryan's template named exactly
-            "homes, condos, or land" as the three variants, with no mention
-            of the 5-city Oceanfront pages or the combined Oceanfront
-            "Listings" view — so this doesn't render there, same scoping
-            precedent as the neighborhood-page ContactUsTrigger blocks only
-            covering the neighborhoods actually named. "Contact Us Today"
-            bold + underlined + a live link via ContactUsTrigger.js (the
-            same "Contact Us" popup Nav.js opens), per Ryan: "is a live
-            link & underlined like you did in the neighborhood pages" —
-            identical <strong><ContactUsTrigger> pattern already used on
-            the Adelaide/Aripeka/Harbor Island Beach Club/Tortoise Island/
-            Lansing Island/Summer Lakes/Aquarina/Suntree neighborhood-page
-            blocks. Same 18px/muted-dark 2-paragraph styling as those
-            blocks too, for visual consistency between the city and
-            neighborhood listing pages. */}
-        {!isOceanfront && !isOceanfrontCombined && (
-          <div style={{ marginBottom: 12 }}>
-            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
-              Discover {CITY_PAGE_TYPE_NOUN[propertyType]} for sale in {city.name}, Florida, and let us make your{' '}
-              {CITY_PAGE_SEARCH_NOUN[propertyType]} search easier. We&rsquo;ll help you compare properties, arrange
-              private showings, negotiate with sellers, and guide you through every step from your initial search to
-              closing.
-            </p>
-            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
-              Start your {city.name} {CITY_PAGE_SEARCH_NOUN[propertyType]} search today.{' '}
-              <strong>
-                <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
-              </strong>{' '}
-              to get started.
-            </p>
-          </div>
-        )}
+            comment above for the original city-page request, and
+            introTypeNoun/introSearchNoun's comment above for the 2026-09-16
+            follow-up extending this to the 5-city Oceanfront pages too (per
+            Ryan: "Can you do these changes for all of the search oceanfront
+            pages also.") — now renders unconditionally across all 3 page
+            shapes this route handles (plain city Homes/Condos/Land,
+            Oceanfront Homes/Condos, and the combined Oceanfront "Listings"
+            view), with introTypeNoun/introSearchNoun already carrying the
+            right "oceanfront "-prefixed or "properties"/"property" wording
+            for each. "Contact Us Today" bold + underlined + a live link via
+            ContactUsTrigger.js (the same "Contact Us" popup Nav.js opens),
+            per Ryan: "is a live link & underlined like you did in the
+            neighborhood pages" — identical <strong><ContactUsTrigger>
+            pattern already used on the Adelaide/Aripeka/Harbor Island Beach
+            Club/Tortoise Island/Lansing Island/Summer Lakes/Aquarina/
+            Suntree neighborhood-page blocks and the plain city pages. Same
+            18px/muted-dark 2-paragraph styling throughout, for visual
+            consistency across every listing page on the site. */}
+        <div style={{ marginBottom: 12 }}>
+          <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+            Discover {introTypeNoun} for sale in {city.name}, Florida, and let us make your {introSearchNoun} search
+            easier. We&rsquo;ll help you compare properties, arrange private showings, negotiate with sellers, and
+            guide you through every step from your initial search to closing.
+          </p>
+          <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+            Start your {city.name} {introSearchNoun} search today.{' '}
+            <strong>
+              <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
+            </strong>{' '}
+            to get started.
+          </p>
+        </div>
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
