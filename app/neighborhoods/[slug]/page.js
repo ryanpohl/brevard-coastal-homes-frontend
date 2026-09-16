@@ -736,13 +736,18 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             Ryan: "Can you make 'Contact Us Today' exactly like this on the
             Adelaide & Aripeka pages instead of lower case" — was "Contact
             us today"; rest of each paragraph's sentence case is unchanged,
-            only the linked phrase itself. */}
+            only the linked phrase itself.
+            "tour model homes" changed to "set up private tours of the model
+            homes" 2026-09-16, per Ryan: "On the Aripeka & Adelaide pages can
+            you change the text from tour model homes to 'set up private
+            tours of the model homes'." Same swap applied to the identical
+            Adelaide block below. */}
         {isAripeka && (
           <div style={{ marginBottom: 12 }}>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
               Explore new construction and existing homes for sale in Aripeka. With four custom home builders to
-              choose from, we can help you compare options, tour model homes, negotiate with builders, and navigate
-              the entire buying process through closing.
+              choose from, we can help you compare options, set up private tours of the model homes, negotiate with
+              builders, and navigate the entire buying process through closing.
             </p>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
               Looking for an Aripeka home?{' '}
@@ -786,13 +791,18 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             Ryan: "Can you make 'Contact Us Today' exactly like this on the
             Adelaide & Aripeka pages instead of lower case" — was "Contact
             us today"; rest of each paragraph's sentence case is unchanged,
-            only the linked phrase itself. */}
+            only the linked phrase itself.
+            "tour model homes" changed to "set up private tours of the model
+            homes" 2026-09-16, per Ryan: "On the Aripeka & Adelaide pages can
+            you change the text from tour model homes to 'set up private
+            tours of the model homes'." Same swap applied to the identical
+            Aripeka block above. */}
         {isAdelaide && (
           <div style={{ marginBottom: 12 }}>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
               Explore new construction and existing homes for sale in Adelaide. With three custom home builders to
-              choose from, we can help you compare options, tour model homes, negotiate with builders, and navigate
-              the entire buying process through closing.
+              choose from, we can help you compare options, set up private tours of the model homes, negotiate with
+              builders, and navigate the entire buying process through closing.
             </p>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
               Looking for an Adelaide home?{' '}
