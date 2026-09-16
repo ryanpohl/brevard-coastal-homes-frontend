@@ -4,6 +4,7 @@ import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import BuildingInquiryModal from '@/components/BuildingInquiryModal';
+import ContactUsTrigger from '@/components/ContactUsTrigger';
 
 // Matches the reference design's "1-30 of 34 Homes" pagination — the
 // backend defaults to 24 if this isn't passed. Same value as the sibling
@@ -150,6 +151,38 @@ export default async function CityAllListingsPage({ params, searchParams: search
         <h1 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', marginBottom: 8, fontFamily: 'var(--font-inter-tight)' }}>
           {city.name} Listings — Homes, Condos & Land For Sale, FL
         </h1>
+        {/* Intro copy (2026-09-16, per Ryan, pasting the same "Search by
+            City" dropdown screenshot that names this page — "Cocoa Beach
+            Listings," "Indialantic Listings," etc. — from Nav.js): "Can you
+            do it for these pages too. Just use properties in the place of
+            homes, condos, & lots. Do it on all the city main pages." — same
+            template already added to the sibling single-type page
+            (app/[citySlug]/[propertySlug]/page.js's CITY_PAGE_TYPE_NOUN/
+            CITY_PAGE_SEARCH_NOUN comment has the original request), but
+            since this page always shows Homes + Condos + Land together
+            (see effectivePropertyTypes above defaulting to all three),
+            there's no single propertyType to pick a noun from — "properties"/
+            "property" is hardcoded here instead of a per-type map, exactly
+            matching Ryan's own substitution instruction. Uses this page's
+            already-fetched city.name so it works correctly across every
+            city with no hardcoded city list, same mechanism as the sibling
+            page. "Contact Us Today" bold + underlined + a live link via
+            ContactUsTrigger.js, identical <strong><ContactUsTrigger>
+            pattern used everywhere else this copy has been added. */}
+        <div style={{ marginBottom: 12 }}>
+          <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+            Discover properties for sale in {city.name}, Florida, and let us make your property search easier.
+            We&rsquo;ll help you compare properties, arrange private showings, negotiate with sellers, and guide you
+            through every step from your initial search to closing.
+          </p>
+          <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+            Start your {city.name} property search today.{' '}
+            <strong>
+              <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
+            </strong>{' '}
+            to get started.
+          </p>
+        </div>
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
