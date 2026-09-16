@@ -687,7 +687,14 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             foreclosures modal the maroon button does (confirmed via the
             screenshot: "Send Us a Message" / "...current foreclosures in
             Harbor Island Beach Club. We will reach out shortly!" — this is
-            HarborIslandInquiryModals's 'foreclosures' modal, not a new one). */}
+            HarborIslandInquiryModals's 'foreclosures' modal, not a new one).
+            "Contact Us Today" bolded 2026-09-16, same day, per Ryan: "Also
+            put Contact Us Today text in bold on the pages of Aripeka,
+            Adelaide, & Harbor Island Beach club." — wraps the existing
+            ContactUsTrigger in a <strong>, same pattern already used just
+            above for "Foreclosed bank-owned condos" (link nested inside
+            <strong> so the text stays both bold and underlined/clickable).
+            Applied identically to the Aripeka and Adelaide blocks below. */}
         {isHarborIslandBeachClub && (
           <div style={{ marginBottom: 12 }}>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
@@ -700,7 +707,10 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               from start to closing.
             </p>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
-              <ContactUsTrigger>Contact Us Today</ContactUsTrigger> to begin your search.
+              <strong>
+                <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
+              </strong>{' '}
+              to begin your search.
             </p>
           </div>
         )}
@@ -735,7 +745,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               the entire buying process through closing.
             </p>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
-              Looking for an Aripeka home? <ContactUsTrigger>Contact Us Today</ContactUsTrigger> to get started.
+              Looking for an Aripeka home?{' '}
+              <strong>
+                <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
+              </strong>{' '}
+              to get started.
             </p>
           </div>
         )}
@@ -781,7 +795,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               the entire buying process through closing.
             </p>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
-              Looking for an Adelaide home? <ContactUsTrigger>Contact Us Today</ContactUsTrigger> to get started.
+              Looking for an Adelaide home?{' '}
+              <strong>
+                <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
+              </strong>{' '}
+              to get started.
             </p>
           </div>
         )}
