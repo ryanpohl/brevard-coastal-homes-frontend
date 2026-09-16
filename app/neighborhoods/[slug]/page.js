@@ -21,7 +21,6 @@ import {
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
-import HarborIslandForeclosuresTrigger from '@/components/HarborIslandForeclosuresTrigger';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 
@@ -270,63 +269,43 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // Picked via primaryType for Nav.js's single-type "Homes"/"Condos"
   // sub-links (which explicitly set ?propertyType=Home/Condo).
   //
-  // Each variant is now split into a HEADING (rendered in the big bold H1)
-  // and a SUBTEXT (rendered as a smaller normal-weight line below, same
-  // treatment as the Aripeka builder note below) instead of one combined
-  // H1 string (2026-09-15, per Ryan: "make the pages for harbor island
-  // beach club look similar to [Aripeka] with the formatting" — applied to
-  // all three variants per Ryan's follow-up confirmation, keeping each
-  // variant's existing wording, just visually split). Wording is unchanged
-  // from the previous single-string H1s below — only where the sentence
-  // break falls (heading vs. subtext) is new.
+  // Each variant keeps its own HEADING (rendered in the big bold H1,
+  // unchanged below). The separate per-variant SUBTEXT constants that used
+  // to sit here (Home/Condo/Combined, each with its own foreclosures-or-not
+  // wording, plus the HARBOR_ISLAND_BEACH_CLUB_SUBTEXT ternary that picked
+  // between them) were removed entirely 2026-09-16, per Ryan, who pasted
+  // one universal replacement paragraph covering all three variants at
+  // once: "Can you change the text on the harbor Island Beach Club to the
+  // following & add a link to 'Contact Us Today' and make the words start
+  // with caps like I did." — see the render section below (the same
+  // isHarborIslandBeachClub block that used to read
+  // HARBOR_ISLAND_BEACH_CLUB_SUBTEXT) for the new copy, styled to match the
+  // Adelaide/Aripeka paragraph blocks rather than keeping the old bulleted
+  // list (which no longer applies once every variant shares one paragraph).
   const HARBOR_ISLAND_BEACH_CLUB_HOME_HEADING = 'Harbor Island Beach Club, Melbourne Beach FL Homes for sale.';
-  // "properties" -> "SINGLE FAMILY HOMES" (2026-09-15, per Ryan: "replace
-  // properties with Single family Homes in the first bullet point in
-  // Harbor Island beach club homes page", then follow-up: "Single family
-  // Homes....make them all caps").
-  const HARBOR_ISLAND_BEACH_CLUB_HOME_SUBTEXT =
-    'Contact us about current off-market SINGLE FAMILY HOMES currently available in Harbor Island.';
   const HARBOR_ISLAND_BEACH_CLUB_CONDO_HEADING = 'Harbor Island Beach Club, Melbourne Beach FL Condos for sale.';
-  // Reworded (2026-09-15, per Ryan: "do this exact same thing for the ...
-  // Condos page too" / "make it look exactly the same as the other page")
-  // to match HARBOR_ISLAND_BEACH_CLUB_COMBINED_SUBTEXT's wording exactly —
-  // was "Contact us about current foreclosures & off-market properties
-  // currently available in Harbor Island." Rendered with the same
-  // underlined "Foreclosed Bank-Owned Condos" treatment below (see
-  // isCondoOrCombinedSubtext in the render section).
-  const HARBOR_ISLAND_BEACH_CLUB_CONDO_SUBTEXT =
-    'Reach out for information on the Foreclosed Bank-Owned Condos that are currently available in Harbor Island Beach Club.';
-  // Combined heading/subtext (2026-09-01, per Ryan; revised same-day twice
-  // more — first to add a foreclosures/off-market sentence, then trimmed
-  // back down to drop its "off-market Single-Family homes" clause, per
-  // Ryan's final wording: "Reach out for information on the Foreclosed
-  // Bank-Owned condos that are currently available in Harbor Island Beach
-  // Club.") — shown only for the "<Name> Listings" header link's own bare
-  // /neighborhoods/harbor-island-beach-club URL (no ?propertyType= param),
-  // the same hasExplicitPropertyTypeFilter distinction AQUARINA_COMBINED_H1
-  // below uses. Before this, that bare URL fell through to the
-  // Home-specific heading above (primaryType defaults to 'Home' whenever no
-  // param is present), which read as Homes-only even though the page
-  // itself shows every type combined. The "Homes"/"Condos" sub-links keep
-  // their own existing single-type heading/subtext pairs untouched.
+  // Combined heading (2026-09-01, per Ryan) — shown only for the "<Name>
+  // Listings" header link's own bare /neighborhoods/harbor-island-beach-club
+  // URL (no ?propertyType= param), the same hasExplicitPropertyTypeFilter
+  // distinction AQUARINA_COMBINED_H1 below uses. Before this, that bare URL
+  // fell through to the Home-specific heading above (primaryType defaults
+  // to 'Home' whenever no param is present), which read as Homes-only even
+  // though the page itself shows every type combined. The "Homes"/"Condos"
+  // sub-links keep their own existing single-type heading untouched.
+  // Ryan's 2026-09-16 pasted replacement text opened with this same
+  // heading (en dash vs. comma) — read as restating page context rather
+  // than a request to change it, same reasoning as the Adelaide
+  // neighborhood-page H1 further below, so left as-is here.
   const HARBOR_ISLAND_BEACH_CLUB_COMBINED_HEADING =
     'Harbor Island Beach Club Homes & Condos For Sale, Melbourne Beach, Florida';
-  const HARBOR_ISLAND_BEACH_CLUB_COMBINED_SUBTEXT =
-    'Reach out for information on the Foreclosed Bank-Owned Condos that are currently available in Harbor Island Beach Club.';
   const HARBOR_ISLAND_BEACH_CLUB_HEADING = !hasExplicitPropertyTypeFilter
     ? HARBOR_ISLAND_BEACH_CLUB_COMBINED_HEADING
     : primaryType === 'Condo'
       ? HARBOR_ISLAND_BEACH_CLUB_CONDO_HEADING
       : HARBOR_ISLAND_BEACH_CLUB_HOME_HEADING;
-  const HARBOR_ISLAND_BEACH_CLUB_SUBTEXT = !hasExplicitPropertyTypeFilter
-    ? HARBOR_ISLAND_BEACH_CLUB_COMBINED_SUBTEXT
-    : primaryType === 'Condo'
-      ? HARBOR_ISLAND_BEACH_CLUB_CONDO_SUBTEXT
-      : HARBOR_ISLAND_BEACH_CLUB_HOME_SUBTEXT;
   // HARBOR_ISLAND_BEACH_CLUB_H1 kept as the heading-only value so every
   // other reference to "the H1" below (h1Text's ternary chain) needs no
-  // further changes — the subtext is rendered separately, right below the
-  // Aripeka note block.
+  // further changes.
   const HARBOR_ISLAND_BEACH_CLUB_H1 = HARBOR_ISLAND_BEACH_CLUB_HEADING;
   // Aquarina (per Ryan, 2026-09-01: "make it Aquarina Homes & Condos For
   // Sale for the main Aquarina link") — one of only two neighborhoods with
@@ -657,74 +636,53 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             ))}
           </p>
         )}
-        {/* Harbor Island Beach Club subtext (2026-09-15, per Ryan — split out
-            of the combined H1 above into its own line; enlarged same day
-            per Ryan: "make the text larger. Make it look professional &
-            easy to read. Use your best judgement" — bumped 18px -> 21px,
-            added medium weight (600) and slightly tighter line-height for a
-            more polished, readable look than the plain 400-weight body
-            text, short of the H1's full bold treatment). Picks the matching
-            variant's subtext (combined/Home/Condo) via
-            HARBOR_ISLAND_BEACH_CLUB_SUBTEXT above — wording unchanged from
-            the previous single-string H1s, only styling is new here.
-            "Foreclosed Bank-Owned Condos" underlined + "Condos" capitalized
-            (2026-09-15, per Ryan) — shown on both the combined/bare-URL
-            variant and the Condos-only variant (2026-09-15 follow-up, per
-            Ryan: "do this exact same thing for the ... Condos page too" /
-            "make it look exactly the same as the other page" — the
-            Condos-only subtext was reworded above to match the combined
-            one exactly, so both branches render identically here). The
-            Home-only variant keeps rendering its own plain-text
-            HARBOR_ISLAND_BEACH_CLUB_SUBTEXT untouched below, since it never
-            mentions foreclosures/condos.
-            "Foreclosed Bank-Owned Condos" made an active link (2026-09-15,
-            per Ryan: "make the underlined ... an active link & when
-            someone clicks on the link can you have this popup box come
-            up") — clicking it opens the same "Send Us a Message" modal as
-            the maroon/gold "Contact Us Here about Foreclosures in Harbor
-            Island" button below (rendered by HarborIslandInquiryModals via
-            FilterBar's extraActions prop), via a small window CustomEvent
-            bridge since this Server Component can't call that Client
-            Component's state setters directly — see
-            HarborIslandForeclosuresTrigger.js for the full explanation.
-            Switched from a single <p> to a <ul> (2026-09-15, per Ryan: "use
-            bullet points similar to Aripeka" — see the Aripeka block below)
-            with a new 2nd bullet giving general buying-process guidance for
-            all three HIBC variants (Ryan's given text tidied: "island"
-            capitalized, a comma added before "reach out", and a closing
-            period added, matching the light copy-edits made to Aripeka's
-            bullets). Kept the existing 21px/600-weight styling from the
-            "make it look professional" request rather than matching
-            Aripeka's plainer 18px/400 — Ryan asked for bullet POINTS like
-            Aripeka, not a full style match, and reverting the earlier
-            enlarge/bold work wasn't asked for. */}
+        {/* Harbor Island Beach Club subtext — replaced entirely 2026-09-16,
+            per Ryan: "Can you change the text on the harbor Island Beach
+            Club to the following & add a link to 'Contact Us Today' and
+            make the words start with caps like I did. 'Harbor Island Beach
+            Club Homes & Condos For Sale – Melbourne Beach, Florida /
+            Looking for a home or condo in Harbor Island Beach Club? We can
+            help you find available properties, including bank-owned
+            condos, arrange private showings, negotiate on your behalf, and
+            guide you through the entire purchase process from start to
+            closing. / Contact us today to begin your search.'" — replaces
+            the prior 3-variant (Home/Condo/Combined) bulleted subtext
+            entirely (see HARBOR_ISLAND_BEACH_CLUB_HEADING's comment above
+            for what happened to those per-variant constants) with one
+            universal 2-paragraph block shown for all three variants alike,
+            same pattern as the Adelaide/Aripeka blocks below (which this
+            now matches in styling too — 18px/muted-dark paragraphs, not
+            the old 21px/600-weight bullets). The pasted text's first line
+            duplicates HARBOR_ISLAND_BEACH_CLUB_COMBINED_HEADING (en dash
+            vs. comma) — left as page-context, not an H1 edit, same
+            reasoning noted on that constant above.
+            "Contact Us Today" linked via ContactUsTrigger.js (same
+            ContactModal popup as Adelaide/Aripeka) and capitalized per
+            Ryan's explicit instruction ("make the words start with caps
+            like I did" — Ryan's own instruction text used title case even
+            though the pasted paragraph below it used sentence case, so the
+            title-cased version is what's rendered, matching the
+            Adelaide/Aripeka link text's 2026-09-16 capitalization change).
+            The old underlined "Foreclosed Bank-Owned Condos" inline link
+            (HarborIslandForeclosuresTrigger, opening the foreclosures modal
+            via a CustomEvent) is dropped from this text — it's no longer
+            part of Ryan's replacement copy — but the always-visible maroon
+            "Contact Us Here about Foreclosures in Harbor Island" button
+            (HarborIslandInquiryModals.js, via FilterBar's extraActions
+            prop below) still opens that same modal directly, so the
+            foreclosures inquiry flow itself isn't lost, just this one
+            inline text entry point into it. */}
         {isHarborIslandBeachClub && (
-          <ul
-            style={{
-              fontSize: 21,
-              lineHeight: 1.5,
-              fontWeight: 600,
-              color: 'var(--color-muted-dark)',
-              marginBottom: 16,
-              paddingLeft: 24,
-            }}
-          >
-            <li style={{ marginBottom: 8 }}>
-              {!hasExplicitPropertyTypeFilter || primaryType === 'Condo' ? (
-                <>
-                  Reach out for information on the{' '}
-                  <HarborIslandForeclosuresTrigger>Foreclosed Bank-Owned Condos</HarborIslandForeclosuresTrigger> that
-                  are currently available in Harbor Island Beach Club.
-                </>
-              ) : (
-                HARBOR_ISLAND_BEACH_CLUB_SUBTEXT
-              )}
-            </li>
-            <li>
-              If you are looking for an agent to help guide you through the buying process in Harbor Island Beach
-              Club, reach out when you are ready to start the search & we will take care of all the arrangements.
-            </li>
-          </ul>
+          <div style={{ marginBottom: 12 }}>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+              Looking for a home or condo in Harbor Island Beach Club? We can help you find available properties,
+              including bank-owned condos, arrange private showings, negotiate on your behalf, and guide you through
+              the entire purchase process from start to closing.
+            </p>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+              <ContactUsTrigger>Contact Us Today</ContactUsTrigger> to begin your search.
+            </p>
+          </div>
         )}
         {/* Aripeka builder note — replaced entirely 2026-09-16, per Ryan:
             "Now use the exact text for the Aripeka pages but there are 4
