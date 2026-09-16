@@ -803,6 +803,112 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             </p>
           </div>
         )}
+        {/* Tortoise Island / Lansing Island / Summer Lakes / Aquarina / Suntree
+            builder-free "generic" note — added 2026-09-16, per Ryan, pasting
+            one template and asking for it on all five pages at once: "Explore
+            homes for sale in Tortoise Island. We can help you compare
+            options, tour homes, negotiate with sellers, and navigate the
+            entire buying process through closing. / Looking for an Tortoise
+            Island home? Contact Us Today to get started. ... Add this text to
+            the Tortoise Island Pages, Lansing Island pages, Summer Lakes
+            pages, Aquarina Pages, & Suntree pages. Just switch out the Name
+            of the pages to match the neighborhood name." Unlike the
+            Adelaide/Aripeka template (which names a specific builder count),
+            this one is builder-agnostic ("tour homes"/"negotiate with
+            sellers" instead of "tour model homes"/"negotiate with
+            builders") — these 5 neighborhoods are resales, not new
+            construction communities, matching Ryan's own wording exactly.
+            Same 2-paragraph 18px/muted-dark styling, same ContactUsTrigger
+            link (bold + underlined, per Ryan's same request: "Make the
+            Contact Us Today Bold & underlined as a live link like the other
+            pages you just did" — the Adelaide/Aripeka/Harbor Island Beach
+            Club <strong><ContactUsTrigger> pattern added earlier this same
+            day). One block per neighborhood, each gated on that
+            neighborhood's own existing isX flag (all five already declared
+            above, driving these pages' FilterBar options) so this can't
+            leak onto any other neighborhood page.
+            "a"/"an" corrected per neighborhood for grammar rather than
+            copied verbatim from Ryan's literal "an Tortoise Island" — his
+            instruction was to swap in each neighborhood's name, and
+            Tortoise Island/Lansing Island/Summer Lakes/Suntree all start
+            with a consonant sound ("a Tortoise Island home", etc.); only
+            Aquarina keeps "an" (vowel sound), matching how "an Adelaide
+            home"/"an Aripeka home" were already handled above. */}
+        {isTortoiseIsland && (
+          <div style={{ marginBottom: 12 }}>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+              Explore homes for sale in Tortoise Island. We can help you compare options, tour homes, negotiate with
+              sellers, and navigate the entire buying process through closing.
+            </p>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+              Looking for a Tortoise Island home?{' '}
+              <strong>
+                <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
+              </strong>{' '}
+              to get started.
+            </p>
+          </div>
+        )}
+        {isLansingIsland && (
+          <div style={{ marginBottom: 12 }}>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+              Explore homes for sale in Lansing Island. We can help you compare options, tour homes, negotiate with
+              sellers, and navigate the entire buying process through closing.
+            </p>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+              Looking for a Lansing Island home?{' '}
+              <strong>
+                <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
+              </strong>{' '}
+              to get started.
+            </p>
+          </div>
+        )}
+        {isSummerLakes && (
+          <div style={{ marginBottom: 12 }}>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+              Explore homes for sale in Summer Lakes. We can help you compare options, tour homes, negotiate with
+              sellers, and navigate the entire buying process through closing.
+            </p>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+              Looking for a Summer Lakes home?{' '}
+              <strong>
+                <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
+              </strong>{' '}
+              to get started.
+            </p>
+          </div>
+        )}
+        {isAquarina && (
+          <div style={{ marginBottom: 12 }}>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+              Explore homes for sale in Aquarina. We can help you compare options, tour homes, negotiate with
+              sellers, and navigate the entire buying process through closing.
+            </p>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+              Looking for an Aquarina home?{' '}
+              <strong>
+                <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
+              </strong>{' '}
+              to get started.
+            </p>
+          </div>
+        )}
+        {isSuntree && (
+          <div style={{ marginBottom: 12 }}>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+              Explore homes for sale in Suntree. We can help you compare options, tour homes, negotiate with
+              sellers, and navigate the entire buying process through closing.
+            </p>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+              Looking for a Suntree home?{' '}
+              <strong>
+                <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
+              </strong>{' '}
+              to get started.
+            </p>
+          </div>
+        )}
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
