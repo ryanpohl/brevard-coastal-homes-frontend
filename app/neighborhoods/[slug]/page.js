@@ -22,6 +22,7 @@ import {
 import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import HarborIslandForeclosuresTrigger from '@/components/HarborIslandForeclosuresTrigger';
+import ContactUsTrigger from '@/components/ContactUsTrigger';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 
 // Matches the reference design's "1-30 of 34 Homes" pagination — the
@@ -769,47 +770,46 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             </li>
           </ul>
         )}
-        {/* Adelaide builder note (2026-09-15, per Ryan: "Add similar text to
-            the Adelaide pages. The first line will be 'In Adelaide there
-            are three custom home builders to choose from.' In the last
-            sentence just replace Aripeka with Adelaide.") — same 3-bullet
-            pattern as the Aripeka block above: bullet 1 uses Ryan's exact
-            given wording (three builders, no "award-winning" qualifier —
-            Aripeka's has one, Ryan didn't ask for one here, so none added);
-            bullet 2 is verbatim identical to Aripeka's (it never names the
-            neighborhood, so "similar text" needed no edit there); bullet 3
-            is Aripeka's third bullet with "Aripeka" swapped for "Adelaide"
-            per Ryan's instruction. Bullet 3 reworded again 2026-09-15 (same
-            change as the Aripeka block above, per Ryan's follow-up pasting
-            new wording for "the 3rd section down" on both pages) to the
-            agent-guidance framing that also mentions sending property
-            updates. Same 18px/muted-dark <ul> styling.
-            Scoped to Adelaide only via isAdelaide — Summer Lakes (which
-            shares some of Adelaide's other overrides elsewhere on this
-            page) is untouched, since Ryan's request named Adelaide only. */}
+        {/* Adelaide builder note — replaced entirely 2026-09-16, per Ryan:
+            "Can you replace the text on the Adelaide pages with the
+            following. 'Adelaide Homes For Sale – Viera, Florida / Explore
+            new construction and existing homes for sale in Adelaide. With
+            three custom home builders to choose from, we can help you
+            compare options, tour model homes, negotiate with builders, and
+            navigate the entire buying process through closing. / Looking
+            for an Adelaide home? Contact us today to get started.'" — swaps
+            out the prior 3-bullet list (the 2026-09-15 "In Adelaide there
+            are three custom home builders..." wording, added right above
+            the identical Aripeka block, see git history) for this shorter
+            2-paragraph version. The 3-line pasted text's first line,
+            "Adelaide Homes For Sale – Viera, Florida," duplicates the
+            existing ADELAIDE_H1 below (same wording, en dash vs. hyphen) —
+            read as restating the page context Ryan was replacing text
+            *on*, not a request to change the H1 itself, so ADELAIDE_H1 is
+            left untouched here.
+            "Contact us today" underlined and wired to the same "Contact
+            Us" popup Nav.js opens (ContactModal.js), via the new
+            ContactUsTrigger.js — asked Ryan which phrase to link ("Contact
+            us today" vs. "Contact us today to get started.") and used the
+            shorter phrase: keeps the anchor text a clean, conventional CTA
+            length (matching HarborIslandForeclosuresTrigger's linked
+            phrase further up this file, which also links a short phrase
+            rather than the whole sentence) rather than swallowing "to get
+            started." into the underline too.
+            Kept the same 18px/muted-dark paragraph styling as the block it
+            replaces. Scoped to Adelaide only via isAdelaide — unchanged
+            for every other neighborhood page. */}
         {isAdelaide && (
-          <ul
-            style={{
-              fontSize: 18,
-              lineHeight: 1.6,
-              color: 'var(--color-muted-dark)',
-              marginBottom: 12,
-              paddingLeft: 22,
-            }}
-          >
-            <li style={{ marginBottom: 8 }}>In Adelaide there are three custom home builders to choose from.</li>
-            <li style={{ marginBottom: 8 }}>
-              Looking for an agent to be there every step of the way & guide you through the whole home building
-              process from setting up private showings at the different model homes, negotiating with the builders,
-              & being there all the way through closing? We are here to help.
-            </li>
-            <li>
-              If you are looking for an agent to help guide you through the buying process of an existing home in
-              Adelaide, we can help with that too. Reach out when you are ready to start your home search & we can
-              start sending you property updates as well as take care of all the arrangements when you are ready to
-              start touring properties in person.
-            </li>
-          </ul>
+          <div style={{ marginBottom: 12 }}>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+              Explore new construction and existing homes for sale in Adelaide. With three custom home builders to
+              choose from, we can help you compare options, tour model homes, negotiate with builders, and navigate
+              the entire buying process through closing.
+            </p>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+              Looking for an Adelaide home? <ContactUsTrigger>Contact us today</ContactUsTrigger> to get started.
+            </p>
+          </div>
         )}
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
