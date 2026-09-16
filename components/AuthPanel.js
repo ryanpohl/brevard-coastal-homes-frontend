@@ -163,7 +163,7 @@ export default function AuthPanel({ onClose, message, embedded = false }) {
               <button
                 type="button"
                 onClick={(e) => {
-                  // Stop this click from bubbling to Nav.js's document-level
+                  // Stop this click from reaching Nav.js's document-level
                   // "click outside closes the panel" listener (2026-09-16,
                   // per Ryan: "When i click on the eye icon to show the
                   // password the whole sign in pop up box disappears. Same
@@ -175,30 +175,42 @@ export default function AuthPanel({ onClose, message, embedded = false }) {
                   // — unlike its sibling closeNow, it has no isAuth/isAccount
                   // guard.
                   //
-                  // A first attempt at this fix called only e.stopPropagation()
-                  // (React's own synthetic-event method) and shipped, but Ryan
-                  // reported the panel still disappeared — traced live via a
-                  // document-level capture+bubble listener pair that logging
-                  // this exact click event still reached document's bubble
-                  // phase with defaultPrevented:false even after that call.
-                  // Root cause: React's SyntheticEvent.stopPropagation() only
-                  // stops React's own internal (simulated) bubbling through
-                  // OTHER REACT component handlers — it does not call the
-                  // real DOM Event.stopPropagation(), so a plain native
-                  // document.addEventListener('click', ...) listener like
-                  // Nav.js's own (added outside React entirely) still sees
-                  // the event regardless. Calling stopPropagation() on
-                  // e.nativeEvent (the underlying real Event) is what
-                  // actually halts native bubbling and keeps it from ever
-                  // reaching Nav.js's listener. onMouseDown/onTouchStart
-                  // below do the same for touch devices, where 'touchstart'
-                  // fires (and would already have closed the panel) before
-                  // 'click' ever does.
-                  e.nativeEvent.stopPropagation();
+                  // Two earlier attempts at this fix both shipped and both
+                  // still let the panel disappear on a real click, traced
+                  // live each time via a pair of document-level listeners
+                  // logging what actually reached them:
+                  //  1. Plain e.stopPropagation() (React's synthetic-event
+                  //     method) — doesn't touch the real DOM event at all, so
+                  //     a plain native document.addEventListener('click', ...)
+                  //     listener like Nav.js's own (added outside React
+                  //     entirely) never even sees it stopped.
+                  //  2. e.nativeEvent.stopPropagation() — this DOES stop the
+                  //     real event from reaching ANCESTOR nodes, but tracing
+                  //     showed Nav.js's listener still ran. Root cause:
+                  //     Next.js/React registers its one delegated root click
+                  //     listener directly on `document` itself (confirmed
+                  //     live: a same-node test with two plain
+                  //     document.addEventListener('click', ...) listeners
+                  //     showed the second one still fires after the first
+                  //     calls stopPropagation(), and only stops when the
+                  //     first calls stopImmediatePropagation() instead).
+                  //     Nav.js's handleOutsideInteraction is therefore a
+                  //     SIBLING listener on that same document node, not an
+                  //     ancestor — regular stopPropagation() only blocks
+                  //     propagation to ancestor nodes, not other listeners
+                  //     already registered on the current node, so it never
+                  //     had a chance of stopping a same-node listener.
+                  //     stopImmediatePropagation() is the one that also
+                  //     blocks same-node listeners registered after it,
+                  //     which is what's actually needed here. onMouseDown/
+                  //     onTouchStart below do the same for touch devices,
+                  //     where 'touchstart' fires (and would already have
+                  //     closed the panel) before 'click' ever does.
+                  e.nativeEvent.stopImmediatePropagation();
                   setShowPassword((v) => !v);
                 }}
-                onMouseDown={(e) => e.nativeEvent.stopPropagation()}
-                onTouchStart={(e) => e.nativeEvent.stopPropagation()}
+                onMouseDown={(e) => e.nativeEvent.stopImmediatePropagation()}
+                onTouchStart={(e) => e.nativeEvent.stopImmediatePropagation()}
                 style={passwordToggleBtnStyle}
                 // No visible label of its own (icon-only button) — aria-label
                 // is the accessible name a screen reader announces, and it
@@ -225,14 +237,15 @@ export default function AuthPanel({ onClose, message, embedded = false }) {
                 type="button"
                 onClick={(e) => {
                   // Same outside-click-listener fix as the Password field's
-                  // own toggle above (including the e.nativeEvent detail —
-                  // see that button's comment for the full explanation of
-                  // why plain e.stopPropagation() alone wasn't enough).
-                  e.nativeEvent.stopPropagation();
+                  // own toggle above (including the stopImmediatePropagation
+                  // detail — see that button's comment for the full
+                  // explanation of why plain stopPropagation(), even on
+                  // e.nativeEvent, wasn't enough).
+                  e.nativeEvent.stopImmediatePropagation();
                   setShowConfirmPassword((v) => !v);
                 }}
-                onMouseDown={(e) => e.nativeEvent.stopPropagation()}
-                onTouchStart={(e) => e.nativeEvent.stopPropagation()}
+                onMouseDown={(e) => e.nativeEvent.stopImmediatePropagation()}
+                onTouchStart={(e) => e.nativeEvent.stopImmediatePropagation()}
                 style={passwordToggleBtnStyle}
                 aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
               >
