@@ -173,19 +173,32 @@ export default function AuthPanel({ onClose, message, embedded = false }) {
                   // open, and unconditionally closes it (setOpenMenu(null))
                   // for ANY click it sees that isn't inside its containerRef
                   // — unlike its sibling closeNow, it has no isAuth/isAccount
-                  // guard. This button lives inside a <label> (Field's own
-                  // wrapper) — clicking it forwards a second synthetic click
-                  // to the label's associated password <input>, and that
-                  // forwarded event is what was reaching document and
-                  // reading as an "outside" click. onMouseDown/onTouchStart
-                  // below stop the same thing happening on touch devices,
-                  // where 'touchstart' fires (and would already have closed
-                  // the panel) before 'click' ever does.
-                  e.stopPropagation();
+                  // guard.
+                  //
+                  // A first attempt at this fix called only e.stopPropagation()
+                  // (React's own synthetic-event method) and shipped, but Ryan
+                  // reported the panel still disappeared — traced live via a
+                  // document-level capture+bubble listener pair that logging
+                  // this exact click event still reached document's bubble
+                  // phase with defaultPrevented:false even after that call.
+                  // Root cause: React's SyntheticEvent.stopPropagation() only
+                  // stops React's own internal (simulated) bubbling through
+                  // OTHER REACT component handlers — it does not call the
+                  // real DOM Event.stopPropagation(), so a plain native
+                  // document.addEventListener('click', ...) listener like
+                  // Nav.js's own (added outside React entirely) still sees
+                  // the event regardless. Calling stopPropagation() on
+                  // e.nativeEvent (the underlying real Event) is what
+                  // actually halts native bubbling and keeps it from ever
+                  // reaching Nav.js's listener. onMouseDown/onTouchStart
+                  // below do the same for touch devices, where 'touchstart'
+                  // fires (and would already have closed the panel) before
+                  // 'click' ever does.
+                  e.nativeEvent.stopPropagation();
                   setShowPassword((v) => !v);
                 }}
-                onMouseDown={(e) => e.stopPropagation()}
-                onTouchStart={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.nativeEvent.stopPropagation()}
+                onTouchStart={(e) => e.nativeEvent.stopPropagation()}
                 style={passwordToggleBtnStyle}
                 // No visible label of its own (icon-only button) — aria-label
                 // is the accessible name a screen reader announces, and it
@@ -212,13 +225,14 @@ export default function AuthPanel({ onClose, message, embedded = false }) {
                 type="button"
                 onClick={(e) => {
                   // Same outside-click-listener fix as the Password field's
-                  // own toggle above — see that button's comment for the
-                  // full explanation.
-                  e.stopPropagation();
+                  // own toggle above (including the e.nativeEvent detail —
+                  // see that button's comment for the full explanation of
+                  // why plain e.stopPropagation() alone wasn't enough).
+                  e.nativeEvent.stopPropagation();
                   setShowConfirmPassword((v) => !v);
                 }}
-                onMouseDown={(e) => e.stopPropagation()}
-                onTouchStart={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.nativeEvent.stopPropagation()}
+                onTouchStart={(e) => e.nativeEvent.stopPropagation()}
                 style={passwordToggleBtnStyle}
                 aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
               >
