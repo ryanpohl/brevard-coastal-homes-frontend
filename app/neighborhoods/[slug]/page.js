@@ -743,7 +743,12 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             popup via ContactUsTrigger.js (imported above, already used by
             the Adelaide block). Kept the same 18px/muted-dark paragraph
             styling as the Adelaide block. Scoped to Aripeka only via
-            isAripeka — every other neighborhood page unaffected. */}
+            isAripeka — every other neighborhood page unaffected.
+            Link text capitalized to "Contact Us Today" 2026-09-16, per
+            Ryan: "Can you make 'Contact Us Today' exactly like this on the
+            Adelaide & Aripeka pages instead of lower case" — was "Contact
+            us today"; rest of each paragraph's sentence case is unchanged,
+            only the linked phrase itself. */}
         {isAripeka && (
           <div style={{ marginBottom: 12 }}>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
@@ -752,7 +757,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               the entire buying process through closing.
             </p>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
-              Looking for an Aripeka home? <ContactUsTrigger>Contact us today</ContactUsTrigger> to get started.
+              Looking for an Aripeka home? <ContactUsTrigger>Contact Us Today</ContactUsTrigger> to get started.
             </p>
           </div>
         )}
@@ -784,7 +789,12 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             started." into the underline too.
             Kept the same 18px/muted-dark paragraph styling as the block it
             replaces. Scoped to Adelaide only via isAdelaide — unchanged
-            for every other neighborhood page. */}
+            for every other neighborhood page.
+            Link text capitalized to "Contact Us Today" 2026-09-16, per
+            Ryan: "Can you make 'Contact Us Today' exactly like this on the
+            Adelaide & Aripeka pages instead of lower case" — was "Contact
+            us today"; rest of each paragraph's sentence case is unchanged,
+            only the linked phrase itself. */}
         {isAdelaide && (
           <div style={{ marginBottom: 12 }}>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
@@ -793,7 +803,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               the entire buying process through closing.
             </p>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
-              Looking for an Adelaide home? <ContactUsTrigger>Contact us today</ContactUsTrigger> to get started.
+              Looking for an Adelaide home? <ContactUsTrigger>Contact Us Today</ContactUsTrigger> to get started.
             </p>
           </div>
         )}
