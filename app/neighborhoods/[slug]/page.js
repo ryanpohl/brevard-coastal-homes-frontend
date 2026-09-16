@@ -21,6 +21,7 @@ import {
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
+import HarborIslandForeclosuresTrigger from '@/components/HarborIslandForeclosuresTrigger';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 
@@ -663,27 +664,40 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             though the pasted paragraph below it used sentence case, so the
             title-cased version is what's rendered, matching the
             Adelaide/Aripeka link text's 2026-09-16 capitalization change).
-            The old underlined "Foreclosed Bank-Owned Condos" inline link
-            (HarborIslandForeclosuresTrigger, opening the foreclosures modal
-            via a CustomEvent) is dropped from this text — it's no longer
-            part of Ryan's replacement copy — but the always-visible maroon
-            "Contact Us Here about Foreclosures in Harbor Island" button
+            The original underlined "Foreclosed Bank-Owned Condos" inline
+            link (HarborIslandForeclosuresTrigger, opening the foreclosures
+            "Send Us a Message" modal via a CustomEvent — see that file and
+            HarborIslandInquiryModals.js for the full mechanism) was dropped
+            from this text when it was first replaced, since it wasn't part
+            of Ryan's pasted copy — the always-visible maroon "Contact Us
+            Here about Foreclosures in Harbor Island" button
             (HarborIslandInquiryModals.js, via FilterBar's extraActions
-            prop below) still opens that same modal directly, so the
-            foreclosures inquiry flow itself isn't lost, just this one
-            inline text entry point into it.
+            prop below) kept the flow reachable in the meantime.
             "bank-owned condos" -> "Foreclosed bank-owned condos", bolded
             (2026-09-16 follow-up, per Ryan: "Can you put 'Foreclosed
-            bank-owned condos' in bold & add Foreclosed") — plain <strong>
-            emphasis, not a link (the foreclosures modal link on this phrase
-            was intentionally dropped just above; this only restores the
-            word "Foreclosed" and bolds the phrase, no click behavior). */}
+            bank-owned condos' in bold & add Foreclosed") — at first plain
+            <strong> emphasis, no link.
+            Turned back into a live link 2026-09-16, same day, per Ryan
+            (pasting a screenshot of the foreclosures "Send Us a Message"
+            modal): "Can you make the Foreclosed bank-owned condos a live
+            link & have this pop up box pop up when the link is clicked
+            on?" — re-wraps the phrase in HarborIslandForeclosuresTrigger
+            (import restored above), nested inside the <strong> so the text
+            stays bold AND underlined/clickable, opening the exact same
+            foreclosures modal the maroon button does (confirmed via the
+            screenshot: "Send Us a Message" / "...current foreclosures in
+            Harbor Island Beach Club. We will reach out shortly!" — this is
+            HarborIslandInquiryModals's 'foreclosures' modal, not a new one). */}
         {isHarborIslandBeachClub && (
           <div style={{ marginBottom: 12 }}>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
               Looking for a home or condo in Harbor Island Beach Club? We can help you find available properties,
-              including <strong>Foreclosed bank-owned condos</strong>, arrange private showings, negotiate on your
-              behalf, and guide you through the entire purchase process from start to closing.
+              including{' '}
+              <strong>
+                <HarborIslandForeclosuresTrigger>Foreclosed bank-owned condos</HarborIslandForeclosuresTrigger>
+              </strong>
+              , arrange private showings, negotiate on your behalf, and guide you through the entire purchase process
+              from start to closing.
             </p>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
               <ContactUsTrigger>Contact Us Today</ContactUsTrigger> to begin your search.
