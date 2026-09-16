@@ -726,49 +726,35 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             </li>
           </ul>
         )}
-        {/* Aripeka builder note (2026-09-15, per Ryan — rewritten and
-            switched from a 2-line paragraph to a real bulleted list per
-            Ryan's follow-up: "Let me know how this sounds? ... Id like to
-            separate the different options with the dot bullet points." —
-            replaces the prior "Choose From Four Custom Builders in
-            Aripeka." / "Have questions about the building process? We are
-            here to help." wording entirely. 3rd bullet added same day, per
-            Ryan, covering existing-home resale buyers (this page's listings
-            aren't only new-construction builder lots) — one comma added
-            after "Aripeka" for readability, wording otherwise exactly as
-            given. 3rd bullet reworded again same day per Ryan, replacing
-            the original "we can help with that too... & meet you there"
-            resale-buyer wording with an agent-guidance framing that also
-            mentions sending property updates (matching the pasted text
-            verbatim, applied identically to the Adelaide block below).
-            Kept the same 18px/muted-dark styling as before, on a
-            <ul> so the browser's default disc bullets do the separating
-            (globals.css has no list-style reset). Scoped to Aripeka only
-            via isAripeka — every other neighborhood page keeps just the H1
-            + result count, unaffected. */}
+        {/* Aripeka builder note — replaced entirely 2026-09-16, per Ryan:
+            "Now use the exact text for the Aripeka pages but there are 4
+            builders to choose from instead of 3" — reuses the same
+            2-paragraph template just written for the Adelaide block below
+            (see that block's comment for the full pasted text and the
+            "Contact us today" link-choice reasoning), with "Adelaide"
+            swapped for "Aripeka" and "three" swapped for "four" (matching
+            this page's actual builder count — the prior bulleted version
+            of this block, replaced here, already said "four... builders,"
+            just with an "award-winning" qualifier Ryan's exact template
+            doesn't include, so that qualifier is dropped here too, same as
+            the Adelaide block took Ryan's wording as given rather than
+            keeping the old copy's extra adjectives).
+            "Contact us today" underlined and wired to the same ContactModal
+            popup via ContactUsTrigger.js (imported above, already used by
+            the Adelaide block). Kept the same 18px/muted-dark paragraph
+            styling as the Adelaide block. Scoped to Aripeka only via
+            isAripeka — every other neighborhood page unaffected. */}
         {isAripeka && (
-          <ul
-            style={{
-              fontSize: 18,
-              lineHeight: 1.6,
-              color: 'var(--color-muted-dark)',
-              marginBottom: 12,
-              paddingLeft: 22,
-            }}
-          >
-            <li style={{ marginBottom: 8 }}>In Aripeka there are four award-winning custom home builders to choose from.</li>
-            <li style={{ marginBottom: 8 }}>
-              Looking for an agent to be there every step of the way & guide you through the whole home building
-              process from setting up private showings at the different model homes, negotiating with the builders,
-              & being there all the way through closing? We are here to help.
-            </li>
-            <li>
-              If you are looking for an agent to help guide you through the buying process of an existing home in
-              Aripeka, we can help with that too. Reach out when you are ready to start your home search & we can
-              start sending you property updates as well as take care of all the arrangements when you are ready to
-              start touring properties in person.
-            </li>
-          </ul>
+          <div style={{ marginBottom: 12 }}>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+              Explore new construction and existing homes for sale in Aripeka. With four custom home builders to
+              choose from, we can help you compare options, tour model homes, negotiate with builders, and navigate
+              the entire buying process through closing.
+            </p>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+              Looking for an Aripeka home? <ContactUsTrigger>Contact us today</ContactUsTrigger> to get started.
+            </p>
+          </div>
         )}
         {/* Adelaide builder note — replaced entirely 2026-09-16, per Ryan:
             "Can you replace the text on the Adelaide pages with the
