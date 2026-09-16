@@ -12,6 +12,29 @@ import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import BuildingInquiryModal from '@/components/BuildingInquiryModal';
+import ContactUsTrigger from '@/components/ContactUsTrigger';
+
+// City page intro copy (2026-09-16, per Ryan, pasting one template and
+// asking for it on every city page, with the city name and property type
+// swapped in: "Discover homes for sale in Cocoa Beach, Florida, and let us
+// make your home search easier. We'll help you compare properties, arrange
+// private showings, negotiate with sellers, and guide you through every
+// step from your initial search to closing. / Start your Cocoa Beach home
+// search today. Contact Us Today to get started. ... Insert the correct
+// cities & also insert homes, condos, or land depending on the page." —
+// two small word-maps drive the per-propertyType substitution: the plural
+// noun for "Discover ___ for sale" (homes/condos/land — matches Ryan's
+// "homes, condos, or land" wording exactly) and the singular noun for the
+// "___ search" phrase used twice further down (matches standard English
+// compound-noun-modifier grammar — "home search"/"condo search", not
+// "condos search" — same singular treatment Ryan's own template already
+// used for "home search"). Declared as plain objects here (module scope,
+// not exported) rather than added to PROPERTY_TYPE_LABEL above, since that
+// map's "Single-Family Homes"/"Condos/Townhomes" wording is a page
+// heading/label style, not the lowercase conversational copy this intro
+// paragraph needs.
+const CITY_PAGE_TYPE_NOUN = { Home: 'homes', Condo: 'condos', Land: 'land' };
+const CITY_PAGE_SEARCH_NOUN = { Home: 'home', Condo: 'condo', Land: 'land' };
 
 // "Request Information on Property Management" CTA (per Ryan, 2026-08-26)
 // — the blue button/modal originally built for the Harbor Island Beach
@@ -311,6 +334,41 @@ export default async function CityListingsPage({ params, searchParams: searchPar
                 ? `Oceanfront ${PROPERTY_TYPE_LABEL[propertyType]} For Sale in ${city.name}, FL`
                 : `${PROPERTY_TYPE_LABEL[propertyType]} in ${city.name}, FL`)}
         </h1>
+        {/* Intro copy — see CITY_PAGE_TYPE_NOUN/CITY_PAGE_SEARCH_NOUN's
+            comment above for the full request. Scoped to just the 3 plain
+            city routes (Homes/Condos/Land — i.e. !isOceanfront &&
+            !isOceanfrontCombined) since Ryan's template named exactly
+            "homes, condos, or land" as the three variants, with no mention
+            of the 5-city Oceanfront pages or the combined Oceanfront
+            "Listings" view — so this doesn't render there, same scoping
+            precedent as the neighborhood-page ContactUsTrigger blocks only
+            covering the neighborhoods actually named. "Contact Us Today"
+            bold + underlined + a live link via ContactUsTrigger.js (the
+            same "Contact Us" popup Nav.js opens), per Ryan: "is a live
+            link & underlined like you did in the neighborhood pages" —
+            identical <strong><ContactUsTrigger> pattern already used on
+            the Adelaide/Aripeka/Harbor Island Beach Club/Tortoise Island/
+            Lansing Island/Summer Lakes/Aquarina/Suntree neighborhood-page
+            blocks. Same 18px/muted-dark 2-paragraph styling as those
+            blocks too, for visual consistency between the city and
+            neighborhood listing pages. */}
+        {!isOceanfront && !isOceanfrontCombined && (
+          <div style={{ marginBottom: 12 }}>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+              Discover {CITY_PAGE_TYPE_NOUN[propertyType]} for sale in {city.name}, Florida, and let us make your{' '}
+              {CITY_PAGE_SEARCH_NOUN[propertyType]} search easier. We&rsquo;ll help you compare properties, arrange
+              private showings, negotiate with sellers, and guide you through every step from your initial search to
+              closing.
+            </p>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+              Start your {city.name} {CITY_PAGE_SEARCH_NOUN[propertyType]} search today.{' '}
+              <strong>
+                <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
+              </strong>{' '}
+              to get started.
+            </p>
+          </div>
+        )}
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
