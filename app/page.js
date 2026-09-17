@@ -146,7 +146,20 @@ export default async function HomePage() {
             style={{
               position: 'absolute',
               inset: 0,
-              background: 'linear-gradient(180deg, rgba(15,35,45,0.35) 0%, rgba(15,35,45,0.15) 40%, rgba(10,25,32,0.55) 100%)',
+              // Lightened to roughly half its previous opacity at each stop
+              // (2026-09-17, per Ryan: "the hero picture ... seems a little
+              // dark to me"). The source photo (/hero/brevard-hero.jpg) is
+              // bright and sunny on its own -- the darkness was coming
+              // entirely from this overlay, which exists to keep the white
+              // "Brevard County Listings" headline and the search bar
+              // readable over the photo. Was: 0.35/0.15/0.55 at the same
+              // three stops -- the 0.55 bottom stop in particular was
+              // muting the pool/patio area more than the text over that
+              // area actually needed for contrast. Kept the same shape
+              // (darker top and bottom, lighter middle) rather than
+              // removing it outright, since the headline still crosses the
+              // brighter sky portion of the photo.
+              background: 'linear-gradient(180deg, rgba(15,35,45,0.18) 0%, rgba(15,35,45,0.08) 40%, rgba(10,25,32,0.28) 100%)',
               pointerEvents: 'none',
             }}
           />
