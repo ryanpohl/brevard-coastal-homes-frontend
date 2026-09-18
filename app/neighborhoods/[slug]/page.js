@@ -526,7 +526,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             staying clearly identifiable as links now that they're plain
             black instead of gold. Scoped to the wrapper page only via
             isVieraBuildersCommunitiesVieraWest — the 6 sub-community pages
-            themselves don't render this (they're leaf pages, not hubs). */}
+            render their own filtered version of this same grid instead (see
+            the subCommunity block below, restyled to match this one
+            2026-09-18). */}
         {isVieraBuildersCommunitiesVieraWest && (
           <ul
             style={{
@@ -579,63 +581,78 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             ))}
           </ul>
         )}
-        {/* Sibling-community cross-links on each individual Viera Builders
-            page (2026-09-15, per Ryan — follow-up to the hub page's link
-            list above: "Would you advise keeping the 6 neighborhood page
-            link on all the individual pages for Viera Builders?" ->
-            "Yes.....and do links add enough for SEO or is it better to
-            list all the neighborhoods too"). Two reasons for adding this:
-            (1) these are small subdivisions that can easily show 0 active
-            listings at any given time (confirmed live on Farallon Fields
-            the day this was added) — without a way to jump to a sibling
-            community, a visitor landing here from search/an ad with no
-            results hits a dead end and leaves; (2) internal links between
-            the 6 pages help search engines crawl/associate them as one
-            cluster and pass authority between them.
-            On the SEO question specifically: NOT duplicating the 6 names
-            again as plain non-linked text — a <Link>'s own visible text
-            (the neighborhood name) already IS the keyword-relevant anchor
-            text search engines use, so repeating the same names a second
-            time as plain text next to the links would just be redundant
-            boilerplate, especially since this exact block repeats
-            verbatim across all 6 pages. Instead this adds one short,
-            genuine sentence of context ("part of the Viera Builders
-            communities in Viera West") around the links, which is the
-            part that actually reads as real content rather than a
-            keyword list.
-            Deliberately a lighter/secondary treatment than the hub page's
-            large bold black link list (which is that page's main call to
-            action) — here the page's own listings are the priority, so
-            this is smaller (16px) and muted, sitting quietly below the
-            result count rather than competing with the H1. Excludes the
-            current page's own community from the list via .filter (no
-            reason to link Farallon Fields back to itself). Reuses the
-            same auto-fit responsive wrapping approach isn't needed here
-            since it's an inline sentence, not a grid, and comfortably
-            wraps on its own at any screen width. Scoped via subCommunity
-            (truthy only for the 6 leaf pages — the hub page itself uses
-            isVieraBuildersCommunitiesVieraWest above instead, so the two
-            blocks never both render). */}
+        {/* Sibling-community links on each individual Viera Builders page —
+            restyled 2026-09-18 (per Ryan, pasting a screenshot of the hub
+            grid above: "Can you keep these links consistent on each
+            individual viera builders neighborhood to look like this on
+            each individual neighborhood page? ... Obviously if its an
+            individual page like Pangea park then you dont have to show the
+            Pangea Park link"). Originally added 2026-09-15 as a single
+            small muted sentence ("X is one of the Viera Builders
+            communities... See also: A, B, C") — see git history for that
+            version and the SEO reasoning behind adding sibling links at
+            all (small-inventory dead-end pages + crawl/authority sharing
+            between the cluster). This swaps that sentence for the exact
+            same heading text and bold/black/underlined 2-column grid as
+            the hub page above, reusing VIERA_BUILDERS_COMMUNITIES_VIERA_
+            WEST_H1 verbatim (it already reads fine standalone — it
+            describes the group, not "this page" specifically) so a
+            visitor sees an identical-looking link block no matter which of
+            the 7 pages they land on, same as Ryan's reference screenshot.
+            Rendered as an <h2>, not a second <h1> — each page's own H1
+            above ("Homes for Sale in {subCommunity.name}, FL") stays the
+            page's one true H1 for on-page SEO structure, so this heading
+            is sized a step smaller (clamp(22px,3vw,30px) vs the H1's
+            clamp(26px,3.5vw,38px)) while keeping the same bold Inter Tight
+            treatment — a visitor reads it as visually consistent with the
+            hub page without the page technically having two H1s.
+            Still excludes the current page's own community via the same
+            .filter() as the sentence version had (no reason to link Pangea
+            Park back to itself from its own page), and still reads
+            VIERA_BUILDERS_SUB_COMMUNITIES in its existing order so it stays
+            in sync with any future reordering there. Scoped via
+            subCommunity (truthy only for the 6 leaf pages — the hub page
+            itself uses isVieraBuildersCommunitiesVieraWest above instead,
+            so the two blocks never both render). */}
         {subCommunity && (
-          <p
-            style={{
-              fontSize: 16,
-              lineHeight: 1.6,
-              color: 'var(--color-muted-dark)',
-              marginBottom: 16,
-            }}
-          >
-            {subCommunity.name} is one of the Viera Builders communities in Viera West, FL. See also:{' '}
-            {VIERA_BUILDERS_SUB_COMMUNITIES.filter((c) => c.slug !== subCommunity.slug).map((c, i, arr) => (
-              <span key={c.slug}>
-                <Link href={`/neighborhoods/${c.slug}`} style={{ color: '#000', textDecoration: 'underline' }}>
-                  {c.name}
-                </Link>
-                {c.comingSoon ? ' (Coming Soon)' : ''}
-                {i < arr.length - 1 ? ', ' : '.'}
-              </span>
-            ))}
-          </p>
+          <>
+            <h2
+              style={{
+                fontSize: 'clamp(22px, 3vw, 30px)',
+                marginBottom: 8,
+                fontFamily: 'var(--font-inter-tight)',
+                fontWeight: 800,
+              }}
+            >
+              {VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_H1}
+            </h2>
+            <ul
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+                maxWidth: 760,
+                columnGap: 40,
+                rowGap: 14,
+                fontSize: 'clamp(19px, 3vw, 26px)',
+                fontWeight: 600,
+                lineHeight: 1.4,
+                marginBottom: 20,
+                paddingLeft: 22,
+              }}
+            >
+              {VIERA_BUILDERS_SUB_COMMUNITIES.filter((c) => c.slug !== subCommunity.slug).map((c) => (
+                <li key={c.slug}>
+                  <Link
+                    href={`/neighborhoods/${c.slug}`}
+                    style={{ color: '#000', textDecoration: 'underline', textUnderlineOffset: 3 }}
+                  >
+                    {c.name}
+                  </Link>
+                  {c.comingSoon ? ' (Coming Soon)' : ''}
+                </li>
+              ))}
+            </ul>
+          </>
         )}
         {/* Harbor Island Beach Club subtext — replaced entirely 2026-09-16,
             per Ryan: "Can you change the text on the harbor Island Beach
