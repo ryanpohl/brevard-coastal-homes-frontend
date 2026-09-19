@@ -402,21 +402,41 @@ export default async function CityListingsPage({ params, searchParams: searchPar
             to get started.
           </p>
         </div>
-        {/* Beach Woods cross-link (per Ryan, 2026-09-19 — see
-            isMelbourneBeachCondos's comment above and the new
-            /neighborhoods/beach-woods page). Plain sentence + underlined
-            <Link>, not the bold heading/grid style used for the Viera
-            Builders sibling links — this is one link pointing off this
-            page to a single related community, not a cluster of sibling
-            pages linking to each other, so the lighter treatment (matching
-            the Adelaide/Aripeka/etc. "Contact Us Today" paragraph styling
+        {/* Condo-community cross-links (per Ryan, 2026-09-19 — see
+            isMelbourneBeachCondos's comment above). Started with just Beach
+            Woods (the new /neighborhoods/beach-woods page), then extended
+            same day to also link Harbor Island Beach Club's and Aquarina's
+            own Condo-filtered views (?propertyType=Condo, per Ryan's exact
+            URLs) from this same page. Aquarina is a real Melbourne Beach
+            neighborhood, so that one's a natural fit; Harbor Island Beach
+            Club is actually seeded under Indian Harbour Beach (see
+            NEIGHBORHOODS in the backend's seed.js) — linked here anyway
+            since Ryan asked for it by name/URL specifically, not because it
+            shares Melbourne Beach as its city.
+            One combined sentence with all 3 links, not three separate
+            paragraphs or the bold grid style used for the Viera Builders
+            sibling links — this is a short "see also" list pointing off
+            this page to related communities, not a cluster of sibling pages
+            linking to each other, so the lighter treatment (matching the
+            Adelaide/Aripeka/etc. "Contact Us Today" paragraph styling
             already on this same page) fits better than a big call-to-action
             block would. */}
         {isMelbourneBeachCondos && (
           <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
-            Looking specifically in Beach Woods?{' '}
+            Looking for a specific community? See{' '}
             <Link href="/neighborhoods/beach-woods" style={{ color: '#000', textDecoration: 'underline' }}>
-              See Beach Woods Condos &amp; Townhomes For Sale
+              Beach Woods Condos &amp; Townhomes For Sale
+            </Link>
+            ,{' '}
+            <Link
+              href="/neighborhoods/harbor-island-beach-club?propertyType=Condo"
+              style={{ color: '#000', textDecoration: 'underline' }}
+            >
+              Harbor Island Beach Club Condos For Sale
+            </Link>
+            , or{' '}
+            <Link href="/neighborhoods/aquarina?propertyType=Condo" style={{ color: '#000', textDecoration: 'underline' }}>
+              Aquarina Condos For Sale
             </Link>
             .
           </p>
