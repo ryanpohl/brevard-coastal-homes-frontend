@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import * as api from '@/lib/api';
 import {
   SLUG_TO_PROPERTY_TYPE,
@@ -172,6 +173,16 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   const isOceanfront = Boolean(OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug]);
   const propertyType = isOceanfront ? OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug] : SLUG_TO_PROPERTY_TYPE[propertySlug];
   if (!propertyType && !isOceanfrontCombined) notFound();
+  // Beach Woods cross-link (per Ryan, 2026-09-19: "put a link for this page
+  // on the Melbourne Beach Condos page" — see the new
+  // /neighborhoods/beach-woods page and lib/constants.js's
+  // BEACH_WOODS_SUBDIVISION_NAMES). Scoped to this city's own plain Condos
+  // route specifically (not the Oceanfront Condos variant or the combined
+  // Oceanfront Listings page) — Ryan named "the Melbourne Beach Condos
+  // page" singular, and Beach Woods isn't marketed as an oceanfront
+  // community, so the plain Condos page is the more accurate place to
+  // surface it.
+  const isMelbourneBeachCondos = citySlug === 'melbourne-beach' && propertyType === 'Condo' && !isOceanfront && !isOceanfrontCombined;
   // Oceanfront pages (combined "Listings" included) only exist for the 5
   // barrier-island cities named by Ryan (2026-08-22) — e.g.
   // /melbourne/oceanfront-homes-for-sale (or /melbourne/oceanfront-listings)
@@ -391,6 +402,25 @@ export default async function CityListingsPage({ params, searchParams: searchPar
             to get started.
           </p>
         </div>
+        {/* Beach Woods cross-link (per Ryan, 2026-09-19 — see
+            isMelbourneBeachCondos's comment above and the new
+            /neighborhoods/beach-woods page). Plain sentence + underlined
+            <Link>, not the bold heading/grid style used for the Viera
+            Builders sibling links — this is one link pointing off this
+            page to a single related community, not a cluster of sibling
+            pages linking to each other, so the lighter treatment (matching
+            the Adelaide/Aripeka/etc. "Contact Us Today" paragraph styling
+            already on this same page) fits better than a big call-to-action
+            block would. */}
+        {isMelbourneBeachCondos && (
+          <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+            Looking specifically in Beach Woods?{' '}
+            <Link href="/neighborhoods/beach-woods" style={{ color: '#000', textDecoration: 'underline' }}>
+              See Beach Woods Condos &amp; Townhomes For Sale
+            </Link>
+            .
+          </p>
+        )}
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
