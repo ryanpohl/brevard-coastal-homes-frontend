@@ -981,30 +981,20 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             </p>
           </div>
         )}
-        {/* Beach Woods description (per Ryan, 2026-09-19, creating this page
-            from scratch — see BEACH_WOODS_SUBDIVISION_NAMES's comment in
-            lib/constants.js for the full backstory). Content drawn from the
-            community's own Property Owners Association site
-            (beachwoodsmb.com/home/), not invented: it's a gated, deed-
-            restricted community stretching from the Indian River Lagoon to
-            the Atlantic Ocean, with townhomes, villas, quads, single-family
-            residences, beachfront units, and a six-story riverside
-            condominium spread across its numbered phases — plus a couple of
-            its more distinctive amenities (private beach access, the boat
-            ramp) rather than listing all of them, matching how the other
-            community blocks on this page stay to 1-2 short paragraphs.
-            Same 2-paragraph 18px/muted-dark + bold/underlined ContactUsTrigger
-            pattern as every other neighborhood block on this page. */}
+        {/* Beach Woods CTA (per Ryan, 2026-09-19). Originally added with a
+            first descriptive paragraph too (drawn from the community's own
+            Property Owners Association site, beachwoodsmb.com/home/) — Ryan
+            asked same day to delete that paragraph entirely and just keep
+            this one CTA line, plus reword "a home" to "a property" ("Looking
+            for a property in Beach Woods?"), matching Beach Woods' actual
+            mix of condos/townhomes/villas better than "home" implied. Same
+            18px/muted-dark + bold/underlined ContactUsTrigger styling as
+            every other neighborhood block on this page, just the one
+            paragraph instead of two now. */}
         {isBeachWoods && (
           <div style={{ marginBottom: 12 }}>
-            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
-              Beach Woods is a gated, deed-restricted community in Melbourne Beach that stretches from the Indian
-              River Lagoon to the Atlantic Ocean, with condos, townhomes, villas, and single-family residences spread
-              across several phases. Residents enjoy private beach access, two pools, a clubhouse, tennis and
-              pickleball courts, and a boat ramp on the river side.
-            </p>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
-              Looking for a home in Beach Woods?{' '}
+              Looking for a property in Beach Woods?{' '}
               <strong>
                 <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
               </strong>{' '}
