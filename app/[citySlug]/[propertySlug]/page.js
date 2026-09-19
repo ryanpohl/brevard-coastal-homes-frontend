@@ -420,23 +420,26 @@ export default async function CityListingsPage({ params, searchParams: searchPar
             linking to each other, so the lighter treatment (matching the
             Adelaide/Aripeka/etc. "Contact Us Today" paragraph styling
             already on this same page) fits better than a big call-to-action
-            block would. */}
+            block would. Order is Harbor Island Beach Club, then Aquarina,
+            then Beach Woods last, per Ryan's explicit reorder request
+            (2026-09-19, same day) — originally Beach Woods was listed
+            first. */}
         {isMelbourneBeachCondos && (
           <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
             Looking for a specific community? See{' '}
-            <Link href="/neighborhoods/beach-woods" style={{ color: '#000', textDecoration: 'underline' }}>
-              Beach Woods Condos &amp; Townhomes For Sale
-            </Link>
-            ,{' '}
             <Link
               href="/neighborhoods/harbor-island-beach-club?propertyType=Condo"
               style={{ color: '#000', textDecoration: 'underline' }}
             >
               Harbor Island Beach Club Condos For Sale
             </Link>
-            , or{' '}
+            ,{' '}
             <Link href="/neighborhoods/aquarina?propertyType=Condo" style={{ color: '#000', textDecoration: 'underline' }}>
               Aquarina Condos For Sale
+            </Link>
+            , or{' '}
+            <Link href="/neighborhoods/beach-woods" style={{ color: '#000', textDecoration: 'underline' }}>
+              Beach Woods Condos &amp; Townhomes For Sale
             </Link>
             .
           </p>
