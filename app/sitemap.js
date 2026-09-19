@@ -123,6 +123,20 @@ export default async function sitemap() {
     });
   });
 
+  // Beach Woods (Melbourne Beach) — same situation as the Viera Builders
+  // sub-communities just above: a real, live page (per Ryan, 2026-09-19)
+  // but not a `neighborhoods` table row, so it needs its own explicit
+  // entry here or it'd be silently missing from the sitemap. Priority 0.7,
+  // matching the real neighborhoods loop above rather than the Viera
+  // Builders sub-communities' 0.6 — this one has active listings (unlike
+  // most of those), same as every other real neighborhood page.
+  entries.push({
+    url: `${SITE_URL}/neighborhoods/beach-woods`,
+    lastModified: now,
+    changeFrequency: 'daily',
+    priority: 0.7,
+  });
+
   const listingIds = await getAllListingIds();
   listingIds.forEach((id) => {
     entries.push({
