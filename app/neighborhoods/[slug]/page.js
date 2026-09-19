@@ -18,6 +18,7 @@ import {
   VIERA_BUILDERS_PRICE_BANDS,
   VIERA_BUILDERS_PROPERTY_TYPE_OPTIONS,
   SOUTH_MERRITT_ISLAND_PRICE_BANDS,
+  BEACH_WOODS_SUBDIVISION_NAMES,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -68,6 +69,17 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
         description: `Browse listings in ${subCommunity.name}, a Viera Builders community in Viera West, FL.`,
       };
     }
+    // Beach Woods (per Ryan, 2026-09-19) — same reasoning as the
+    // subCommunity branch just above: no backend `neighborhoods` row (and
+    // so no SEO row) exists for this synthetic community page either — see
+    // lib/constants.js's BEACH_WOODS_SUBDIVISION_NAMES comment.
+    if (params.slug === 'beach-woods') {
+      return {
+        title: 'Beach Woods Condos & Townhomes | Melbourne Beach, FL | Brevard Coastal Homes',
+        description:
+          'Browse condos and townhomes for sale in Beach Woods, a gated riverfront-to-oceanfront community in Melbourne Beach, FL.',
+      };
+    }
     try {
       const { neighborhood } = await api.getNeighborhood(params.slug);
       return {
@@ -101,6 +113,12 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // neighborhood param logic. Declared once here; reused later for the H1/
   // FilterBar wiring instead of being recomputed.
   const isVieraBuildersCommunitiesVieraWest = slug === 'viera-builders-communities-viera-west';
+  // Beach Woods (Melbourne Beach) — per Ryan (2026-09-19): same "stand-in
+  // neighborhood, no backend row" treatment as the Viera Builders
+  // sub-communities above, just a single page rather than a hub + 6 leaves.
+  // See lib/constants.js's BEACH_WOODS_SUBDIVISION_NAMES for the full
+  // reasoning and how its listings get matched.
+  const isBeachWoods = slug === 'beach-woods';
 
   let neighborhood;
   if (subCommunity) {
@@ -108,6 +126,19 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
       slug,
       name: subCommunity.name,
       city: { slug: 'viera-west' },
+      latitude: null,
+      longitude: null,
+      mapZoom: null,
+    };
+  } else if (isBeachWoods) {
+    neighborhood = {
+      slug,
+      name: 'Beach Woods',
+      city: { slug: 'melbourne-beach' },
+      // No dedicated lat/lng of its own (same as the Viera Builders
+      // sub-communities) — the map center falls back to the parent city's
+      // coordinate below, which is Melbourne Beach itself, close enough
+      // for a single-community page like this one.
       latitude: null,
       longitude: null,
       mapZoom: null,
@@ -147,10 +178,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
 
   let seo = null;
   let jsonLd = null;
-  if (!subCommunity) {
-    // Skipped for the 6 synthetic sub-community pages above — there's no
-    // backend SEO row for them (they don't exist as real neighborhoods),
-    // so this would just be a guaranteed-to-fail request every time.
+  if (!subCommunity && !isBeachWoods) {
+    // Skipped for the 6 synthetic sub-community pages and Beach Woods
+    // above — there's no backend SEO row for any of them (they don't
+    // exist as real neighborhoods), so this would just be a
+    // guaranteed-to-fail request every time.
     try {
       ({ seo, jsonLd } = await api.getNeighborhoodSeo(slug, primaryType));
     } catch {
@@ -183,7 +215,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
     ? { subdivision: subCommunity.name }
     : isVieraBuildersCommunitiesVieraWest
       ? { subdivision: searchParams.subdivision || VIERA_BUILDERS_SUB_COMMUNITIES.map((c) => c.name).join(',') }
-      : { neighborhood: slug };
+      : isBeachWoods
+        ? { subdivision: BEACH_WOODS_SUBDIVISION_NAMES.join(',') }
+        : { neighborhood: slug };
 
   let results = [];
   let total = 0;
@@ -411,6 +445,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // Adelaide only — Summer Lakes keeps using ADELAIDE_SUMMER_LAKES_H1
   // unchanged below, since this request's screenshot was Adelaide-only.
   const ADELAIDE_H1 = 'Adelaide Homes For Sale - Viera, Florida';
+  // Beach Woods (per Ryan, 2026-09-19) — hand-written, same reasoning as
+  // ARIPEKA_COMBINED_H1 above (no single-type backend h1 to derive this
+  // from, since there's no backend row at all). "Condos & Townhomes"
+  // rather than just "Condos" even though every unit here is Condo-typed
+  // in the MLS (see BEACH_WOODS_SUBDIVISION_NAMES's comment) — Ryan's own
+  // request called them "condos & townhomes," matching how the community's
+  // own POA site describes its mix of town homes, villas, quads, and a
+  // riverside condo building.
+  const BEACH_WOODS_H1 = 'Beach Woods Condos & Townhomes For Sale - Melbourne Beach, Florida';
   const h1Text = isHarborIslandBeachClub
     ? HARBOR_ISLAND_BEACH_CLUB_H1
     : isVieraBuildersCommunitiesVieraWest
@@ -426,7 +469,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               ? ADELAIDE_SUMMER_LAKES_H1 || `Homes for Sale in ${neighborhood.name}, FL`
               : isAquarina && !hasExplicitPropertyTypeFilter
                 ? AQUARINA_COMBINED_H1 || `Homes & Condos for Sale in ${neighborhood.name}, FL`
-                : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
+                : isBeachWoods
+                  ? BEACH_WOODS_H1
+                  : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
   // Bold sans-serif H1 styling (per Ryan, 2026-08-05) — originally added for
   // Harbor Island Beach Club, now shared by Viera Builders Communities
   // Viera West per Ryan's follow-up request to match that same style. Every
@@ -936,6 +981,37 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             </p>
           </div>
         )}
+        {/* Beach Woods description (per Ryan, 2026-09-19, creating this page
+            from scratch — see BEACH_WOODS_SUBDIVISION_NAMES's comment in
+            lib/constants.js for the full backstory). Content drawn from the
+            community's own Property Owners Association site
+            (beachwoodsmb.com/home/), not invented: it's a gated, deed-
+            restricted community stretching from the Indian River Lagoon to
+            the Atlantic Ocean, with townhomes, villas, quads, single-family
+            residences, beachfront units, and a six-story riverside
+            condominium spread across its numbered phases — plus a couple of
+            its more distinctive amenities (private beach access, the boat
+            ramp) rather than listing all of them, matching how the other
+            community blocks on this page stay to 1-2 short paragraphs.
+            Same 2-paragraph 18px/muted-dark + bold/underlined ContactUsTrigger
+            pattern as every other neighborhood block on this page. */}
+        {isBeachWoods && (
+          <div style={{ marginBottom: 12 }}>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+              Beach Woods is a gated, deed-restricted community in Melbourne Beach that stretches from the Indian
+              River Lagoon to the Atlantic Ocean, with condos, townhomes, villas, and single-family residences spread
+              across several phases. Residents enjoy private beach access, two pools, a clubhouse, tennis and
+              pickleball courts, and a boat ramp on the river side.
+            </p>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+              Looking for a home in Beach Woods?{' '}
+              <strong>
+                <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
+              </strong>{' '}
+              to get started.
+            </p>
+          </div>
+        )}
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
@@ -943,7 +1019,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
 
       <FilterBar
         waterfrontFlags={waterfrontFlags}
-        hidePropertyType={isAdelaide || isSummerLakes}
+        hidePropertyType={isAdelaide || isSummerLakes || isBeachWoods}
         propertyTypeOptions={
           isAripeka || isLansingIsland || isTortoiseIsland || isSouthMerrittIsland
             ? ARIPEKA_PROPERTY_TYPE_OPTIONS
