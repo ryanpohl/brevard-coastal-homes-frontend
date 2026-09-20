@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import { formatPrice, formatAssocFee } from '@/lib/constants';
+import { formatPrice, formatAssocFee, isPricePerSqftPlausible } from '@/lib/constants';
 import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
 
@@ -233,8 +233,14 @@ export default function ListingCard({ listing, onHoverChange }) {
               spare horizontal room next to the price on a card this width,
               and a light, smaller, regular-weight treatment keeps it from
               competing with the bold price or making the card feel busier.
-              Land-gated same as the detail page (no sqft to divide by). */}
-{!isLand && listing.listPricePerSqft != null && (
+              Land-gated same as the detail page (no sqft to divide by).
+              isPricePerSqftPlausible() (2026-09-20, same day, per Ryan
+              flagging a Harbor Island Beach Club condo showing
+              $299,750/SqFt off a bad sqft=4 sync) guards this the same way
+              on the detail page — see its comment in lib/constants.js for
+              the bounds and why this needed a shared check rather than
+              trusting listPricePerSqft outright. */}
+{!isLand && isPricePerSqftPlausible(listing) && (
               <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-muted-dark)' }}>
 {formatPrice(listing.listPricePerSqft)}/SqFt
               </span>
