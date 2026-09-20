@@ -224,6 +224,21 @@ export default function ListingCard({ listing, onHoverChange }) {
               <span style={{ fontSize: 18, verticalAlign: -2 }}>↓</span> {formatPrice(priceReduction)}
                 </span>
           )}
+{/* List Price/SqFt on the card (2026-09-20, per Ryan). Same
+              listing.listPricePerSqft field already shown on the Property
+              Detail page (computed server-side, price/sqft — see that
+              page's 2026-09-14 comment), added here in the price line's own
+              flex row rather than the already-dense bd/ba/sqft/Year
+              Built/Rental Restrictions line below: this line has real
+              spare horizontal room next to the price on a card this width,
+              and a light, smaller, regular-weight treatment keeps it from
+              competing with the bold price or making the card feel busier.
+              Land-gated same as the detail page (no sqft to divide by). */}
+{!isLand && listing.listPricePerSqft != null && (
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-muted-dark)' }}>
+{formatPrice(listing.listPricePerSqft)}/SqFt
+              </span>
+          )}
 </p>
 {showAssocFee && (
             <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-ink)', marginBottom: 4 }}>
