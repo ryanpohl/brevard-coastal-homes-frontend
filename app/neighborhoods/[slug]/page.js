@@ -19,6 +19,7 @@ import {
   VIERA_BUILDERS_PROPERTY_TYPE_OPTIONS,
   SOUTH_MERRITT_ISLAND_PRICE_BANDS,
   BEACH_WOODS_SUBDIVISION_NAMES,
+  AQUARINA_SUBDIVISION_NAMES,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -119,6 +120,18 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // See lib/constants.js's BEACH_WOODS_SUBDIVISION_NAMES for the full
   // reasoning and how its listings get matched.
   const isBeachWoods = slug === 'beach-woods';
+  // Aquarina (Melbourne Beach) — per Ryan (2026-09-20). Unlike Beach Woods,
+  // Aquarina IS a real `neighborhoods` table row, so the neighborhood
+  // object/SEO content below still comes from the backend as normal for
+  // it — only the listings query further down is overridden to filter by
+  // an explicit subdivision list instead of neighborhood_id, since some of
+  // Aquarina's sub-associations' MLS SubdivisionName values weren't getting
+  // tied to it. See lib/constants.js's AQUARINA_SUBDIVISION_NAMES for the
+  // full reasoning and how this was found. (isAquarina itself is declared
+  // once, further below near AQUARINA_COMBINED_H1, and reused here — see
+  // that declaration's own comment for the H1-driven reasoning it was
+  // originally added for.)
+  const isAquarina = slug === 'aquarina';
 
   let neighborhood;
   if (subCommunity) {
@@ -211,13 +224,20 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   //    dropdown, which sets the same `subdivision` URL param to a specific
   //    subset. This is a best-guess pending the real feed being connected
   //    next week — verify against it then per schema.sql's comment.
+  //  - Aquarina: a real neighborhood row, but filters by `subdivision`
+  //    too (per Ryan, 2026-09-20) rather than `neighborhood: slug` — see
+  //    isAquarina's comment above and AQUARINA_SUBDIVISION_NAMES in
+  //    lib/constants.js for why the neighborhood_id link can't be trusted
+  //    to include every one of its sub-associations.
   const listingsFilterParams = subCommunity
     ? { subdivision: subCommunity.name }
     : isVieraBuildersCommunitiesVieraWest
       ? { subdivision: searchParams.subdivision || VIERA_BUILDERS_SUB_COMMUNITIES.map((c) => c.name).join(',') }
       : isBeachWoods
         ? { subdivision: BEACH_WOODS_SUBDIVISION_NAMES.join(',') }
-        : { neighborhood: slug };
+        : isAquarina
+          ? { subdivision: AQUARINA_SUBDIVISION_NAMES.join(',') }
+          : { neighborhood: slug };
 
   let results = [];
   let total = 0;
@@ -358,8 +378,10 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // ?propertyType=Home/Condo) still show their own correct single-type h1
   // instead of this combined one. (hasExplicitPropertyTypeFilter is
   // declared once, near primaryType above, and shared with
-  // HARBOR_ISLAND_BEACH_CLUB_H1's identical combined-vs-single-type check.)
-  const isAquarina = slug === 'aquarina';
+  // HARBOR_ISLAND_BEACH_CLUB_H1's identical combined-vs-single-type check.
+  // isAquarina itself is now declared once, up near isBeachWoods — see that
+  // declaration's comment for the 2026-09-20 subdivision-filtering reason
+  // it moved up there — and reused here unchanged.)
   const AQUARINA_COMBINED_H1 = seo?.h1 ? seo.h1.replace('Homes For Sale', 'Homes & Condos For Sale') : seo?.h1;
   // Viera Builders Communities Viera West (per Ryan, 2026-08-05): drops a
   // new "Neighborhood" dropdown (before Property Type) listing its 6
