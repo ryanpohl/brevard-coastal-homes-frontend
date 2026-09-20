@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import * as api from '@/lib/api';
-import { formatPrice, PROPERTY_TYPE_LABEL } from '@/lib/constants';
+import { formatPrice, PROPERTY_TYPE_LABEL, isPricePerSqftPlausible } from '@/lib/constants';
 import FavoriteButton from '@/components/FavoriteButton';
 import PropertyGallery from '@/components/PropertyGallery';
 import PropertyContactPanel from '@/components/PropertyContactPanel';
@@ -211,8 +211,15 @@ export default async function ListingDetailPage({ params }) {
                               price/sqft rather than read as its own MLS field — see the
                               backend's listings.controller.js serializeListing comment.
                               Land-gated same as Sq.Ft. itself (Land has no sqft to divide
-                              by, so the backend already sends null there). */}
-            {!isLand && listing.listPricePerSqft != null && (
+                              by, so the backend already sends null there).
+                              isPricePerSqftPlausible() (2026-09-20, per Ryan flagging a
+                              Harbor Island Beach Club condo, MLS #1073180, showing
+                              $299,750/SqFt off a bad sqft=4 sync) guards this the same way
+                              on the listing cards (components/ListingCard.js) — see its
+                              comment in lib/constants.js for the bounds and reasoning. The
+                              plain Sq.Ft. stat just above is left untouched either way —
+                              only this derived figure gets hidden when it's implausible. */}
+            {!isLand && isPricePerSqftPlausible(listing) && (
                             <StatItem value={`${formatPrice(listing.listPricePerSqft)}/SqFt`} label="List Price/SqFt" />
                           )}
             {/* "Year Built" (2026-08-26, per Ryan, referencing a Space Coast
