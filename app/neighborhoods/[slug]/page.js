@@ -796,6 +796,47 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               </strong>{' '}
               to begin your search.
             </p>
+            {/* Reciprocal Homes<->Condos cross-link (per Ryan, 2026-09-20):
+                the Condo-filtered variant of this page links to the
+                Home-filtered variant, and vice versa, so a visitor on one
+                type can jump straight to the other rather than having to
+                clear the Property Type filter back to the combined view
+                first. Only shown on the two single-type variants
+                (hasExplicitPropertyTypeFilter) — the bare combined URL
+                already shows both types together, so there's nothing to
+                cross-link to there. Same lighter "see also" paragraph
+                treatment as the Melbourne Beach Condos page's Beach
+                Woods/Aquarina/Harbor Island cross-links (isMelbourneBeachCondos
+                in app/[citySlug]/[propertySlug]/page.js), not the bold
+                Viera Builders sibling-grid style — this is one related
+                link, not a cluster of sibling pages. */}
+            {hasExplicitPropertyTypeFilter && (
+              <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginTop: 12 }}>
+                {primaryType === 'Condo' ? (
+                  <>
+                    Looking for a home instead? See{' '}
+                    <Link
+                      href="/neighborhoods/harbor-island-beach-club?propertyType=Home"
+                      style={{ color: '#000', textDecoration: 'underline' }}
+                    >
+                      Harbor Island Beach Club Homes For Sale
+                    </Link>
+                    .
+                  </>
+                ) : (
+                  <>
+                    Looking for a condo instead? See{' '}
+                    <Link
+                      href="/neighborhoods/harbor-island-beach-club?propertyType=Condo"
+                      style={{ color: '#000', textDecoration: 'underline' }}
+                    >
+                      Harbor Island Beach Club Condos For Sale
+                    </Link>
+                    .
+                  </>
+                )}
+              </p>
+            )}
           </div>
         )}
         {/* Aripeka builder note — replaced entirely 2026-09-16, per Ryan:
