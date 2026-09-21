@@ -1027,6 +1027,33 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               </strong>{' '}
               to get started.
             </p>
+            {/* Reciprocal Homes<->Condos cross-link (per Ryan, 2026-09-21),
+                same pattern as Harbor Island Beach Club's identical block
+                above: the Condo-filtered variant links to the Home-filtered
+                variant and vice versa, shown only on the two single-type
+                variants (hasExplicitPropertyTypeFilter) since the bare
+                combined URL already shows both types together. */}
+            {hasExplicitPropertyTypeFilter && (
+              <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginTop: 12 }}>
+                {primaryType === 'Condo' ? (
+                  <>
+                    Looking for a home instead? See{' '}
+                    <Link href="/neighborhoods/aquarina?propertyType=Home" style={{ color: '#000', textDecoration: 'underline' }}>
+                      Aquarina Homes For Sale
+                    </Link>
+                    .
+                  </>
+                ) : (
+                  <>
+                    Looking for a condo instead? See{' '}
+                    <Link href="/neighborhoods/aquarina?propertyType=Condo" style={{ color: '#000', textDecoration: 'underline' }}>
+                      Aquarina Condos For Sale
+                    </Link>
+                    .
+                  </>
+                )}
+              </p>
+            )}
           </div>
         )}
         {isSuntree && (
