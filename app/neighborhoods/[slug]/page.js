@@ -1005,6 +1005,26 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               </strong>{' '}
               to get started.
             </p>
+            {/* Cross-link to Aripeka's Homes view (per Ryan, 2026-09-22: "add
+                a link in there for the page aripeka homes for sale") — same
+                lighter "see also" treatment as the Homes<->Condos cross-link
+                above (Harbor Island Beach Club) and the Land<->Homes
+                cross-link on the city Land pages (app/[citySlug]/[propertySlug]/page.js's
+                LAND_AND_LOTS_CITY_SLUGS block). Links to
+                ?propertyType=Home,Land (not just Home) to match Nav.js's own
+                Aripeka "Homes" link, which per Ryan's 2026-08-21 request
+                ("display both homes & Lots" in the Aripeka homes section)
+                shows Home+Land combined — that resolves to primaryType
+                'Home' (see primaryType's `.split(',')[0]` above), so it
+                lands on this page's builder/homes copy block, not back on
+                this Land copy. */}
+            <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+              Looking for a home instead? See{' '}
+              <Link href="/neighborhoods/aripeka?propertyType=Home,Land" style={{ color: '#000', textDecoration: 'underline' }}>
+                Aripeka Homes For Sale
+              </Link>
+              .
+            </p>
           </div>
         )}
         {/* Adelaide builder note — replaced entirely 2026-09-16, per Ryan:
