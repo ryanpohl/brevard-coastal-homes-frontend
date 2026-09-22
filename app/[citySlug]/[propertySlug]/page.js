@@ -37,6 +37,26 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
 const CITY_PAGE_TYPE_NOUN = { Home: 'homes', Condo: 'condos', Land: 'land' };
 const CITY_PAGE_SEARCH_NOUN = { Home: 'home', Condo: 'condo', Land: 'land' };
 
+// "Land and lots" wording (2026-09-22, per Ryan, for SEO — asked after
+// seeing the live Melbourne Beach Land page: "for SEO would you suggest
+// adding lots in the description along with land that is already there?"
+// then, once shown the proposed wording: "Can you add it to the melbourne
+// beach land page along with the Merritt island land page & the aripeka
+// land page where you can add the word land. Make all three of the
+// webpages the same with land & lots" followed same-turn by "Also do it to
+// the Cocoa Beach land page" — so 3 city Land pages plus the separate
+// Aripeka neighborhood page (handled in app/neighborhoods/[slug]/page.js)
+// get "lots" added alongside "land." Deliberately NOT a change to the
+// shared CITY_PAGE_TYPE_NOUN/CITY_PAGE_SEARCH_NOUN maps above, which drive
+// every city's Land page — Ryan named exactly these 4 pages, not every
+// city, so this is a narrow override applied only when both the property
+// type is Land and the city is one of these 4.
+// Slugs match Nav.js's CITY_LOTS_NAV_SLUGS exactly (the 3 cities whose
+// "Search by City" dropdown already gets a "Lots" link next to Homes/
+// Condos, added 2026-08-30) — the same 3 cities that actually have a real
+// dedicated Land page worth calling out lots on.
+const LAND_AND_LOTS_CITY_SLUGS = ['merritt-island', 'cocoa-beach', 'melbourne-beach'];
+
 // "Request Information on Property Management" CTA (per Ryan, 2026-08-26)
 // — the blue button/modal originally built for the Harbor Island Beach
 // Club neighborhood page (see HarborIslandInquiryModals.js), added here
@@ -333,16 +353,26 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   // effectivePropertyTypes above), so it reuses the same "properties"/
   // "property" wording the sibling combined city-Listings page
   // (app/[citySlug]/page.js) already uses for the identical reason.
-  const introTypeNoun = isOceanfrontCombined
-    ? 'oceanfront properties'
-    : isOceanfront
-      ? `oceanfront ${CITY_PAGE_TYPE_NOUN[propertyType]}`
-      : CITY_PAGE_TYPE_NOUN[propertyType];
-  const introSearchNoun = isOceanfrontCombined
-    ? 'oceanfront property'
-    : isOceanfront
-      ? `oceanfront ${CITY_PAGE_SEARCH_NOUN[propertyType]}`
-      : CITY_PAGE_SEARCH_NOUN[propertyType];
+  // See LAND_AND_LOTS_CITY_SLUGS above — Land is never an Oceanfront
+  // property type (no OCEANFRONT_SLUG_TO_PROPERTY_TYPE.Land, no combined
+  // Oceanfront Land view either), so `propertyType === 'Land'` alone is
+  // enough to identify these cities' plain Land pages, same reasoning
+  // showBuildingCTA above already relies on.
+  const useLandAndLotsWording = propertyType === 'Land' && LAND_AND_LOTS_CITY_SLUGS.includes(citySlug);
+  const introTypeNoun = useLandAndLotsWording
+    ? 'land and lots'
+    : isOceanfrontCombined
+      ? 'oceanfront properties'
+      : isOceanfront
+        ? `oceanfront ${CITY_PAGE_TYPE_NOUN[propertyType]}`
+        : CITY_PAGE_TYPE_NOUN[propertyType];
+  const introSearchNoun = useLandAndLotsWording
+    ? 'land or lot'
+    : isOceanfrontCombined
+      ? 'oceanfront property'
+      : isOceanfront
+        ? `oceanfront ${CITY_PAGE_SEARCH_NOUN[propertyType]}`
+        : CITY_PAGE_SEARCH_NOUN[propertyType];
   const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const rangeEnd = Math.min(page * PAGE_SIZE, total);
 
