@@ -57,6 +57,56 @@ const CITY_PAGE_SEARCH_NOUN = { Home: 'home', Condo: 'condo', Land: 'land' };
 // dedicated Land page worth calling out lots on.
 const LAND_AND_LOTS_CITY_SLUGS = ['merritt-island', 'cocoa-beach', 'melbourne-beach'];
 
+// Live listing-count meta description prefix (2026-09-22, per Ryan — he
+// asked "Is there a reason or a benefit" after seeing Zillow/Realtor.com/
+// Compass/Redfin/Homes.com search snippets that all lead their description
+// with a current listing count: "Zillow has 159 homes for sale in
+// Melbourne Beach FL...", "Search 153 homes for sale in Melbourne Beach...
+// ", "Search 162 Melbourne Beach homes on Compass...", etc. The answer —
+// a concrete, current-looking number stands out against otherwise
+// near-identical search snippets and tends to earn a higher click-through
+// rate, which Google's ranking does take into account — is why this same
+// treatment is added here, per Ryan's "yes" to implementing it. This is
+// PREPENDED to whatever description text each generateMetadata branch
+// below already builds (backend page_seo copy or the hand-written
+// fallback text) — additive, not a rewrite of the existing copywriting.
+// The count itself is a fresh, unfiltered `/api/listings` total for the
+// page's own city+propertyType (mirroring the canonical URL's scope, not
+// whatever price/beds/etc. filters a visitor's own querystring might add)
+// — a separate request from the page component's own listings fetch
+// below, since generateMetadata runs independently and pageSize:1 here
+// keeps it cheap (only `total` is used, not the actual results).
+// Noun mostly follows CITY_PAGE_TYPE_NOUN's Home/Condo wording, except
+// Land uses "lots" for this specific count sentence — "125 land for sale"
+// reads grammatically wrong since "land" doesn't pluralize with a count
+// the way "lot" does, and real estate listings for raw land are commonly
+// called "lots" anyway. Independent of LAND_AND_LOTS_CITY_SLUGS above
+// (that constant only drives the on-page "land and lots" body copy for 3
+// specific cities — this count noun is "lots" on every city's Land page).
+const LISTING_COUNT_NOUN = { Home: 'homes', Condo: 'condos', Land: 'lots' };
+
+async function buildListingCountPrefix({ citySlug, cityName, propertyType, oceanfront = false, noun }) {
+  if (!cityName || !propertyType) return '';
+  const types = Array.isArray(propertyType) ? propertyType : [propertyType];
+  try {
+    const data = await api.getListings({
+      city: citySlug,
+      propertyType: types,
+      waterfront: oceanfront ? 'Oceanfront' : undefined,
+      pageSize: 1,
+    });
+    const total = typeof data.total === 'number' ? data.total : null;
+    if (total == null) return '';
+    const resolvedNoun = noun || LISTING_COUNT_NOUN[types[0]] || 'listings';
+    const fullNoun = oceanfront ? `oceanfront ${resolvedNoun}` : resolvedNoun;
+    return `${total} ${fullNoun} for sale in ${cityName}, FL. `;
+  } catch {
+    // Count fetch failed — render the description without the prefix
+    // rather than losing the page's metadata entirely over this.
+    return '';
+  }
+}
+
 // "Request Information on Property Management" CTA (per Ryan, 2026-08-26)
 // — the blue button/modal originally built for the Harbor Island Beach
 // Club neighborhood page (see HarborIslandInquiryModals.js), added here
@@ -131,29 +181,50 @@ export async function generateMetadata({ params }) {
   if (!propertyType && !isOceanfrontCombined) return {};
   if ((isOceanfront || isOceanfrontCombined) && !OCEANFRONT_CITY_SLUGS.includes(citySlug)) return {};
 
+  // Fetched once up front (2026-09-22, added alongside the listing-count
+  // prefix above) — every branch below now wants the city's display name,
+  // where before only the hand-written fallback branches fetched it. A
+  // failure here still lets the main backend-SEO branch below render fine
+  // (just without the new count prefix, since the backend's own
+  // title/description already embed the city name) — only the
+  // isOceanfrontCombined and backend-SEO-failure branches actually require
+  // it, same as before this change.
+  let city = null;
+  try {
+    ({ city } = await api.getCity(citySlug));
+  } catch {
+    // Handled per-branch below.
+  }
+
   // No backend SEO row exists for a combined-type view (page_seo is keyed
   // by a single propertyType, same limitation as app/[citySlug]/page.js's
   // own combined "Listings" page) — hand-write it from the city's own name
   // instead of calling api.getOceanfrontSeo.
   if (isOceanfrontCombined) {
-    try {
-      const { city } = await api.getCity(citySlug);
-      return {
-        title: `Oceanfront Homes & Condos For Sale in ${city.name}, FL | Brevard Coastal Homes`,
-        description: `Browse every oceanfront home and condo listing in ${city.name}, FL in one place — updated from the MLS.`,
-      };
-    } catch {
-      return {};
-    }
+    if (!city) return {};
+    const countPrefix = await buildListingCountPrefix({
+      citySlug,
+      cityName: city.name,
+      propertyType: ['Home', 'Condo'],
+      oceanfront: true,
+      noun: 'properties',
+    });
+    return {
+      title: `Oceanfront Homes & Condos For Sale in ${city.name}, FL | Brevard Coastal Homes`,
+      description: `${countPrefix}Browse every oceanfront home and condo listing in ${city.name}, FL in one place — updated from the MLS.`,
+    };
   }
 
   try {
     const { seo } = isOceanfront
       ? await api.getOceanfrontSeo(citySlug, propertyType)
       : await api.getCitySeo(citySlug, propertyType);
+    const countPrefix = city
+      ? await buildListingCountPrefix({ citySlug, cityName: city.name, propertyType, oceanfront: isOceanfront })
+      : '';
     return {
       title: seo.title,
-      description: seo.metaDescription,
+      description: `${countPrefix}${seo.metaDescription}`,
       keywords: seo.keywords,
       alternates: { canonical: seo.canonicalUrl || seo.canonicalPath },
     };
@@ -166,13 +237,14 @@ export async function generateMetadata({ params }) {
     // root layout on every city/oceanfront page site-wide — confirmed live
     // on /cocoa-beach/homes-for-sale before this fix, which rendered that
     // bare sitewide title instead of anything Cocoa-Beach- or Homes-specific.
+    if (!city) return {};
     try {
-      const { city } = await api.getCity(citySlug);
       const typeLabel = PROPERTY_TYPE_LABEL[propertyType] || propertyType;
       const oceanPrefix = isOceanfront ? 'Oceanfront ' : '';
+      const countPrefix = await buildListingCountPrefix({ citySlug, cityName: city.name, propertyType, oceanfront: isOceanfront });
       return {
         title: `${oceanPrefix}${typeLabel} For Sale in ${city.name}, FL | Brevard Coastal Homes`,
-        description: `Browse ${oceanPrefix.toLowerCase()}${typeLabel.toLowerCase()} for sale in ${city.name}, FL — updated from the MLS.`,
+        description: `${countPrefix}Browse ${oceanPrefix.toLowerCase()}${typeLabel.toLowerCase()} for sale in ${city.name}, FL — updated from the MLS.`,
       };
     } catch {
       return {};
