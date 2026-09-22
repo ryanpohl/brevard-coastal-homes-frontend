@@ -866,8 +866,13 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             homes" 2026-09-16, per Ryan: "On the Aripeka & Adelaide pages can
             you change the text from tour model homes to 'set up private
             tours of the model homes'." Same swap applied to the identical
-            Adelaide block below. */}
-        {isAripeka && (
+            Adelaide block below.
+            Gated to `primaryType !== 'Land'` 2026-09-22 (added alongside the
+            new Land-specific block just below) — this builder/homes copy
+            only makes sense for Aripeka's Home view; Aripeka's Land view
+            (?propertyType=Land, reached via Nav.js's NEIGHBORHOOD_LOTS_PAGE_SLUGS
+            "Lots" link) now gets its own "land and lots" copy instead. */}
+        {isAripeka && primaryType !== 'Land' && (
           <div style={{ marginBottom: 12 }}>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
               Explore new construction and existing homes for sale in Aripeka. With four custom home builders to
@@ -876,6 +881,42 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             </p>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
               Looking for an Aripeka home?{' '}
+              <strong>
+                <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
+              </strong>{' '}
+              to get started.
+            </p>
+          </div>
+        )}
+        {/* Aripeka Land ("Lots") copy — added 2026-09-22, per Ryan: "for SEO
+            would you suggest adding lots in the description along with land
+            that is already there?" (about the Melbourne Beach Land page's
+            intro copy — see LAND_AND_LOTS_CITY_SLUGS's comment in
+            app/[citySlug]/[propertySlug]/page.js for the full request
+            thread) then "Can you add it to the melbourne beach land page
+            along with the Merritt island land page & the aripeka land page
+            where you can add the word land. Make all three of the webpages
+            the same with land & lots" plus the same-turn follow-up "Also do
+            it to the Cocoa Beach land page." Aripeka has no dedicated Land
+            *page* the way the 3 cities do (it's ?propertyType=Land on this
+            same neighborhood route — see NEIGHBORHOOD_LOTS_PAGE_SLUGS in
+            Nav.js), so this reuses the exact same "Discover land and lots
+            for sale in ___, Florida..." template as the city Land pages
+            (word-for-word, just swapping in "Aripeka") to satisfy Ryan's
+            "make all three/four the same" ask, rather than adapting
+            Aripeka's builder-specific copy above (which doesn't apply to
+            raw land lots). Shown only on the Land-filtered view
+            (primaryType === 'Land'); the builder/homes block above is now
+            gated to the opposite case so the two never render together. */}
+        {isAripeka && primaryType === 'Land' && (
+          <div style={{ marginBottom: 12 }}>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+              Discover land and lots for sale in Aripeka, Florida, and let us make your land or lot search easier.
+              We&rsquo;ll help you compare properties, arrange private showings, negotiate with sellers, and guide
+              you through every step from your initial search to closing.
+            </p>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+              Start your Aripeka land or lot search today.{' '}
               <strong>
                 <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
               </strong>{' '}
