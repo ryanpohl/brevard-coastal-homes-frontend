@@ -31,6 +31,37 @@ import ListingResultsLayout from '@/components/ListingResultsLayout';
 // backend defaults to 24 if this isn't passed.
 const PAGE_SIZE = 30;
 
+// Live listing-count meta description prefix (2026-09-22, per Ryan —
+// extending the same treatment already added to the city pages, see
+// LISTING_COUNT_NOUN's twin comment in
+// app/[citySlug]/[propertySlug]/page.js for the full "why": a concrete,
+// current-looking number in the search snippet — "125 homes for sale in
+// X" — tends to stand out and earn a higher click-through rate versus the
+// generic copy every competing result otherwise shows). PREPENDED to
+// whatever description text each branch below already builds; additive,
+// not a rewrite.
+// Unlike the city pages (a distinct canonical URL per property type), a
+// neighborhood page's type is driven entirely by the query string, so the
+// count here always matches whatever searchParams.propertyType this exact
+// request has (or every type combined, for the bare URL) rather than
+// defaulting to a single fixed type.
+const LISTING_COUNT_NOUN = { Home: 'homes', Condo: 'condos', Land: 'lots' };
+
+async function buildNeighborhoodListingCountPrefix({ listingsFilterParams, propertyType, neighborhoodName }) {
+  if (!neighborhoodName) return '';
+  try {
+    const data = await api.getListings({ ...listingsFilterParams, propertyType, pageSize: 1 });
+    const total = typeof data.total === 'number' ? data.total : null;
+    if (total == null) return '';
+    const noun = Array.isArray(propertyType) && propertyType.length === 1 ? LISTING_COUNT_NOUN[propertyType[0]] || 'listings' : 'listings';
+    return `${total} ${noun} for sale in ${neighborhoodName}, FL. `;
+  } catch {
+    // Count fetch failed — render the description without the prefix
+    // rather than losing the page's metadata entirely over this.
+    return '';
+  }
+}
+
 /**
  * Neighborhood listing page — one route covers all 8 neighborhoods, e.g.
  * /neighborhoods/pineda-landing. Unlike the city pages, property type isn't
@@ -44,53 +75,105 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
   // reference untouched, same pattern applied across every dynamic route
   // this session.
   const [params, searchParams] = await Promise.all([paramsPromise, searchParamsPromise]);
+  const { slug } = params;
   const primaryType = (searchParams.propertyType || 'Home').split(',')[0];
-  try {
-    const { seo } = await api.getNeighborhoodSeo(params.slug, primaryType);
-    return {
-      title: seo.title,
-      description: seo.metaDescription,
-      keywords: seo.keywords,
-      alternates: { canonical: seo.canonicalUrl || seo.canonicalPath },
-    };
-  } catch {
-    // The SEO call fails two different ways here: the backend endpoint
-    // itself is unreachable (2026-09-11 audit finding — see sitemap.js's
-    // comment for the full story), OR — for the 6 Viera Builders Communities
-    // Viera West sub-community pages — there's simply no backend row to
-    // begin with, since those aren't real `neighborhoods` table entries (see
-    // VIERA_BUILDERS_SUB_COMMUNITIES's comment in lib/constants.js). Either
-    // way, hand-write a reasonable per-page fallback instead of returning
-    // {}, which would otherwise inherit the generic sitewide title/
-    // description from the root layout.
-    const subCommunity = VIERA_BUILDERS_SUB_COMMUNITIES.find((c) => c.slug === params.slug);
-    if (subCommunity) {
-      return {
-        title: `${subCommunity.name} | Viera West, FL | Brevard Coastal Homes`,
-        description: `Browse listings in ${subCommunity.name}, a Viera Builders community in Viera West, FL.`,
-      };
-    }
-    // Beach Woods (per Ryan, 2026-09-19) — same reasoning as the
-    // subCommunity branch just above: no backend `neighborhoods` row (and
-    // so no SEO row) exists for this synthetic community page either — see
-    // lib/constants.js's BEACH_WOODS_SUBDIVISION_NAMES comment.
-    if (params.slug === 'beach-woods') {
-      return {
-        title: 'Beach Woods Condos & Townhomes | Melbourne Beach, FL | Brevard Coastal Homes',
-        description:
-          'Browse condos and townhomes for sale in Beach Woods, a gated riverfront-to-oceanfront community in Melbourne Beach, FL.',
-      };
-    }
+
+  // Same flags/listingsFilterParams logic as the page component further
+  // below (kept in sync manually — generateMetadata and the page component
+  // run as two separate functions with no shared state). See
+  // listingsFilterParams's own fuller comment down there for the
+  // per-community reasoning.
+  const subCommunity = VIERA_BUILDERS_SUB_COMMUNITIES.find((c) => c.slug === slug);
+  const isVieraBuildersCommunitiesVieraWest = slug === 'viera-builders-communities-viera-west';
+  const isBeachWoods = slug === 'beach-woods';
+  const isAquarina = slug === 'aquarina';
+  const listingsFilterParams = subCommunity
+    ? { subdivision: subCommunity.name }
+    : isVieraBuildersCommunitiesVieraWest
+      ? { subdivision: searchParams.subdivision || VIERA_BUILDERS_SUB_COMMUNITIES.map((c) => c.name).join(',') }
+      : isBeachWoods
+        ? { subdivision: BEACH_WOODS_SUBDIVISION_NAMES.join(',') }
+        : isAquarina
+          ? { subdivision: AQUARINA_SUBDIVISION_NAMES.join(',') }
+          : { neighborhood: slug };
+  const countPropertyType = searchParams.propertyType ? searchParams.propertyType.split(',') : undefined;
+
+  // Display name for the count sentence — subCommunity/Beach Woods already
+  // know their own name without a lookup; every other neighborhood
+  // (Aquarina included — it's a real backend row) needs one. Fetched
+  // unconditionally here, rather than only inside the old
+  // failure-fallback branch, since the count prefix now needs it on the
+  // successful-SEO path too.
+  let neighborhoodName = subCommunity ? subCommunity.name : isBeachWoods ? 'Beach Woods' : null;
+  if (!neighborhoodName) {
     try {
-      const { neighborhood } = await api.getNeighborhood(params.slug);
-      return {
-        title: `${neighborhood.name} Real Estate | Brevard Coastal Homes`,
-        description: `Browse homes, condos, and land for sale in ${neighborhood.name}, FL — updated from the MLS.`,
-      };
+      const { neighborhood } = await api.getNeighborhood(slug);
+      neighborhoodName = neighborhood.name;
     } catch {
-      return {};
+      // No neighborhood row at all (real 404) — every branch below already
+      // tolerates a null neighborhoodName by skipping the count prefix.
     }
   }
+
+  if (!subCommunity && !isBeachWoods) {
+    // Skipped for the 6 synthetic sub-community pages and Beach Woods —
+    // there's no backend SEO row for any of them (they don't exist as real
+    // neighborhoods), so this would just be a guaranteed-to-fail request
+    // every time (same optimization the page component below already
+    // makes).
+    try {
+      const { seo } = await api.getNeighborhoodSeo(slug, primaryType);
+      const countPrefix = await buildNeighborhoodListingCountPrefix({
+        listingsFilterParams,
+        propertyType: countPropertyType,
+        neighborhoodName,
+      });
+      return {
+        title: seo.title,
+        description: `${countPrefix}${seo.metaDescription}`,
+        keywords: seo.keywords,
+        alternates: { canonical: seo.canonicalUrl || seo.canonicalPath },
+      };
+    } catch {
+      // The SEO call fails two different ways here: the backend endpoint
+      // itself is unreachable (2026-09-11 audit finding — see sitemap.js's
+      // comment for the full story), or there's simply no SEO row yet for
+      // this neighborhood/property type. Either way, fall through to the
+      // hand-written fallback below instead of returning {}, which would
+      // otherwise inherit the generic sitewide title/description from the
+      // root layout.
+    }
+  }
+
+  // Beach Woods (per Ryan, 2026-09-19) and the 6 Viera Builders Communities
+  // Viera West sub-community pages (e.g. Pangea Park) aren't real
+  // `neighborhoods` table rows, so they never had a backend SEO row to
+  // begin with — see lib/constants.js's BEACH_WOODS_SUBDIVISION_NAMES/
+  // VIERA_BUILDERS_SUB_COMMUNITIES comments.
+  const countPrefix = await buildNeighborhoodListingCountPrefix({
+    listingsFilterParams,
+    propertyType: countPropertyType,
+    neighborhoodName,
+  });
+  if (subCommunity) {
+    return {
+      title: `${subCommunity.name} | Viera West, FL | Brevard Coastal Homes`,
+      description: `${countPrefix}Browse listings in ${subCommunity.name}, a Viera Builders community in Viera West, FL.`,
+    };
+  }
+  if (isBeachWoods) {
+    return {
+      title: 'Beach Woods Condos & Townhomes | Melbourne Beach, FL | Brevard Coastal Homes',
+      description: `${countPrefix}Browse condos and townhomes for sale in Beach Woods, a gated riverfront-to-oceanfront community in Melbourne Beach, FL.`,
+    };
+  }
+  if (neighborhoodName) {
+    return {
+      title: `${neighborhoodName} Real Estate | Brevard Coastal Homes`,
+      description: `${countPrefix}Browse homes, condos, and land for sale in ${neighborhoodName}, FL — updated from the MLS.`,
+    };
+  }
+  return {};
 }
 
 export default async function NeighborhoodListingsPage({ params: paramsPromise, searchParams: searchParamsPromise }) {
