@@ -107,6 +107,18 @@ export default async function ListingDetailPage({ params }) {
 
   const mapCenter = listing.latitude != null && listing.longitude != null ? { lat: listing.latitude, lng: listing.longitude } : null;
 
+  // Price reduction indicator (2026-09-23, per Ryan: "the website shows
+  // price changes on the neighborhood & city pages but not on the
+  // individual listing pages... can you add that"). Mirrors
+  // components/ListingCard.js's priceReduction exactly — same field
+  // (listing.originalListPrice vs listing.price), same red (not Zillow's
+  // green/down-is-good convention) down-arrow treatment, just placed next
+  // to the larger price display used on this page instead of the card's.
+  const priceReduction =
+    listing.originalListPrice != null && listing.originalListPrice > listing.price
+      ? listing.originalListPrice - listing.price
+      : null;
+
   return (
         <>
   {/* Two-column split for the property detail layout, widened 1.25in
@@ -178,7 +190,14 @@ export default async function ListingDetailPage({ params }) {
 </div>
   </div>
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 600, color: 'var(--color-ink)' }}>{formatPrice(listing.price)}</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 600, color: 'var(--color-ink)' }}>{formatPrice(listing.price)}</span>
+                {priceReduction != null && (
+                  <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-error)' }}>
+                    <span style={{ fontSize: 18, verticalAlign: -2 }}>↓</span> {formatPrice(priceReduction)}
+                  </span>
+                )}
+              </div>
   </div>
   </div>
 
