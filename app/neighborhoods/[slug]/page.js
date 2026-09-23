@@ -20,6 +20,8 @@ import {
   SOUTH_MERRITT_ISLAND_PRICE_BANDS,
   BEACH_WOODS_SUBDIVISION_NAMES,
   AQUARINA_SUBDIVISION_NAMES,
+  TORTOISE_ISLAND_SUBDIVISION_NAMES,
+  SUMMER_LAKES_SUBDIVISION_NAMES,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -95,7 +97,11 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
         ? { subdivision: BEACH_WOODS_SUBDIVISION_NAMES.join(',') }
         : isAquarina
           ? { subdivision: AQUARINA_SUBDIVISION_NAMES.join(',') }
-          : { neighborhood: slug };
+          : slug === 'tortoise-island'
+            ? { subdivision: TORTOISE_ISLAND_SUBDIVISION_NAMES.join(',') }
+            : slug === 'summer-lakes'
+              ? { subdivision: SUMMER_LAKES_SUBDIVISION_NAMES.join(',') }
+              : { neighborhood: slug };
   const countPropertyType = searchParams.propertyType ? searchParams.propertyType.split(',') : undefined;
 
   // Display name for the count sentence — subCommunity/Beach Woods already
@@ -320,7 +326,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         ? { subdivision: BEACH_WOODS_SUBDIVISION_NAMES.join(',') }
         : isAquarina
           ? { subdivision: AQUARINA_SUBDIVISION_NAMES.join(',') }
-          : { neighborhood: slug };
+          : slug === 'tortoise-island'
+            ? { subdivision: TORTOISE_ISLAND_SUBDIVISION_NAMES.join(',') }
+            : slug === 'summer-lakes'
+              ? { subdivision: SUMMER_LAKES_SUBDIVISION_NAMES.join(',') }
+              : { neighborhood: slug };
 
   let results = [];
   let total = 0;
