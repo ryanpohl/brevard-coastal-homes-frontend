@@ -24,6 +24,7 @@ import {
   SUMMER_LAKES_SUBDIVISION_NAMES,
   LANSING_ISLAND_SUBDIVISION_NAMES,
   SOUTH_MERRITT_ISLAND_LAT_MAX,
+  SUNTREE_SUBDIVISION_NAMES,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -107,7 +108,9 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
                 ? { subdivision: LANSING_ISLAND_SUBDIVISION_NAMES.join(',') }
                 : slug === 'south-merritt-island'
                   ? { city: 'merritt-island', latMax: SOUTH_MERRITT_ISLAND_LAT_MAX }
-                  : { neighborhood: slug };
+                  : slug === 'suntree'
+                    ? { subdivision: SUNTREE_SUBDIVISION_NAMES.join(',') }
+                    : { neighborhood: slug };
   const countPropertyType = searchParams.propertyType ? searchParams.propertyType.split(',') : undefined;
 
   // Display name for the count sentence — subCommunity/Beach Woods already
@@ -340,7 +343,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                 ? { subdivision: LANSING_ISLAND_SUBDIVISION_NAMES.join(',') }
                 : slug === 'south-merritt-island'
                   ? { city: 'merritt-island', latMax: SOUTH_MERRITT_ISLAND_LAT_MAX }
-                  : { neighborhood: slug };
+                  : slug === 'suntree'
+                    ? { subdivision: SUNTREE_SUBDIVISION_NAMES.join(',') }
+                    : { neighborhood: slug };
 
   let results = [];
   let total = 0;
