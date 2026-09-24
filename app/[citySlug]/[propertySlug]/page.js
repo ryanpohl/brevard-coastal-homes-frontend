@@ -87,7 +87,57 @@ const LAND_AND_LOTS_CITY_SLUGS = ['merritt-island', 'cocoa-beach', 'melbourne-be
 // called "lots" anyway. Independent of LAND_AND_LOTS_CITY_SLUGS above
 // (that constant only drives the on-page "land and lots" body copy for 3
 // specific cities — this count noun is "lots" on every city's Land page).
-const LISTING_COUNT_NOUN = { Home: 'homes', Condo: 'condos', Land: 'lots' };
+// Singular/plural pairs (2026-09-24, SEO audit fix — see combineDescription's
+// own comment below for the character-limit half of this fix): the count
+// sentence previously always used the plural noun ("1 homes for sale in..."),
+// grammatically wrong whenever a city/oceanfront/neighborhood combination's
+// live total happens to be exactly 1 — caught live while fixing the length
+// issue (Cocoa Beach's Oceanfront Homes page read "1 oceanfront homes for
+// sale" at the time). pickNoun below picks the right form for the actual
+// live count each time this runs.
+const LISTING_COUNT_NOUN = {
+  Home: { singular: 'home', plural: 'homes' },
+  Condo: { singular: 'condo', plural: 'condos' },
+  Land: { singular: 'lot', plural: 'lots' },
+};
+const DEFAULT_COUNT_NOUN = { singular: 'listing', plural: 'listings' };
+function pickNoun(nounPair, total) {
+  return total === 1 ? nounPair.singular : nounPair.plural;
+}
+
+// Google typically truncates a search result's description past roughly
+// 155-160 characters, cutting off mid-word/mid-sentence rather than at a
+// clean boundary. SEO audit finding (2026-09-24, per Ryan, pointing at the
+// audit doc's "Trim meta descriptions running past ~160 characters" item):
+// the count-prefix built above (added 2026-09-11 as a deliberate SEO
+// enhancement — see buildListingCountPrefix's own comment) is *prepended*
+// to each page's already-tuned base description without ever re-checking
+// the combined length, so a live count with enough digits pushes several
+// page types over the limit — confirmed live at 177 chars on Cocoa Beach's
+// Homes page and 191 on its Oceanfront Homes page, both cut off mid-word in
+// a real Google result per Ryan's own screenshot. Rather than shortening
+// each hand-written/backend base description individually (which would
+// still overflow again the moment a city's listing count grows another
+// digit), this trims whichever of the two needs it at request time: the
+// prefix (city name, live count) is always kept intact since it's the part
+// carrying real-time information a static base description can't; the base
+// description is truncated to whatever budget remains, cut at the last
+// whole word rather than mid-word, and closed with a clean period.
+const META_DESCRIPTION_MAX_LEN = 160;
+function combineDescription(prefix, base, maxLen = META_DESCRIPTION_MAX_LEN) {
+  if (!prefix) return base;
+  const budget = maxLen - prefix.length;
+  // Budget this thin only happens with an implausibly long city name/count
+  // — the prefix itself already carries the essential info, so fall back to
+  // it alone rather than gluing on an unreadable one-word fragment.
+  if (budget <= 20) return prefix.trim();
+  if (base.length <= budget) return `${prefix}${base}`;
+  let truncated = base.slice(0, budget);
+  const lastSpace = truncated.lastIndexOf(' ');
+  if (lastSpace > 0) truncated = truncated.slice(0, lastSpace);
+  truncated = truncated.replace(/[.,;:\s]+$/, '');
+  return `${prefix}${truncated}.`;
+}
 
 async function buildListingCountPrefix({ citySlug, cityName, propertyType, oceanfront = false, noun }) {
   if (!cityName || !propertyType) return '';
@@ -102,7 +152,8 @@ async function buildListingCountPrefix({ citySlug, cityName, propertyType, ocean
     });
     const total = typeof data.total === 'number' ? data.total : null;
     if (total == null) return '';
-    const resolvedNoun = noun || LISTING_COUNT_NOUN[types[0]] || 'listings';
+    const nounPair = noun || LISTING_COUNT_NOUN[types[0]] || DEFAULT_COUNT_NOUN;
+    const resolvedNoun = pickNoun(nounPair, total);
     const fullNoun = oceanfront ? `oceanfront ${resolvedNoun}` : resolvedNoun;
     return `${total} ${fullNoun} for sale in ${cityName}, FL. `;
   } catch {
@@ -212,11 +263,14 @@ export async function generateMetadata({ params }) {
       cityName: city.name,
       propertyType: ['Home', 'Condo'],
       oceanfront: true,
-      noun: 'properties',
+      noun: { singular: 'property', plural: 'properties' },
     });
     return {
       title: `Oceanfront Homes & Condos For Sale in ${city.name}, FL | Brevard Coastal Homes`,
-      description: `${countPrefix}Browse every oceanfront home and condo listing in ${city.name}, FL in one place — updated from the MLS.`,
+      description: combineDescription(
+        countPrefix,
+        `Browse every oceanfront home and condo listing in ${city.name}, FL in one place — updated from the MLS.`
+      ),
     };
   }
 
@@ -229,7 +283,7 @@ export async function generateMetadata({ params }) {
       : '';
     return {
       title: seo.title,
-      description: `${countPrefix}${seo.metaDescription}`,
+      description: combineDescription(countPrefix, seo.metaDescription),
       keywords: seo.keywords,
       alternates: { canonical: seo.canonicalUrl || seo.canonicalPath },
     };
@@ -249,7 +303,10 @@ export async function generateMetadata({ params }) {
       const countPrefix = await buildListingCountPrefix({ citySlug, cityName: city.name, propertyType, oceanfront: isOceanfront });
       return {
         title: `${oceanPrefix}${typeLabel} For Sale in ${city.name}, FL | Brevard Coastal Homes`,
-        description: `${countPrefix}Browse ${oceanPrefix.toLowerCase()}${typeLabel.toLowerCase()} for sale in ${city.name}, FL — updated from the MLS.`,
+        description: combineDescription(
+          countPrefix,
+          `Browse ${oceanPrefix.toLowerCase()}${typeLabel.toLowerCase()} for sale in ${city.name}, FL — updated from the MLS.`
+        ),
       };
     } catch {
       return {};
