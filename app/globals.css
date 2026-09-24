@@ -1,4 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600;700;800&family=Inter+Tight:wght@400;500;600;700;800&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&display=swap');
+/* Fonts are loaded via next/font/google in app/layout.js (2026-09-24, SEO/
+   performance re-audit) rather than the @import that used to be here —
+   next/font self-hosts the font files at build time (no render-blocking
+   request to fonts.googleapis.com/fonts.gstatic.com) and exposes each
+   family as a CSS custom property on <html> (--font-nf-playfair,
+   --font-nf-jost, --font-nf-inter-tight, --font-nf-bodoni), which the
+   --font-heading/--font-body/--font-inter-tight/--font-didot tokens below
+   reference. See layout.js for the full rationale. */
 
 /* Design tokens — see design/README.md "Design Tokens" section. Keep these
    in sync with that file; it's the source of truth from the design handoff. */
@@ -33,8 +40,8 @@
   --shadow-nav-menu: 0 12px 32px rgba(0, 0, 0, 0.3);
   --shadow-filter-menu: 0 8px 24px rgba(0, 0, 0, 0.14);
 
-  --font-heading: 'Playfair Display', serif;
-  --font-body: 'Jost', sans-serif;
+  --font-heading: var(--font-nf-playfair), 'Playfair Display', serif;
+  --font-body: var(--font-nf-jost), 'Jost', sans-serif;
   /* Added 2026-08-21 per Ryan ("Change the font to inter tight on all the
      pages city & neighborhood descriptions") — used specifically on the
      city/neighborhood listing pages' H1 (there's no separate visible
@@ -42,7 +49,7 @@
      "N results" line — the H1 is what Ryan's reference screenshots
      showed). See app/[citySlug]/[propertySlug]/page.js and
      app/neighborhoods/[slug]/page.js. */
-  --font-inter-tight: 'Inter Tight', sans-serif;
+  --font-inter-tight: var(--font-nf-inter-tight), 'Inter Tight', sans-serif;
   /* Added 2026-09-04 per Ryan: matched a reference site's hero headline
      (high-contrast Didot-style serif, thin hairline serifs, tall
      proportions) after comparing it against the homepage hero in a
@@ -51,7 +58,7 @@
      homepage hero H1 (app/page.js) — was var(--font-inter-tight) there,
      everything else on the homepage stays Inter Tight per Ryan's
      2026-08-21 sitewide-text decision. */
-  --font-didot: 'Bodoni Moda', 'Playfair Display', serif;
+  --font-didot: var(--font-nf-bodoni), 'Bodoni Moda', var(--font-nf-playfair), 'Playfair Display', serif;
 }
 
 * {

@@ -1,10 +1,56 @@
 import Script from 'next/script';
+import { Playfair_Display, Jost, Inter_Tight, Bodoni_Moda } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/lib/auth-context';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import AuthPromptHost from '@/components/AuthPromptHost';
 import * as api from '@/lib/api';
+
+// Self-hosted via next/font (2026-09-24, found during the SEO/performance
+// re-audit) — replaces the old `@import url('https://fonts.googleapis.com/...')`
+// at the top of globals.css. That @import was a textbook render-blocking
+// chain: the browser has to download globals.css, parse it, discover the
+// @import, fetch fonts.googleapis.com's CSS, parse THAT, then finally fetch
+// the actual font files from fonts.gstatic.com — three serial round trips
+// to a third-party domain before any of this site's custom-font text could
+// paint, which PageSpeed Insights flagged as ~1.35s of render-blocking
+// delay on top of directly hurting LCP for any hero/heading whose largest
+// element uses one of these fonts (Playfair Display, Inter Tight, Bodoni
+// Moda are all used on H1s — see globals.css's --font-heading etc.).
+// next/font/google downloads these same font files at BUILD time and
+// self-hosts them from this domain (no fonts.googleapis.com/fonts.gstatic.com
+// request at all), inlines the @font-face rules, and applies font-display:
+// swap automatically — same visual fonts/weights as before, just not
+// render-blocking. Each font's `variable` becomes a CSS custom property
+// (applied to <html> below) that globals.css's existing --font-heading/
+// --font-body/--font-inter-tight/--font-didot tokens now point at, so
+// none of the ~60 call sites using var(--font-heading) etc. needed to
+// change. Weights kept identical to the old @import URL's wght list.
+const playfairDisplay = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['500', '600', '700'],
+  display: 'swap',
+  variable: '--font-nf-playfair',
+});
+const jost = Jost({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-nf-jost',
+});
+const interTight = Inter_Tight({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-nf-inter-tight',
+});
+const bodoniModa = Bodoni_Moda({
+  subsets: ['latin'],
+  weight: ['500', '600'],
+  display: 'swap',
+  variable: '--font-nf-bodoni',
+});
 
 // Sitewide SEO defaults (2026-09-11) — metadataBase resolves every page's
 // relative image/canonical URLs (e.g. a page's `alternates.canonical: '/foo'`
@@ -64,7 +110,10 @@ export default async function RootLayout({ children }) {
   const { cities, neighborhoods } = await getNavData();
 
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      className={`${playfairDisplay.variable} ${jost.variable} ${interTight.variable} ${bodoniModa.variable}`}
+    >
       <body>
         {/* Google Ads conversion tracking (gtag.js), added 2026-08-20 per Ryan.
             Loaded here in the root layout so it's present on every page. */}
