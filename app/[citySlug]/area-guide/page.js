@@ -1,7 +1,13 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import * as api from '@/lib/api';
-import { CITY_AREA_GUIDE_SLUGS, CITY_AREA_GUIDE_CONTENT, CITY_LISTINGS_FAQ, formatPrice } from '@/lib/constants';
+import {
+  CITY_AREA_GUIDE_SLUGS,
+  CITY_AREA_GUIDE_CONTENT,
+  CITY_LISTINGS_FAQ,
+  formatPrice,
+  cityListingsQueryParams,
+} from '@/lib/constants';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 
@@ -52,7 +58,11 @@ async function getMarketSnapshot(citySlug, propertyType) {
   let results = [];
   try {
     do {
-      const data = await api.getListings({ city: citySlug, propertyType, page, pageSize: 100 });
+      // See cityListingsQueryParams's comment (lib/constants.js) — needed
+      // here too, since this function is exactly what surfaced Viera
+      // West's "0 results" bug in the first place (an empty Market
+      // Snapshot on its own Area Guide page).
+      const data = await api.getListings({ ...cityListingsQueryParams(citySlug), propertyType, page, pageSize: 100 });
       results = results.concat(data.results || []);
       totalPages = Math.min(data.totalPages || 1, 3);
       page += 1;
