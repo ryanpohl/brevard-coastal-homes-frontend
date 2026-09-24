@@ -1,9 +1,48 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import * as api from '@/lib/api';
-import { NEIGHBORHOOD_AREA_GUIDE_CONTENT, NEIGHBORHOOD_LISTINGS_FAQ, formatPrice } from '@/lib/constants';
+import {
+  NEIGHBORHOOD_AREA_GUIDE_CONTENT,
+  NEIGHBORHOOD_LISTINGS_FAQ,
+  VIERA_BUILDERS_SUB_COMMUNITIES,
+  AQUARINA_SUBDIVISION_NAMES,
+  TORTOISE_ISLAND_SUBDIVISION_NAMES,
+  SUMMER_LAKES_SUBDIVISION_NAMES,
+  LANSING_ISLAND_SUBDIVISION_NAMES,
+  SUNTREE_SUBDIVISION_NAMES,
+  formatPrice,
+} from '@/lib/constants';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+
+// Mirrors app/neighborhoods/[slug]/page.js's own listingsFilterParams
+// switch (2026-09-24, added while wiring up the 5 Viera Builders Communities
+// sub-community Area Guides below) — but only the subset of branches that
+// apply to a slug with real NEIGHBORHOOD_AREA_GUIDE_CONTENT: the 6 Viera
+// Builders sub-communities (subCommunity, e.g. Pangea Park) aren't real
+// `neighborhoods` table rows, so `{ neighborhood: slug }` — this file's
+// previous unconditional query — returns nothing for them; Aquarina/
+// Tortoise Island/Summer Lakes/Lansing Island/Suntree ARE real rows, but
+// their listings' neighborhood_id links are known incomplete or entirely
+// missing (see each *_SUBDIVISION_NAMES constant's own comment in
+// lib/constants.js), so they need the same `subdivision` list the main
+// listings page already filters by. Caught live while building this: before
+// this fix, Tortoise Island's and Summer Lakes's Area Guide pages were both
+// silently showing "0 Active Listings" in the Market Snapshot despite 11
+// and 4 real active listings respectively, because `{ neighborhood: slug }`
+// matched zero of them — Aquarina/Suntree happened to show correct-looking
+// numbers only because enough of their listings' neighborhood_id links were
+// intact to coincidentally match their own already-thin/small counts.
+function getListingsFilterParams(slug) {
+  const subCommunity = VIERA_BUILDERS_SUB_COMMUNITIES.find((c) => c.slug === slug);
+  if (subCommunity) return { subdivision: subCommunity.name };
+  if (slug === 'aquarina') return { subdivision: AQUARINA_SUBDIVISION_NAMES.join(',') };
+  if (slug === 'tortoise-island') return { subdivision: TORTOISE_ISLAND_SUBDIVISION_NAMES.join(',') };
+  if (slug === 'summer-lakes') return { subdivision: SUMMER_LAKES_SUBDIVISION_NAMES.join(',') };
+  if (slug === 'lansing-island') return { subdivision: LANSING_ISLAND_SUBDIVISION_NAMES.join(',') };
+  if (slug === 'suntree') return { subdivision: SUNTREE_SUBDIVISION_NAMES.join(',') };
+  return { neighborhood: slug };
+}
 
 /**
  * Neighborhood "Area Guide" page (2026-09-24, per Ryan: "make the
@@ -33,6 +72,19 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   if (!NEIGHBORHOOD_AREA_GUIDE_CONTENT[slug]) return {};
+  // The 6 Viera Builders Communities sub-communities (e.g. Pangea Park)
+  // aren't real `neighborhoods` table rows — see VIERA_BUILDERS_SUB_
+  // COMMUNITIES's own comment in lib/constants.js — so api.getNeighborhood
+  // would 404 for them every time. Same stand-in-name treatment
+  // app/neighborhoods/[slug]/page.js already uses for these slugs.
+  const subCommunity = VIERA_BUILDERS_SUB_COMMUNITIES.find((c) => c.slug === slug);
+  if (subCommunity) {
+    return {
+      title: `${subCommunity.name}, FL Area Guide — Amenities, Schools & HOA Fees | Brevard Coastal Homes`,
+      description: `What to know before buying in ${subCommunity.name}, a Viera Builders community in Viera West, FL: amenities, schools, HOA fees, current market stats, and FAQs.`,
+      alternates: { canonical: `/neighborhoods/${slug}/area-guide` },
+    };
+  }
   try {
     const { neighborhood } = await api.getNeighborhood(slug);
     return {
@@ -45,9 +97,9 @@ export async function generateMetadata({ params }) {
   }
 }
 
-async function getMarketSnapshot(slug) {
+async function getMarketSnapshot(listingsFilterParams) {
   try {
-    const data = await api.getListings({ neighborhood: slug, pageSize: 100 });
+    const data = await api.getListings({ ...listingsFilterParams, pageSize: 100 });
     const results = data.results || [];
     const prices = results.map((l) => l.price).filter((p) => typeof p === 'number').sort((a, b) => a - b);
     const median = prices.length ? prices[Math.floor(prices.length / 2)] : null;
@@ -63,14 +115,23 @@ export default async function NeighborhoodAreaGuidePage({ params }) {
 
   const content = NEIGHBORHOOD_AREA_GUIDE_CONTENT[slug];
 
+  // Same stand-in neighborhood object app/neighborhoods/[slug]/page.js
+  // builds for the 6 Viera Builders Communities sub-communities instead of
+  // fetching one (see that file's own subCommunity comment) — these aren't
+  // real `neighborhoods` table rows, so api.getNeighborhood(slug) 404s.
+  const subCommunity = VIERA_BUILDERS_SUB_COMMUNITIES.find((c) => c.slug === slug);
   let neighborhood;
-  try {
-    ({ neighborhood } = await api.getNeighborhood(slug));
-  } catch {
-    notFound();
+  if (subCommunity) {
+    neighborhood = { slug, name: subCommunity.name };
+  } else {
+    try {
+      ({ neighborhood } = await api.getNeighborhood(slug));
+    } catch {
+      notFound();
+    }
   }
 
-  const snapshot = await getMarketSnapshot(slug);
+  const snapshot = await getMarketSnapshot(getListingsFilterParams(slug));
   const faqItems = NEIGHBORHOOD_LISTINGS_FAQ[slug];
 
   return (
