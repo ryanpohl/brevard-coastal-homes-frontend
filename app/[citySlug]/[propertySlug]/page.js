@@ -276,9 +276,48 @@ export async function generateMetadata({ params }) {
   }
 
   try {
-    const { seo } = isOceanfront
+    let { seo } = isOceanfront
       ? await api.getOceanfrontSeo(citySlug, propertyType)
       : await api.getCitySeo(citySlug, propertyType);
+    // "Viera East" -> "Viera" fix (2026-09-24, found during a full redo of
+    // the SEO audit per Ryan: "can you redo the SEO & AI Visibility Audit
+    // to make sure we have everything completed" — live check turned up
+    // /viera/homes-for-sale|condos-for-sale|land-for-sale all still
+    // reading "Viera East, FL Homes For Sale | Viera East Realtors" in
+    // both title and H1, even though the city itself was renamed back to
+    // "Viera" the same day (2026-09-24, per Ryan: "Lets do Viera then
+    // instead of viera east" — see lib/constants.js's VIERA_LAT_MIN
+    // comment). That rename fixed every neighborhood parented to this city
+    // (Aripeka/Adelaide/Summer Lakes, via each one's own frontend-side
+    // seo.h1.replace('Viera East', 'Viera') a few lines below in the
+    // sibling app/neighborhoods/[slug]/page.js) and the hand-written
+    // bare-city/Area Guide pages (app/[citySlug]/page.js,
+    // app/[citySlug]/area-guide/page.js), but missed this city's own
+    // property-type pages — their title/h1/description/keywords all come
+    // straight from the backend's page_seo table via getCitySeo, which was
+    // seeded before the rename and still literally stores "Viera East"
+    // today. The original audit doc (written the same day) misdiagnosed
+    // this as the known 1-hour SEO fetch cache still catching up — it
+    // wasn't; the stale text is in the database row itself, so no amount
+    // of waiting fixes it. Same frontend-side string-replace pattern as
+    // the neighborhood pages here too, rather than a backend page_seo
+    // reseed — this project's own incident history flags backend seed
+    // changes as risky for the live DB (see CLAUDE.md's "Apply changes"
+    // incident) — scoped to citySlug === 'viera' only so no other city's
+    // (correctly-seeded) SEO text is touched. isOceanfront is never true
+    // for Viera (it's not in OCEANFRONT_CITY_SLUGS — Viera has no
+    // waterfront pages), so this only ever needs to cover the
+    // getCitySeo branch in practice, but it's applied unconditionally
+    // here for safety in case that ever changes.
+    if (citySlug === 'viera') {
+      seo = {
+        ...seo,
+        title: seo.title?.replace(/Viera East/g, 'Viera'),
+        h1: seo.h1?.replace(/Viera East/g, 'Viera'),
+        metaDescription: seo.metaDescription?.replace(/Viera East/g, 'Viera'),
+        keywords: Array.isArray(seo.keywords) ? seo.keywords.map((k) => k.replace(/Viera East/g, 'Viera')) : seo.keywords,
+      };
+    }
     const countPrefix = city
       ? await buildListingCountPrefix({ citySlug, cityName: city.name, propertyType, oceanfront: isOceanfront })
       : '';
@@ -369,6 +408,20 @@ export default async function CityListingsPage({ params, searchParams: searchPar
       ({ seo, jsonLd } = isOceanfront
         ? await api.getOceanfrontSeo(citySlug, propertyType)
         : await api.getCitySeo(citySlug, propertyType));
+      // "Viera East" -> "Viera" fix — same normalization as generateMetadata
+      // above (see the long comment there for the full history). Needed here
+      // too since this seo object independently feeds pageTitle (used for
+      // buildItemListSchema below) and the actual <h1> JSX render further
+      // down this component.
+      if (citySlug === 'viera' && seo) {
+        seo = {
+          ...seo,
+          title: seo.title?.replace(/Viera East/g, 'Viera'),
+          h1: seo.h1?.replace(/Viera East/g, 'Viera'),
+          metaDescription: seo.metaDescription?.replace(/Viera East/g, 'Viera'),
+          keywords: Array.isArray(seo.keywords) ? seo.keywords.map((k) => k.replace(/Viera East/g, 'Viera')) : seo.keywords,
+        };
+      }
     } catch {
       // No SEO row yet (e.g. seed:seo hasn't run) — render with sensible fallbacks below.
     }
