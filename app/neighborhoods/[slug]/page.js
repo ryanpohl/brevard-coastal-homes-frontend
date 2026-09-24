@@ -51,7 +51,38 @@ const PAGE_SIZE = 30;
 // count here always matches whatever searchParams.propertyType this exact
 // request has (or every type combined, for the bare URL) rather than
 // defaulting to a single fixed type.
-const LISTING_COUNT_NOUN = { Home: 'homes', Condo: 'condos', Land: 'lots' };
+const LISTING_COUNT_NOUN = {
+  Home: { singular: 'home', plural: 'homes' },
+  Condo: { singular: 'condo', plural: 'condos' },
+  Land: { singular: 'lot', plural: 'lots' },
+};
+const DEFAULT_COUNT_NOUN = { singular: 'listing', plural: 'listings' };
+function pickNoun(nounPair, total) {
+  return total === 1 ? nounPair.singular : nounPair.plural;
+}
+
+// SEO audit fix (2026-09-24, per Ryan: "do these 2 suggestions next",
+// pasting the "Trim meta descriptions running past ~160 characters" row —
+// same overflow bug and same fix already applied to the sibling city page,
+// app/[citySlug]/[propertySlug]/page.js; see that file's own
+// META_DESCRIPTION_MAX_LEN/combineDescription comment for the full
+// reasoning). This page's countPrefix is prepended to 4 different base
+// descriptions below with no length check, so any of them can run past
+// Google's ~155-160 character truncation point once a live listing count is
+// spliced in — trims at a word boundary and appends a period rather than
+// cutting off mid-word/mid-sentence.
+const META_DESCRIPTION_MAX_LEN = 160;
+function combineDescription(prefix, base, maxLen = META_DESCRIPTION_MAX_LEN) {
+  if (!prefix) return base;
+  const budget = maxLen - prefix.length;
+  if (budget <= 20) return prefix.trim();
+  if (base.length <= budget) return `${prefix}${base}`;
+  let truncated = base.slice(0, budget);
+  const lastSpace = truncated.lastIndexOf(' ');
+  if (lastSpace > 0) truncated = truncated.slice(0, lastSpace);
+  truncated = truncated.replace(/[.,;:\s]+$/, '');
+  return `${prefix}${truncated}.`;
+}
 
 async function buildNeighborhoodListingCountPrefix({ listingsFilterParams, propertyType, neighborhoodName }) {
   if (!neighborhoodName) return '';
@@ -59,7 +90,9 @@ async function buildNeighborhoodListingCountPrefix({ listingsFilterParams, prope
     const data = await api.getListings({ ...listingsFilterParams, propertyType, pageSize: 1 });
     const total = typeof data.total === 'number' ? data.total : null;
     if (total == null) return '';
-    const noun = Array.isArray(propertyType) && propertyType.length === 1 ? LISTING_COUNT_NOUN[propertyType[0]] || 'listings' : 'listings';
+    const nounPair =
+      Array.isArray(propertyType) && propertyType.length === 1 ? LISTING_COUNT_NOUN[propertyType[0]] || DEFAULT_COUNT_NOUN : DEFAULT_COUNT_NOUN;
+    const noun = pickNoun(nounPair, total);
     return `${total} ${noun} for sale in ${neighborhoodName}, FL. `;
   } catch {
     // Count fetch failed — render the description without the prefix
@@ -146,7 +179,7 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
       });
       return {
         title: seo.title,
-        description: `${countPrefix}${seo.metaDescription}`,
+        description: combineDescription(countPrefix, seo.metaDescription),
         keywords: seo.keywords,
         alternates: { canonical: seo.canonicalUrl || seo.canonicalPath },
       };
@@ -174,19 +207,28 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
   if (subCommunity) {
     return {
       title: `${subCommunity.name} | Viera West, FL | Brevard Coastal Homes`,
-      description: `${countPrefix}Browse listings in ${subCommunity.name}, a Viera Builders community in Viera West, FL.`,
+      description: combineDescription(
+        countPrefix,
+        `Browse listings in ${subCommunity.name}, a Viera Builders community in Viera West, FL.`
+      ),
     };
   }
   if (isBeachWoods) {
     return {
       title: 'Beach Woods Condos & Townhomes | Melbourne Beach, FL | Brevard Coastal Homes',
-      description: `${countPrefix}Browse condos and townhomes for sale in Beach Woods, a gated riverfront-to-oceanfront community in Melbourne Beach, FL.`,
+      description: combineDescription(
+        countPrefix,
+        `Browse condos and townhomes for sale in Beach Woods, a gated riverfront-to-oceanfront community in Melbourne Beach, FL.`
+      ),
     };
   }
   if (neighborhoodName) {
     return {
       title: `${neighborhoodName} Real Estate | Brevard Coastal Homes`,
-      description: `${countPrefix}Browse homes, condos, and land for sale in ${neighborhoodName}, FL — updated from the MLS.`,
+      description: combineDescription(
+        countPrefix,
+        `Browse homes, condos, and land for sale in ${neighborhoodName}, FL — updated from the MLS.`
+      ),
     };
   }
   return {};
