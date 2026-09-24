@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import * as api from '@/lib/api';
-import { cityListingsQueryParams } from '@/lib/constants';
+import { cityListingsQueryParams, buildItemListSchema } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -162,8 +162,27 @@ export default async function CityAllListingsPage({ params, searchParams: search
   // always centered on the right place even with zero pins to show yet.
   const mapCenter = city.latitude != null && city.longitude != null ? { lat: city.latitude, lng: city.longitude } : null;
 
+  // ItemList structured data (2026-09-24, per Ryan: "Lets do this next" —
+  // SEO audit doc's "Wire the backend's existing ItemList schema into
+  // city/neighborhood listing pages" row; see buildItemListSchema's own
+  // comment in lib/constants.js for the full reasoning). This page has no
+  // backend SEO row to begin with (see generateMetadata's own comment
+  // above — an "all types combined" view has no single-propertyType
+  // page_seo row to fetch), so there's no existing BreadcrumbList jsonLd
+  // here to merge with — this ItemList is the page's only structured data.
+  const itemListSchema = buildItemListSchema({
+    pageTitle: `${city.name} Listings — Homes, Condos & Land For Sale, FL`,
+    path: `/${citySlug}`,
+    listings: results,
+    total,
+    pageStart: rangeStart,
+  });
+
   return (
     <div>
+      {itemListSchema && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
+      )}
       <div className="container" style={{ padding: '32px clamp(16px, 4vw, 56px) 0' }}>
         <h1 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', marginBottom: 8, fontFamily: 'var(--font-inter-tight)' }}>
           {city.name} Listings — Homes, Condos & Land For Sale, FL
