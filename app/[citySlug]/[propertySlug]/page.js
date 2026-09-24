@@ -10,6 +10,7 @@ import {
   OCEANFRONT_LISTINGS_SLUG,
   CITY_AREA_GUIDE_SLUGS,
   CITY_LISTINGS_FAQ,
+  cityListingsQueryParams,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
@@ -93,7 +94,8 @@ async function buildListingCountPrefix({ citySlug, cityName, propertyType, ocean
   const types = Array.isArray(propertyType) ? propertyType : [propertyType];
   try {
     const data = await api.getListings({
-      city: citySlug,
+      // See cityListingsQueryParams's comment (lib/constants.js).
+      ...cityListingsQueryParams(citySlug),
       propertyType: types,
       waterfront: oceanfront ? 'Oceanfront' : undefined,
       pageSize: 1,
@@ -332,7 +334,8 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   let totalPages = 1;
   try {
     const data = await api.getListings({
-      city: citySlug,
+      // See cityListingsQueryParams's comment (lib/constants.js).
+      ...cityListingsQueryParams(citySlug),
       propertyType: effectivePropertyTypes,
       priceMin: searchParams.priceMin,
       priceMax: searchParams.priceMax,
