@@ -25,12 +25,15 @@ import {
   LANSING_ISLAND_SUBDIVISION_NAMES,
   SOUTH_MERRITT_ISLAND_LAT_MAX,
   SUNTREE_SUBDIVISION_NAMES,
+  NEIGHBORHOOD_AREA_GUIDE_CONTENT,
+  NEIGHBORHOOD_LISTINGS_FAQ,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import HarborIslandForeclosuresTrigger from '@/components/HarborIslandForeclosuresTrigger';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
+import Faq from '@/components/Faq';
 
 // Matches the reference design's "1-30 of 34 Homes" pagination — the
 // backend defaults to 24 if this isn't passed.
@@ -627,6 +630,12 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
       : parentCity && parentCity.latitude != null && parentCity.longitude != null
         ? { lat: parentCity.latitude, lng: parentCity.longitude }
         : null;
+
+  // See NEIGHBORHOOD_AREA_GUIDE_CONTENT/NEIGHBORHOOD_LISTINGS_FAQ in
+  // lib/constants.js — undefined (renders nothing below) for every
+  // neighborhood not yet built out.
+  const guideContent = NEIGHBORHOOD_AREA_GUIDE_CONTENT[slug];
+  const faqItems = NEIGHBORHOOD_LISTINGS_FAQ[slug];
 
   return (
     <div>
@@ -1349,6 +1358,43 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           totalPages={totalPages}
         />
       </div>
+
+      {/* Neighborhood "About" content (2026-09-24, per Ryan: "Do it how
+          you did it on the city pages") — same GuideSection pattern as
+          app/[citySlug]/area-guide/page.js's CITY_AREA_GUIDE_CONTENT, but
+          folded into this same page below the listings rather than a
+          separate /area-guide route, since a neighborhood (unlike a city)
+          only has this one page — see NEIGHBORHOOD_AREA_GUIDE_CONTENT's
+          own comment in lib/constants.js for the rollout plan and
+          Adelaide's sourcing. Renders nothing for any neighborhood not yet
+          in that object. */}
+      {guideContent && (
+        <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px', maxWidth: 760 }}>
+          <h2 style={{ fontSize: 26, marginBottom: 20, fontFamily: 'var(--font-inter-tight)' }}>
+            About {neighborhood.name}
+          </h2>
+          <GuideSection title="Overview" text={guideContent.intro} />
+          <GuideSection title="Community & Amenities" text={guideContent.amenities} />
+          <GuideSection title="Homesites & Builders" text={guideContent.homesites} />
+          <GuideSection title="Schools" text={guideContent.schools} />
+          <GuideSection title="HOA & Community Fees" text={guideContent.hoa} />
+          {faqItems && (
+            <section style={{ marginBottom: 36 }}>
+              <Faq items={faqItems} heading={`Frequently Asked Questions About ${neighborhood.name}`} />
+            </section>
+          )}
+        </div>
+      )}
     </div>
+  );
+}
+
+function GuideSection({ title, text }) {
+  if (!text) return null;
+  return (
+    <section style={{ marginBottom: 28 }}>
+      <h3 style={{ fontSize: 20, marginBottom: 8, fontFamily: 'var(--font-inter-tight)' }}>{title}</h3>
+      <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>{text}</p>
+    </section>
   );
 }
