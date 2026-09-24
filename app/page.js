@@ -76,13 +76,24 @@ const CITY_IMAGE_POSITION = {
 // "Viera" rename above): Ryan sent a new night photo of the monument sign
 // — now reading just "VIERA" (no "EAST" line) — to match. Same tall
 // portrait source (1024x1536), same crop treatment (1024x768 landscape
-// centered on the "V" logo + "VIERA" text), saved as its own new file
-// (viera-sign.jpg) rather than overwriting viera-east-sign.jpg, following
-// this file's own established "new dedicated static file per photo swap"
-// pattern from the entry just above rather than mutating one in place.
+// centered on the "V" logo + "VIERA" text).
+//
+// First attempt saved this as its own new file (viera-sign.jpg), following
+// this file's usual "new dedicated file per photo swap" pattern — but that
+// new file 404'd on the live site well after the rest of the same deploy
+// (the "Viera" text changes) had already gone live, while the existing
+// viera-east-sign.jpg kept loading fine throughout. Whatever Hostinger's
+// deploy pipeline does to sync new files under public/ appears to lag (or
+// not run) independently of the Next.js app rebuild itself; overwriting an
+// already-served path doesn't depend on that step. Per Ryan ("You can
+// change it to whatever loads the easiest"): reused viera-east-sign.jpg's
+// existing, already-working path instead — its bytes are now this new
+// "VIERA" (no "EAST") photo. viera-sign.jpg is still sitting in the repo,
+// unreferenced and harmless, rather than deleted (this session's
+// established file-upload flow only adds/replaces, doesn't delete).
 const CITY_THUMBNAIL_OVERRIDE = {
   'viera-west': 'viera-west-city.jpg',
-  viera: 'viera-sign.jpg',
+  viera: 'viera-east-sign.jpg',
 };
 
 // Homepage "Search By Neighborhood" display order (2026-09-07, per Ryan:
