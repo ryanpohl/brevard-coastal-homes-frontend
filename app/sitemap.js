@@ -78,6 +78,28 @@ export default async function sitemap() {
         priority: 0.8,
       });
     });
+    // SEO audit fix (2026-09-24) — this loop only ever covered the
+    // per-property-type pages above, so the bare "/{city}" combined
+    // Listings page (app/[citySlug]/page.js, added 2026-09-01) and the
+    // "/{city}/area-guide" page (app/[citySlug]/area-guide/page.js) were
+    // both silently missing from the sitemap despite being real, live,
+    // unique pages — 20 URLs across the 10 cities, zero of which search
+    // engines could discover. Priorities: the combined Listings page sits
+    // just under the single-property-type pages (0.75 vs 0.8) since it's
+    // the broader, entry-point view; the Area Guide is informational
+    // rather than transactional, matching the neighborhood pages' 0.7.
+    entries.push({
+      url: `${SITE_URL}/${city.slug}`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.75,
+    });
+    entries.push({
+      url: `${SITE_URL}/${city.slug}/area-guide`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    });
     // Oceanfront homes/condos + the combined "Listings" view only exist for
     // the 5 barrier-island cities — see OCEANFRONT_CITY_SLUGS's own comment
     // in lib/constants.js.
