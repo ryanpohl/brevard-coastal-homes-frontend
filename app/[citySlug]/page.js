@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import * as api from '@/lib/api';
+import { cityListingsQueryParams } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -100,7 +101,10 @@ export default async function CityAllListingsPage({ params, searchParams: search
   let totalPages = 1;
   try {
     const data = await api.getListings({
-      city: citySlug,
+      // See cityListingsQueryParams's comment (lib/constants.js) — plain
+      // `{ city: citySlug }` for every city except Viera West, whose real
+      // MLS `city` field is never "Viera West".
+      ...cityListingsQueryParams(citySlug),
       propertyType: effectivePropertyTypes,
       priceMin: searchParams.priceMin,
       priceMax: searchParams.priceMax,
