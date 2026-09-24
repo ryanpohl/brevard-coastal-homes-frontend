@@ -16,7 +16,10 @@ import SearchBar from '@/components/SearchBar';
 export const metadata = {
   title: 'Brevard Coastal Homes | Homes & Condos in Brevard County',
   description:
-    'Search homes, condos, and land for sale across Cocoa Beach, Melbourne Beach, Satellite Beach, Viera East, and every coastal city and neighborhood in Brevard County, FL.',
+    // "Viera East" -> "Viera" (2026-09-24, per Ryan: "Lets do Viera then
+    // instead of viera east") — see lib/constants.js's VIERA_LAT_MIN/etc.
+    // comment for the full SEO reasoning behind the reversal.
+    'Search homes, condos, and land for sale across Cocoa Beach, Melbourne Beach, Satellite Beach, Viera, and every coastal city and neighborhood in Brevard County, FL.',
   alternates: { canonical: '/' },
 };
 
@@ -50,14 +53,14 @@ const CITY_IMAGE_POSITION = {
 // picture on the home page with this one" — a night photo of the actual
 // "Viera East" monument entrance sign, same style of real-world signage
 // photo he's used for the other Viera-related cards above). The backend's
-// `viera` city row (display name "Viera East" — see
-// app/neighborhoods/[slug]/page.js's ARIPEKA_H1 comment on the
-// Viera -> "Viera East" rename) currently points its thumbnail at
-// viera.avif; rather than overwrite that file directly (its extension
-// implies the backend expects real AVIF-encoded bytes there, and there's
-// no way from this frontend-only session to confirm nothing else upstream
-// also reads that exact filename), this follows the same safer pattern as
-// the viera-west override just above: a new dedicated static file
+// `viera` city row (display name "Viera East" at the time — see
+// app/neighborhoods/[slug]/page.js's ARIPEKA_H1 comment on the original
+// Viera -> "Viera East" rename) pointed its thumbnail at viera.avif;
+// rather than overwrite that file directly (its extension implies the
+// backend expects real AVIF-encoded bytes there, and there's no way from
+// this frontend-only session to confirm nothing else upstream also reads
+// that exact filename), this followed the same safer pattern as the
+// viera-west override just above: a new dedicated static file
 // (viera-east-sign.jpg, not something the backend sends) plus an override
 // entry here, so PlaceCard uses it for this one card without touching the
 // backend-controlled file at all. Source photo was a tall portrait
@@ -68,9 +71,18 @@ const CITY_IMAGE_POSITION = {
 // with no further CITY_IMAGE_POSITION override needed, and re-exported as
 // a ~115KB JPEG (in line with this folder's other photos) rather than
 // keeping the multi-MB source.
+//
+// Follow-up (2026-09-24, per Ryan, same request as the "Viera East" ->
+// "Viera" rename above): Ryan sent a new night photo of the monument sign
+// — now reading just "VIERA" (no "EAST" line) — to match. Same tall
+// portrait source (1024x1536), same crop treatment (1024x768 landscape
+// centered on the "V" logo + "VIERA" text), saved as its own new file
+// (viera-sign.jpg) rather than overwriting viera-east-sign.jpg, following
+// this file's own established "new dedicated static file per photo swap"
+// pattern from the entry just above rather than mutating one in place.
 const CITY_THUMBNAIL_OVERRIDE = {
   'viera-west': 'viera-west-city.jpg',
-  viera: 'viera-east-sign.jpg',
+  viera: 'viera-sign.jpg',
 };
 
 // Homepage "Search By Neighborhood" display order (2026-09-07, per Ryan:
