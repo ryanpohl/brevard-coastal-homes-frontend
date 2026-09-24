@@ -1,11 +1,12 @@
 import { notFound } from 'next/navigation';
 import * as api from '@/lib/api';
-import { cityListingsQueryParams, buildItemListSchema } from '@/lib/constants';
+import { cityListingsQueryParams, buildItemListSchema, CITY_LISTINGS_FAQ } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import BuildingInquiryModal from '@/components/BuildingInquiryModal';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+import Faq from '@/components/Faq';
 
 // Matches the reference design's "1-30 of 34 Homes" pagination — the
 // backend defaults to 24 if this isn't passed. Same value as the sibling
@@ -178,6 +179,16 @@ export default async function CityAllListingsPage({ params, searchParams: search
     pageStart: rangeStart,
   });
 
+  // Collapsed FAQ (2026-09-24, per Ryan: "Move on to the next item" — SEO
+  // audit doc's "Add FAQ schema + Q&A content to neighborhood pages and
+  // bare city 'Listings' pages" row). Reuses the exact same
+  // CITY_LISTINGS_FAQ content the sibling per-property-type pages
+  // (app/[citySlug]/[propertySlug]/page.js) and each city's Area Guide
+  // page already show — no new Q&A content to write. Only populated for
+  // the cities CITY_LISTINGS_FAQ has content for today; Faq.js renders
+  // nothing when items is undefined, so this is a no-op elsewhere.
+  const listingsFaqItems = CITY_LISTINGS_FAQ[citySlug];
+
   return (
     <div>
       {itemListSchema && (
@@ -246,6 +257,15 @@ export default async function CityAllListingsPage({ params, searchParams: search
           totalPages={totalPages}
         />
       </div>
+
+      {/* Collapsed FAQ (2026-09-24, per Ryan — see listingsFaqItems above).
+          Placed after the listing grid/pagination, same "below the
+          listings" spot the sibling property-type page already uses. */}
+      {listingsFaqItems && (
+        <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px', maxWidth: 760 }}>
+          <Faq items={listingsFaqItems} />
+        </div>
+      )}
     </div>
   );
 }
