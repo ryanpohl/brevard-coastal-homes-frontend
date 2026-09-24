@@ -26,14 +26,12 @@ import {
   SOUTH_MERRITT_ISLAND_LAT_MAX,
   SUNTREE_SUBDIVISION_NAMES,
   NEIGHBORHOOD_AREA_GUIDE_CONTENT,
-  NEIGHBORHOOD_LISTINGS_FAQ,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import HarborIslandForeclosuresTrigger from '@/components/HarborIslandForeclosuresTrigger';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
-import Faq from '@/components/Faq';
 
 // Matches the reference design's "1-30 of 34 Homes" pagination — the
 // backend defaults to 24 if this isn't passed.
@@ -631,11 +629,16 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         ? { lat: parentCity.latitude, lng: parentCity.longitude }
         : null;
 
-  // See NEIGHBORHOOD_AREA_GUIDE_CONTENT/NEIGHBORHOOD_LISTINGS_FAQ in
-  // lib/constants.js — undefined (renders nothing below) for every
-  // neighborhood not yet built out.
-  const guideContent = NEIGHBORHOOD_AREA_GUIDE_CONTENT[slug];
-  const faqItems = NEIGHBORHOOD_LISTINGS_FAQ[slug];
+  // Gates the "{Neighborhood} Area Guide →" link below (2026-09-24, per
+  // Ryan: "make the neighborhood pages look like the city pages with the
+  // link instead of all the text on the actual page below the listings")
+  // — true only for a neighborhood NEIGHBORHOOD_AREA_GUIDE_CONTENT
+  // actually has content for (lib/constants.js), same gating
+  // app/[citySlug]/[propertySlug]/page.js's showAreaGuideLink uses via
+  // CITY_AREA_GUIDE_SLUGS. The content itself, and the FAQ, now render on
+  // the dedicated app/neighborhoods/[slug]/area-guide/page.js instead of
+  // inline here.
+  const showAreaGuideLink = Boolean(NEIGHBORHOOD_AREA_GUIDE_CONTENT[slug]);
 
   return (
     <div>
@@ -1279,6 +1282,17 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             </p>
           </div>
         )}
+        {/* Area Guide link (2026-09-24, per Ryan) — same placement/styling
+            as the city pages' own link (app/[citySlug]/[propertySlug]/
+            page.js's showAreaGuideLink), right under the intro text and
+            above the results count. */}
+        {showAreaGuideLink && (
+          <p style={{ fontSize: 15, marginBottom: 12 }}>
+            <Link href={`/neighborhoods/${slug}/area-guide`} style={{ color: '#000', textDecoration: 'underline' }}>
+              {neighborhood.name} Area Guide →
+            </Link>
+          </p>
+        )}
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
@@ -1359,49 +1373,6 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         />
       </div>
 
-      {/* Neighborhood "About" content (2026-09-24, per Ryan: "Do it how
-          you did it on the city pages") — same GuideSection pattern as
-          app/[citySlug]/area-guide/page.js's CITY_AREA_GUIDE_CONTENT, but
-          folded into this same page below the listings rather than a
-          separate /area-guide route, since a neighborhood (unlike a city)
-          only has this one page — see NEIGHBORHOOD_AREA_GUIDE_CONTENT's
-          own comment in lib/constants.js for the rollout plan and
-          Adelaide's sourcing. Renders nothing for any neighborhood not yet
-          in that object. */}
-      {guideContent && (
-        <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px', maxWidth: 760 }}>
-          <h2 style={{ fontSize: 26, marginBottom: 20, fontFamily: 'var(--font-inter-tight)' }}>
-            About {neighborhood.name}
-          </h2>
-          <GuideSection title="Overview" text={guideContent.intro} />
-          <GuideSection title="Community & Amenities" text={guideContent.amenities} />
-          {/* Title overridable per neighborhood (2026-09-24, added for
-              Harbor Island Beach Club) — "Homesites & Builders" fits a
-              custom-build community like Adelaide/Aripeka, but HIBC is a
-              developer-built mix of homes/villas/condos, so its own
-              content in lib/constants.js sets homesitesTitle: 'Homes &
-              Condos' instead. Falls back to the original title for every
-              neighborhood that doesn't set one. */}
-          <GuideSection title={guideContent.homesitesTitle || 'Homesites & Builders'} text={guideContent.homesites} />
-          <GuideSection title="Schools" text={guideContent.schools} />
-          <GuideSection title="HOA & Community Fees" text={guideContent.hoa} />
-          {faqItems && (
-            <section style={{ marginBottom: 36 }}>
-              <Faq items={faqItems} heading={`Frequently Asked Questions About ${neighborhood.name}`} />
-            </section>
-          )}
-        </div>
-      )}
     </div>
-  );
-}
-
-function GuideSection({ title, text }) {
-  if (!text) return null;
-  return (
-    <section style={{ marginBottom: 28 }}>
-      <h3 style={{ fontSize: 20, marginBottom: 8, fontFamily: 'var(--font-inter-tight)' }}>{title}</h3>
-      <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>{text}</p>
-    </section>
   );
 }
