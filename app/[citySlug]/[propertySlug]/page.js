@@ -8,12 +8,15 @@ import {
   OCEANFRONT_SLUG_TO_PROPERTY_TYPE,
   OCEANFRONT_CITY_SLUGS,
   OCEANFRONT_LISTINGS_SLUG,
+  CITY_AREA_GUIDE_SLUGS,
+  CITY_LISTINGS_FAQ,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import BuildingInquiryModal from '@/components/BuildingInquiryModal';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+import Faq from '@/components/Faq';
 
 // City page intro copy (2026-09-16, per Ryan, pasting one template and
 // asking for it on every city page, with the city name and property type
@@ -275,6 +278,14 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   // community, so the plain Condos page is the more accurate place to
   // surface it.
   const isMelbourneBeachCondos = citySlug === 'melbourne-beach' && propertyType === 'Condo' && !isOceanfront && !isOceanfrontCombined;
+  // Area Guide link + collapsed FAQ (2026-09-24, per Ryan — see
+  // CITY_AREA_GUIDE_SLUGS/CITY_LISTINGS_FAQ in lib/constants.js for the
+  // full story and rollout plan). Gated on citySlug alone, not
+  // propertyType — the guide covers the whole city, so it's relevant from
+  // the Homes, Condos, Land, and Oceanfront pages alike, same as this
+  // page's own city-level intro copy above.
+  const showAreaGuideLink = CITY_AREA_GUIDE_SLUGS.includes(citySlug);
+  const listingsFaqItems = CITY_LISTINGS_FAQ[citySlug];
   // Oceanfront pages (combined "Listings" included) only exist for the 5
   // barrier-island cities named by Ryan (2026-08-22) — e.g.
   // /melbourne/oceanfront-homes-for-sale (or /melbourne/oceanfront-listings)
@@ -504,6 +515,18 @@ export default async function CityListingsPage({ params, searchParams: searchPar
             to get started.
           </p>
         </div>
+        {/* Area Guide link (2026-09-24, per Ryan: "Add a link to the top of
+            the page... right under the intro text" — a single small text
+            link, not a third button, per his "very easy to navigate
+            without a lot of text" instruction, so it adds no visual weight
+            to the listings page itself. */}
+        {showAreaGuideLink && (
+          <p style={{ fontSize: 15, marginBottom: 12 }}>
+            <Link href={`/${citySlug}/area-guide`} style={{ color: '#000', textDecoration: 'underline' }}>
+              {city.name} Area Guide →
+            </Link>
+          </p>
+        )}
         {/* Condo-community cross-links (per Ryan, 2026-09-19 — see
             isMelbourneBeachCondos's comment above). Started with just Beach
             Woods (the new /neighborhoods/beach-woods page), then extended
@@ -591,6 +614,16 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           totalPages={totalPages}
         />
       </div>
+
+      {/* Collapsed FAQ (2026-09-24, per Ryan — see listingsFaqItems above).
+          Placed after the listing grid/pagination, same "below the
+          listings" spot Ryan asked for, so it never pushes the listings
+          themselves down the page. */}
+      {listingsFaqItems && (
+        <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px', maxWidth: 760 }}>
+          <Faq items={listingsFaqItems} />
+        </div>
+      )}
     </div>
   );
 }
