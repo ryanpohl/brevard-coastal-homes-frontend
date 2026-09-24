@@ -10,27 +10,27 @@
 
 ## Cities covered
 
-- Cocoa Beach — /cocoa-beach
-- Indialantic — /indialantic
-- Indian Harbour Beach — /indian-harbour-beach
-- Melbourne — /melbourne
-- Melbourne Beach — /melbourne-beach
-- Merritt Island — /merritt-island
-- Rockledge — /rockledge
-- Satellite Beach — /satellite-beach
-- Viera — /viera
-- Viera West — /viera-west
+- [Cocoa Beach](https://brevardcoastalhomes.com/cocoa-beach)
+- [Indialantic](https://brevardcoastalhomes.com/indialantic)
+- [Indian Harbour Beach](https://brevardcoastalhomes.com/indian-harbour-beach)
+- [Melbourne](https://brevardcoastalhomes.com/melbourne)
+- [Melbourne Beach](https://brevardcoastalhomes.com/melbourne-beach)
+- [Merritt Island](https://brevardcoastalhomes.com/merritt-island)
+- [Rockledge](https://brevardcoastalhomes.com/rockledge)
+- [Satellite Beach](https://brevardcoastalhomes.com/satellite-beach)
+- [Viera](https://brevardcoastalhomes.com/viera)
+- [Viera West](https://brevardcoastalhomes.com/viera-west)
 
 ## Page types
 
-- City listings, all types combined: /{city}
-- City listings by type: /{city}/homes-for-sale, /{city}/condos-for-sale, /{city}/land-for-sale
-- Oceanfront listings (barrier-island cities only): /{city}/oceanfront-homes-for-sale, /{city}/oceanfront-condos-for-sale, /{city}/oceanfront-listings
-- Neighborhood listings: /neighborhoods/{slug}
-- Neighborhood Area Guides (amenities, schools, HOA, FAQ): /neighborhoods/{slug}/area-guide
-- Individual listing detail pages: /listings/{id}
-- Sell your home: /looking-to-sell
-- Contact: /contact
+- City listings, all types combined (`/{city}`): e.g. [Cocoa Beach](https://brevardcoastalhomes.com/cocoa-beach)
+- City listings by type (`/{city}/homes-for-sale`, `/{city}/condos-for-sale`, `/{city}/land-for-sale`): e.g. [Cocoa Beach homes for sale](https://brevardcoastalhomes.com/cocoa-beach/homes-for-sale)
+- Oceanfront listings, barrier-island cities only (`/{city}/oceanfront-homes-for-sale`, `/{city}/oceanfront-condos-for-sale`, `/{city}/oceanfront-listings`): e.g. [Cocoa Beach oceanfront homes for sale](https://brevardcoastalhomes.com/cocoa-beach/oceanfront-homes-for-sale)
+- Neighborhood listings (`/neighborhoods/{slug}`): e.g. [Adelaide](https://brevardcoastalhomes.com/neighborhoods/adelaide)
+- Neighborhood Area Guides, amenities/schools/HOA/FAQ (`/neighborhoods/{slug}/area-guide`): e.g. [Adelaide Area Guide](https://brevardcoastalhomes.com/neighborhoods/adelaide/area-guide)
+- Individual listing detail pages: `/listings/{id}` (ids change continuously as the MLS feed updates, so no example link is listed here)
+- [Sell your home](https://brevardcoastalhomes.com/looking-to-sell)
+- [Contact](https://brevardcoastalhomes.com/contact)
 
 ## Contact
 
