@@ -1,11 +1,13 @@
-/* Fonts are loaded via next/font/google in app/layout.js (2026-09-24, SEO/
-   performance re-audit) rather than the @import that used to be here —
-   next/font self-hosts the font files at build time (no render-blocking
-   request to fonts.googleapis.com/fonts.gstatic.com) and exposes each
-   family as a CSS custom property on <html> (--font-nf-playfair,
-   --font-nf-jost, --font-nf-inter-tight, --font-nf-bodoni), which the
-   --font-heading/--font-body/--font-inter-tight/--font-didot tokens below
-   reference. See layout.js for the full rationale. */
+/* Fonts are loaded via <link rel="stylesheet"> tags in app/layout.js's
+   <head> (2026-09-24, SEO/performance re-audit) rather than the @import
+   that used to be here — moving the exact same Google Fonts request out of
+   a CSS-nested @import (which blocks on globals.css downloading+parsing
+   first) and into HTML <link> tags the browser's preload scanner can
+   discover immediately, fetched in parallel with globals.css instead of
+   serially after it. (A next/font/google self-hosted version was tried
+   first same day but broke the Hostinger build — see layout.js's comment
+   for why — so this is the fallback that keeps working in this build
+   environment.) Font family names below are unchanged from before. */
 
 /* Design tokens — see design/README.md "Design Tokens" section. Keep these
    in sync with that file; it's the source of truth from the design handoff. */
@@ -40,8 +42,8 @@
   --shadow-nav-menu: 0 12px 32px rgba(0, 0, 0, 0.3);
   --shadow-filter-menu: 0 8px 24px rgba(0, 0, 0, 0.14);
 
-  --font-heading: var(--font-nf-playfair), 'Playfair Display', serif;
-  --font-body: var(--font-nf-jost), 'Jost', sans-serif;
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Jost', sans-serif;
   /* Added 2026-08-21 per Ryan ("Change the font to inter tight on all the
      pages city & neighborhood descriptions") — used specifically on the
      city/neighborhood listing pages' H1 (there's no separate visible
@@ -49,7 +51,7 @@
      "N results" line — the H1 is what Ryan's reference screenshots
      showed). See app/[citySlug]/[propertySlug]/page.js and
      app/neighborhoods/[slug]/page.js. */
-  --font-inter-tight: var(--font-nf-inter-tight), 'Inter Tight', sans-serif;
+  --font-inter-tight: 'Inter Tight', sans-serif;
   /* Added 2026-09-04 per Ryan: matched a reference site's hero headline
      (high-contrast Didot-style serif, thin hairline serifs, tall
      proportions) after comparing it against the homepage hero in a
@@ -58,7 +60,7 @@
      homepage hero H1 (app/page.js) — was var(--font-inter-tight) there,
      everything else on the homepage stays Inter Tight per Ryan's
      2026-08-21 sitewide-text decision. */
-  --font-didot: var(--font-nf-bodoni), 'Bodoni Moda', var(--font-nf-playfair), 'Playfair Display', serif;
+  --font-didot: 'Bodoni Moda', 'Playfair Display', serif;
 }
 
 * {

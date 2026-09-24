@@ -1,5 +1,4 @@
 import Script from 'next/script';
-import { Playfair_Display, Jost, Inter_Tight, Bodoni_Moda } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/lib/auth-context';
 import Nav from '@/components/Nav';
@@ -7,50 +6,37 @@ import Footer from '@/components/Footer';
 import AuthPromptHost from '@/components/AuthPromptHost';
 import * as api from '@/lib/api';
 
-// Self-hosted via next/font (2026-09-24, found during the SEO/performance
-// re-audit) — replaces the old `@import url('https://fonts.googleapis.com/...')`
-// at the top of globals.css. That @import was a textbook render-blocking
-// chain: the browser has to download globals.css, parse it, discover the
-// @import, fetch fonts.googleapis.com's CSS, parse THAT, then finally fetch
-// the actual font files from fonts.gstatic.com — three serial round trips
-// to a third-party domain before any of this site's custom-font text could
-// paint, which PageSpeed Insights flagged as ~1.35s of render-blocking
-// delay on top of directly hurting LCP for any hero/heading whose largest
-// element uses one of these fonts (Playfair Display, Inter Tight, Bodoni
-// Moda are all used on H1s — see globals.css's --font-heading etc.).
-// next/font/google downloads these same font files at BUILD time and
-// self-hosts them from this domain (no fonts.googleapis.com/fonts.gstatic.com
-// request at all), inlines the @font-face rules, and applies font-display:
-// swap automatically — same visual fonts/weights as before, just not
-// render-blocking. Each font's `variable` becomes a CSS custom property
-// (applied to <html> below) that globals.css's existing --font-heading/
-// --font-body/--font-inter-tight/--font-didot tokens now point at, so
-// none of the ~60 call sites using var(--font-heading) etc. needed to
-// change. Weights kept identical to the old @import URL's wght list.
-const playfairDisplay = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['500', '600', '700'],
-  display: 'swap',
-  variable: '--font-nf-playfair',
-});
-const jost = Jost({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  display: 'swap',
-  variable: '--font-nf-jost',
-});
-const interTight = Inter_Tight({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  display: 'swap',
-  variable: '--font-nf-inter-tight',
-});
-const bodoniModa = Bodoni_Moda({
-  subsets: ['latin'],
-  weight: ['500', '600'],
-  display: 'swap',
-  variable: '--font-nf-bodoni',
-});
+// Google Fonts (2026-09-24, SEO/performance re-audit) — this used to be a
+// `@import url('https://fonts.googleapis.com/...')` at the top of
+// globals.css, which is a textbook render-blocking chain: the browser has
+// to download globals.css, parse it, discover the @import, THEN fetch
+// fonts.googleapis.com's CSS, parse that, THEN finally fetch the actual
+// font files from fonts.gstatic.com — three serial round trips before any
+// of this site's custom-font text (including hero/H1 text that's often the
+// LCP element) could paint. PageSpeed Insights flagged ~1.35s of
+// render-blocking delay from this.
+//
+// First attempt was next/font/google (self-hosts the files at build time,
+// no external request at all) — reverted same day after it broke the
+// Hostinger build: `next build` failed with "TypeError: Cannot read
+// properties of null (reading '1')" inside next/font's Google-fonts
+// loader, almost certainly because this build sandbox can't reach
+// fonts.googleapis.com/fonts.gstatic.com during the build step (the site
+// itself never broke — Hostinger kept serving the last successful build
+// throughout). See deployment 01a0d4c3 in Hostinger's build log for the
+// full stack trace if this needs revisiting later (e.g. if Hostinger's
+// build environment gets broader network access).
+//
+// This fallback keeps the same runtime request to Google Fonts (so it
+// still needs today's network access, just at request time from the
+// visitor's browser instead of at build time), but moves it from a
+// CSS-nested @import to <link> tags in <head> below: the browser's preload
+// scanner discovers these directly while parsing the initial HTML, in
+// parallel with fetching globals.css, instead of only after globals.css
+// has fully downloaded and parsed. rel="preconnect" additionally warms up
+// the DNS/TLS handshake to both Google Fonts hosts before the stylesheet
+// request even starts. Same font families/weights as the old @import.
+
 
 // Sitewide SEO defaults (2026-09-11) — metadataBase resolves every page's
 // relative image/canonical URLs (e.g. a page's `alternates.canonical: '/foo'`
@@ -110,10 +96,15 @@ export default async function RootLayout({ children }) {
   const { cities, neighborhoods } = await getNavData();
 
   return (
-    <html
-      lang="en"
-      className={`${playfairDisplay.variable} ${jost.variable} ${interTight.variable} ${bodoniModa.variable}`}
-    >
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600;700;800&family=Inter+Tight:wght@400;500;600;700;800&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&display=swap"
+        />
+      </head>
       <body>
         {/* Google Ads conversion tracking (gtag.js), added 2026-08-20 per Ryan.
             Loaded here in the root layout so it's present on every page. */}
