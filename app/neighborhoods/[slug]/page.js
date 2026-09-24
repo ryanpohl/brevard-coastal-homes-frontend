@@ -1375,7 +1375,14 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           </h2>
           <GuideSection title="Overview" text={guideContent.intro} />
           <GuideSection title="Community & Amenities" text={guideContent.amenities} />
-          <GuideSection title="Homesites & Builders" text={guideContent.homesites} />
+          {/* Title overridable per neighborhood (2026-09-24, added for
+              Harbor Island Beach Club) — "Homesites & Builders" fits a
+              custom-build community like Adelaide/Aripeka, but HIBC is a
+              developer-built mix of homes/villas/condos, so its own
+              content in lib/constants.js sets homesitesTitle: 'Homes &
+              Condos' instead. Falls back to the original title for every
+              neighborhood that doesn't set one. */}
+          <GuideSection title={guideContent.homesitesTitle || 'Homesites & Builders'} text={guideContent.homesites} />
           <GuideSection title="Schools" text={guideContent.schools} />
           <GuideSection title="HOA & Community Fees" text={guideContent.hoa} />
           {faqItems && (
