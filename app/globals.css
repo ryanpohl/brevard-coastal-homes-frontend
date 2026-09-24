@@ -260,6 +260,52 @@ h4 {
   border: 1px solid var(--color-border-light);
 }
 
+/* FAQ accordion (2026-09-24, per Ryan) — see components/Faq.js. Native
+   <details>/<summary>, styled to look like a real accordion: a plus/minus
+   indicator built from a rotating ::after pseudo-element rather than the
+   browser's default disclosure triangle (marker), which renders
+   inconsistently across browsers and doesn't match the rest of the site's
+   flat, minimal control styling (FilterBar's dropdown chevrons, etc.). */
+.faq-item {
+  border-bottom: 1px solid var(--color-border-light);
+  padding: 14px 0;
+}
+.faq-item:first-of-type {
+  border-top: 1px solid var(--color-border-light);
+}
+.faq-item summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--font-inter-tight);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--color-ink);
+}
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+.faq-item summary::after {
+  content: '+';
+  flex: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--color-muted);
+  transition: transform 0.15s ease;
+}
+.faq-item[open] summary::after {
+  content: '\2212'; /* minus sign */
+}
+.faq-item p {
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-muted-dark);
+}
+
 /* Top nav dropdown panels (Search by City/Neighborhood, My Account,
    Sign In/Join) — solid dark navy, used instead of .card so these read
    consistently against the plain light-cream body background on every
