@@ -19,7 +19,17 @@ export const metadata = {
     // "Viera East" -> "Viera" (2026-09-24, per Ryan: "Lets do Viera then
     // instead of viera east") — see lib/constants.js's VIERA_LAT_MIN/etc.
     // comment for the full SEO reasoning behind the reversal.
-    'Search homes, condos, and land for sale across Cocoa Beach, Melbourne Beach, Satellite Beach, Viera, and every coastal city and neighborhood in Brevard County, FL.',
+    //
+    // Trimmed "and every coastal city and neighborhood" -> "and every
+    // coastal city" (2026-09-24, found during a full redo of the SEO audit)
+    // — this string was 163 characters, over the ~160 char meta description
+    // best practice, and had never been touched by the earlier
+    // buildListingCountPrefix/buildNeighborhoodListingCountPrefix trimming
+    // work since those only cover dynamically-generated city/neighborhood
+    // descriptions, not this static homepage one. "and neighborhood" was
+    // redundant with "city" here anyway (neighborhoods are covered via the
+    // per-city/neighborhood pages, not implied by this summary line).
+    'Search homes, condos, and land for sale across Cocoa Beach, Melbourne Beach, Satellite Beach, Viera, and every coastal city in Brevard County, FL.',
   alternates: { canonical: '/' },
 };
 
