@@ -61,7 +61,20 @@ export async function generateMetadata({ params }) {
   try {
     const { city } = await api.getCity(citySlug);
     return {
-      title: `${city.name} Real Estate Listings — Homes, Condos & Land For Sale | Brevard Coastal Homes`,
+      // Shortened (2026-09-24, per Ryan, pointing at the SEO audit doc's
+      // "Shorten bare-city 'Listings' page titles" finding) — the previous
+      // title ran 82–97 characters across all 10 cities (e.g. Indian
+      // Harbour Beach's own 97-char version), well past the ~50–60
+      // character point Google typically truncates a result's title at,
+      // cutting off mid-word in search results ("...Homes, Condos & Land
+      // For Sale | Brevard C" for Cocoa Beach). This form tops out at 57
+      // characters for the longest city name (Indian Harbour Beach) and
+      // as low as 42 for the shortest (Viera) — every city fits inside a
+      // typical SERP without truncation. "Real Estate" still communicates
+      // this page's all-property-types scope (homes, condos, and land
+      // combined) in one word the way the old title spelled out in three,
+      // matching this page's own meta description just below.
+      title: `${city.name} Real Estate | Brevard Coastal Homes`,
       description: `Browse every available listing in ${city.name}, FL in one place — single-family homes, condos, and land, updated from the MLS.`,
       alternates: { canonical: `/${citySlug}` },
     };
