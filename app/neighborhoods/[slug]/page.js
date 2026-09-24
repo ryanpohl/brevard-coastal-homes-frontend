@@ -540,6 +540,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // ever appears in this H1 as the property-type label — neither
   // "Aripeka" nor "Viera" contain that substring — and it's a no-op on
   // the Home page's H1, which never contains "Land" to begin with.
+  //
+  // Follow-up (2026-09-24, per Ryan: "Lets do Viera then instead of viera
+  // east") — the backend's `viera` city row was renamed back to "Viera"
+  // (see the backend's renameVieraBackFromEast migration), so the
+  // backend's own generated H1 no longer contains "Viera East" to begin
+  // with and the `.replace('Viera East', 'Viera')` call below is now a
+  // harmless no-op. Left in place rather than removed — costs nothing to
+  // keep, and protects against the city name ever drifting back to
+  // "Viera East" without this file being revisited.
   const ARIPEKA_H1 = seo?.h1 ? seo.h1.replace('Viera East', 'Viera').replace('Land', 'Lots') : seo?.h1;
   // Aripeka's "Aripeka Listings" main link H1 (per Ryan, 2026-09-02: "Can
   // you change the text to 'Aripeka Homes & Lots for sale - Viera,
