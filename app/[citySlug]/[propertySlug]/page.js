@@ -11,6 +11,7 @@ import {
   CITY_AREA_GUIDE_SLUGS,
   CITY_LISTINGS_FAQ,
   cityListingsQueryParams,
+  buildItemListSchema,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
@@ -519,6 +520,28 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const rangeEnd = Math.min(page * PAGE_SIZE, total);
 
+  // ItemList structured data (2026-09-24, per Ryan: "Lets do this next" —
+  // see buildItemListSchema's own comment in lib/constants.js for the full
+  // "why build this here instead of calling the backend's GET
+  // /api/seo/listing-collection endpoint" reasoning). pageTitle duplicates
+  // the <h1> ternary just below — kept in sync manually, same "two
+  // separate functions, no shared state" convention already used between
+  // this file's generateMetadata and page component.
+  const pageTitle = isOceanfrontCombined
+    ? `Oceanfront Homes & Condos For Sale in ${city.name}, FL`
+    : seo?.h1 ||
+      (isOceanfront
+        ? `Oceanfront ${PROPERTY_TYPE_LABEL[propertyType]} For Sale in ${city.name}, FL`
+        : `${PROPERTY_TYPE_LABEL[propertyType]} in ${city.name}, FL`);
+  const itemListSchema = buildItemListSchema({
+    pageTitle,
+    path: `/${citySlug}/${propertySlug}`,
+    listings: results,
+    total,
+    pageStart: rangeStart,
+  });
+  const combinedJsonLd = [...(jsonLd || []), ...(itemListSchema ? [itemListSchema] : [])];
+
   // Real per-listing coordinates come from the Spark MLS sync (null until
   // then); the map center falls back to the city's own coordinate so it's
   // always centered on the right place even with zero pins to show yet.
@@ -526,7 +549,9 @@ export default async function CityListingsPage({ params, searchParams: searchPar
 
   return (
     <div>
-      {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
+      {combinedJsonLd.length > 0 && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(combinedJsonLd) }} />
+      )}
 
       <div className="container" style={{ padding: '32px clamp(16px, 4vw, 56px) 0' }}>
         {/* fontFamily: Inter Tight (2026-08-21, per Ryan: "Change the font
