@@ -26,6 +26,7 @@ import {
   SOUTH_MERRITT_ISLAND_LAT_MAX,
   SUNTREE_SUBDIVISION_NAMES,
   NEIGHBORHOOD_AREA_GUIDE_CONTENT,
+  NEIGHBORHOOD_LISTINGS_FAQ,
   buildItemListSchema,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
@@ -33,6 +34,7 @@ import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import HarborIslandForeclosuresTrigger from '@/components/HarborIslandForeclosuresTrigger';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
+import Faq from '@/components/Faq';
 
 // Matches the reference design's "1-30 of 34 Homes" pagination — the
 // backend defaults to 24 if this isn't passed.
@@ -697,10 +699,27 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // — true only for a neighborhood NEIGHBORHOOD_AREA_GUIDE_CONTENT
   // actually has content for (lib/constants.js), same gating
   // app/[citySlug]/[propertySlug]/page.js's showAreaGuideLink uses via
-  // CITY_AREA_GUIDE_SLUGS. The content itself, and the FAQ, now render on
-  // the dedicated app/neighborhoods/[slug]/area-guide/page.js instead of
-  // inline here.
+  // CITY_AREA_GUIDE_SLUGS. The full guide content still renders only on
+  // the dedicated app/neighborhoods/[slug]/area-guide/page.js, not inline
+  // here — but the FAQ itself is also shown below the listings on this
+  // page now too (see listingsFaqItems below), matching how the sibling
+  // city property-type page shows the same FAQ content both here and
+  // again on its own Area Guide page.
   const showAreaGuideLink = Boolean(NEIGHBORHOOD_AREA_GUIDE_CONTENT[slug]);
+  // Collapsed FAQ (2026-09-24, per Ryan: "Move on to the next item" — SEO
+  // audit doc's "Add FAQ schema + Q&A content to neighborhood pages and
+  // bare city 'Listings' pages" row: every other page type already has
+  // FAQPage schema; this page didn't, because the FAQ moved to the
+  // dedicated Area Guide sub-page during the 2026-09-24 restructuring
+  // above and was never also kept here). Reuses the exact same
+  // NEIGHBORHOOD_LISTINGS_FAQ content the Area Guide page already shows —
+  // no new Q&A content to write, same "reuse what already exists" approach
+  // this fix uses on the sibling city Listings page (CITY_LISTINGS_FAQ).
+  // Only populated for the handful of neighborhoods NEIGHBORHOOD_LISTINGS_FAQ
+  // has content for today (same set as showAreaGuideLink above); Faq.js
+  // itself renders nothing when items is undefined/empty, so this is a
+  // no-op everywhere else rather than a broken/empty section.
+  const listingsFaqItems = NEIGHBORHOOD_LISTINGS_FAQ[slug];
 
   return (
     <div>
@@ -1437,6 +1456,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         />
       </div>
 
+      {/* Collapsed FAQ (2026-09-24, per Ryan — see listingsFaqItems above).
+          Placed after the listing grid/pagination, same "below the
+          listings" spot the sibling city property-type page already uses
+          for its own FAQ. */}
+      {listingsFaqItems && (
+        <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px', maxWidth: 760 }}>
+          <Faq items={listingsFaqItems} />
+        </div>
+      )}
     </div>
   );
 }
