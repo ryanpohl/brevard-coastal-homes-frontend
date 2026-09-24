@@ -1,0 +1,39 @@
+# Brevard Coastal Homes
+
+> Real estate search site for Brevard County, Florida (the Space Coast) — browse homes, condos, and land for sale, updated continuously from the MLS.
+
+## About
+
+- Brevard Coastal Homes is a real estate listing and search site covering Brevard County, FL, including barrier-island beach cities and mainland communities.
+- Listings are sourced from the MLS and refresh continuously (price, status, and photos).
+- The site is organized by city, by neighborhood, and by individual listing, with Area Guide pages providing local context (amenities, schools, HOA fees) and FAQs for many neighborhoods.
+
+## Cities covered
+
+- Cocoa Beach — /cocoa-beach
+- Indialantic — /indialantic
+- Indian Harbour Beach — /indian-harbour-beach
+- Melbourne — /melbourne
+- Melbourne Beach — /melbourne-beach
+- Merritt Island — /merritt-island
+- Rockledge — /rockledge
+- Satellite Beach — /satellite-beach
+- Viera — /viera
+- Viera West — /viera-west
+
+## Page types
+
+- City listings, all types combined: /{city}
+- City listings by type: /{city}/homes-for-sale, /{city}/condos-for-sale, /{city}/land-for-sale
+- Oceanfront listings (barrier-island cities only): /{city}/oceanfront-homes-for-sale, /{city}/oceanfront-condos-for-sale, /{city}/oceanfront-listings
+- Neighborhood listings: /neighborhoods/{slug}
+- Neighborhood Area Guides (amenities, schools, HOA, FAQ): /neighborhoods/{slug}/area-guide
+- Individual listing detail pages: /listings/{id}
+- Sell your home: /looking-to-sell
+- Contact: /contact
+
+## Contact
+
+- Business: Brevard Coastal Homes
+- Phone: 321-350-7661
+- Email: Ryan@BrevardCoastalHomes.com
