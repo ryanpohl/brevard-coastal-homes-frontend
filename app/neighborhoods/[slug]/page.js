@@ -26,6 +26,7 @@ import {
   SOUTH_MERRITT_ISLAND_LAT_MAX,
   SUNTREE_SUBDIVISION_NAMES,
   NEIGHBORHOOD_AREA_GUIDE_CONTENT,
+  buildItemListSchema,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -664,6 +665,25 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const rangeEnd = Math.min(page * PAGE_SIZE, total);
 
+  // ItemList structured data (2026-09-24, per Ryan: "Lets do this next" —
+  // see buildItemListSchema's own comment in lib/constants.js for the full
+  // "why build this here instead of calling the backend's GET
+  // /api/seo/listing-collection endpoint" reasoning, including why that
+  // endpoint specifically can't be trusted for several of this page's own
+  // neighborhoods/sub-communities). Reuses h1Text as-is rather than
+  // duplicating it — this file already computes one h1Text covering every
+  // branch (subCommunity, Beach Woods, Aquarina, Harbor Island Beach Club,
+  // etc.), unlike the sibling city page which has no single shared title
+  // variable to reuse.
+  const itemListSchema = buildItemListSchema({
+    pageTitle: h1Text,
+    path: `/neighborhoods/${slug}`,
+    listings: results,
+    total,
+    pageStart: rangeStart,
+  });
+  const combinedJsonLd = [...(jsonLd || []), ...(itemListSchema ? [itemListSchema] : [])];
+
   const mapCenter =
     neighborhood.latitude != null && neighborhood.longitude != null
       ? { lat: neighborhood.latitude, lng: neighborhood.longitude }
@@ -684,7 +704,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
 
   return (
     <div>
-      {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
+      {combinedJsonLd.length > 0 && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(combinedJsonLd) }} />
+      )}
 
       <div className="container" style={{ padding: '32px clamp(16px, 4vw, 56px) 0' }}>
         <h1
