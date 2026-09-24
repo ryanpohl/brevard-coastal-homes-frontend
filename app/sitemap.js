@@ -5,6 +5,7 @@ import {
   OCEANFRONT_CITY_SLUGS,
   OCEANFRONT_LISTINGS_SLUG,
   VIERA_BUILDERS_SUB_COMMUNITIES,
+  NEIGHBORHOOD_AREA_GUIDE_CONTENT,
 } from '@/lib/constants';
 
 // Native Next.js sitemap.xml (2026-09-11, SEO audit finding: brevardcoastalhomes.com/sitemap.xml
@@ -128,6 +129,19 @@ export default async function sitemap() {
       changeFrequency: 'daily',
       priority: 0.7,
     });
+    // Neighborhood Area Guide pages (2026-09-24, per Ryan — see
+    // NEIGHBORHOOD_AREA_GUIDE_CONTENT's own comment in lib/constants.js).
+    // Same "don't submit a page that doesn't exist yet" gating as the
+    // rollout itself — only added for a neighborhood that object actually
+    // has content for, not all 16 neighborhood rows.
+    if (NEIGHBORHOOD_AREA_GUIDE_CONTENT[n.slug]) {
+      entries.push({
+        url: `${SITE_URL}/neighborhoods/${n.slug}/area-guide`,
+        lastModified: now,
+        changeFrequency: 'weekly',
+        priority: 0.65,
+      });
+    }
   });
 
   // Viera Builders Communities Viera West's 6 sub-communities are real, live
