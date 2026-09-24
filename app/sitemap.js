@@ -157,6 +157,22 @@ export default async function sitemap() {
       changeFrequency: 'daily',
       priority: 0.6,
     });
+    // Sub-community Area Guide pages (2026-09-24, per Ryan: "can you do the
+    // same thing for the 6 communities listed under viera builders") — same
+    // NEIGHBORHOOD_AREA_GUIDE_CONTENT gating as the real-neighborhoods loop
+    // above, so a sub-community without content yet (or comingSoon, already
+    // filtered out above) isn't submitted to search engines. Priority 0.6,
+    // one notch below the real neighborhoods' 0.65 Area Guide priority,
+    // matching how these 6 sub-communities' own bare listing pages already
+    // sit a notch below real neighborhoods' 0.7 just above.
+    if (NEIGHBORHOOD_AREA_GUIDE_CONTENT[c.slug]) {
+      entries.push({
+        url: `${SITE_URL}/neighborhoods/${c.slug}/area-guide`,
+        lastModified: now,
+        changeFrequency: 'weekly',
+        priority: 0.6,
+      });
+    }
   });
 
   // Beach Woods (Melbourne Beach) — same situation as the Viera Builders
