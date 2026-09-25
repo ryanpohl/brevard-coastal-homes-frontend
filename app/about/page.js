@@ -41,8 +41,11 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
  */
 export const metadata = {
   title: 'About Ryan Pohl | Brevard Coastal Homes',
-  description:
-    "Meet Ryan Pohl, a Brevard County, FL real estate agent with Tropical Realty & Inv. of Brevard — ranked in the top 3% of all Realtors, specializing in waterfront, luxury, first-time buyer, investment, and new construction properties.",
+  // Brokerage name corrected 2026-09-26, per Ryan, to match
+  // BROKERAGE_INFO.name's confirmed spelling — this was previously
+  // hardcoded as "Tropical Realty & Inv. of Brevard" (see that constant's
+  // own comment in lib/constants.js for the full naming history).
+  description: `Meet Ryan Pohl, a Brevard County, FL real estate agent with ${BROKERAGE_INFO.name} — ranked in the top 3% of all Realtors, specializing in waterfront, luxury, first-time buyer, investment, and new construction properties.`,
   alternates: { canonical: '/about' },
 };
 
@@ -103,9 +106,15 @@ export default function AboutPage() {
           <li>Background in securities &amp; financial services</li>
         </ul>
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginTop: 16, lineHeight: 1.6 }}>
-          {AGENT_INFO.name} — {BROKERAGE_INFO.name}
+          {/* CORRECTED 2026-09-26, per Ryan: the number originally shown
+              here was his own individual license, not the brokerage's —
+              see AGENT_INFO/BROKERAGE_INFO's comments in lib/constants.js
+              for the full history. Now each entity gets its own license
+              number, Ryan's individual license and the brokerage's
+              corporate license. */}
+          {AGENT_INFO.name}, FL License #{AGENT_INFO.licenseNumber}
           <br />
-          FL License #{BROKERAGE_INFO.licenseNumber}
+          {BROKERAGE_INFO.name}, FL License #{BROKERAGE_INFO.licenseNumber}
         </p>
       </div>
 
