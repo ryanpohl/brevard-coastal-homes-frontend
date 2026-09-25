@@ -1,4 +1,4 @@
-import { AGENT_INFO } from '@/lib/constants';
+import { AGENT_INFO, BROKERAGE_INFO } from '@/lib/constants';
 import ContactForm from '@/components/ContactForm';
 
 export const metadata = {
@@ -30,6 +30,15 @@ export default function ContactPage() {
             </div>
             {AGENT_INFO.phone && <p style={{ fontSize: 14, marginBottom: 4 }}>{AGENT_INFO.phone}</p>}
             {AGENT_INFO.email && <p style={{ fontSize: 14 }}>{AGENT_INFO.email}</p>}
+            {/* Brokerage + license (2026-09-25, per Ryan, SEO audit finding
+                — same brokerage/license disclosure as Footer.js, added here
+                too since Contact Us is the other page a visitor (or a
+                search engine) would naturally look for this). */}
+            <p style={{ fontSize: 12, color: 'var(--color-muted)', marginTop: 10, lineHeight: 1.5 }}>
+              {BROKERAGE_INFO.name}
+              <br />
+              FL License #{BROKERAGE_INFO.licenseNumber}
+            </p>
           </div>
 
           <div
