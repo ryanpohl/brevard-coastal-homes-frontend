@@ -93,6 +93,9 @@ export default async function sitemap() {
     // fifth evergreen guide page, see app/moving-to-brevard/page.js. Same
     // priority tier as the other guides.
     { url: `${SITE_URL}/moving-to-brevard`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    // Client Reviews page (2026-09-25, per Ryan) — see app/reviews/page.js.
+    // Same priority tier as the other static informational pages.
+    { url: `${SITE_URL}/reviews`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
     // /contact (2026-09-25, Ryan's checklist finding: this was the one
     // sitemap gap left after the city-hub-pages fix on 2026-09-24 — a
     // real, live, unique page that was simply never added to `entries`).
