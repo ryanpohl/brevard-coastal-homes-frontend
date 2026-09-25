@@ -230,6 +230,19 @@ export default async function HomePage() {
           </h1>
 
           <SearchBar cities={cities} neighborhoods={neighborhoods} />
+
+          {/* Down Payment Assistance guide link (2026-09-25, per Ryan) —
+              small, unobtrusive contextual link for first-time buyers right
+              where they're already searching, on top of the site-wide
+              Footer link (see Footer.js's own comment) — this is the one
+              buyer-facing page it made sense to link from directly, since
+              /looking-to-sell is entirely seller-focused. */}
+          <p style={{ marginTop: 20, fontSize: 14, color: 'rgba(255,255,255,0.8)', textAlign: 'center' }}>
+            First-time buyer?{' '}
+            <Link href="/down-payment-assistance" style={{ color: '#fff', textDecoration: 'underline', fontWeight: 600 }}>
+              See down payment assistance programs →
+            </Link>
+          </p>
         </div>
       </div>
 

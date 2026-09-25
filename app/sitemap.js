@@ -68,6 +68,15 @@ export default async function sitemap() {
   const entries = [
     { url: SITE_URL, lastModified: now, changeFrequency: 'daily', priority: 1 },
     { url: `${SITE_URL}/looking-to-sell`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    // Down Payment Assistance guide (2026-09-25, per Ryan) — the site's
+    // first evergreen guide page, see app/down-payment-assistance/page.js.
+    // Priority in line with /looking-to-sell — both are informational,
+    // non-listing static pages.
+    { url: `${SITE_URL}/down-payment-assistance`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    // /contact (2026-09-25, Ryan's checklist finding: this was the one
+    // sitemap gap left after the city-hub-pages fix on 2026-09-24 — a
+    // real, live, unique page that was simply never added to `entries`).
+    { url: `${SITE_URL}/contact`, lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
   ];
 
   cities.forEach((city) => {
