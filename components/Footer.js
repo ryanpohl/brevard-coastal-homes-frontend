@@ -94,8 +94,15 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               ContactModal.js's phone line (AGENT_INFO.phone reads
               NEXT_PUBLIC_BUSINESS_PHONE, confirmed empty on the live
               production bundle per CLAUDE.md's 2026-08-04 note). Wrapped in a
-              tel: link for tap-to-call on mobile. */}
-          <p style={{ color: 'var(--color-gold, #c9a15a)', fontWeight: 700, fontSize: 17, margin: '6px 0 12px' }}>
+              tel: link for tap-to-call on mobile.
+              whiteSpace: 'nowrap' added 2026-09-26, per Ryan ("fix the phone
+              number so its all on one line") — the line was wrapping mid-
+              number, right after "321-350-" and before "7661". Not a true
+              overflow (the column had room); browsers treat a hyphen as a
+              soft line-break opportunity by default, so "321-350-7661" was
+              splitting at one of its own hyphens. nowrap stops any break in
+              this line, hyphen or otherwise. */}
+          <p style={{ color: 'var(--color-gold, #c9a15a)', fontWeight: 700, fontSize: 17, margin: '6px 0 12px', whiteSpace: 'nowrap' }}>
             Call or Text:{' '}
             <a href="tel:+13213507661" style={{ color: 'inherit', textDecoration: 'none' }}>
               321-350-7661
