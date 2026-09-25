@@ -5,6 +5,13 @@ export const metadata = {
   title: 'Looking to Sell Your Brevard County Home? | Brevard Coastal Homes',
   description:
     'Thinking of selling your home, condo, or land in Brevard County, FL? Get a free market analysis and learn about our property management services.',
+  // Canonical added 2026-09-25 (SEO audit finding: this page had no
+  // alternates.canonical at all, unlike every other static-metadata page
+  // in the app — e.g. app/contact/page.js's own canonical-less metadata
+  // was an oversight too, but Ryan's checklist named this page
+  // specifically). Same static string pattern as the homepage's own
+  // `alternates: { canonical: '/' }` in app/page.js.
+  alternates: { canonical: '/looking-to-sell' },
 };
 
 export default function LookingToSellPage() {
