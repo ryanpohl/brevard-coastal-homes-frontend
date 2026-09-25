@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { PROPERTY_TYPE_TO_SLUG } from '@/lib/constants';
+import { PROPERTY_TYPE_TO_SLUG, BROKERAGE_INFO } from '@/lib/constants';
 import ContactModal from './ContactModal';
 
 // Footer's "Contact Us" link now opens the same popup as the top nav's
@@ -174,6 +174,18 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               style={{ display: 'block', width: 110, height: 110 }}
             />
           </div>
+          {/* Brokerage name + FL license number as real text (2026-09-25,
+              per Ryan, SEO audit finding — the logo above was the only
+              place the brokerage was named anywhere on the site, and only
+              via alt text; a license number appeared nowhere at all).
+              Plain text rather than folded into the logo's alt text so
+              it's legible to a visitor too, not just a crawler, and shows
+              on every page since Footer is rendered site-wide. */}
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', marginTop: 10, lineHeight: 1.5 }}>
+            {BROKERAGE_INFO.name}
+            <br />
+            FL License #{BROKERAGE_INFO.licenseNumber}
+          </p>
         </div>
       </div>
 
