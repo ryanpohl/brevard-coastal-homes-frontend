@@ -27,15 +27,33 @@ import * as api from '@/lib/api';
 // full stack trace if this needs revisiting later (e.g. if Hostinger's
 // build environment gets broader network access).
 //
-// This fallback keeps the same runtime request to Google Fonts (so it
-// still needs today's network access, just at request time from the
-// visitor's browser instead of at build time), but moves it from a
-// CSS-nested @import to <link> tags in <head> below: the browser's preload
-// scanner discovers these directly while parsing the initial HTML, in
-// parallel with fetching globals.css, instead of only after globals.css
-// has fully downloaded and parsed. rel="preconnect" additionally warms up
-// the DNS/TLS handshake to both Google Fonts hosts before the stylesheet
-// request even starts. Same font families/weights as the old @import.
+// Second attempt was a plain <link rel="preconnect"> + <link
+// rel="stylesheet"> pair — this correctly moved *discovery* of the font
+// CSS request earlier (the browser's preload scanner finds it immediately
+// while parsing <head>, instead of only after globals.css finishes
+// downloading+parsing), but a synchronous <link rel="stylesheet"> is
+// STILL render-blocking no matter how early it's discovered. Re-running
+// PageSpeed Insights after that deploy confirmed it: "Render-blocking
+// requests" was still flagged with ~1.2s of estimated savings, barely
+// down from the original ~1.35s.
+//
+// This is the actual fix: the "loadCSS" pattern (a well-known technique,
+// not Next-specific). `media="print"` makes the browser fetch the
+// stylesheet WITHOUT blocking initial render (print stylesheets don't
+// apply to screen rendering, so they're never in the critical path); the
+// inline <script> immediately after runs synchronously during HTML
+// parsing and flips it to `media="all"` once loaded, so the fonts apply
+// normally a moment later. This has to be a plain inline <script> rather
+// than a React `onLoad` prop — RootLayout is an async Server Component,
+// and Server Components can't pass event-handler functions to Client
+// Component-style props (there's no client-side JS bundle to run them).
+// A vanilla <script> tag sidesteps that entirely: it's just HTML the
+// browser executes in document order, no React involved. <noscript>
+// keeps fonts working the normal way for the rare visitor with JS
+// disabled. Same font families/weights as before; still the same
+// fonts.googleapis.com/fonts.gstatic.com runtime request (no build-time
+// network dependency, so this doesn't reintroduce the Hostinger build
+// failure from the next/font attempt).
 
 
 // Sitewide SEO defaults (2026-09-11) — metadataBase resolves every page's
@@ -101,9 +119,22 @@ export default async function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
+          id="google-fonts-css"
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600;700;800&family=Inter+Tight:wght@400;500;600;700;800&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&display=swap"
+          media="print"
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "document.getElementById('google-fonts-css').media='all';",
+          }}
+        />
+        <noscript>
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600;700;800&family=Inter+Tight:wght@400;500;600;700;800&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&display=swap"
+          />
+        </noscript>
       </head>
       <body>
         {/* Google Ads conversion tracking (gtag.js), added 2026-08-20 per Ryan.
