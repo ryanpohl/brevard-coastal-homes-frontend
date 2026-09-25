@@ -33,11 +33,17 @@ export default function ContactPage() {
             {/* Brokerage + license (2026-09-25, per Ryan, SEO audit finding
                 — same brokerage/license disclosure as Footer.js, added here
                 too since Contact Us is the other page a visitor (or a
-                search engine) would naturally look for this). */}
+                search engine) would naturally look for this).
+                CORRECTED 2026-09-26, per Ryan: the number originally shown
+                here was his own individual license, not the brokerage's —
+                see AGENT_INFO/BROKERAGE_INFO's comments in lib/constants.js
+                for the full history. Now each entity gets its own license
+                number, Ryan's individual license and the brokerage's
+                corporate license. */}
             <p style={{ fontSize: 12, color: 'var(--color-muted)', marginTop: 10, lineHeight: 1.5 }}>
-              {BROKERAGE_INFO.name}
+              {AGENT_INFO.name}, FL License #{AGENT_INFO.licenseNumber}
               <br />
-              FL License #{BROKERAGE_INFO.licenseNumber}
+              {BROKERAGE_INFO.name}, FL License #{BROKERAGE_INFO.licenseNumber}
             </p>
           </div>
 
