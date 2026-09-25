@@ -177,6 +177,16 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               Property Taxes
             </Link>
           </div>
+          {/* Moving to Brevard County relocation guide (2026-09-25, per
+              Ryan) — fifth guide in this column, at the ~5-6 threshold
+              this column's own top comment flags for swapping to a single
+              "Buyer Resources" hub link (Task #68, still pending) instead
+              of a flat list — worth doing on the next guide. */}
+          <div style={{ marginBottom: 8 }}>
+            <Link href="/moving-to-brevard" className="footer-link" style={footerLinkStyle}>
+              Moving to Brevard County
+            </Link>
+          </div>
         </div>
 
         <div>
