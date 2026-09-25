@@ -138,15 +138,28 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
             than folding guide links into Company, since Company was
             already at 3 links and this is meant to grow: down payment
             assistance and flood insurance today, more evergreen guides
-            (hurricane insurance, property taxes, relocation, VA loans —
-            see the task list) landing here as each one ships. Every guide
-            gets linked from every page site-wide this way, which is the
-            whole point per Ryan's ask — internal-linking signal plus easy
-            discovery. If this list grows past ~5-6 links, consider
-            swapping it for a single link to a "Buyer Resources" hub page
-            (also planned) that lists them all instead. */}
+            (hurricane insurance, property taxes, relocation, VA loans)
+            landing here as each one shipped. Reached 6 direct guide links
+            (see below); at that point Ryan said to freeze it there rather
+            than keep growing it flat: "Lets stop at 6 with the Buyers
+            Guides. task #68 next." Task #68 (see app/buyer-resources/
+            page.js) is a pillar/index page listing all 6 guides — per
+            Ryan's explicit choice (asked directly rather than guessed),
+            it's added here as its OWN 7th link, above the 6 direct guide
+            links rather than replacing them, so a visitor can still jump
+            straight to one guide or land on the full list. Any future
+            guide beyond these 6 should be added to the hub page's GUIDES
+            array, not to this column — this column is done growing. */}
         <div>
           <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Buyer Guides</h4>
+          {/* Buyer Resources hub page (2026-09-25, per Ryan — Task #68).
+              Listed first, above the 6 individual guides, since it's the
+              "see everything" entry point into this column. */}
+          <div style={{ marginBottom: 8 }}>
+            <Link href="/buyer-resources" className="footer-link" style={footerLinkStyle}>
+              Buyer Resources
+            </Link>
+          </div>
           <div style={{ marginBottom: 8 }}>
             <Link href="/down-payment-assistance" className="footer-link" style={footerLinkStyle}>
               Down Payment Assistance
