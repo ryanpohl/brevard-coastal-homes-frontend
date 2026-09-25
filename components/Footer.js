@@ -161,6 +161,13 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
 
         <div>
           <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Company</h4>
+          {/* About (2026-09-25, per Ryan — new agent bio page, see
+              app/about/page.js) — listed first in this column, above
+              Contact Us/Looking to Sell, same as it leads off the nav bar. */}
+          <Link href="/about" className="footer-link" style={footerLinkStyle}>
+            About
+          </Link>
+          <br />
           <button
             type="button"
             onClick={() => setContactModalOpen(true)}
