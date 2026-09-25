@@ -96,6 +96,10 @@ export default async function sitemap() {
     // Client Reviews page (2026-09-25, per Ryan) — see app/reviews/page.js.
     // Same priority tier as the other static informational pages.
     { url: `${SITE_URL}/reviews`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    // VA Home Loans guide (2026-09-25, per Ryan) — sixth evergreen guide
+    // page, see app/va-loans/page.js. Same priority tier as the other
+    // guides.
+    { url: `${SITE_URL}/va-loans`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
     // /contact (2026-09-25, Ryan's checklist finding: this was the one
     // sitemap gap left after the city-hub-pages fix on 2026-09-24 — a
     // real, live, unique page that was simply never added to `entries`).
