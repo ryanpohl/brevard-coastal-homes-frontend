@@ -160,6 +160,13 @@ export default function DownPaymentAssistancePage() {
         </p>
       </div>
 
+      <p style={{ fontSize: 15, marginBottom: 36 }}>
+        A veteran? A VA loan can mean no down payment at all — see our{' '}
+        <Link href="/va-loans" style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+          VA home loans guide →
+        </Link>
+      </p>
+
       <section style={{ marginBottom: 36 }}>
         <Faq items={FAQ_ITEMS} heading="Down Payment Assistance FAQ" />
       </section>
