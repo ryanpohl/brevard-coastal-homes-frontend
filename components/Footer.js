@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { PROPERTY_TYPE_TO_SLUG, BROKERAGE_INFO } from '@/lib/constants';
+import { PROPERTY_TYPE_TO_SLUG, BROKERAGE_INFO, AGENT_INFO } from '@/lib/constants';
 import ContactModal from './ContactModal';
 
 // Footer's "Contact Us" link now opens the same popup as the top nav's
@@ -265,9 +265,14 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               of the plain static file under /logos/ loaded correctly at 200x200. */}
           <div style={{ marginTop: 16, background: '#fff', display: 'inline-block', padding: 8, borderRadius: 6 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
+            {/* alt text corrected 2026-09-26, per Ryan, to match the
+                brokerage's confirmed registered name (BROKERAGE_INFO.name
+                in lib/constants.js) rather than the old "...of Brevard"
+                spelling that was never quite right — see that constant's
+                comment for the full naming-inconsistency history. */}
             <img
               src="/logos/tropical-realty-logo.jpg"
-              alt="Tropical Realty & Investments of Brevard"
+              alt={BROKERAGE_INFO.name}
               style={{ display: 'block', width: 110, height: 110 }}
             />
           </div>
@@ -277,11 +282,18 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               via alt text; a license number appeared nowhere at all).
               Plain text rather than folded into the logo's alt text so
               it's legible to a visitor too, not just a crawler, and shows
-              on every page since Footer is rendered site-wide. */}
+              on every page since Footer is rendered site-wide.
+              CORRECTED 2026-09-26, per Ryan: the number originally shown
+              here was his own individual license, not the brokerage's —
+              see AGENT_INFO/BROKERAGE_INFO's comments in lib/constants.js
+              for the full history. Now each entity gets its own name +
+              license number line: Ryan's individual license, then the
+              brokerage's corporate license (confirmed and approved for
+              publishing by Ryan on 2026-09-26). */}
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', marginTop: 10, lineHeight: 1.5 }}>
-            {BROKERAGE_INFO.name}
+            {AGENT_INFO.name}, FL License #{AGENT_INFO.licenseNumber}
             <br />
-            FL License #{BROKERAGE_INFO.licenseNumber}
+            {BROKERAGE_INFO.name}, FL License #{BROKERAGE_INFO.licenseNumber}
           </p>
         </div>
       </div>
