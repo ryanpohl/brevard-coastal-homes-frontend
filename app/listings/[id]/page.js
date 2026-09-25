@@ -177,14 +177,25 @@ export default async function ListingDetailPage({ params }) {
 
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginTop: 20 }}>
             <div>
-                        <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 700, color: 'var(--color-ink)' }}>
+                        {/* H1 (2026-09-25, SEO audit finding: none of the 21 listing
+                            pages checked had an H1 — the address was rendered as two
+                            plain, unstyled-semantically <div>s that only LOOKED like a
+                            heading). The street address is the page's natural H1: it's
+                            the one piece of text that's both unique per page and matches
+                            what a searcher is actually looking for. Kept the exact same
+                            visual treatment (font, size, weight, color, two-line stack)
+                            by using a <br /> between the two address lines inside a
+                            single <h1> instead of two separate <div>s, and reset the
+                            browser's default h1 margin to 0 so this doesn't shift the
+                            layout below it (the outer flex container's own `gap`/
+                            `marginTop` already provide all the spacing this needs). The
+                            status badge ("ACTIVE" etc.) intentionally stays OUTSIDE the
+                            h1 as its own element — it's a status indicator, not part of
+                            the page's heading. */}
+                        <h1 style={{ margin: 0, fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 700, color: 'var(--color-ink)' }}>
 {streetLine}
-</div>
-{cityStateZip && (
-                  <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 700, color: 'var(--color-ink)' }}>
-{cityStateZip}
-</div>
-              )}
+{cityStateZip && (<><br />{cityStateZip}</>)}
+</h1>
               <div style={{ fontSize: 12, letterSpacing: 0.8, fontWeight: 600, marginTop: 8, color: STATUS_COLOR[listing.status] || 'var(--color-muted)' }}>
 {listing.status?.toUpperCase()}
 </div>
