@@ -162,6 +162,16 @@ export default function FloodInsurancePage() {
         </p>
       </GuideSection>
 
+      {/* Reciprocal cross-link to the Hurricane Insurance guide (2026-09-25,
+          per Ryan) — mirrors that guide's own link back to this page in its
+          "Wind vs. flood" section; a buyer reading about flood coverage is
+          also exactly who wants to know how wind/hurricane coverage works. */}
+      <p style={{ fontSize: 14, marginBottom: 28 }}>
+        <Link href="/hurricane-insurance" style={{ color: '#000', textDecoration: 'underline' }}>
+          Read our hurricane &amp; homeowners insurance guide →
+        </Link>
+      </p>
+
       <section style={{ marginBottom: 36 }}>
         <Faq items={FAQ_ITEMS} heading="Flood Insurance FAQ" />
       </section>
