@@ -109,6 +109,15 @@ export default function AboutPage() {
         </p>
       </div>
 
+      {/* Cross-link to the Reviews page (2026-09-25, per Ryan) — a visitor
+          reading Ryan's credentials is exactly who wants to see what past
+          clients actually say next. */}
+      <p style={{ fontSize: 15, marginBottom: 36 }}>
+        <Link href="/reviews" style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+          Read what past clients say →
+        </Link>
+      </p>
+
       <div className="card" style={{ padding: 24, textAlign: 'center' }}>
         <p style={{ fontSize: 16, marginBottom: 14 }}>Ready to start your search, or have a question first?</p>
         <p style={{ fontSize: 15 }}>
