@@ -521,6 +521,12 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
             )
           }
         />
+        {/* About (2026-09-25, per Ryan — new agent bio page, see
+            app/about/page.js) — placed right next to Looking to Sell,
+            mirroring how that link is styled/wired (plain bare NavLink,
+            closeNow on hover so it closes any dropdown left open from a
+            sibling trigger, same as every other non-dropdown nav item). */}
+        <NavLink label="About" href="/about" bare onEnter={closeNow} />
         <NavLink label="Looking to Sell" href="/looking-to-sell" bare onEnter={closeNow} />
         {/* Was a Link to /contact — now opens ContactModal instead, per Ryan
             2026-08-15: "make the Contact Us link ... a pop up window
