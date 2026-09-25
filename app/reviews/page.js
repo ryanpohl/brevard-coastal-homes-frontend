@@ -24,13 +24,19 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
  *
  * The 6 reviews below are transcribed verbatim from screenshots Ryan sent
  * of his Google Business Profile (5.0 stars, 6 reviews, confirmed live via
- * the actual Google listing — see the CID link below). Two reviews
- * (Chris Harwood, Daniel Bajer) were truncated by Google's own "... More"
- * UI in the screenshot; only the visible text is quoted here rather than
- * guessing at the rest. Relative timestamps ("a week ago", "20 hours ago")
- * and each reviewer's own review/photo counts were deliberately left out
- * of the quotes themselves — both go stale immediately on a static page,
- * unlike the quotes.
+ * the actual Google listing — see the CID link below). Two reviews (Chris
+ * Harwood, Daniel Bajer) were initially truncated by Google's own "... More"
+ * UI in Ryan's first round of screenshots; Ryan later sent fuller
+ * screenshots of both (2026-09-25). Chris Harwood's full text matched what
+ * was already here verbatim, so no change was needed. Daniel Bajer's was
+ * genuinely longer and has been updated below to the complete quote. Each
+ * screenshot also showed a Google-provided "Ease of reaching staff" sub-tag
+ * beneath the review text — that's a separate structured attribute, not
+ * part of the reviewer's own words, so it's deliberately not included in
+ * any quote. Relative timestamps ("a week ago", "20 hours ago") and each
+ * reviewer's own review/photo counts were deliberately left out of the
+ * quotes themselves — both go stale immediately on a static page, unlike
+ * the quotes.
  *
  * GOOGLE_REVIEWS_URL is Brevard Coastal Homes' actual Google Business
  * Profile, resolved from Ryan's share.google link to a stable
@@ -66,7 +72,7 @@ const REVIEWS = [
   {
     name: 'Daniel Bajer',
     quote:
-      'Ryan went above and beyond to help us find a 2nd home in Melbourne FL. We were not from the area, Ryan spent plenty of time helping us to decide on a beautiful home that would be best for our Family. Ryan was also easy to get in touch with.',
+      "Ryan went above and beyond to help us find a 2nd home in Melbourne FL. We were not from the area, Ryan spent plenty of time helping us to decide on a beautiful home that would be best for our Family. Ryan was also easy to get in touch with and if he didn't know the answer to a question he was always able to get back to us quickly with an answer. I can't say enough good things about Ryan, he did an amazing job for us and I would completely recommend him!!",
   },
   {
     name: 'Tariq Abou-Bakr',
