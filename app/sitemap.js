@@ -81,6 +81,10 @@ export default async function sitemap() {
     // guide page, see app/flood-insurance/page.js. Same priority as the
     // down payment guide.
     { url: `${SITE_URL}/flood-insurance`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    // Hurricane Insurance guide (2026-09-25, per Ryan) — third evergreen
+    // guide page, see app/hurricane-insurance/page.js. Same priority tier
+    // as the other two guides.
+    { url: `${SITE_URL}/hurricane-insurance`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
     // /contact (2026-09-25, Ryan's checklist finding: this was the one
     // sitemap gap left after the city-hub-pages fix on 2026-09-24 — a
     // real, live, unique page that was simply never added to `entries`).
