@@ -166,6 +166,17 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               Hurricane Insurance
             </Link>
           </div>
+          {/* Property Taxes & Homestead Exemption guide (2026-09-25, per
+              Ryan) — fourth guide in this column. Now at 4 links; still
+              under the ~5-6 threshold this column's own top comment flags
+              for swapping to a single "Buyer Resources" hub link instead
+              (see Task list: that hub page is planned once more guides
+              ship). */}
+          <div style={{ marginBottom: 8 }}>
+            <Link href="/property-taxes" className="footer-link" style={footerLinkStyle}>
+              Property Taxes
+            </Link>
+          </div>
         </div>
 
         <div>
