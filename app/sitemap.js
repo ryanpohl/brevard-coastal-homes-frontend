@@ -100,6 +100,11 @@ export default async function sitemap() {
     // page, see app/va-loans/page.js. Same priority tier as the other
     // guides.
     { url: `${SITE_URL}/va-loans`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    // Buyer Resources hub page (2026-09-25, per Ryan — Task #68, built
+    // after Ryan said to stop growing the footer's Buyer Guides column
+    // past 6 links) — see app/buyer-resources/page.js. Same priority tier
+    // as the guides it links to.
+    { url: `${SITE_URL}/buyer-resources`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
     // /contact (2026-09-25, Ryan's checklist finding: this was the one
     // sitemap gap left after the city-hub-pages fix on 2026-09-24 — a
     // real, live, unique page that was simply never added to `entries`).
