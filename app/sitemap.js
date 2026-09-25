@@ -89,6 +89,10 @@ export default async function sitemap() {
     // fourth evergreen guide page, see app/property-taxes/page.js. Same
     // priority tier as the other three guides.
     { url: `${SITE_URL}/property-taxes`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    // Moving to Brevard County relocation guide (2026-09-25, per Ryan) —
+    // fifth evergreen guide page, see app/moving-to-brevard/page.js. Same
+    // priority tier as the other guides.
+    { url: `${SITE_URL}/moving-to-brevard`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
     // /contact (2026-09-25, Ryan's checklist finding: this was the one
     // sitemap gap left after the city-hub-pages fix on 2026-09-24 — a
     // real, live, unique page that was simply never added to `entries`).
