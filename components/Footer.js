@@ -187,6 +187,19 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               Moving to Brevard County
             </Link>
           </div>
+          {/* VA Home Loans guide (2026-09-25, per Ryan — see
+              app/va-loans/page.js). Sixth guide in this column — now past
+              the ~5-6 link threshold this column's top comment has been
+              flagging since the fourth guide. Still added as a flat link
+              rather than held back, consistent with Ryan's "put as many
+              of these in the footer if possible" — but Task #68 (a single
+              "Buyer Resources" hub page/link replacing this whole column)
+              should be the very next thing built, not deferred again. */}
+          <div style={{ marginBottom: 8 }}>
+            <Link href="/va-loans" className="footer-link" style={footerLinkStyle}>
+              VA Home Loans
+            </Link>
+          </div>
         </div>
 
         <div>
