@@ -80,7 +80,14 @@ export async function generateMetadata({ params }) {
   const subCommunity = VIERA_BUILDERS_SUB_COMMUNITIES.find((c) => c.slug === slug);
   if (subCommunity) {
     return {
-      title: `${subCommunity.name}, FL Area Guide — Amenities, Schools & HOA Fees | Brevard Coastal Homes`,
+      // Shortened 2026-09-25 — see the sibling city Area Guide page's
+      // (app/[citySlug]/area-guide/page.js) generateMetadata comment for
+      // the full why (SEO audit flagged these as 83+ chars). Same
+      // treatment: drop ", FL" and the itemized amenities/schools/HOA list
+      // from the <title>, keep the "${name} Area Guide | Brevard Coastal
+      // Homes" pattern. Longest neighborhood name (Harbor Island Beach
+      // Club) still comes to 59 chars.
+      title: `${subCommunity.name} Area Guide | Brevard Coastal Homes`,
       description: `What to know before buying in ${subCommunity.name}, a Viera Builders community in Viera West, FL: amenities, schools, HOA fees, current market stats, and FAQs.`,
       alternates: { canonical: `/neighborhoods/${slug}/area-guide` },
     };
@@ -88,7 +95,7 @@ export async function generateMetadata({ params }) {
   try {
     const { neighborhood } = await api.getNeighborhood(slug);
     return {
-      title: `${neighborhood.name}, FL Area Guide — Amenities, Schools & HOA Fees | Brevard Coastal Homes`,
+      title: `${neighborhood.name} Area Guide | Brevard Coastal Homes`,
       description: `What to know before buying in ${neighborhood.name}, FL: amenities, schools, HOA fees, current market stats, and FAQs.`,
       alternates: { canonical: `/neighborhoods/${slug}/area-guide` },
     };
