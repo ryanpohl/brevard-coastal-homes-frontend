@@ -171,6 +171,13 @@ export default function PropertyTaxesPage() {
             required.
           </li>
         </ul>
+        <p>
+          If you&apos;re a veteran, it&apos;s also worth reading our{' '}
+          <Link href="/va-loans" style={{ color: 'inherit' }}>
+            VA home loans guide
+          </Link>{' '}
+          — it covers these exemptions alongside VA financing itself.
+        </p>
       </GuideSection>
 
       <section style={{ marginBottom: 36 }}>
