@@ -199,14 +199,39 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
       setScriptLoaded(true);
       return;
     }
-    if (!window.__gmapsBootstrapInjected) {
-      window.__gmapsBootstrapInjected = true;
-      const script = document.createElement('script');
-      script.id = 'google-maps-js';
-      script.innerHTML = mapsBootstrapLoaderSrc(GOOGLE_MAPS_API_KEY);
-      document.head.appendChild(script);
+
+    // Deferred via requestIdleCallback (2026-09-25, PageSpeed re-audit) —
+    // this used to inject+run synchronously the instant this component
+    // mounted, i.e. during the same critical window as the page's LCP
+    // image and web fonts. The Maps JS payload (the 'maps' + 'marker'
+    // libraries pulled in by the effect below, once this flips
+    // scriptLoaded true) is large enough that PageSpeed flagged
+    // ~176-302 KiB of "unused JavaScript" on listing search pages — every
+    // one of which renders this map immediately above the results grid
+    // (see globals.css's .listing-page-map) — and it was competing with
+    // the LCP image for network/main-thread time. The map isn't part of
+    // any above-the-fold *content* paint itself (it's interactive chrome,
+    // not text/an image Lighthouse scores as LCP), so it loses nothing by
+    // starting a beat later: requestIdleCallback runs this once the
+    // browser has an idle moment (capped at 2s so it still starts
+    // promptly even on a busy page), falling back to a short setTimeout
+    // on Safari/older browsers that don't support requestIdleCallback.
+    const inject = () => {
+      if (!window.__gmapsBootstrapInjected) {
+        window.__gmapsBootstrapInjected = true;
+        const script = document.createElement('script');
+        script.id = 'google-maps-js';
+        script.innerHTML = mapsBootstrapLoaderSrc(GOOGLE_MAPS_API_KEY);
+        document.head.appendChild(script);
+      }
+      setScriptLoaded(true);
+    };
+    if (typeof window.requestIdleCallback === 'function') {
+      const handle = window.requestIdleCallback(inject, { timeout: 2000 });
+      return () => window.cancelIdleCallback?.(handle);
     }
-    setScriptLoaded(true);
+    const timer = setTimeout(inject, 200);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {

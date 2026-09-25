@@ -36,10 +36,19 @@ export default function ListingResultsLayout({ mapCenter, results, mapZoom, resu
                         gap: 20,
           }}
         >
-{results.map((listing) => (
+{results.map((listing, index) => (
+              // priority on the first row (2026-09-25, PageSpeed re-audit) —
+              // see ListingCard.js's own comment on its <Image priority>
+              // prop for the full why. 4 covers the widest single row this
+              // grid ever renders (auto-fill, minmax(260px, 1fr) — a typical
+              // desktop results column fits 3-4 cards per row before
+              // wrapping), so this only eagerly loads what's actually
+              // visible on load without over-fetching for narrower/mobile
+              // viewports where just the first 1-2 would show anyway.
               <ListingCard
                            key={listing.id}
               listing={listing}
+              priority={index < 4}
               onHoverChange={(hovering) => setHoveredId(hovering ? listing.id : null)}
             />
                           ))}

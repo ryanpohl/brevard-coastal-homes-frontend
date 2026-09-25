@@ -7,7 +7,7 @@ import { formatPrice, formatAssocFee, isPricePerSqftPlausible } from '@/lib/cons
 import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
 
-export default function ListingCard({ listing, onHoverChange }) {
+export default function ListingCard({ listing, onHoverChange, priority = false }) {
     const { signedIn, token, promptSignIn } = useAuth();
     const [favorited, setFavorited] = useState(listing.isFavorited);
     const [busy, setBusy] = useState(false);
@@ -128,7 +128,28 @@ export default function ListingCard({ listing, onHoverChange }) {
     >
       <div style={{ position: 'relative', width: '100%', paddingTop: '66%', background: '#e6e1d6' }}>
 {photo && (
-            <Image src={photo} alt={listing.address} fill sizes="(max-width: 768px) 100vw, 25vw" style={{ objectFit: 'cover' }} />
+            // priority (2026-09-25, PageSpeed re-audit): every card image used
+            // to render with next/image's default loading="lazy" +
+            // fetchPriority="auto" — including the first card in the grid,
+            // which sits inside the initial viewport on every listing
+            // search-results page (city/neighborhood/search). Lazy-loading an
+            // image that's already visible on load means the browser doesn't
+            // even discover the request until an IntersectionObserver fires
+            // post-hydration, which was directly delaying LCP (measured
+            // 7-8.6s on PageSpeed's mobile test for a page whose largest
+            // paint IS this image). ListingResultsLayout now passes
+            // priority=true for the first few cards (the first visible row),
+            // which makes next/image switch those to loading="eager" +
+            // fetchPriority="high" + an actual <link rel="preload"> in
+            // <head> — everything below the fold stays lazy as before.
+            <Image
+              src={photo}
+              alt={listing.address}
+              fill
+              sizes="(max-width: 768px) 100vw, 25vw"
+              style={{ objectFit: 'cover' }}
+              priority={priority}
+            />
         )}
         <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
 {/* Pending badge (2026-09-13, per Ryan: "Show all listings from the
