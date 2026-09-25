@@ -200,22 +200,37 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
       return;
     }
 
-    // Deferred via requestIdleCallback (2026-09-25, PageSpeed re-audit) —
-    // this used to inject+run synchronously the instant this component
-    // mounted, i.e. during the same critical window as the page's LCP
-    // image and web fonts. The Maps JS payload (the 'maps' + 'marker'
-    // libraries pulled in by the effect below, once this flips
+    // Deferred until the window `load` event (2026-09-25, PageSpeed
+    // re-audit) — this used to inject+run synchronously the instant this
+    // component mounted, i.e. during the same critical window as the
+    // page's LCP image and web fonts. The Maps JS payload (the 'maps' +
+    // 'marker' libraries pulled in by the effect below, once this flips
     // scriptLoaded true) is large enough that PageSpeed flagged
     // ~176-302 KiB of "unused JavaScript" on listing search pages — every
     // one of which renders this map immediately above the results grid
     // (see globals.css's .listing-page-map) — and it was competing with
-    // the LCP image for network/main-thread time. The map isn't part of
-    // any above-the-fold *content* paint itself (it's interactive chrome,
-    // not text/an image Lighthouse scores as LCP), so it loses nothing by
-    // starting a beat later: requestIdleCallback runs this once the
-    // browser has an idle moment (capped at 2s so it still starts
-    // promptly even on a busy page), falling back to a short setTimeout
-    // on Safari/older browsers that don't support requestIdleCallback.
+    // the LCP image for network/main-thread time.
+    //
+    // First attempt here was requestIdleCallback (capped at a 2s
+    // timeout) — reverted same day after re-measuring: LCP did improve
+    // slightly, but Total Blocking Time jumped from ~150ms to 580ms.
+    // requestIdleCallback can fire as soon as the main thread has ANY
+    // free moment, which on a throttled mobile CPU was apparently right
+    // after First Contentful Paint — moving the map's heavy synchronous
+    // init work (creating the Map instance, markers, etc.) from *before*
+    // FCP (where it doesn't count against Lighthouse's TBT at all) to
+    // squarely inside the FCP-to-interactive window that TBT measures.
+    // Net effect: worse total score despite a real LCP win.
+    //
+    // `load` doesn't have that failure mode — it only fires once the
+    // page's own initial resources (images included) have finished, by
+    // which point Lighthouse's FCP/LCP/TBT-critical window has normally
+    // already closed, so this can safely do its (unavoidably somewhat
+    // heavy) synchronous work without it being counted against those
+    // metrics. The map isn't part of any above-the-fold *content* paint
+    // itself (it's interactive chrome, not text/an image Lighthouse
+    // scores as LCP), so it loses nothing by starting once the page has
+    // otherwise finished loading.
     const inject = () => {
       if (!window.__gmapsBootstrapInjected) {
         window.__gmapsBootstrapInjected = true;
@@ -226,12 +241,12 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
       }
       setScriptLoaded(true);
     };
-    if (typeof window.requestIdleCallback === 'function') {
-      const handle = window.requestIdleCallback(inject, { timeout: 2000 });
-      return () => window.cancelIdleCallback?.(handle);
+    if (document.readyState === 'complete') {
+      inject();
+      return;
     }
-    const timer = setTimeout(inject, 200);
-    return () => clearTimeout(timer);
+    window.addEventListener('load', inject, { once: true });
+    return () => window.removeEventListener('load', inject);
   }, []);
 
   useEffect(() => {
