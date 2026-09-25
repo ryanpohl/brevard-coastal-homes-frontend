@@ -207,6 +207,15 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
     propertyType: countPropertyType,
     neighborhoodName,
   });
+  // Canonical added to all 3 branches below (2026-09-25, SEO audit finding:
+  // unlike the backend-SEO branch above them, none of these hand-written
+  // fallbacks ever set alternates.canonical — meaning the 6 Viera Builders
+  // sub-community pages, Beach Woods, and any neighborhood whose backend
+  // SEO call fails/has no row yet were missing a canonical entirely, not
+  // just client-side). Bare `/neighborhoods/${slug}` in every case — same
+  // "ignore query-string filter state" convention as the successful branch
+  // just above (seo.canonicalUrl/seo.canonicalPath), and as every other
+  // canonical in this codebase.
   if (subCommunity) {
     return {
       title: `${subCommunity.name} | Viera West, FL | Brevard Coastal Homes`,
@@ -214,6 +223,7 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
         countPrefix,
         `Browse listings in ${subCommunity.name}, a Viera Builders community in Viera West, FL.`
       ),
+      alternates: { canonical: `/neighborhoods/${slug}` },
     };
   }
   if (isBeachWoods) {
@@ -223,6 +233,7 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
         countPrefix,
         `Browse condos and townhomes for sale in Beach Woods, a gated riverfront-to-oceanfront community in Melbourne Beach, FL.`
       ),
+      alternates: { canonical: `/neighborhoods/${slug}` },
     };
   }
   if (neighborhoodName) {
@@ -232,6 +243,7 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
         countPrefix,
         `Browse homes, condos, and land for sale in ${neighborhoodName}, FL — updated from the MLS.`
       ),
+      alternates: { canonical: `/neighborhoods/${slug}` },
     };
   }
   return {};
