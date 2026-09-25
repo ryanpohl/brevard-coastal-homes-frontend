@@ -126,6 +126,19 @@ export default async function AreaGuidePage({ params }) {
       <GuideSection title="Lifestyle & Character" text={content.lifestyle} />
       <GuideSection title="Schools" text={content.schools} />
       <GuideSection title="Flood Zones & Insurance" text={content.floodZones} />
+      {/* Cross-link to the full Flood Insurance guide (2026-09-25, per
+          Ryan) — right under the per-city flood blurb above, since a buyer
+          reading about THIS city's flood zones is exactly who wants the
+          fuller guide next. Gated on content.floodZones so it never shows
+          up under an empty section (matches GuideSection's own text-gating
+          below). */}
+      {content.floodZones && (
+        <p style={{ fontSize: 14, marginTop: -20, marginBottom: 28 }}>
+          <Link href="/flood-insurance" style={{ color: '#000', textDecoration: 'underline' }}>
+            Read our full flood insurance guide →
+          </Link>
+        </p>
+      )}
       <GuideSection title="HOA & Community Fees" text={content.hoa} />
 
       <section style={{ marginBottom: 36 }}>
