@@ -272,6 +272,15 @@ export async function generateMetadata({ params }) {
         countPrefix,
         `Browse every oceanfront home and condo listing in ${city.name}, FL in one place — updated from the MLS.`
       ),
+      // Canonical added 2026-09-25 (SEO audit finding: this hand-written
+      // branch — the combined "Listings" view for each of the 5 oceanfront
+      // cities — was the one generateMetadata branch in this file that
+      // never set alternates.canonical at all, unlike the backend-SEO
+      // branch and its own fallback branch just below, both of which do.
+      // Bare city+slug path, matching how every other canonical in this
+      // file points at the un-filtered URL regardless of query-string
+      // state.
+      alternates: { canonical: `/${citySlug}/${OCEANFRONT_LISTINGS_SLUG}` },
     };
   }
 
