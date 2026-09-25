@@ -133,6 +133,32 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
           ))}
         </div>
 
+        {/* Buyer Guides column (2026-09-25, per Ryan: "put as many of
+            these in the footer if possible") — a dedicated column rather
+            than folding guide links into Company, since Company was
+            already at 3 links and this is meant to grow: down payment
+            assistance and flood insurance today, more evergreen guides
+            (hurricane insurance, property taxes, relocation, VA loans —
+            see the task list) landing here as each one ships. Every guide
+            gets linked from every page site-wide this way, which is the
+            whole point per Ryan's ask — internal-linking signal plus easy
+            discovery. If this list grows past ~5-6 links, consider
+            swapping it for a single link to a "Buyer Resources" hub page
+            (also planned) that lists them all instead. */}
+        <div>
+          <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Buyer Guides</h4>
+          <div style={{ marginBottom: 8 }}>
+            <Link href="/down-payment-assistance" className="footer-link" style={footerLinkStyle}>
+              Down Payment Assistance
+            </Link>
+          </div>
+          <div style={{ marginBottom: 8 }}>
+            <Link href="/flood-insurance" className="footer-link" style={footerLinkStyle}>
+              Flood Zones & Insurance
+            </Link>
+          </div>
+        </div>
+
         <div>
           <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Company</h4>
           <button
@@ -146,17 +172,6 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
           <br />
           <Link href="/looking-to-sell" className="footer-link" style={footerLinkStyle}>
             Looking to Sell
-          </Link>
-          <br />
-          {/* Down Payment Assistance guide link (2026-09-25, per Ryan —
-              linked site-wide from the footer so every page passes some
-              internal-linking signal to the new guide and helps it get
-              crawled/indexed quickly; see app/down-payment-assistance/
-              page.js for the page itself). Placed in this Company column
-              next to Contact Us/Looking to Sell rather than a new column —
-              one link doesn't justify its own footer section yet. */}
-          <Link href="/down-payment-assistance" className="footer-link" style={footerLinkStyle}>
-            Down Payment Assistance
           </Link>
           <br />
           {/* Tropical Realty & Investments of Brevard logo (2026-08-21, per Ryan:
