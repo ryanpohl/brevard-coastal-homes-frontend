@@ -157,6 +157,15 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               Flood Zones & Insurance
             </Link>
           </div>
+          {/* Hurricane Insurance guide (2026-09-25, per Ryan — "can you put
+              this link in the footer also," confirmed via clarifying
+              question to mean the hurricane/homeowners insurance guide).
+              Third guide in this column, same treatment as the two above. */}
+          <div style={{ marginBottom: 8 }}>
+            <Link href="/hurricane-insurance" className="footer-link" style={footerLinkStyle}>
+              Hurricane Insurance
+            </Link>
+          </div>
         </div>
 
         <div>
