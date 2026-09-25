@@ -198,6 +198,14 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
             About
           </Link>
           <br />
+          {/* Reviews (2026-09-25, per Ryan — client testimonials page, see
+              app/reviews/page.js) — grouped with About in Company rather
+              than the Buyer Guides column above: it's a trust/company page
+              about Ryan, not a topical buyer guide. */}
+          <Link href="/reviews" className="footer-link" style={footerLinkStyle}>
+            Reviews
+          </Link>
+          <br />
           <button
             type="button"
             onClick={() => setContactModalOpen(true)}
