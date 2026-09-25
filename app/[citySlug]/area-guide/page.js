@@ -34,7 +34,18 @@ export async function generateMetadata({ params }) {
   try {
     const { city } = await api.getCity(citySlug);
     return {
-      title: `${city.name}, FL Area Guide — Schools, Flood Zones & HOA Fees | Brevard Coastal Homes`,
+      // Shortened 2026-09-25 (per the SEO audit's Titles & meta descriptions
+      // table — flagged as running 84-88+ chars, past the ~60-char point
+      // Google truncates at in results) — dropped ", FL" and the itemized
+      // "Schools, Flood Zones & HOA Fees" list from the <title> itself
+      // (that detail still lives in the description below, so it's not
+      // lost from the search snippet, just out of the truncation-prone
+      // blue link) and matched the "${name} Real Estate | Brevard Coastal
+      // Homes" pattern already used by the sibling bare-city Listings page
+      // (app/[citySlug]/page.js) for consistency. Longest city name (Indian
+      // Harbour Beach) comes to 55 chars this way — comfortably under the
+      // limit for every one of the 10 cities in CITY_AREA_GUIDE_SLUGS.
+      title: `${city.name} Area Guide | Brevard Coastal Homes`,
       description: `What to know before buying in ${city.name}, FL: schools, flood zones, HOA fees, current market stats, and neighborhoods.`,
       alternates: { canonical: `/${citySlug}/area-guide` },
     };
