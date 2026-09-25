@@ -68,6 +68,10 @@ export default async function sitemap() {
   const entries = [
     { url: SITE_URL, lastModified: now, changeFrequency: 'daily', priority: 1 },
     { url: `${SITE_URL}/looking-to-sell`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    // About / agent bio page (2026-09-25, per Ryan) — see app/about/page.js.
+    // Same priority tier as Looking to Sell — both are informational,
+    // non-listing static pages that link from every page's nav/footer.
+    { url: `${SITE_URL}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
     // Down Payment Assistance guide (2026-09-25, per Ryan) — the site's
     // first evergreen guide page, see app/down-payment-assistance/page.js.
     // Priority in line with /looking-to-sell — both are informational,
