@@ -148,6 +148,17 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
             Looking to Sell
           </Link>
           <br />
+          {/* Down Payment Assistance guide link (2026-09-25, per Ryan —
+              linked site-wide from the footer so every page passes some
+              internal-linking signal to the new guide and helps it get
+              crawled/indexed quickly; see app/down-payment-assistance/
+              page.js for the page itself). Placed in this Company column
+              next to Contact Us/Looking to Sell rather than a new column —
+              one link doesn't justify its own footer section yet. */}
+          <Link href="/down-payment-assistance" className="footer-link" style={footerLinkStyle}>
+            Down Payment Assistance
+          </Link>
+          <br />
           {/* Tropical Realty & Investments of Brevard logo (2026-08-21, per Ryan:
               "put this logo under Brevard Coastal homes & the text on the homepage").
               Moved here from the Brevard Coastal Homes column on 2026-09-12,
