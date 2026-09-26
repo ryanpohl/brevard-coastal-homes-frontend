@@ -174,7 +174,38 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
     // every time (same optimization the page component below already
     // makes).
     try {
-      const { seo } = await api.getNeighborhoodSeo(slug, primaryType);
+      let { seo } = await api.getNeighborhoodSeo(slug, primaryType);
+      // Tortoise Island "Melbourne Beach" -> "Satellite Beach" fix
+      // (2026-09-26, per Ryan flagging the live neighborhood page's H1 —
+      // "Tortoise island page says its located in Melbourne Beach when
+      // its actually located in Satellite Beach"). Same root cause and
+      // same frontend-only fix pattern as ARIPEKA_H1/
+      // ADELAIDE_SUMMER_LAKES_H1 below: the backend's SEO title/
+      // description for every neighborhood interpolates its parent city's
+      // display name (see that comment for the full "why a .replace()
+      // instead of a backend reseed" reasoning), and Tortoise Island's
+      // `neighborhoods` seed row is parented to citySlug 'melbourne-beach'
+      // — confirmed wrong: Tortoise Island is a real, independently
+      // documented South Patrick Shores/Satellite Beach community (see
+      // this file's own NEIGHBORHOOD_AREA_GUIDE_CONTENT['tortoise-island']
+      // entry in lib/constants.js, sourced from the community's own
+      // neighborhood-association site, which already correctly places it
+      // in Satellite Beach — and Ryan himself flagged this same seed
+      // mismatch once before, 2026-09-24, when removing Tortoise Island
+      // from Melbourne Beach's own Area Guide "nearby neighborhoods" list
+      // rather than re-homing it, per that constant's own comment). Scoped
+      // to slug === 'tortoise-island' only — no other neighborhood shares
+      // this particular seed mistake.
+      if (slug === 'tortoise-island') {
+        seo = {
+          ...seo,
+          title: seo.title?.replace('Melbourne Beach', 'Satellite Beach'),
+          metaDescription: seo.metaDescription?.replace('Melbourne Beach', 'Satellite Beach'),
+          keywords: Array.isArray(seo.keywords)
+            ? seo.keywords.map((k) => k.replace('Melbourne Beach', 'Satellite Beach'))
+            : seo.keywords,
+        };
+      }
       const countPrefix = await buildNeighborhoodListingCountPrefix({
         listingsFilterParams,
         propertyType: countPropertyType,
@@ -320,6 +351,27 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
     }
   }
 
+  // Tortoise Island parent-city fix (2026-09-26, per Ryan: "Tortoise
+  // island page says its located in Melbourne Beach when its actually
+  // located in Satellite Beach") — the backend's `neighborhoods` seed row
+  // parents Tortoise Island to citySlug 'melbourne-beach', which is wrong
+  // (see generateMetadata's identical fix above for the full sourcing —
+  // this is a real South Patrick Shores/Satellite Beach community, and
+  // Ryan flagged this same seed mismatch once before, 2026-09-24, on
+  // Melbourne Beach's own Area Guide page). Overriding `neighborhood.city`
+  // here — rather than only patching the H1 text below — fixes every
+  // downstream use of it in one place: the parentCity fetch just below
+  // (so waterfrontFlags and the map's fallback center both resolve to
+  // Satellite Beach instead), not just the displayed text. No admin UI or
+  // established path from this session to correct the backend seed row
+  // directly (same "override in the frontend" situation as
+  // OCEANFRONT_PAGE_EXCLUDED_MLS_NUMBERS in the sibling city page) — if
+  // the backend seed is ever corrected upstream, this becomes a harmless
+  // no-op (neighborhood.city.slug would already read 'satellite-beach').
+  if (slug === 'tortoise-island' && neighborhood.city) {
+    neighborhood = { ...neighborhood, city: { ...neighborhood.city, slug: 'satellite-beach' } };
+  }
+
   // The neighborhood object itself doesn't carry waterfront filter flags —
   // those live on its parent city (and encode the Merritt Island /
   // Viera West special cases) — so fetch the city to get them. The parent
@@ -354,6 +406,33 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
     // guaranteed-to-fail request every time.
     try {
       ({ seo, jsonLd } = await api.getNeighborhoodSeo(slug, primaryType));
+      // Tortoise Island breadcrumb JSON-LD fix (2026-09-26, per Ryan) —
+      // see the `neighborhood.city` override above for the full sourcing.
+      // The backend builds this BreadcrumbList schema from
+      // `neighborhood.city_id` server-side (seo.controller.js's
+      // getNeighborhoodSeo), independently of the `neighborhood` object
+      // this file fetched above — so overriding `neighborhood.city` alone
+      // doesn't reach this structured data; it still names "Melbourne
+      // Beach" (linking to /melbourne-beach) as Tortoise Island's parent
+      // in the breadcrumb a search engine reads, which is exactly the
+      // wrong signal to leave uncorrected. Patched here rather than left
+      // alone since JSON-LD is consumed by crawlers, not just displayed
+      // text — same "don't ship a known-wrong structured-data claim"
+      // standard as every other SEO fix in this file.
+      if (slug === 'tortoise-island' && Array.isArray(jsonLd)) {
+        jsonLd = jsonLd.map((schema) =>
+          schema?.['@type'] === 'BreadcrumbList' && Array.isArray(schema.itemListElement)
+            ? {
+                ...schema,
+                itemListElement: schema.itemListElement.map((item) =>
+                  item.name === 'Melbourne Beach'
+                    ? { ...item, name: 'Satellite Beach', item: item.item?.replace('/melbourne-beach', '/satellite-beach') }
+                    : item
+                ),
+              }
+            : schema
+        );
+      }
     } catch {
       // No SEO row yet for this neighborhood/property type — render with fallbacks below.
     }
@@ -651,6 +730,12 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // own POA site describes its mix of town homes, villas, quads, and a
   // riverside condo building.
   const BEACH_WOODS_H1 = 'Beach Woods Condos & Townhomes For Sale - Melbourne Beach, Florida';
+  // Tortoise Island's H1 (2026-09-26, per Ryan — see the `neighborhood.city`
+  // override above for the full sourcing/reasoning). Same pattern as
+  // ARIPEKA_H1/ADELAIDE_SUMMER_LAKES_H1: the backend's SEO h1 interpolates
+  // its (wrong) parent city name, so this is a plain string swap on the
+  // backend's own generated H1 rather than a backend reseed.
+  const TORTOISE_ISLAND_H1 = seo?.h1 ? seo.h1.replace('Melbourne Beach', 'Satellite Beach') : seo?.h1;
   const h1Text = isHarborIslandBeachClub
     ? HARBOR_ISLAND_BEACH_CLUB_H1
     : isVieraBuildersCommunitiesVieraWest
@@ -668,7 +753,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                 ? AQUARINA_COMBINED_H1 || `Homes & Condos for Sale in ${neighborhood.name}, FL`
                 : isBeachWoods
                   ? BEACH_WOODS_H1
-                  : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
+                  : isTortoiseIsland
+                    ? TORTOISE_ISLAND_H1 || `Homes for Sale in ${neighborhood.name}, FL`
+                    : seo?.h1 || `Homes for Sale in ${neighborhood.name}, FL`;
   // Bold sans-serif H1 styling (per Ryan, 2026-08-05) — originally added for
   // Harbor Island Beach Club, now shared by Viera Builders Communities
   // Viera West per Ryan's follow-up request to match that same style. Every
