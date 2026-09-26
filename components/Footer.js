@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { PROPERTY_TYPE_TO_SLUG, BROKERAGE_INFO, AGENT_INFO } from '@/lib/constants';
+import { PROPERTY_TYPE_TO_SLUG, BROKERAGE_INFO, AGENT_INFO, OCEANFRONT_CITY_SLUGS, OCEANFRONT_LISTINGS_SLUG } from '@/lib/constants';
 import ContactModal from './ContactModal';
 
 // Footer's "Contact Us" link now opens the same popup as the top nav's
@@ -125,6 +125,26 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               <Link href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Condo}`} className="footer-link" style={footerLinkStyle}>
                 Condos
               </Link>
+              {/* Oceanfront link (2026-09-26, per Ryan — asked whether it'd
+                  be worth adding oceanfront links across all 5 barrier-
+                  island city pages, then confirmed footer + a cross-link on
+                  the listings pages themselves; see the property listing
+                  page's own showOceanfrontCrossLink comment for that half).
+                  Only these 5 cities (OCEANFRONT_CITY_SLUGS) have an
+                  oceanfront page at all — every other city's row stays
+                  exactly "Homes · Condos" as before. Points at the combined
+                  Oceanfront Listings page (OCEANFRONT_LISTINGS_SLUG, both
+                  homes and condos together) rather than picking just one of
+                  Home/Condo, matching how Nav.js's own "Oceanfront" link
+                  already does it for these same cities. */}
+              {OCEANFRONT_CITY_SLUGS.includes(city.slug) && (
+                <>
+                  {' · '}
+                  <Link href={`/${city.slug}/${OCEANFRONT_LISTINGS_SLUG}`} className="footer-link" style={footerLinkStyle}>
+                    Oceanfront
+                  </Link>
+                </>
+              )}
             </div>
           ))}
         </div>
