@@ -8,6 +8,7 @@ import {
   OCEANFRONT_SLUG_TO_PROPERTY_TYPE,
   OCEANFRONT_CITY_SLUGS,
   OCEANFRONT_LISTINGS_SLUG,
+  OCEANFRONT_PROPERTY_TYPE_TO_SLUG,
   CITY_AREA_GUIDE_SLUGS,
   CITY_LISTINGS_FAQ,
   cityListingsQueryParams,
@@ -386,6 +387,21 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   // community, so the plain Condos page is the more accurate place to
   // surface it.
   const isMelbourneBeachCondos = citySlug === 'melbourne-beach' && propertyType === 'Condo' && !isOceanfront && !isOceanfrontCombined;
+  // Oceanfront cross-link (2026-09-26, per Ryan — he asked whether it'd be
+  // worth adding oceanfront links across all 5 barrier-island city pages;
+  // this is the "Looking for oceanfront homes/condos in {city}?" line he
+  // asked for on the plain Homes/Condos pages themselves, in addition to
+  // the Footer links added the same day). Only shown on the plain Home/
+  // Condo pages (never Land, and never the oceanfront pages themselves —
+  // no point telling someone already looking at oceanfront listings to go
+  // look at oceanfront listings) for the 5 OCEANFRONT_CITY_SLUGS cities,
+  // where OCEANFRONT_PROPERTY_TYPE_TO_SLUG actually has a matching page to
+  // send them to.
+  const showOceanfrontCrossLink =
+    OCEANFRONT_CITY_SLUGS.includes(citySlug) &&
+    !isOceanfront &&
+    !isOceanfrontCombined &&
+    Boolean(OCEANFRONT_PROPERTY_TYPE_TO_SLUG[propertyType]);
   // Area Guide link + collapsed FAQ (2026-09-24, per Ryan — see
   // CITY_AREA_GUIDE_SLUGS/CITY_LISTINGS_FAQ in lib/constants.js for the
   // full story and rollout plan). Gated on citySlug alone, not
@@ -671,6 +687,24 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           <p style={{ fontSize: 15, marginBottom: 12 }}>
             <Link href={`/${citySlug}/area-guide`} style={{ color: '#000', textDecoration: 'underline' }}>
               {city.name} Area Guide →
+            </Link>
+          </p>
+        )}
+        {/* Oceanfront cross-link (2026-09-26, per Ryan) — see
+            showOceanfrontCrossLink's own comment above. Descriptive link
+            text ("See Oceanfront Condos For Sale") rather than the "Click
+            Here" Ryan first suggested, matching every other link's style on
+            this page/site (better for SEO and for anyone using a screen
+            reader, where link text needs to make sense out of context) —
+            Ryan said to use whatever wording works best. */}
+        {showOceanfrontCrossLink && (
+          <p style={{ fontSize: 15, marginBottom: 12 }}>
+            Looking for oceanfront {propertyType === 'Condo' ? 'condos' : 'homes'} in {city.name}?{' '}
+            <Link
+              href={`/${citySlug}/${OCEANFRONT_PROPERTY_TYPE_TO_SLUG[propertyType]}`}
+              style={{ color: '#000', textDecoration: 'underline' }}
+            >
+              See Oceanfront {propertyType === 'Condo' ? 'Condos' : 'Homes'} For Sale →
             </Link>
           </p>
         )}
