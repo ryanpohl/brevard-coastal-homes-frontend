@@ -205,7 +205,52 @@ const PAGE_SIZE = 30;
 // and stable from this side. If the MLS feed's own data is ever corrected
 // upstream (or the backend gains a real per-listing override), this list
 // stops being necessary but stays harmless — it just won't match anything.
-const OCEANFRONT_PAGE_EXCLUDED_MLS_NUMBERS = ['1081189', '1084560'];
+//
+// 5 more added (2026-09-26, per Ryan — screenshots of 5297 Solway Drive,
+// 2912 Dockside Lane 2, 411 Hiawatha Way, 5357 Solway Drive, and 379
+// Pentland Drive all showing up on the Melbourne Beach Oceanfront Homes
+// page despite clearly not being oceanfront). Verified directly in
+// Space Coast MLS/Flexmls (Ryan logged this session into his own MLS
+// account) rather than guessed from the photos alone:
+//   - 5297 Solway Drive (MLS #1087772) — Indian Landing Riverside
+//     subdivision, Water Body "Canal Navigational to Indian River",
+//     Waterfront Features "Canal Front; Deeded Beach Access;
+//     Intracoastal; Navigable Water; Ocean Access; River Access".
+//   - 2912 Dockside Lane 2 (MLS #1087148) — Outdoor Resorts subdivision,
+//     Waterfront Features "Deeded Beach Access; Ocean Access; River
+//     Access; River Front; Seawall"; public remarks literally open with
+//     "DIRECT RIVERFRONT PROPERTY... overlooking the Indian River!".
+//   - 411 Hiawatha Way (MLS #1086044) — Sunnyland Beach Sec 6
+//     subdivision, Water Body "Indian River", Waterfront Features
+//     "Deeded Beach Access; Navigable Water; Ocean Access; River
+//     Access; River Front; Seawall".
+//   - 5357 Solway Drive (MLS #1070031) — Indian Landing Riverside
+//     subdivision, Water Body Access Type "Canal Non-Navigation",
+//     Waterfront Features "Canal Front; Deeded Beach Access; Ocean
+//     Access; River Access".
+//   - 379 Pentland Drive (MLS #1063740) — Indian Landing Phase II
+//     subdivision, Waterfront Features "Canal Front; Deeded Beach
+//     Access; Ocean Access; River Access"; public remarks describe a
+//     "peaceful canal" with "a short 5-7 minute walk" to the beach.
+// Same root cause as the original two: every one of these is a
+// canal/river-front home in a gated mainland community (Indian Landing,
+// Outdoor Resorts, Sunnyland Beach) that happens to also carry "Ocean
+// Access"/"Deeded Beach Access" among its MLS WaterfrontFeatures (meaning
+// residents can walk or boat to the beach, not that the home fronts the
+// Atlantic) — the backend's mapWaterfront() apparently treats any
+// "Ocean Access" mention as qualifying for "Oceanfront". Excluding by
+// MLS# here rather than trying to out-guess that logic for every future
+// Indian Landing/Outdoor Resorts/Sunnyland Beach listing that lists the
+// same amenity.
+const OCEANFRONT_PAGE_EXCLUDED_MLS_NUMBERS = [
+  '1081189',
+  '1084560',
+  '1087772',
+  '1087148',
+  '1086044',
+  '1070031',
+  '1063740',
+];
 
 /**
  * City listing page — one route covers all 10 cities x 3 property types
