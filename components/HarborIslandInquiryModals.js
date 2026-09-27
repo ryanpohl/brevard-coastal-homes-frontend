@@ -180,7 +180,12 @@ export default function HarborIslandInquiryModals({ showForeclosures = true, are
           is used at its default single-line size everywhere else it appears
           (filter triggers, etc.), so this now matches that rather than
           wrapping onto two lines. */}
-      <button type="button" className="btn btn-outline" onClick={() => openModal('propertyManagement')}>
+      {/* btn-cta-outline added 2026-09-27, per Ryan: "the buttons with the
+          tan background seem to blend in & not stand out" — see its
+          comment in globals.css. Gives this a white rest-state background
+          against the filter bar's cream page background, and a solid-ink
+          hover fill matching Schedule a Showing. */}
+      <button type="button" className="btn btn-outline btn-cta-outline" onClick={() => openModal('propertyManagement')}>
         Request Information on Property Management
       </button>
 

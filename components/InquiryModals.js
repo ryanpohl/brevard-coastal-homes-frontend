@@ -11,9 +11,13 @@ import * as api from '@/lib/api';
  *    passed, so the request is tied to that one listing.
  *  - The city/neighborhood listing page's filter bar (FilterBar.js): no
  *    listingId — these are general "ask about this area" submissions, and
- *    the backend accepts that (listingId is optional there). Passes
- *    `containerStyle`/`scheduleClassName`/`questionClassName` to get the
- *    inline green/maroon pill look instead of the sidebar's stacked buttons.
+ *    the backend accepts that (listingId is optional there). Passes just
+ *    `containerStyle` to lay the buttons out inline instead of the
+ *    sidebar's stacked layout — as of 2026-09-27 it no longer overrides
+ *    `scheduleClassName`/`questionClassName` (was a green/maroon pill pair,
+ *    unified back to this component's own btn-primary/btn-outline defaults
+ *    per Ryan's design-feedback request, so both call sites now render
+ *    identically styled buttons).
  *
  * `showSchedule` (default true) lets a caller suppress this component's own
  * "Schedule a Showing" button/modal — used by FilterBar.js (per Ryan,
@@ -37,7 +41,13 @@ export default function InquiryModals({
   listingId,
   containerStyle,
   scheduleClassName = 'btn btn-primary',
-  questionClassName = 'btn btn-outline',
+  // btn-cta-outline (2026-09-27, per Ryan: "the buttons with the tan
+  // background seem to blend in & not stand out") — gives this button a
+  // white rest-state background instead of plain .btn-outline's transparent
+  // one, plus a solid-ink hover fill matching Schedule a Showing's own
+  // color. See its comment in globals.css for why this isn't just added to
+  // .btn-outline directly.
+  questionClassName = 'btn btn-outline btn-cta-outline',
   showSchedule = true,
 }) {
   const { user } = useAuth();
