@@ -215,20 +215,6 @@ h4 {
   }
 }
 
-/* Schedule a Showing / Ask a Question buttons in the listing-page filter bar
-   (FilterBar.js, via InquiryModals) — a green/maroon pair per the design
-   reference, distinct from the site's default navy .btn-primary so these
-   two calls-to-action stand out against the other (outlined) filter pills. */
-.btn-success {
-  background: var(--color-success);
-  color: #fff;
-}
-
-.btn-maroon {
-  background: var(--color-maroon);
-  color: #fff;
-}
-
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
