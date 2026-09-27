@@ -16,21 +16,28 @@ const CONTACT_METHODS = ['Call', 'Text', 'Email'];
  * app/neighborhoods/[slug]/page.js's isHarborIslandBeachClub flag).
  *
  * Extended 2026-08-26 (per Ryan) to also render just the blue "Request
- * Information on Property Management" button — without the
- * Harbor-Island-specific Foreclosures button next to it — on the plain
- * (non-oceanfront) Condos pages for Cocoa Beach, Melbourne Beach,
- * Satellite Beach, Indian Harbour Beach, and Indialantic. Two new optional
- * props control this:
- *  - `showForeclosures` (default true) — set to false to render only the
- *    Property Management button/modal, e.g. on a city Condos page.
- *  - `areaLabel` (default 'Harbor Island Beach Club') — the area name
- *    referenced in the Property Management modal's intro copy and CRM
- *    message body, so a city page's modal reads e.g. "...within Cocoa
- *    Beach as well as other areas of Brevard County" instead of Harbor
- *    Island's own wording. Harbor Island's own usage is unaffected since
- *    it relies on both props' defaults.
+ * Information on Property Management" button on the plain (non-oceanfront)
+ * Condos pages for Cocoa Beach, Melbourne Beach, Satellite Beach, Indian
+ * Harbour Beach, and Indialantic, via an optional `areaLabel` prop (default
+ * 'Harbor Island Beach Club') — the area name referenced in the Property
+ * Management modal's intro copy and CRM message body, so a city page's
+ * modal reads e.g. "...within Cocoa Beach as well as other areas of
+ * Brevard County" instead of Harbor Island's own wording. Harbor Island's
+ * own usage is unaffected since it relies on this prop's default.
  * See app/[citySlug]/[propertySlug]/page.js's showPropertyManagementCTA
  * for the city-page wiring.
+ *
+ * Used to also render a Harbor-Island-specific Foreclosures button/link
+ * here (gated behind a `showForeclosures` prop) — moved out entirely
+ * 2026-09-27, per Ryan, to its own text-link paragraph on the neighborhood
+ * page itself, right under the "Contact Us Today" link (see
+ * app/neighborhoods/[slug]/page.js's HarborIslandForeclosuresTrigger usage
+ * there). It fit poorly as a lone plain-text link wedged between this
+ * component's own pill buttons, and reads better grouped with the page's
+ * other quiet text-links. The foreclosures modal itself is unaffected —
+ * still opened via the same HARBOR_ISLAND_OPEN_FORECLOSURES_EVENT listener
+ * below, just triggered exclusively from that new location now instead of
+ * from a button rendered by this component.
  *
  * Field layout differs from the site's other inquiry modals
  * (InquiryModals.js / PropertyManagementModal.js) — a "How would you like
@@ -53,7 +60,7 @@ const CONTACT_METHODS = ['Call', 'Text', 'Email'];
  *    /seller-inquiry webhook — so no data is silently dropped without
  *    needing a backend/schema change.
  */
-export default function HarborIslandInquiryModals({ showForeclosures = true, areaLabel = 'Harbor Island Beach Club' }) {
+export default function HarborIslandInquiryModals({ areaLabel = 'Harbor Island Beach Club' }) {
   const [open, setOpen] = useState(null); // 'foreclosures' | 'propertyManagement' | null
   const [form, setForm] = useState(emptyForm());
   const [status, setStatus] = useState({ submitting: false, error: '', success: '' });
@@ -68,14 +75,17 @@ export default function HarborIslandInquiryModals({ showForeclosures = true, are
     setOpen(kind);
   }
 
-  // Listens for the underlined "Foreclosed Bank-Owned Condos" text in the
-  // page's subtext (HarborIslandForeclosuresTrigger.js, a separate Client
-  // Component the Server Component page can't call this component's state
-  // setters directly from) — see that file's comment for the full why.
-  // Registered unconditionally (not gated on showForeclosures) since the
-  // trigger text/link only exists on pages that also render this component
-  // with its default showForeclosures=true, so the two are never mounted
-  // without each other.
+  // Listens for both HarborIslandForeclosuresTrigger usages on the
+  // neighborhood page — the bolded "Foreclosed bank-owned condos" mention
+  // in the intro paragraph, and the "Ask us about foreclosures in Harbor
+  // Island" link right under Contact Us Today (moved here from this
+  // component's own CTA row 2026-09-27, per Ryan) — since neither of those
+  // Client Components can call this component's state setters directly
+  // from the Server Component page that renders both; see
+  // HarborIslandForeclosuresTrigger.js's own comment for the full why. Both
+  // triggers only exist on the Harbor Island Beach Club page, which is the
+  // only page that renders this component without areaLabel overridden, so
+  // this listener is never mounted without a trigger for it to serve.
   useEffect(() => {
     function handleOpenForeclosuresEvent() {
       openModal('foreclosures');
@@ -134,41 +144,6 @@ export default function HarborIslandInquiryModals({ showForeclosures = true, are
 
   return (
     <>
-      {showForeclosures && (
-        // Changed from a gold button to a plain text-link trigger
-        // (2026-09-27, per Ryan's design-feedback request on the 4-button
-        // CTA row — "Option C": this action already exists as an
-        // underlined "Foreclosed bank-owned condos" link earlier in the
-        // page's subtext, via HarborIslandForeclosuresTrigger.js, which
-        // opens this exact same 'foreclosures' modal. Having a second,
-        // brightly-colored button down here for the identical action
-        // competed with Schedule a Showing/Ask a Question/Property
-        // Management for attention without adding a distinct capability —
-        // this keeps the action reachable, just no longer duplicated as a
-        // full CTA button. Uses a real <button> (not the span+role="button"
-        // trick HarborIslandForeclosuresTrigger.js needs) since openModal
-        // lives right here in this same component — no CustomEvent
-        // indirection required.
-        <button
-          type="button"
-          onClick={() => openModal('foreclosures')}
-          style={{
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            alignSelf: 'center',
-            color: 'var(--color-ink)',
-            textDecoration: 'underline',
-            textUnderlineOffset: 3,
-            fontSize: 14,
-            fontWeight: 600,
-            fontFamily: 'inherit',
-            cursor: 'pointer',
-          }}
-        >
-          Ask us about foreclosures in Harbor Island →
-        </button>
-      )}
       {/* Was a bespoke blue button (#2b6ea8, before that btn-gold) — switched
           to the site's standard btn-outline pill 2026-09-27, per Ryan's
           design-feedback request on the 4-button CTA row: this and the
