@@ -135,25 +135,38 @@ export default function HarborIslandInquiryModals({ showForeclosures = true, are
   return (
     <>
       {showForeclosures && (
+        // Changed from a gold button to a plain text-link trigger
+        // (2026-09-27, per Ryan's design-feedback request on the 4-button
+        // CTA row — "Option C": this action already exists as an
+        // underlined "Foreclosed bank-owned condos" link earlier in the
+        // page's subtext, via HarborIslandForeclosuresTrigger.js, which
+        // opens this exact same 'foreclosures' modal. Having a second,
+        // brightly-colored button down here for the identical action
+        // competed with Schedule a Showing/Ask a Question/Property
+        // Management for attention without adding a distinct capability —
+        // this keeps the action reachable, just no longer duplicated as a
+        // full CTA button. Uses a real <button> (not the span+role="button"
+        // trick HarborIslandForeclosuresTrigger.js needs) since openModal
+        // lives right here in this same component — no CustomEvent
+        // indirection required.
         <button
           type="button"
-          className="btn"
           onClick={() => openModal('foreclosures')}
           style={{
-            maxWidth: 320,
-            whiteSpace: 'normal',
-            textAlign: 'center',
-            lineHeight: 1.25,
-            padding: '8px 20px',
-            // Darker yellow per Ryan (2026-08-05) — was btn-maroon, then
-            // changed to this deep gold/amber so it reads distinct from the
-            // blue Property Management button; lightened slightly per
-            // Ryan's follow-up ("a little lighter") from an initial #8a6a1f.
-            background: '#a8842c',
-            color: '#fff',
+            background: 'none',
+            border: 'none',
+            padding: 0,
+            alignSelf: 'center',
+            color: 'var(--color-ink)',
+            textDecoration: 'underline',
+            textUnderlineOffset: 3,
+            fontSize: 14,
+            fontWeight: 600,
+            fontFamily: 'inherit',
+            cursor: 'pointer',
           }}
         >
-          Contact Us Here about Foreclosures in Harbor Island
+          Ask us about foreclosures in Harbor Island →
         </button>
       )}
       <button
