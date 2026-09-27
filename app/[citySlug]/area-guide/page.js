@@ -110,8 +110,31 @@ export default async function AreaGuidePage({ params }) {
 
   return (
     <div className="container" style={{ padding: '32px clamp(16px, 4vw, 56px) 64px', maxWidth: 760 }}>
-      <p style={{ fontSize: 15, marginBottom: 20 }}>
-        <Link href={`/${citySlug}/homes-for-sale`} style={{ color: '#000', textDecoration: 'underline' }}>
+      {/* Back-to-listings link (2026-09-27, per Ryan: "make the 'View
+          Laurasia Homes for Sale' link larger & make it stand out" —
+          applied to every city AND neighborhood Area Guide page, both
+          sharing this same template). Was a plain 15px underlined text
+          link, easy to miss above the H1 — restyled as a pill/chip
+          (card-style background + border, matching the site's existing
+          .card treatment) with a larger, bolder label so it reads as a
+          clear "go back to the listings" affordance rather than
+          incidental text. */}
+      <p style={{ marginBottom: 24 }}>
+        <Link
+          href={`/${citySlug}/homes-for-sale`}
+          className="card"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: 17,
+            fontWeight: 700,
+            color: '#000',
+            textDecoration: 'none',
+            padding: '10px 20px',
+            borderRadius: 999,
+          }}
+        >
           ← View {city.name} Homes For Sale
         </Link>
       </p>
