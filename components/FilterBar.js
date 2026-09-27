@@ -370,8 +370,18 @@ export default function FilterBar({
             on the homepage hero (SearchBar.js) and the Property Detail
             page's sidebar — see ScheduleShowingModal.js/
             PropertyContactPanel.js. No listingId — general "ask about
-            this area" inquiry, same as the homepage's version. */}
-        <button type="button" className="btn btn-success" onClick={() => setScheduleModalOpen(true)}>
+            this area" inquiry, same as the homepage's version.
+            Was btn-success (green) — switched to the site's standard
+            btn-primary (ink) 2026-09-27 per Ryan's design-feedback request
+            on the Harbor Island 4-button CTA row: green/maroon/gold/blue
+            side by side had no unifying color system and didn't match how
+            Schedule a Showing/Ask a Question already look everywhere else
+            they appear (homepage hero, Property Detail sidebar), which use
+            InquiryModals.js's own btn-primary/btn-outline defaults. This
+            just brings every listing page's filter bar in line with that
+            existing site-wide default instead of introducing a second,
+            page-specific color pair. */}
+        <button type="button" className="btn btn-primary" onClick={() => setScheduleModalOpen(true)}>
           Schedule a Showing
         </button>
 
@@ -379,11 +389,14 @@ export default function FilterBar({
             — schedule button suppressed here since the button above now
             covers that. No listingId, since no one listing is selected here
             (see InquiryModals.js and the backend's now-optional listingId
-            on these two inquiry types). */}
+            on these two inquiry types).
+            No scheduleClassName/questionClassName override anymore (was
+            btn-success/btn-maroon) — see the comment on the Schedule a
+            Showing button above; this now just takes InquiryModals.js's
+            own btn-primary/btn-outline defaults, same as every other page
+            that renders it. */}
         <InquiryModals
           containerStyle={{ display: 'flex', gap: 10 }}
-          scheduleClassName="btn btn-success"
-          questionClassName="btn btn-maroon"
           showSchedule={false}
         />
 

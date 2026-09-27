@@ -169,21 +169,18 @@ export default function HarborIslandInquiryModals({ showForeclosures = true, are
           Ask us about foreclosures in Harbor Island →
         </button>
       )}
-      <button
-        type="button"
-        className="btn"
-        onClick={() => openModal('propertyManagement')}
-        style={{
-          maxWidth: 320,
-          whiteSpace: 'normal',
-          textAlign: 'center',
-          lineHeight: 1.25,
-          padding: '8px 20px',
-          // Blue per Ryan (2026-08-05) — was btn-gold.
-          background: '#2b6ea8',
-          color: '#fff',
-        }}
-      >
+      {/* Was a bespoke blue button (#2b6ea8, before that btn-gold) — switched
+          to the site's standard btn-outline pill 2026-09-27, per Ryan's
+          design-feedback request on the 4-button CTA row: this and the
+          neighboring Schedule a Showing/Ask a Question buttons (FilterBar.js)
+          were the only 4-button set on the site using one-off colors instead
+          of the site's existing btn-primary/btn-outline pair, which is why
+          the row read as 4 unrelated colors rather than one button group.
+          No more maxWidth/whiteSpace/lineHeight override either — btn-outline
+          is used at its default single-line size everywhere else it appears
+          (filter triggers, etc.), so this now matches that rather than
+          wrapping onto two lines. */}
+      <button type="button" className="btn btn-outline" onClick={() => openModal('propertyManagement')}>
         Request Information on Property Management
       </button>
 
