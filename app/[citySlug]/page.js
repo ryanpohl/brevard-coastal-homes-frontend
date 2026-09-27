@@ -242,7 +242,7 @@ export default async function CityAllListingsPage({ params, searchParams: search
         show55Filter={show55Filter}
         extraActions={
           <>
-            {showPropertyManagementCTA && <HarborIslandInquiryModals showForeclosures={false} areaLabel={city.name} />}
+            {showPropertyManagementCTA && <HarborIslandInquiryModals areaLabel={city.name} />}
             <BuildingInquiryModal />
           </>
         }
