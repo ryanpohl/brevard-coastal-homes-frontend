@@ -215,6 +215,38 @@ h4 {
   }
 }
 
+/* Outline CTA buttons — Ask a Question (InquiryModals.js default) and
+   Harbor Island's Property Management button (HarborIslandInquiryModals.js)
+   (2026-09-27, per Ryan: "the buttons with the tan background seem to
+   blend in & not stand out" — plain .btn-outline is transparent, so on the
+   page's --color-bg cream/tan background these read as barely-there
+   outlines rather than clickable buttons. Not changed on .btn-outline
+   itself, since that class is shared by the Price/Beds/Baths/Sort filter
+   triggers and the dropdown menu options inside them (FilterBar.js), which
+   already solve this same problem their own way (explicit inline
+   background: '#fff' on the trigger, plus .filter-menu-option:hover above)
+   — adding a white rest-state background here too would be redundant for
+   those, and adding the hover-fill below would double up with
+   .filter-menu-option:hover's own gray hover. A separate class keeps the
+   two independent. */
+.btn-cta-outline {
+  background: #fff;
+}
+
+/* Gated behind @media (hover: hover) (2026-09-07, mobile double-tap fix)
+   — see the .filter-menu-option:hover comment above for the full
+   writeup. Fills solid ink on hover, per Ryan: "have [them] turn dark like
+   the schedule a showing button when the buttons are hovered over" —
+   mirrors .btn-primary's own resting color so the whole CTA row's hover
+   state reads as one consistent family. */
+@media (hover: hover) {
+  .btn-cta-outline:hover {
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+    color: #fff;
+  }
+}
+
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
