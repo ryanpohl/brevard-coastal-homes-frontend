@@ -1107,6 +1107,35 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               </strong>{' '}
               to begin your search.
             </p>
+            {/* Foreclosures link moved here 2026-09-27, per Ryan (comparing
+                it against the "Contact Us Today" link above it): it used
+                to live down in the filter bar's CTA button row
+                (HarborIslandInquiryModals.js), as a small plain-text link
+                wedged between three much larger pill buttons — the
+                "Option C" 2026-09-27 change earlier the same day that
+                replaced its old gold button with this same link, just not
+                yet in its best location. Moving it up here, right under
+                Contact Us Today, groups it with the page's other quiet
+                text-links (Contact Us Today, and the bolded "Foreclosed
+                bank-owned condos" mention above) instead of sitting oddly
+                among the CTA row's uppercase pills — and drops the CTA
+                row down to a clean matching set of exactly three buttons
+                (Schedule a Showing/Ask a Question/Property Management).
+                Same HarborIslandForeclosuresTrigger mechanism as the
+                "Foreclosed bank-owned condos" link above — dispatches the
+                shared CustomEvent HarborIslandInquiryModals.js listens for
+                to open its existing 'foreclosures' modal; nothing new to
+                wire up. Arrow dropped from the copy ("Ask us about
+                foreclosures in Harbor Island →" became "...Harbor Island")
+                and sized/weighted to match its new paragraph neighbors
+                (18px, bold) rather than the smaller 14px understated
+                treatment it needed down in the button row. */}
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+              <strong>
+                <HarborIslandForeclosuresTrigger>Ask us about foreclosures in Harbor Island</HarborIslandForeclosuresTrigger>
+              </strong>
+              .
+            </p>
             {/* Reciprocal Homes<->Condos cross-link (per Ryan, 2026-09-20):
                 the Condo-filtered variant of this page links to the
                 Home-filtered variant, and vice versa, so a visitor on one
