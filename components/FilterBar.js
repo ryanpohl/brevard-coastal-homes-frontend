@@ -157,7 +157,30 @@ export default function FilterBar({
       onMouseLeave={scheduleClose}
       onMouseEnter={cancelClose}
     >
-      {/* Optional page-specific "Neighborhood" dropdown for sub-communities
+      {/* Filter toolbar panel (2026-09-27, per Ryan: "make it cleaner & pop
+          more" — the filter pills and the Schedule a Showing/Ask a
+          Question/extraActions CTA row below used the exact same white
+          pill treatment with no visual separation, so the whole area read
+          as one undifferentiated strip of 9+ identical buttons. Wrapping
+          just the filter triggers in the site's existing .card treatment
+          (white background, light border, 8px radius — same class used
+          for StatTile/neighborhood cards elsewhere) gives them their own
+          "search toolbar" identity, so the CTA row sitting on the plain
+          page background right below/beside it now reads as a distinct,
+          separate group rather than more filtering options. Landed on
+          this over also adding a divider line (Ryan's other option) —
+          the panel's own edge already does that job, so a divider on top
+          of it would be redundant.
+          Still a single flex item within the outer flex row above, so the
+          existing behavior is unchanged: on pages with no extraActions
+          (every page except Harbor Island Beach Club), the CTA row's own
+          marginLeft: 'auto' still pushes it flush right on the same line
+          as this panel when there's room, wrapping below it only when
+          there isn't — same as before this panel existed, just with the
+          filters now visually grouped instead of each pill wrapping
+          independently. */}
+      <div className="card" style={{ display: 'flex', gap: 10, flexWrap: 'wrap', padding: 12 }}>
+        {/* Optional page-specific "Neighborhood" dropdown for sub-communities
           within one neighborhood page, e.g. Viera Builders Communities
           Viera West's Atlin Cove/Crossmolina/Farallon Fields/Laurasia/
           Pangea Park/Reeling Park (per Ryan, 2026-08-05). Placed before
@@ -346,6 +369,7 @@ export default function FilterBar({
           </button>
         ))}
       </FilterTrigger>
+      </div>
 
       <div
         style={{
