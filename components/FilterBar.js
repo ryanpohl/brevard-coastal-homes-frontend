@@ -157,29 +157,34 @@ export default function FilterBar({
       onMouseLeave={scheduleClose}
       onMouseEnter={cancelClose}
     >
-      {/* Filter toolbar panel (2026-09-27, per Ryan: "make it cleaner & pop
-          more" — the filter pills and the Schedule a Showing/Ask a
-          Question/extraActions CTA row below used the exact same white
-          pill treatment with no visual separation, so the whole area read
-          as one undifferentiated strip of 9+ identical buttons. Wrapping
-          just the filter triggers in the site's existing .card treatment
-          (white background, light border, 8px radius — same class used
-          for StatTile/neighborhood cards elsewhere) gives them their own
-          "search toolbar" identity, so the CTA row sitting on the plain
-          page background right below/beside it now reads as a distinct,
-          separate group rather than more filtering options. Landed on
-          this over also adding a divider line (Ryan's other option) —
-          the panel's own edge already does that job, so a divider on top
-          of it would be redundant.
+      {/* Filter/CTA row separator — was a bordered .card panel around just
+          the filter triggers (2026-09-27, per Ryan: "make it cleaner & pop
+          more"), swapped same day for a plain bottom-border rule once the
+          Harbor Island CTA row's stray "Ask us about foreclosures" link
+          moved elsewhere on the page (see HarborIslandInquiryModals.js/
+          app/neighborhoods/[slug]/page.js): with that gone, the CTA row is
+          already just a clean matching set of pill buttons, so the bordered
+          panel was doing more than needed — it made the filters read as
+          another content card (competing with the listing/FAQ cards
+          elsewhere on the page, which use this same .card class) rather
+          than a plain functional toolbar. A thin rule under the filter
+          pills gives the same "these are two separate groups" signal with
+          much less visual weight.
           Still a single flex item within the outer flex row above, so the
           existing behavior is unchanged: on pages with no extraActions
           (every page except Harbor Island Beach Club), the CTA row's own
           marginLeft: 'auto' still pushes it flush right on the same line
-          as this panel when there's room, wrapping below it only when
-          there isn't — same as before this panel existed, just with the
-          filters now visually grouped instead of each pill wrapping
-          independently. */}
-      <div className="card" style={{ display: 'flex', gap: 10, flexWrap: 'wrap', padding: 12 }}>
+          as this group when there's room, wrapping below it only when
+          there isn't. */}
+      <div
+        style={{
+          display: 'flex',
+          gap: 10,
+          flexWrap: 'wrap',
+          paddingBottom: 16,
+          borderBottom: '1px solid var(--color-border-light)',
+        }}
+      >
         {/* Optional page-specific "Neighborhood" dropdown for sub-communities
           within one neighborhood page, e.g. Viera Builders Communities
           Viera West's Atlin Cove/Crossmolina/Farallon Fields/Laurasia/
