@@ -167,9 +167,9 @@ async function buildListingCountPrefix({ citySlug, cityName, propertyType, ocean
 
 // "Request Information on Property Management" CTA (per Ryan, 2026-08-26)
 // — the blue button/modal originally built for the Harbor Island Beach
-// Club neighborhood page (see HarborIslandInquiryModals.js), added here
-// (without its Harbor-Island-specific Foreclosures button) to both the
-// plain Condos pages AND the Oceanfront Condos pages for these 5 cities
+// Club neighborhood page (see HarborIslandInquiryModals.js), added here to
+// both the plain Condos pages AND the Oceanfront Condos pages for these 5
+// cities
 // (the second, Oceanfront-Condos ask came as a same-day follow-up) — the
 // same 5 barrier-island cities as OCEANFRONT_CITY_SLUGS above, chosen
 // after confirming with Ryan that "Cape Canaveral" (not an actual city on
@@ -824,7 +824,7 @@ export default async function CityListingsPage({ params, searchParams: searchPar
         hideAcreageSort={propertyType !== 'Land'}
         extraActions={
           showPropertyManagementCTA ? (
-            <HarborIslandInquiryModals showForeclosures={false} areaLabel={city.name} />
+            <HarborIslandInquiryModals areaLabel={city.name} />
           ) : showBuildingCTA ? (
             <BuildingInquiryModal />
           ) : undefined
