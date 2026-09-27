@@ -45,6 +45,15 @@ const CONTACT_METHODS = ['Call', 'Text', 'Email'];
  * Email, and (Property Management only) an Address of Property field — no
  * free-text message box, matching the reference screenshots exactly.
  *
+ * "Are you currently working with an agent?" (optional Yes/No) added
+ * 2026-09-27, per Ryan — same request/reasoning as InquiryModals.js's
+ * identical addition (see that file's top-of-file comment for the full
+ * why). Foreclosures-only here — Property Management inquiries come from
+ * landlords, not buyers, so the question doesn't apply and Ryan asked to
+ * leave that modal as-is. Folded into the free-text `message` field, same
+ * no-backend-change approach already used below for Property Management's
+ * contactNote/addressNote.
+ *
  * Submission mapping (no backend changes needed):
  *  - Foreclosures -> `ask_question` inquiry type, which already has
  *    end-to-end support for `preferredContactMethod` (stored + forwarded
@@ -66,7 +75,7 @@ export default function HarborIslandInquiryModals({ areaLabel = 'Harbor Island B
   const [status, setStatus] = useState({ submitting: false, error: '', success: '' });
 
   function emptyForm() {
-    return { name: '', phone: '', email: '', propertyAddress: '', contactMethods: [] };
+    return { name: '', phone: '', email: '', propertyAddress: '', contactMethods: [], workingWithAgent: null };
   }
 
   function openModal(kind) {
@@ -117,12 +126,15 @@ export default function HarborIslandInquiryModals({ areaLabel = 'Harbor Island B
     try {
       let result;
       if (open === 'foreclosures') {
+        const agentNote = form.workingWithAgent
+          ? `[Working with an agent: ${form.workingWithAgent === 'yes' ? 'Yes' : 'No'}] `
+          : '';
         result = await api.submitAskQuestion({
           name: form.name,
           email: form.email,
           phone: form.phone,
           preferredContactMethod: form.contactMethods,
-          message: 'Interested in current foreclosures & off-market properties in Harbor Island Beach Club.',
+          message: `${agentNote}Interested in current foreclosures & off-market properties in Harbor Island Beach Club.`,
         });
       } else {
         const contactNote = form.contactMethods.length
@@ -217,6 +229,39 @@ export default function HarborIslandInquiryModals({ areaLabel = 'Harbor Island B
                     ))}
                   </div>
                 </div>
+
+                {/* "Are you currently working with an agent?" — optional,
+                    foreclosures only (not Property Management — see
+                    top-of-file comment). */}
+                {open === 'foreclosures' && (
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8 }}>
+                      Are you currently working with an agent? <span style={{ fontWeight: 400, color: 'var(--color-muted-dark)' }}>(optional)</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: 24 }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, cursor: 'pointer' }}>
+                        <input
+                          type="radio"
+                          name="working-with-agent"
+                          checked={form.workingWithAgent === 'yes'}
+                          onChange={() => update('workingWithAgent', 'yes')}
+                          style={{ width: 'auto' }}
+                        />
+                        Yes
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, cursor: 'pointer' }}>
+                        <input
+                          type="radio"
+                          name="working-with-agent"
+                          checked={form.workingWithAgent === 'no'}
+                          onChange={() => update('workingWithAgent', 'no')}
+                          style={{ width: 'auto' }}
+                        />
+                        No
+                      </label>
+                    </div>
+                  </div>
+                )}
 
                 <div style={{ display: 'flex', gap: 10 }}>
                   <input

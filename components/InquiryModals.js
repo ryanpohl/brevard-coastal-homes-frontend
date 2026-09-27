@@ -36,6 +36,28 @@ import * as api from '@/lib/api';
  * AskQuestionModal's identical usage) — no backend change needed. Not
  * shown for 'schedule' mode, matching every other implementation of this
  * block, which is Ask-a-Question-specific.
+ *
+ * "Are you currently working with an agent?" (optional Yes/No) added
+ * 2026-09-27, per Ryan — he wants to spend less time on buyer leads who are
+ * already repped by another agent, and asked for this on Schedule a Showing
+ * and Ask a Question (Property Management left as-is; not a buyer-side
+ * inquiry). Shown for BOTH modes here (unlike the contact-method checkboxes
+ * above), since Schedule a Showing is the more time-costly one for Ryan and
+ * was the primary motivator. Deliberately plain "working with an agent?"
+ * wording rather than Make an Offer's "signed an exclusive buyer agency
+ * agreement" phrasing (see PropertyContactPanel.js's MakeOfferModal) — that
+ * legal phrasing fits the higher-stakes offer step, but reads as too
+ * technical/off-putting for these lower-commitment, earlier-funnel forms.
+ * The `ask_question`/`schedule_showing` inquiry types have no dedicated
+ * column for this (only the separate `offers` table does, for Make an
+ * Offer), and the backend's shared createInquiry handler doesn't forward an
+ * arbitrary new field into the staff notification email the way it does for
+ * `preferredContactMethod`/`tourType` — so rather than a backend change,
+ * this is folded into the free-text `message` field as a `[Working with an
+ * agent: Yes/No]` prefix, matching the same no-backend-change pattern this
+ * file's `propertyAddress` field and HarborIslandInquiryModals.js's
+ * Property Management modal already use. Still fully optional/non-blocking,
+ * matching Make an Offer's treatment of the same underlying question.
  */
 export default function InquiryModals({
   listingId,
@@ -53,6 +75,7 @@ export default function InquiryModals({
   const { user } = useAuth();
   const [open, setOpen] = useState(null); // 'schedule' | 'question' | null
   const [contactMethods, setContactMethods] = useState([]); // ['Call', 'Text', 'Email'] — 'question' mode only
+  const [workingWithAgent, setWorkingWithAgent] = useState(null); // 'yes' | 'no' | null — both modes, see top-of-file comment
   // propertyAddress: added 2026-08-17 per Ryan ("Can you add 'Address of
   // Property' to all the ask a question pop up boxes in all the city &
   // neighborhood pages so I know what property they potentially are asking
@@ -84,6 +107,7 @@ export default function InquiryModals({
       propertyAddress: '',
     });
     setContactMethods([]);
+    setWorkingWithAgent(null);
     setStatus({ submitting: false, error: '', success: '' });
     setOpen(kind);
   }
@@ -104,7 +128,11 @@ export default function InquiryModals({
     e.preventDefault();
     setStatus({ submitting: true, error: '', success: '' });
     try {
-      const payload = { ...form, listingId };
+      // Folded into the free-text `message` field rather than sent as its
+      // own param — see top-of-file comment on why (no backend column/
+      // notification-forwarding for this field on these inquiry types).
+      const agentNote = workingWithAgent ? `[Working with an agent: ${workingWithAgent === 'yes' ? 'Yes' : 'No'}] ` : '';
+      const payload = { ...form, listingId, message: `${agentNote}${form.message}`.trim() };
       const result =
         open === 'schedule'
           ? await api.submitScheduleShowing(payload)
@@ -164,6 +192,35 @@ export default function InquiryModals({
               <p style={{ color: 'var(--color-success)' }}>{status.success}</p>
             ) : (
               <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {/* "Are you currently working with an agent?" — optional,
+                    shown for both modes. See top-of-file comment. */}
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8 }}>
+                    Are you currently working with an agent? <span style={{ fontWeight: 400, color: 'var(--color-muted-dark)' }}>(optional)</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 24 }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, cursor: 'pointer' }}>
+                      <input
+                        type="radio"
+                        name="working-with-agent"
+                        checked={workingWithAgent === 'yes'}
+                        onChange={() => setWorkingWithAgent('yes')}
+                        style={{ width: 'auto' }}
+                      />
+                      Yes
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, cursor: 'pointer' }}>
+                      <input
+                        type="radio"
+                        name="working-with-agent"
+                        checked={workingWithAgent === 'no'}
+                        onChange={() => setWorkingWithAgent('no')}
+                        style={{ width: 'auto' }}
+                      />
+                      No
+                    </label>
+                  </div>
+                </div>
                 {open === 'question' && (
                   <>
                     <input

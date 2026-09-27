@@ -14,7 +14,22 @@ const inputStyle = { border: '1px solid var(--color-border-warm)' };
  * hero card (Make an Offer / Ask a Question gold buttons, each opening a
  * modal), and the inline "Request Showing" panel below it (a 12-day date
  * grid + In Person/Virtual + contact fields — submits directly, no modal).
- * Matches design/design_files/Property Detail.dc.html.
+ * Matches design/design_files/Property Detail.dc.html. Also rendered with no
+ * listingId as the homepage hero's and every city/neighborhood filter bar's
+ * general "Schedule a Showing" popup (see ScheduleShowingModal.js) — so
+ * RequestShowingForm/AskQuestionModal below are the site's real, most-used
+ * Schedule a Showing / Ask a Question flows, not just this page's copy.
+ *
+ * "Are you currently working with an agent?" (optional Yes/No) added to
+ * RequestShowingForm and AskQuestionModal 2026-09-27, per Ryan — he wants to
+ * spend less time on buyer leads already repped by another agent. Kept
+ * MakeOfferModal's existing "Have you signed an exclusive buyer agency
+ * agreement with another Agent or Broker?" wording as-is per Ryan (that
+ * more formal/legal phrasing is intentional for this higher-stakes, later
+ * step) — the two other forms deliberately use plainer wording instead,
+ * since they're earlier, lower-commitment entry points where the legal
+ * phrasing would read as too technical. See each form's own state-
+ * declaration comment for the full reasoning.
  */
 export default function PropertyContactPanel({ listingId, listingAddress }) {
   const { user } = useAuth();
@@ -138,6 +153,21 @@ export default function PropertyContactPanel({ listingId, listingAddress }) {
 function RequestShowingForm({ listingId, listingAddress, dateOptions, user }) {
   const [selectedDate, setSelectedDate] = useState(null); // iso string
   const [tourType, setTourType] = useState(null); // 'in_person' | 'virtual'
+  // "Are you currently working with an agent?" (optional Yes/No) — added
+  // 2026-09-27, per Ryan: he wants to spend less time on buyer leads who
+  // already have an agent, and this is the site's actual, most-used
+  // "Schedule a Showing" flow (homepage hero, every city/neighborhood
+  // page's filter bar via ScheduleShowingModal, and this Property Detail
+  // sidebar) — the one place this question matters most, since showings
+  // cost Ryan real time. Deliberately plain wording, not MakeOfferModal's
+  // "signed an exclusive buyer agency agreement" legal phrasing below —
+  // that fits the higher-stakes offer step, this is an earlier, lower-
+  // commitment one. `schedule_showing` has no dedicated column/staff-email
+  // line for this (only `offers` does, for Make an Offer), so it's folded
+  // into the free-text `message` field on submit below, matching the
+  // no-backend-change pattern this form's own `propertyAddress` field and
+  // InquiryModals.js/HarborIslandInquiryModals.js's identical additions use.
+  const [workingWithAgent, setWorkingWithAgent] = useState(null); // 'yes' | 'no' | null
   // propertyAddress auto-fills from the actual listing's address when this
   // form is rendered on that listing's own Property Detail page (per Ryan,
   // 2026-08-17: "on the actual listing page is there a way to make the
@@ -157,8 +187,10 @@ function RequestShowingForm({ listingId, listingAddress, dateOptions, user }) {
     e.preventDefault();
     setStatus({ submitting: true, error: '', success: '' });
     try {
+      const agentNote = workingWithAgent ? `[Working with an agent: ${workingWithAgent === 'yes' ? 'Yes' : 'No'}] ` : '';
       const result = await api.submitScheduleShowing({
         ...form,
+        message: `${agentNote}${form.message}`.trim(),
         listingId,
         preferredDate: selectedDate || undefined,
         tourType: tourType || undefined,
@@ -249,6 +281,22 @@ function RequestShowingForm({ listingId, listingAddress, dateOptions, user }) {
           <input type="radio" name="tour-type" checked={tourType === 'virtual'} onChange={() => setTourType('virtual')} style={{ width: 'auto' }} /> 📱
           Virtual
         </label>
+      </div>
+
+      {/* "Are you currently working with an agent?" — optional. See its
+          state declaration above for the why. */}
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-muted-dark)', marginBottom: 8 }}>
+          Are you currently working with an agent? <span style={{ fontWeight: 400 }}>(optional)</span>
+        </div>
+        <div style={{ display: 'flex', gap: 24 }}>
+          <RadioLabel name="working-with-agent-schedule" checked={workingWithAgent === 'yes'} onChange={() => setWorkingWithAgent('yes')}>
+            Yes
+          </RadioLabel>
+          <RadioLabel name="working-with-agent-schedule" checked={workingWithAgent === 'no'} onChange={() => setWorkingWithAgent('no')}>
+            No
+          </RadioLabel>
+        </div>
       </div>
 
       <input
@@ -493,6 +541,15 @@ function MakeOfferModal({ listingId, listingAddress, onClose }) {
 
 function AskQuestionModal({ listingId, listingAddress, user, onClose }) {
   const [contactMethods, setContactMethods] = useState([]); // ['Call', 'Text', 'Email']
+  // "Are you currently working with an agent?" (optional Yes/No) — added
+  // 2026-09-27, per Ryan, same reasoning as RequestShowingForm above (see
+  // its comment). This is the site's real "Ask a Question" flow on the
+  // Property Detail page, and also the one nested inside the general
+  // Schedule-a-Showing popup elsewhere (ScheduleShowingModal renders this
+  // whole panel, gold buttons included) — FilterBar.js's own separate,
+  // simpler Ask a Question button uses InquiryModals.js instead, which
+  // got the identical addition already (see that file's top comment).
+  const [workingWithAgent, setWorkingWithAgent] = useState(null); // 'yes' | 'no' | null
   // propertyAddress auto-fills from the actual listing's address when this
   // modal is opened on that listing's own Property Detail page (per Ryan,
   // 2026-08-17: "Can you add a text box on the ask a question popup menu &
@@ -515,8 +572,10 @@ function AskQuestionModal({ listingId, listingAddress, user, onClose }) {
     e.preventDefault();
     setStatus({ submitting: true, error: '', success: '' });
     try {
+      const agentNote = workingWithAgent ? `[Working with an agent: ${workingWithAgent === 'yes' ? 'Yes' : 'No'}] ` : '';
       const result = await api.submitAskQuestion({
         ...form,
+        message: `${agentNote}${form.message}`.trim(),
         listingId,
         preferredContactMethod: contactMethods.length ? contactMethods : undefined,
       });
@@ -584,6 +643,23 @@ function AskQuestionModal({ listingId, listingAddress, user, onClose }) {
                 </label>
               ))}
             </div>
+
+            {/* "Are you currently working with an agent?" — optional. See
+                its state declaration above for the why. */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-ink)', marginBottom: 8 }}>
+                Are you currently working with an agent? <span style={{ fontWeight: 400, color: 'var(--color-muted-dark)' }}>(optional)</span>
+              </div>
+              <div style={{ display: 'flex', gap: 20 }}>
+                <RadioLabel name="working-with-agent-question" checked={workingWithAgent === 'yes'} onChange={() => setWorkingWithAgent('yes')}>
+                  Yes
+                </RadioLabel>
+                <RadioLabel name="working-with-agent-question" checked={workingWithAgent === 'no'} onChange={() => setWorkingWithAgent('no')}>
+                  No
+                </RadioLabel>
+              </div>
+            </div>
+
             <input
               placeholder="Address of Property"
               value={form.propertyAddress}
