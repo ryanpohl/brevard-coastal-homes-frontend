@@ -67,6 +67,21 @@ export default function AuthPanel({ onClose, message, embedded = false }) {
     setFields((f) => ({ ...f, [key]: value }));
   }
 
+  // Prevents Nav.js's document-level "click outside closes this dropdown"
+  // listener from treating a click that changes what THIS panel is showing
+  // as a click outside it — see the Password field's show/hide button
+  // below for the full root-cause writeup (found and fixed there
+  // 2026-09-16; the exact same failure mode was still live here on the
+  // Sign In/Register tabs and the Forgot Password link, just not yet hit
+  // in a way anyone had reported until Ryan's "When I hit Forget password
+  // it just disappears" on 2026-09-28). Any button that calls switchTab —
+  // which swaps out part of the form (hides/shows the tab row, the
+  // password field, etc.) — needs this on onMouseDown/onTouchStart (so it
+  // runs before Nav's listener even for a touch tap) as well as onClick.
+  function stopNavOutsideClick(e) {
+    e.nativeEvent.stopImmediatePropagation();
+  }
+
   // Switches tabs AND clears any error/notice left over from the other
   // tab's last attempt — without this, a failed Log In error would still
   // be showing after switching to Register (or vice versa).
@@ -125,14 +140,24 @@ export default function AuthPanel({ onClose, message, embedded = false }) {
         <div style={tabRowStyle}>
           <button
             type="button"
-            onClick={() => switchTab('signin')}
+            onMouseDown={stopNavOutsideClick}
+            onTouchStart={stopNavOutsideClick}
+            onClick={(e) => {
+              stopNavOutsideClick(e);
+              switchTab('signin');
+            }}
             style={mode === 'signin' ? tabActiveStyle : tabInactiveStyle}
           >
             Sign In
           </button>
           <button
             type="button"
-            onClick={() => switchTab('join')}
+            onMouseDown={stopNavOutsideClick}
+            onTouchStart={stopNavOutsideClick}
+            onClick={(e) => {
+              stopNavOutsideClick(e);
+              switchTab('join');
+            }}
             style={mode === 'join' ? tabActiveStyle : tabInactiveStyle}
           >
             Register
@@ -295,12 +320,30 @@ export default function AuthPanel({ onClose, message, embedded = false }) {
 
       <div style={{ marginTop: 14, fontSize: 12, textAlign: 'center' }}>
         {mode === 'signin' && (
-          <button type="button" onClick={() => switchTab('reset')} style={linkBtnStyle}>
+          <button
+            type="button"
+            onMouseDown={stopNavOutsideClick}
+            onTouchStart={stopNavOutsideClick}
+            onClick={(e) => {
+              stopNavOutsideClick(e);
+              switchTab('reset');
+            }}
+            style={linkBtnStyle}
+          >
             Forgot password?
           </button>
         )}
         {mode === 'reset' && (
-          <button type="button" onClick={() => switchTab('signin')} style={linkBtnStyle}>
+          <button
+            type="button"
+            onMouseDown={stopNavOutsideClick}
+            onTouchStart={stopNavOutsideClick}
+            onClick={(e) => {
+              stopNavOutsideClick(e);
+              switchTab('signin');
+            }}
+            style={linkBtnStyle}
+          >
             Back to sign in
           </button>
         )}
