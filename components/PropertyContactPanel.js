@@ -287,7 +287,7 @@ function RequestShowingForm({ listingId, listingAddress, dateOptions, user }) {
           state declaration above for the why. */}
       <div style={{ marginBottom: 16 }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-muted-dark)', marginBottom: 8 }}>
-          Are you currently working with an agent? <span style={{ fontWeight: 400 }}>(optional)</span>
+          Are you currently working with an agent?
         </div>
         <div style={{ display: 'flex', gap: 24 }}>
           <RadioLabel name="working-with-agent-schedule" checked={workingWithAgent === 'yes'} onChange={() => setWorkingWithAgent('yes')}>
@@ -648,7 +648,7 @@ function AskQuestionModal({ listingId, listingAddress, user, onClose }) {
                 its state declaration above for the why. */}
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-ink)', marginBottom: 8 }}>
-                Are you currently working with an agent? <span style={{ fontWeight: 400, color: 'var(--color-muted-dark)' }}>(optional)</span>
+                Are you currently working with an agent?
               </div>
               <div style={{ display: 'flex', gap: 20 }}>
                 <RadioLabel name="working-with-agent-question" checked={workingWithAgent === 'yes'} onChange={() => setWorkingWithAgent('yes')}>

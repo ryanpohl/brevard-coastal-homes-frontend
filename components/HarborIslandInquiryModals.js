@@ -236,7 +236,7 @@ export default function HarborIslandInquiryModals({ areaLabel = 'Harbor Island B
                 {open === 'foreclosures' && (
                   <div>
                     <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8 }}>
-                      Are you currently working with an agent? <span style={{ fontWeight: 400, color: 'var(--color-muted-dark)' }}>(optional)</span>
+                      Are you currently working with an agent?
                     </div>
                     <div style={{ display: 'flex', gap: 24 }}>
                       <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, cursor: 'pointer' }}>
