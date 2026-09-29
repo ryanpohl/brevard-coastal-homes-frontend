@@ -4,6 +4,8 @@ import {
   OCEANFRONT_PROPERTY_TYPE_TO_SLUG,
   OCEANFRONT_CITY_SLUGS,
   OCEANFRONT_LISTINGS_SLUG,
+  RIVERFRONT_CITY_SLUGS,
+  RIVERFRONT_LISTINGS_SLUG,
   VIERA_BUILDERS_SUB_COMMUNITIES,
   NEIGHBORHOOD_AREA_GUIDE_CONTENT,
 } from '@/lib/constants';
@@ -156,6 +158,21 @@ export default async function sitemap() {
       });
       entries.push({
         url: `${SITE_URL}/${city.slug}/${OCEANFRONT_LISTINGS_SLUG}`,
+        lastModified: now,
+        changeFrequency: 'daily',
+        priority: 0.6,
+      });
+    }
+    // Riverfront combined "Listings" page (2026-09-29, per Ryan — see
+    // RIVERFRONT_CITY_SLUGS/RIVERFRONT_LISTINGS_SLUG in lib/constants.js).
+    // Only one URL per city (unlike Oceanfront's per-type pages above) since
+    // Riverfront is deliberately a single combined Home+Condo+Land view with
+    // no per-type split. Same 0.6 priority tier as the Oceanfront combined
+    // Listings page just above — both are the broader, combined-type
+    // waterfront entry points for their respective city set.
+    if (RIVERFRONT_CITY_SLUGS.includes(city.slug)) {
+      entries.push({
+        url: `${SITE_URL}/${city.slug}/${RIVERFRONT_LISTINGS_SLUG}`,
         lastModified: now,
         changeFrequency: 'daily',
         priority: 0.6,
