@@ -9,6 +9,8 @@ import {
   OCEANFRONT_CITY_SLUGS,
   OCEANFRONT_LISTINGS_SLUG,
   OCEANFRONT_PROPERTY_TYPE_TO_SLUG,
+  RIVERFRONT_CITY_SLUGS,
+  RIVERFRONT_LISTINGS_SLUG,
   CITY_AREA_GUIDE_SLUGS,
   CITY_LISTINGS_FAQ,
   cityListingsQueryParams,
@@ -141,7 +143,17 @@ function combineDescription(prefix, base, maxLen = META_DESCRIPTION_MAX_LEN) {
   return `${prefix}${truncated}.`;
 }
 
-async function buildListingCountPrefix({ citySlug, cityName, propertyType, oceanfront = false, noun }) {
+// `oceanfront` (boolean) generalized to `waterfront` (2026-09-29, alongside
+// isRiverfrontCombined above) — was a plain boolean that could only ever
+// mean "Oceanfront" (both the query param it built and the "oceanfront "
+// noun prefix were hardcoded to that one word). Riverfront needs the exact
+// same count-prefix treatment with a different word, so this now takes
+// whichever Waterfront value the page actually wants (or none for a plain
+// page) instead of special-casing one. Every existing call site below
+// passes `waterfront: isOceanfront ? 'Oceanfront' : undefined` in place of
+// its old `oceanfront: isOceanfront` — same behavior, just no longer
+// oceanfront-only in the function itself.
+async function buildListingCountPrefix({ citySlug, cityName, propertyType, waterfront, noun }) {
   if (!cityName || !propertyType) return '';
   const types = Array.isArray(propertyType) ? propertyType : [propertyType];
   try {
@@ -149,14 +161,14 @@ async function buildListingCountPrefix({ citySlug, cityName, propertyType, ocean
       // See cityListingsQueryParams's comment (lib/constants.js).
       ...cityListingsQueryParams(citySlug),
       propertyType: types,
-      waterfront: oceanfront ? 'Oceanfront' : undefined,
+      waterfront: waterfront || undefined,
       pageSize: 1,
     });
     const total = typeof data.total === 'number' ? data.total : null;
     if (total == null) return '';
     const nounPair = noun || LISTING_COUNT_NOUN[types[0]] || DEFAULT_COUNT_NOUN;
     const resolvedNoun = pickNoun(nounPair, total);
-    const fullNoun = oceanfront ? `oceanfront ${resolvedNoun}` : resolvedNoun;
+    const fullNoun = waterfront ? `${waterfront.toLowerCase()} ${resolvedNoun}` : resolvedNoun;
     return `${total} ${fullNoun} for sale in ${cityName}, FL. `;
   } catch {
     // Count fetch failed — render the description without the prefix
@@ -280,9 +292,18 @@ export async function generateMetadata({ params }) {
   // has no single property type of its own, it's always Home+Condo together.
   const isOceanfrontCombined = propertySlug === OCEANFRONT_LISTINGS_SLUG;
   const isOceanfront = Boolean(OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug]);
+  // Combined Riverfront "Listings" page (2026-09-29, per Ryan) — see
+  // RIVERFRONT_LISTINGS_SLUG in lib/constants.js. Same shape as
+  // isOceanfrontCombined above, but it's the ONLY Riverfront page (no
+  // RIVERFRONT_SLUG_TO_PROPERTY_TYPE split into per-type pages — Ryan
+  // asked for one combined Home+Condo+Land link per city, not a
+  // type-by-type breakdown, so there's nothing analogous to isOceanfront
+  // to check here).
+  const isRiverfrontCombined = propertySlug === RIVERFRONT_LISTINGS_SLUG;
   const propertyType = isOceanfront ? OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug] : SLUG_TO_PROPERTY_TYPE[propertySlug];
-  if (!propertyType && !isOceanfrontCombined) return {};
+  if (!propertyType && !isOceanfrontCombined && !isRiverfrontCombined) return {};
   if ((isOceanfront || isOceanfrontCombined) && !OCEANFRONT_CITY_SLUGS.includes(citySlug)) return {};
+  if (isRiverfrontCombined && !RIVERFRONT_CITY_SLUGS.includes(citySlug)) return {};
 
   // Fetched once up front (2026-09-22, added alongside the listing-count
   // prefix above) — every branch below now wants the city's display name,
@@ -309,7 +330,7 @@ export async function generateMetadata({ params }) {
       citySlug,
       cityName: city.name,
       propertyType: ['Home', 'Condo'],
-      oceanfront: true,
+      waterfront: 'Oceanfront',
       noun: { singular: 'property', plural: 'properties' },
     });
     return {
@@ -327,6 +348,29 @@ export async function generateMetadata({ params }) {
       // file points at the un-filtered URL regardless of query-string
       // state.
       alternates: { canonical: `/${citySlug}/${OCEANFRONT_LISTINGS_SLUG}` },
+    };
+  }
+
+  // No backend SEO row exists for Riverfront either (same limitation as
+  // isOceanfrontCombined just above) — hand-written from the city's own
+  // name. "properties" noun (not "homes") since this always covers Home +
+  // Condo + Land together.
+  if (isRiverfrontCombined) {
+    if (!city) return {};
+    const countPrefix = await buildListingCountPrefix({
+      citySlug,
+      cityName: city.name,
+      propertyType: ['Home', 'Condo', 'Land'],
+      waterfront: 'Riverfront',
+      noun: { singular: 'property', plural: 'properties' },
+    });
+    return {
+      title: `Riverfront Homes, Condos & Land For Sale in ${city.name}, FL | Brevard Coastal Homes`,
+      description: combineDescription(
+        countPrefix,
+        `Browse every riverfront home, condo, and lot listing in ${city.name}, FL in one place — updated from the MLS.`
+      ),
+      alternates: { canonical: `/${citySlug}/${RIVERFRONT_LISTINGS_SLUG}` },
     };
   }
 
@@ -374,7 +418,7 @@ export async function generateMetadata({ params }) {
       };
     }
     const countPrefix = city
-      ? await buildListingCountPrefix({ citySlug, cityName: city.name, propertyType, oceanfront: isOceanfront })
+      ? await buildListingCountPrefix({ citySlug, cityName: city.name, propertyType, waterfront: isOceanfront ? 'Oceanfront' : undefined })
       : '';
     return {
       title: seo.title,
@@ -395,7 +439,7 @@ export async function generateMetadata({ params }) {
     try {
       const typeLabel = PROPERTY_TYPE_LABEL[propertyType] || propertyType;
       const oceanPrefix = isOceanfront ? 'Oceanfront ' : '';
-      const countPrefix = await buildListingCountPrefix({ citySlug, cityName: city.name, propertyType, oceanfront: isOceanfront });
+      const countPrefix = await buildListingCountPrefix({ citySlug, cityName: city.name, propertyType, waterfront: isOceanfront ? 'Oceanfront' : undefined });
       return {
         title: `${oceanPrefix}${typeLabel} For Sale in ${city.name}, FL | Brevard Coastal Homes`,
         description: combineDescription(
@@ -420,8 +464,15 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   // generateMetadata branch above.
   const isOceanfrontCombined = propertySlug === OCEANFRONT_LISTINGS_SLUG;
   const isOceanfront = Boolean(OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug]);
+  // Combined Riverfront "Listings" page (2026-09-29, per Ryan) — same shape
+  // as isOceanfrontCombined above, but it's the ONLY Riverfront page (see
+  // this same flag's comment in generateMetadata above for the full
+  // reasoning). propertyType stays undefined for this branch (no
+  // RIVERFRONT_SLUG_TO_PROPERTY_TYPE lookup exists), same as
+  // isOceanfrontCombined leaves it undefined.
+  const isRiverfrontCombined = propertySlug === RIVERFRONT_LISTINGS_SLUG;
   const propertyType = isOceanfront ? OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug] : SLUG_TO_PROPERTY_TYPE[propertySlug];
-  if (!propertyType && !isOceanfrontCombined) notFound();
+  if (!propertyType && !isOceanfrontCombined && !isRiverfrontCombined) notFound();
   // Beach Woods cross-link (per Ryan, 2026-09-19: "put a link for this page
   // on the Melbourne Beach Condos page" — see the new
   // /neighborhoods/beach-woods page and lib/constants.js's
@@ -460,6 +511,10 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   // /melbourne/oceanfront-homes-for-sale (or /melbourne/oceanfront-listings)
   // 404s rather than silently rendering an unfiltered/mislabeled page.
   if ((isOceanfront || isOceanfrontCombined) && !OCEANFRONT_CITY_SLUGS.includes(citySlug)) notFound();
+  // Riverfront's combined page only exists for the 8 cities Ryan named
+  // (2026-09-29) — see RIVERFRONT_CITY_SLUGS in lib/constants.js and this
+  // same gate's mirror in generateMetadata above.
+  if (isRiverfrontCombined && !RIVERFRONT_CITY_SLUGS.includes(citySlug)) notFound();
 
   let city;
   try {
@@ -470,8 +525,8 @@ export default async function CityListingsPage({ params, searchParams: searchPar
 
   let seo = null;
   let jsonLd = null;
-  if (!isOceanfrontCombined) {
-    // Skipped for the combined page — there's no backend SEO row for a
+  if (!isOceanfrontCombined && !isRiverfrontCombined) {
+    // Skipped for both combined pages — there's no backend SEO row for a
     // combined-type view (see generateMetadata above), so this would just
     // be a guaranteed-to-fail request every time.
     try {
@@ -506,7 +561,9 @@ export default async function CityListingsPage({ params, searchParams: searchPar
     ? searchParams.propertyType.split(',')
     : isOceanfrontCombined
       ? ['Home', 'Condo']
-      : [propertyType];
+      : isRiverfrontCombined
+        ? ['Home', 'Condo', 'Land']
+        : [propertyType];
 
   const page = Number(searchParams.page) || 1;
 
@@ -527,7 +584,7 @@ export default async function CityListingsPage({ params, searchParams: searchPar
       // ignoring any ?waterfront= a visitor's URL might otherwise carry —
       // there's no Waterfront dropdown on these pages to set it from
       // anyway (see hideWaterfront on FilterBar below).
-      waterfront: isOceanfront || isOceanfrontCombined ? 'Oceanfront' : searchParams.waterfront,
+      waterfront: isOceanfront || isOceanfrontCombined ? 'Oceanfront' : isRiverfrontCombined ? 'Riverfront' : searchParams.waterfront,
       // "55+ Communities" (2026-08-14) — the control only ever renders on
       // Viera West's Homes/Condos pages (see show55Filter below), so this
       // param will only be set there in practice. Forwarded unconditionally
@@ -603,9 +660,11 @@ export default async function CityListingsPage({ params, searchParams: searchPar
 
   const typeLabel = isOceanfrontCombined
     ? 'Oceanfront Listings'
-    : isOceanfront
-      ? `Oceanfront ${PROPERTY_TYPE_LABEL[propertyType] || 'Homes'}`
-      : PROPERTY_TYPE_LABEL[propertyType] || 'Homes';
+    : isRiverfrontCombined
+      ? 'Riverfront Listings'
+      : isOceanfront
+        ? `Oceanfront ${PROPERTY_TYPE_LABEL[propertyType] || 'Homes'}`
+        : PROPERTY_TYPE_LABEL[propertyType] || 'Homes';
 
   // Intro copy word choice for the 5-city Oceanfront pages (2026-09-16, per
   // Ryan, pasting a screenshot of the Search Oceanfront nav dropdown —
@@ -630,16 +689,20 @@ export default async function CityListingsPage({ params, searchParams: searchPar
     ? 'land and lots'
     : isOceanfrontCombined
       ? 'oceanfront properties'
-      : isOceanfront
-        ? `oceanfront ${CITY_PAGE_TYPE_NOUN[propertyType]}`
-        : CITY_PAGE_TYPE_NOUN[propertyType];
+      : isRiverfrontCombined
+        ? 'riverfront properties'
+        : isOceanfront
+          ? `oceanfront ${CITY_PAGE_TYPE_NOUN[propertyType]}`
+          : CITY_PAGE_TYPE_NOUN[propertyType];
   const introSearchNoun = useLandAndLotsWording
     ? 'land or lot'
     : isOceanfrontCombined
       ? 'oceanfront property'
-      : isOceanfront
-        ? `oceanfront ${CITY_PAGE_SEARCH_NOUN[propertyType]}`
-        : CITY_PAGE_SEARCH_NOUN[propertyType];
+      : isRiverfrontCombined
+        ? 'riverfront property'
+        : isOceanfront
+          ? `oceanfront ${CITY_PAGE_SEARCH_NOUN[propertyType]}`
+          : CITY_PAGE_SEARCH_NOUN[propertyType];
   const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const rangeEnd = Math.min(page * PAGE_SIZE, total);
 
@@ -652,10 +715,12 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   // this file's generateMetadata and page component.
   const pageTitle = isOceanfrontCombined
     ? `Oceanfront Homes & Condos For Sale in ${city.name}, FL`
-    : seo?.h1 ||
-      (isOceanfront
-        ? `Oceanfront ${PROPERTY_TYPE_LABEL[propertyType]} For Sale in ${city.name}, FL`
-        : `${PROPERTY_TYPE_LABEL[propertyType]} in ${city.name}, FL`);
+    : isRiverfrontCombined
+      ? `Riverfront Homes, Condos & Land For Sale in ${city.name}, FL`
+      : seo?.h1 ||
+        (isOceanfront
+          ? `Oceanfront ${PROPERTY_TYPE_LABEL[propertyType]} For Sale in ${city.name}, FL`
+          : `${PROPERTY_TYPE_LABEL[propertyType]} in ${city.name}, FL`);
   const itemListSchema = buildItemListSchema({
     pageTitle,
     path: `/${citySlug}/${propertySlug}`,
@@ -685,10 +750,12 @@ export default async function CityListingsPage({ params, searchParams: searchPar
         <h1 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', marginBottom: 8, fontFamily: 'var(--font-inter-tight)' }}>
           {isOceanfrontCombined
             ? `Oceanfront Homes & Condos For Sale in ${city.name}, FL`
-            : seo?.h1 ||
-              (isOceanfront
-                ? `Oceanfront ${PROPERTY_TYPE_LABEL[propertyType]} For Sale in ${city.name}, FL`
-                : `${PROPERTY_TYPE_LABEL[propertyType]} in ${city.name}, FL`)}
+            : isRiverfrontCombined
+              ? `Riverfront Homes, Condos & Land For Sale in ${city.name}, FL`
+              : seo?.h1 ||
+                (isOceanfront
+                  ? `Oceanfront ${PROPERTY_TYPE_LABEL[propertyType]} For Sale in ${city.name}, FL`
+                  : `${PROPERTY_TYPE_LABEL[propertyType]} in ${city.name}, FL`)}
         </h1>
         {/* Intro copy — see CITY_PAGE_TYPE_NOUN/CITY_PAGE_SEARCH_NOUN's
             comment above for the original city-page request, and
@@ -809,7 +876,7 @@ export default async function CityListingsPage({ params, searchParams: searchPar
         // above) — showing a Waterfront dropdown that could uncheck the
         // very filter defining the page wouldn't make sense, so it's
         // hidden entirely rather than just pre-checked.
-        hideWaterfront={isOceanfront || isOceanfrontCombined}
+        hideWaterfront={isOceanfront || isOceanfrontCombined || isRiverfrontCombined}
         // Property Type stays visible (so a visitor can still narrow to
         // just Homes or just Condos, or view both together) but Land is
         // excluded from its options — Ryan's request was specifically
