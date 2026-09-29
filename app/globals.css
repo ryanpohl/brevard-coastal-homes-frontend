@@ -369,12 +369,17 @@ h4 {
 .nav-brand-wordmark {
   display: inline-block;
   font-family: var(--font-heading);
-  /* Bumped up another step (2026-09-08, per Ryan: "make Brevard Coastal
-     Homes a little larger again") — was clamp(24px, 4.5vw, 36px), which
-     itself was bumped from the original clamp(22px, 4vw, 32px) earlier the
-     same day. Kept as a clamp (not a flat size) so it still scales down on
-     narrow phones instead of overflowing the header. */
-  font-size: clamp(27px, 5vw, 40px);
+  /* Bumped up again (2026-09-29, per Ryan, after the Search Riverfront nav
+     item forced a text-size/spacing shrink on the row below — asked
+     whether the wordmark itself should grow too) — was clamp(27px, 5vw,
+     40px), itself bumped from clamp(24px, 4.5vw, 36px) and clamp(22px, 4vw,
+     32px) before that on 2026-09-08. With no separate logo icon, this text
+     alone carries the brand's visual weight, and the surrounding padding in
+     .nav-brand-row/.nav-brand-rule-row was making the previous 40px look a
+     little small for the amount of white space framing it. Kept as a clamp
+     (not a flat size) so it still scales down on narrow phones instead of
+     overflowing the header. */
+  font-size: clamp(28px, 5vw, 45px);
   font-weight: 600;
   letter-spacing: 0.09em;
   color: var(--color-ink);
