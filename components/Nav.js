@@ -281,7 +281,13 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           justifyContent: 'center',
           flexWrap: 'wrap',
           rowGap: 8,
-          columnGap: 'clamp(16px, 4vw, 36px)',
+          // Tightened from clamp(16px, 4vw, 36px) (2026-09-29, per Ryan) —
+          // paired with the NavLink fontSize/letterSpacing shrink above, see
+          // that comment for the "Contact Us wrapped to its own line" story.
+          // The 36px max was the main culprit at typical desktop widths (5
+          // gaps x 36px = 180px on its own); 22px keeps items from feeling
+          // cramped while giving the row the room it needs for all 6 items.
+          columnGap: 'clamp(10px, 2vw, 22px)',
           padding: '0 clamp(16px, 4vw, 56px) 16px',
         }}
       >
@@ -692,7 +698,25 @@ function NavLink({ label, href, bare, gold, outline, active, onEnter, onToggle, 
     // padding so it's still comfortable to hit on mobile. Sized up a bit
     // larger than the base (which the Sign In/Join buttons still use)
     // since these links carry more of the header's visual weight.
-    style = { ...base, fontSize: 16, padding: '6px 4px', border: 'none', background: 'transparent', opacity: active ? 1 : 0.92 };
+    //
+    // fontSize 16 -> 14, letterSpacing 1 -> 0.5, padding tightened (2026-09-29,
+    // per Ryan) — adding "Search Riverfront" made this a 6th top-level item
+    // (Search by City / Search by Neighborhood / Search Oceanfront / Search
+    // Riverfront / Looking to Sell / Contact Us), and at this row's real-world
+    // width (.container caps at 1280px, see globals.css) the original 16px/1px
+    // spacing sized these 6 items just wide enough that "Contact Us" wrapped
+    // to its own centered line — Ryan flagged it looking stranded. Shrinking
+    // the text a bit (plus the tighter columnGap below) keeps all 6 on one
+    // row without changing anything else about the header's look.
+    style = {
+      ...base,
+      fontSize: 14,
+      letterSpacing: 0.5,
+      padding: '6px 3px',
+      border: 'none',
+      background: 'transparent',
+      opacity: active ? 1 : 0.92,
+    };
   } else if (gold) {
     style = { ...base, padding: '11px 20px', borderRadius: 3, border: 'none', background: 'var(--color-gold)', color: 'var(--color-ink-dark)' };
   } else if (outline) {
