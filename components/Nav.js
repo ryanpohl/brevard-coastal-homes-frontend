@@ -8,6 +8,8 @@ import {
   OCEANFRONT_CITY_SLUGS,
   OCEANFRONT_PROPERTY_TYPE_TO_SLUG,
   OCEANFRONT_LISTINGS_SLUG,
+  RIVERFRONT_CITY_SLUGS,
+  RIVERFRONT_LISTINGS_SLUG,
 } from '@/lib/constants';
 import AuthPanel from './AuthPanel';
 import ContactModal from './ContactModal';
@@ -66,9 +68,17 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
   // `cities` prop (rather than hardcoding city objects) keeps this in
   // sync with each city's real name/slug automatically.
   const oceanfrontCities = cities.filter((city) => OCEANFRONT_CITY_SLUGS.includes(city.slug));
+  // "Search Riverfront" (2026-09-29, per Ryan) — a sibling top-level nav
+  // item to Search Oceanfront, listing the 8 cities with real river/Indian
+  // River-front inventory (see RIVERFRONT_CITY_SLUGS in lib/constants.js).
+  // Unlike oceanfrontCities above, this includes Melbourne and Rockledge —
+  // both excluded from Search Oceanfront (see CITIES_EXCLUDING_OCEANFRONT
+  // in app/[citySlug]/[propertySlug]/page.js) since they're mainland
+  // cities with no ocean frontage, but they do front the Indian River.
+  const riverfrontCities = cities.filter((city) => RIVERFRONT_CITY_SLUGS.includes(city.slug));
   // 'signin'/'join' merged into a single 'auth' key (2026-08-16) — see the
   // "Sign In/Register" NavLink below and AuthPanel.js's own top comment.
-  const [openMenu, setOpenMenu] = useState(null); // 'city' | 'neighborhood' | 'oceanfront' | 'account' | 'auth' | null
+  const [openMenu, setOpenMenu] = useState(null); // 'city' | 'neighborhood' | 'oceanfront' | 'riverfront' | 'account' | 'auth' | null
   // Separate from openMenu, same reasoning as SearchBar.js's scheduleModalOpen:
   // this is a body-portaled modal (see ContactModal.js), not one of the
   // nav-anchored dropdown panels openMenu tracks.
@@ -521,6 +531,50 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
             )
           }
         />
+        {/* "Search Riverfront" (2026-09-29, per Ryan — asked for a
+            dropdown mirroring Search Oceanfront, for the 8 cities with real
+            river/Indian River-front inventory). Its own top-level dropdown,
+            same reasoning as Search Oceanfront's comment above (a visitor
+            looking specifically for riverfront property is better served by
+            a short, dedicated list than hunting inside the full City
+            dropdown). Unlike Search Oceanfront, this is deliberately just
+            ONE link per city rather than a "<City> Listings" header plus
+            separate Homes/Condos sub-links — Ryan's own call after seeing a
+            two-line-per-city mockup ("You can make the dropdown box smaller
+            too since we are combing everything"): Riverfront's inventory is
+            a smaller pool than a whole city's, so a Homes-only or
+            Condos-only Riverfront link risked landing on a page with very
+            few or zero results for some city/type combinations. Links to
+            the single combined Riverfront landing page built in
+            app/[citySlug]/[propertySlug]/page.js (see
+            RIVERFRONT_CITY_SLUGS/RIVERFRONT_LISTINGS_SLUG in
+            lib/constants.js) — Home + Condo + Land together, with the
+            page's own Property Type filter left visible so a visitor can
+            still narrow to just one type. */}
+        <NavLink
+          label="Search Riverfront"
+          bare
+          active={openMenu === 'riverfront'}
+          onEnter={() => openNow('riverfront')}
+          onToggle={() => toggleOnClick('riverfront')}
+          panel={
+            openMenu === 'riverfront' && (
+              <DropdownPanel grid={4}>
+                {riverfrontCities.map((city) => (
+                  <Link
+                    key={city.slug}
+                    href={`/${city.slug}/${RIVERFRONT_LISTINGS_SLUG}`}
+                    className="hero-search-item nav-dropdown-label nav-dropdown-link"
+                    style={cityListingsOnlyLinkStyle}
+                    onClick={closeNow}
+                  >
+                    {city.name} Listings
+                  </Link>
+                ))}
+              </DropdownPanel>
+            )
+          }
+        />
         {/* About was briefly added here (2026-09-25) then pulled back out
             same day, per Ryan: "afraid it looks too busy" — the top nav is
             built around search/conversion actions (city, neighborhood,
@@ -791,6 +845,14 @@ const cityListingsLabelStyle = {
   borderRadius: 4,
 };
 const cityHomeLinkStyle = { ...gridLinkStyle, padding: '2px 10px 0' };
+
+// Search Riverfront's dropdown items (2026-09-29) — unlike
+// cityListingsLabelStyle above, this is the ONLY link in its cell (no
+// Homes/Condos/Lots sub-links stacked underneath it — see the "Search
+// Riverfront" NavLink's own comment for why), so it keeps full top AND
+// bottom padding from gridLinkStyle instead of cityListingsLabelStyle's
+// bottom-padding-dropped variant.
+const cityListingsOnlyLinkStyle = { ...gridLinkStyle, fontWeight: 700, color: '#fff', lineHeight: 1.3 };
 const gridCondoLinkStyle = {
   display: 'block',
   padding: '2px 10px 8px',
