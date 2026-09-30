@@ -66,6 +66,23 @@ const GUIDES = [
     description:
       'VA loan eligibility, the funding fee, Florida-specific appraisal quirks, and property tax exemptions for veterans.',
   },
+  // Added 2026-09-30, per Ryan — two new construction/build-focused guides,
+  // appended after the original 6 rather than inserted among them (that set
+  // matches the footer's Buyer Guides column order 1:1; these two aren't in
+  // the footer at all, per the footer-stays-at-6 decision noted in this
+  // file's own top comment).
+  {
+    title: 'New Construction in Viera',
+    href: '/new-construction-viera',
+    description:
+      'How new construction works in Viera — Viera Builders’ Viera West communities, and the custom-build communities of Adelaide and Aripeka.',
+  },
+  {
+    title: 'Custom Waterfront Homes',
+    href: '/custom-waterfront-homes',
+    description:
+      'Building new or renovating directly on the water in Melbourne Beach, Indialantic, Merritt Island, Cocoa Beach, Indian Harbour Beach & Satellite Beach.',
+  },
 ];
 
 export default function BuyerResourcesPage() {
