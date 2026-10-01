@@ -138,13 +138,27 @@ export default async function RootLayout({ children }) {
       </head>
       <body>
         {/* Google Ads conversion tracking (gtag.js), added 2026-08-20 per Ryan.
-            Loaded here in the root layout so it's present on every page. */}
+            Loaded here in the root layout so it's present on every page.
+
+            Strategy changed afterInteractive -> lazyOnload 2026-10-01, per
+            Ryan — mobile PageSpeed's "Reduce unused JavaScript" finding
+            flagged this script at 186.1 KiB with 64.9 KiB unused, and it
+            was contributing to Total Blocking Time (370ms). afterInteractive
+            already didn't block the initial render, but it still fetches
+            and executes right after hydration, competing with the rest of
+            the page for the main thread during the window TBT measures.
+            lazyOnload pushes it to whenever the browser is next idle
+            instead — conversion tracking has no reason to win that race.
+            Trade-off: a visitor who navigates away within roughly a second
+            or two of landing, before the browser goes idle, could have a
+            conversion event missed. Standard practice for ad/analytics
+            tags and an acceptable trade for the performance win here. */}
         <Script
           async
           src="https://www.googletagmanager.com/gtag/js?id=AW-18381671560"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="google-ads-gtag" strategy="afterInteractive">
+        <Script id="google-ads-gtag" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
