@@ -313,6 +313,15 @@ function PlaceCard({ name, thumbnail, href, sizes, objectPosition = 'center' }) 
             alt={name}
             fill
             sizes={sizes}
+            // 2026-09-30, per Ryan ("do image compression first") — mobile
+            // PageSpeed flagged ~245 KiB of "improve image delivery"
+            // savings on the homepage, with one of these card photos
+            // (Rockledge) cited by name. These are small 750px-wide card
+            // thumbnails, so dropping from next/image's default quality
+            // (75) to 65 meaningfully shrinks every request here with no
+            // visible difference at this size. See next.config.js's
+            // images.qualities for why 65 needed to be explicitly allowed.
+            quality={65}
             className="place-card-image"
             style={{ objectFit: 'cover', objectPosition }}
           />
