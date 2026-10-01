@@ -173,6 +173,15 @@ export default async function HomePage() {
             alt="Beachfront estate with private pool overlooking the Brevard County coastline"
             fill
             priority
+            // 2026-10-01, per Ryan — this is the page's LCP element (the
+            // first full-bleed image painted), and mobile PageSpeed had
+            // LCP at 5.7s, the single worst-scoring metric after the card
+            // photo compression pass. A smaller quality cut than the card
+            // thumbnails' 65 (see next.config.js's images.qualities) since
+            // this photo is full-size and the first thing every visitor
+            // sees — 70 trims bytes without a visible difference at normal
+            // viewing distance.
+            quality={70}
             style={{ objectFit: 'cover' }}
           />
           <div
