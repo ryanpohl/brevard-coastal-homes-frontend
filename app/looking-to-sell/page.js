@@ -1,6 +1,6 @@
-import Link from 'next/link';
+import * as api from '@/lib/api';
 import PropertyManagementModal from '@/components/PropertyManagementModal';
-import SellWithUsForm from '@/components/SellWithUsForm';
+import HomeValueForm from '@/components/HomeValueForm';
 
 export const metadata = {
   title: 'Looking to Sell Your Brevard County Home? | Brevard Coastal Homes',
@@ -15,7 +15,21 @@ export const metadata = {
   alternates: { canonical: '/looking-to-sell' },
 };
 
-export default function LookingToSellPage() {
+// Fetches the Brevard city list for HomeValueForm's city dropdown — same
+// fallback pattern as app/home-value/page.js's own getCities: an empty list
+// rather than a crashed page if the backend is unreachable at request time.
+async function getCities() {
+  try {
+    const { cities } = await api.getCities();
+    return cities || [];
+  } catch {
+    return [];
+  }
+}
+
+export default async function LookingToSellPage() {
+  const cities = await getCities();
+
   return (
     <div>
       <div style={{ background: 'var(--color-nav-bg)', color: '#fff', padding: '64px clamp(16px, 4vw, 56px)' }}>
@@ -37,23 +51,30 @@ export default function LookingToSellPage() {
           <SellPoint title="Full-Service Support" text="From listing prep to closing, we handle the details so you don't have to." />
         </div>
 
-        {/* Lead-capture form for the free valuation this page's H1 already
-            promises (2026-08-30, per Ryan) — see SellWithUsForm.js. */}
-        <div style={{ marginBottom: 24 }}>
-          <SellWithUsForm />
+        {/* Lead-capture tool for the free valuation this page's H1 already
+            promises (2026-08-30, per Ryan). Originally SellWithUsForm — a
+            general "I want to sell" contact form with no address/property
+            fields — swapped out 2026-10-02, per Ryan, for the actual
+            home-value tool (components/HomeValueForm.js, same one used on
+            the dedicated /home-value page) once it existed: it collects
+            the real property details needed to pull comps, which actually
+            delivers on "free valuation" rather than just routing to a
+            generic contact form. SellWithUsForm.js is kept in the codebase
+            but no longer used anywhere — left in place rather than
+            deleted in case this page's form ever needs to revert. */}
+        <div style={{ marginBottom: 12 }}>
+          <HomeValueForm cities={cities} />
         </div>
 
-        {/* Cross-link to the dedicated home-value report page (2026-10-02,
-            per Ryan) — SellWithUsForm above is the general "I want to
-            sell" lead form (no address/property-detail fields), while
-            /home-value (components/HomeValueForm.js) collects the actual
-            property details needed to pull comps, for a visitor who wants
-            a number first before talking to an agent. */}
+        {/* Fallback for a visitor who doesn't want to fill out property
+            details and would rather just talk to someone directly
+            (2026-10-02, per Ryan) — same phone number SellWithUsForm used
+            to surface above its own form. */}
         <p style={{ textAlign: 'center', marginBottom: 48, fontSize: 14, color: 'var(--color-muted-dark)' }}>
-          Just want a quick estimate first?{' '}
-          <Link href="/home-value" style={{ fontWeight: 600 }}>
-            Get your free home value report
-          </Link>
+          Prefer to just talk it through? Call or text{' '}
+          <a href="tel:+13213507661" style={{ fontWeight: 600 }}>
+            321-350-7661
+          </a>
           .
         </p>
 
