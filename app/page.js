@@ -225,7 +225,9 @@ export default async function HomePage() {
               // var(--font-inter-tight) (2026-08-21 sitewide-text change).
               // This is the one homepage headline that's gone back to a
               // serif; everything else on the homepage stays Inter Tight.
-              fontFamily: 'var(--font-didot)',
+              // Playfair Display (2026-10-02 font consistency pass) — was
+              // Bodoni Moda; now matches the logo and every other heading.
+              fontFamily: 'var(--font-heading)',
               fontWeight: 500,
               fontSize: 'clamp(28px, 5vw, 46px)',
               color: '#ffffff',
@@ -260,7 +262,7 @@ export default async function HomePage() {
           hero above and Footer below. */}
       <div style={{ background: 'var(--color-bg)', padding: '64px 0' }}>
         <section className="wide-container">
-          <h2 className="section-heading" style={{ color: 'var(--color-ink-dark)', fontFamily: 'var(--font-inter-tight)' }}>
+          <h2 className="section-heading" style={{ color: 'var(--color-ink-dark)', fontFamily: 'var(--font-heading)' }}>
             Search By City
           </h2>
           <div className="city-grid">
@@ -282,7 +284,7 @@ export default async function HomePage() {
           Search By City section above; same reasoning applies here. */}
       <div style={{ background: 'var(--color-bg)', padding: '0 0 64px' }}>
         <section className="wide-container">
-          <h2 className="section-heading" style={{ color: 'var(--color-ink-dark)', fontFamily: 'var(--font-inter-tight)' }}>
+          <h2 className="section-heading" style={{ color: 'var(--color-ink-dark)', fontFamily: 'var(--font-heading)' }}>
             Search By Neighborhood
           </h2>
           <div className="city-grid">
