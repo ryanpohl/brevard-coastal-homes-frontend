@@ -121,7 +121,7 @@ export default async function RootLayout({ children }) {
         <link
           id="google-fonts-css"
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600;700;800&family=Inter+Tight:wght@400;500;600;700;800&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
           media="print"
         />
         <script
@@ -132,7 +132,7 @@ export default async function RootLayout({ children }) {
         <noscript>
           <link
             rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Jost:wght@400;500;600;700;800&family=Inter+Tight:wght@400;500;600;700;800&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
           />
         </noscript>
       </head>

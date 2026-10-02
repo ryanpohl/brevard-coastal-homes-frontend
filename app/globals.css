@@ -43,7 +43,10 @@
   --shadow-filter-menu: 0 8px 24px rgba(0, 0, 0, 0.14);
 
   --font-heading: 'Playfair Display', serif;
-  --font-body: 'Jost', sans-serif;
+  /* Body font switched Jost -> Inter Tight (2026-10-02, per Ryan: font
+     consistency pass — one serif for headings (Playfair Display, the
+     logo font) and one sans for everything else). */
+  --font-body: 'Inter Tight', sans-serif;
   /* Added 2026-08-21 per Ryan ("Change the font to inter tight on all the
      pages city & neighborhood descriptions") — used specifically on the
      city/neighborhood listing pages' H1 (there's no separate visible
@@ -60,7 +63,11 @@
      homepage hero H1 (app/page.js) — was var(--font-inter-tight) there,
      everything else on the homepage stays Inter Tight per Ryan's
      2026-08-21 sitewide-text decision. */
-  --font-didot: 'Bodoni Moda', 'Playfair Display', serif;
+  /* 2026-10-02 font consistency pass: the hero H1 now uses
+     var(--font-heading) (Playfair Display) like every other heading, and
+     Bodoni Moda is no longer loaded. Kept as an alias so nothing breaks if
+     it's referenced elsewhere. */
+  --font-didot: var(--font-heading);
 }
 
 * {
