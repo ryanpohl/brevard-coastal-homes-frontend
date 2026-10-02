@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { PROPERTY_TYPE_TO_SLUG, BROKERAGE_INFO, AGENT_INFO, OCEANFRONT_CITY_SLUGS, OCEANFRONT_LISTINGS_SLUG } from '@/lib/constants';
+import { PROPERTY_TYPE_TO_SLUG, BROKERAGE_INFO, AGENT_INFO } from '@/lib/constants';
 import ContactModal from './ContactModal';
 
 // Footer's "Contact Us" link now opens the same popup as the top nav's
@@ -19,7 +19,7 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
   return (
     <footer
       style={{
-        background: 'var(--color-nav-bg)',
+        background: 'var(--color-footer-bg)',
         color: 'rgba(255,255,255,0.85)',
         borderTop: '1px solid rgba(255,255,255,0.15)',
       }}
@@ -115,36 +115,15 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
 
         <div>
           <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Cities</h4>
+          {/* One link per city (2026-10-02, per Ryan: footer "looks very
+              busy") — was "Homes · Condos · Oceanfront" per city (~27 links,
+              most wrapping to 2 lines). Each city's page still offers the
+              condo/oceanfront views. */}
           {cities.map((city) => (
             <div key={city.slug} style={{ marginBottom: 8 }}>
               <Link href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`} className="footer-link" style={footerLinkStyle}>
-                {city.name} Homes
+                {city.name}
               </Link>
-              {/* Footer always links to Condos, even for cities excluded from the nav dropdown (e.g. Viera West) */}
-              {' · '}
-              <Link href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Condo}`} className="footer-link" style={footerLinkStyle}>
-                Condos
-              </Link>
-              {/* Oceanfront link (2026-09-26, per Ryan — asked whether it'd
-                  be worth adding oceanfront links across all 5 barrier-
-                  island city pages, then confirmed footer + a cross-link on
-                  the listings pages themselves; see the property listing
-                  page's own showOceanfrontCrossLink comment for that half).
-                  Only these 5 cities (OCEANFRONT_CITY_SLUGS) have an
-                  oceanfront page at all — every other city's row stays
-                  exactly "Homes · Condos" as before. Points at the combined
-                  Oceanfront Listings page (OCEANFRONT_LISTINGS_SLUG, both
-                  homes and condos together) rather than picking just one of
-                  Home/Condo, matching how Nav.js's own "Oceanfront" link
-                  already does it for these same cities. */}
-              {OCEANFRONT_CITY_SLUGS.includes(city.slug) && (
-                <>
-                  {' · '}
-                  <Link href={`/${city.slug}/${OCEANFRONT_LISTINGS_SLUG}`} className="footer-link" style={footerLinkStyle}>
-                    Oceanfront
-                  </Link>
-                </>
-              )}
             </div>
           ))}
         </div>
@@ -263,7 +242,10 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
             type="button"
             onClick={() => setContactModalOpen(true)}
             className="footer-link"
-            style={{ ...footerLinkStyle, background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left', font: 'inherit' }}
+            // fontFamily (not the `font` shorthand) so footerLinkStyle's 13px size
+            // isn't reset to the inherited 16px — that's why Contact Us looked
+            // bigger than the links around it (fixed 2026-10-02).
+            style={{ ...footerLinkStyle, background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit', lineHeight: 'inherit' }}
           >
             Contact Us
           </button>
@@ -341,4 +323,4 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
   );
 }
 
-const footerLinkStyle = { fontSize: 13, color: 'rgba(255,255,255,0.85)' };
+const footerLinkStyle = { fontSize: 13, color: 'rgba(255,255,255,0.72)' };
