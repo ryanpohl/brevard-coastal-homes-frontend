@@ -341,7 +341,11 @@ export default function SearchBar({ cities, neighborhoods }) {
                         display: 'flex',
                         alignItems: 'center',
                         position: 'relative',
-                        background: 'rgba(20, 35, 40, 0.55)',
+                        // More opaque + blur (2026-10-02): at 0.55 the photo showed
+                        // through, so boxes over bright areas looked washed out.
+                        background: 'rgba(20, 35, 40, 0.82)',
+                        backdropFilter: 'blur(6px)',
+                        WebkitBackdropFilter: 'blur(6px)',
                         border: '1px solid rgba(255,255,255,0.35)',
                         borderRadius: 4,
                         padding: '0 18px',
@@ -808,7 +812,12 @@ function PillTrigger({ label, onClick, narrow }) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  background: 'rgba(20, 35, 40, 0.55)',
+                  // More opaque + blur (2026-10-02): at 0.55 the Price pill, which
+                  // sits over the bright white house in the hero photo, looked like
+                  // it had no background. Now all four pills read the same.
+                  background: 'rgba(20, 35, 40, 0.82)',
+                  backdropFilter: 'blur(6px)',
+                  WebkitBackdropFilter: 'blur(6px)',
                   border: '1px solid rgba(255,255,255,0.35)',
                   borderRadius: 4,
                   padding: narrow ? '0 14px' : '0 20px',

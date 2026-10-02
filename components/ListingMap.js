@@ -165,7 +165,7 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
     // here without hurting keyboard accessibility — Google's own outer
     // InfoWindow container still gets its own focus outline separately;
     // this only removes the second, redundant ring drawn on the inner link.
-    return `<div style="font-family: 'Jost', sans-serif; font-size: 13px; width: 220px;">
+    return `<div style="font-family: 'Inter Tight', sans-serif; font-size: 13px; width: 220px;">
         <a href="/listings/${listing.id}" style="display: block; color: #1c2b30; text-decoration: none; outline: none;">
           <div style="position: relative; width: 100%; height: 130px; border-radius: 4px; overflow: hidden; margin-bottom: 8px; background: #e6e1d6;">
             ${thumbnailPhoto ? `<img src="${escapeHtml(thumbnailPhoto)}" alt="${escapeHtml(listing.address)}" style="width: 100%; height: 100%; object-fit: cover; display: block;" />` : ''}
