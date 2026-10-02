@@ -88,6 +88,12 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
             <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 17, fontWeight: 600, margin: '10px 0 0' }}>
               Ryan Pohl
             </p>
+            {/* Ryan's own license, moved here from under the Tropical Realty
+                logo (2026-10-02, per Ryan) — sits with his name as his
+                credentials; the brokerage's license stays under its logo. */}
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', margin: '4px 0 0' }}>
+              FL License #{AGENT_INFO.licenseNumber}
+            </p>
           </div>
           {/* "Call or Text: 321-350-7661" added 2026-08-29, per Ryan, directly
               under the heading — hardcoded literal number, same reasoning as
@@ -223,13 +229,16 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
 
         <div>
           <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Company</h4>
+          {/* 8px spacers between links (2026-10-02, per Ryan) — were plain <br />s,
+              which stacked these links tighter than the other columns'
+              (each of those links sits in a div with marginBottom: 8). */}
           {/* About (2026-09-25, per Ryan — new agent bio page, see
               app/about/page.js) — listed first in this column, above
               Contact Us/Looking to Sell, same as it leads off the nav bar. */}
           <Link href="/about" className="footer-link" style={footerLinkStyle}>
             About
           </Link>
-          <br />
+          <div style={{ height: 8 }} />
           {/* Reviews (2026-09-25, per Ryan — client testimonials page, see
               app/reviews/page.js) — grouped with About in Company rather
               than the Buyer Guides column above: it's a trust/company page
@@ -237,7 +246,7 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
           <Link href="/reviews" className="footer-link" style={footerLinkStyle}>
             Reviews
           </Link>
-          <br />
+          <div style={{ height: 8 }} />
           <button
             type="button"
             onClick={() => setContactModalOpen(true)}
@@ -249,18 +258,18 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
           >
             Contact Us
           </button>
-          <br />
+          <div style={{ height: 8 }} />
           <Link href="/looking-to-sell" className="footer-link" style={footerLinkStyle}>
             Looking to Sell
           </Link>
-          <br />
+          <div style={{ height: 8 }} />
           {/* What's My Home Worth (2026-10-02, per Ryan) — see
               app/home-value/page.js. Grouped right under Looking to Sell,
               same section, since both target a seller-intent visitor. */}
           <Link href="/home-value" className="footer-link" style={footerLinkStyle}>
             What&apos;s My Home Worth
           </Link>
-          <br />
+          <div style={{ height: 8 }} />
           {/* Tropical Realty & Investments of Brevard logo (2026-08-21, per Ryan:
               "put this logo under Brevard Coastal homes & the text on the homepage").
               Moved here from the Brevard Coastal Homes column on 2026-09-12,
@@ -307,8 +316,6 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               brokerage's corporate license (confirmed and approved for
               publishing by Ryan on 2026-09-26). */}
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', marginTop: 10, lineHeight: 1.5 }}>
-            {AGENT_INFO.name}, FL License #{AGENT_INFO.licenseNumber}
-            <br />
             {BROKERAGE_INFO.name}, FL License #{BROKERAGE_INFO.licenseNumber}
           </p>
         </div>
