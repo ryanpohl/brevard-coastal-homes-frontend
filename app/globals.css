@@ -20,6 +20,11 @@
      SellWithUsForm — changing it here keeps all of them in sync rather
      than turning black in some places and staying navy in others. */
   --color-nav-bg: #000000;
+  /* Footer only (2026-10-02, per Ryan's footer cleanup): deep navy instead
+     of black, matching --color-ink-dark / the hero Search button, so the
+     footer ties back to the navy + gold brand. Other dark surfaces stay
+     black via --color-nav-bg. */
+  --color-footer-bg: #10242c;
   --color-ink: #1c2b30;
   --color-ink-dark: #10242c;
   --color-gold: #c9a15a;
@@ -515,13 +520,13 @@ h4 {
   }
 }
 
-/* Footer links reset `a { text-decoration: none }` above so they read as
-   plain text — this underline makes it clear each one is a separate,
-   clickable link (important where two links sit on one line, e.g.
-   "Cocoa Beach Homes · Condos"). */
+/* Footer links — underlines removed (2026-10-02, per Ryan: footer "looks
+   very busy"). They were added so "Cocoa Beach Homes · Condos" read as two
+   separate links; the Cities column is now one link per city, so plain
+   light-gray text is enough, with a gold underline on hover. */
 .footer-link {
   text-decoration: underline;
-  text-decoration-color: rgba(255, 255, 255, 0.35);
+  text-decoration-color: transparent;
   text-underline-offset: 3px;
   transition: color 0.15s ease, text-decoration-color 0.15s ease;
 }
@@ -549,8 +554,8 @@ h4 {
    writeup. */
 @media (hover: hover) {
   .footer-link:hover {
-    color: #fff;
-    text-decoration-color: rgba(255, 255, 255, 0.9);
+    color: #fff !important;
+    text-decoration-color: var(--color-gold, #c9a15a);
   }
 }
 
