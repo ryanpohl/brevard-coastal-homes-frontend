@@ -88,6 +88,12 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
             <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 17, fontWeight: 600, margin: '10px 0 0' }}>
               Ryan Pohl
             </p>
+            {/* Ryan's own license, moved here from under the Tropical Realty
+                logo (2026-10-02, per Ryan) — sits with his name as his
+                credentials; the brokerage's license stays under its logo. */}
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', margin: '4px 0 0' }}>
+              FL License #{AGENT_INFO.licenseNumber}
+            </p>
           </div>
           {/* "Call or Text: 321-350-7661" added 2026-08-29, per Ryan, directly
               under the heading — hardcoded literal number, same reasoning as
@@ -310,8 +316,6 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               brokerage's corporate license (confirmed and approved for
               publishing by Ryan on 2026-09-26). */}
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', marginTop: 10, lineHeight: 1.5 }}>
-            {AGENT_INFO.name}, FL License #{AGENT_INFO.licenseNumber}
-            <br />
             {BROKERAGE_INFO.name}, FL License #{BROKERAGE_INFO.licenseNumber}
           </p>
         </div>
