@@ -272,6 +272,13 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
             Looking to Sell
           </Link>
           <br />
+          {/* What's My Home Worth (2026-10-02, per Ryan) — see
+              app/home-value/page.js. Grouped right under Looking to Sell,
+              same section, since both target a seller-intent visitor. */}
+          <Link href="/home-value" className="footer-link" style={footerLinkStyle}>
+            What&apos;s My Home Worth
+          </Link>
+          <br />
           {/* Tropical Realty & Investments of Brevard logo (2026-08-21, per Ryan:
               "put this logo under Brevard Coastal homes & the text on the homepage").
               Moved here from the Brevard Coastal Homes column on 2026-09-12,

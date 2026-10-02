@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import PropertyManagementModal from '@/components/PropertyManagementModal';
 import SellWithUsForm from '@/components/SellWithUsForm';
 
@@ -38,9 +39,23 @@ export default function LookingToSellPage() {
 
         {/* Lead-capture form for the free valuation this page's H1 already
             promises (2026-08-30, per Ryan) — see SellWithUsForm.js. */}
-        <div style={{ marginBottom: 48 }}>
+        <div style={{ marginBottom: 24 }}>
           <SellWithUsForm />
         </div>
+
+        {/* Cross-link to the dedicated home-value report page (2026-10-02,
+            per Ryan) — SellWithUsForm above is the general "I want to
+            sell" lead form (no address/property-detail fields), while
+            /home-value (components/HomeValueForm.js) collects the actual
+            property details needed to pull comps, for a visitor who wants
+            a number first before talking to an agent. */}
+        <p style={{ textAlign: 'center', marginBottom: 48, fontSize: 14, color: 'var(--color-muted-dark)' }}>
+          Just want a quick estimate first?{' '}
+          <Link href="/home-value" style={{ fontWeight: 600 }}>
+            Get your free home value report
+          </Link>
+          .
+        </p>
 
         <div className="card" style={{ padding: 32, textAlign: 'center' }}>
           <h2 style={{ fontSize: 24, marginBottom: 12 }}>Own a Rental Property?</h2>
