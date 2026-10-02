@@ -29,6 +29,31 @@ const nextConfig = {
     // visible image on the site and above-the-fold detail matters more)
     // for that Image to use.
     qualities: [65, 70, 75],
+    // 2026-10-02, per Ryan — mobile PageSpeed's "Improve image delivery"
+    // finding was still showing ~181 KiB of savings after the quality
+    // tuning above. Two more levers, both config-only:
+    //
+    // formats: Next only served WebP (its default) with nothing set here.
+    // AVIF typically comes in 20-30% smaller than WebP at a visually
+    // equivalent quality for photos like the hero/card images this site
+    // uses. Listed first so Next prefers it whenever the requesting
+    // browser's Accept header supports it, falling back to webp (then the
+    // original format) otherwise — this is additive, not a replacement for
+    // the quality={65}/{70} work above.
+    //
+    // minimumCacheTTL: left unset, which defaults to a very short window.
+    // Every optimized/resized variant (the hero image, each PlaceCard
+    // thumbnail) gets re-encoded on the fly on the next request once that
+    // expires, rather than served from Next's on-disk cache — on a cold
+    // hit that re-encode adds real latency directly on the LCP path, which
+    // is almost certainly part of why repeated PageSpeed runs have been
+    // landing at different scores. Set to 24 hours: long enough that a
+    // PageSpeed re-run (or a normal visitor) almost always hits a warm
+    // cache, short enough that if a backend/MLS photo URL were ever reused
+    // for different photo content, it corrects within a day rather than
+    // being stuck for a year.
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 86400,
   },
 };
 
