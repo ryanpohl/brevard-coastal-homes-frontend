@@ -61,7 +61,25 @@ export default async function LookingToSellPage() {
             delivers on "free valuation" rather than just routing to a
             generic contact form. SellWithUsForm.js is kept in the codebase
             but no longer used anywhere — left in place rather than
-            deleted in case this page's form ever needs to revert. */}
+            deleted in case this page's form ever needs to revert.
+
+            Mini-heading + intro line added 2026-10-02, per Ryan, so the
+            form doesn't just appear after the three SellPoint cards with
+            no framing of its own — the page's H1/subhead above are about
+            the page as a whole, not specifically introducing this tool.
+            Also sets the "comps-based, not instant" expectation up front,
+            since competitor valuation pages researched for this feature
+            (e.g. megansellsbrevard.com) lead with "instant" results —
+            worth heading off that comparison before a visitor fills out
+            the form and is surprised it's not immediate. */}
+        <h2 style={{ fontSize: 22, textAlign: 'center', marginBottom: 8 }}>
+          Start With a Free Home Value Report
+        </h2>
+        <p style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 24px', fontSize: 14, color: 'var(--color-muted-dark)' }}>
+          Enter your property details below and we&apos;ll pull real comparable sales for your neighborhood — not an
+          instant algorithm guess.
+        </p>
+
         <div style={{ marginBottom: 12 }}>
           <HomeValueForm cities={cities} />
         </div>
