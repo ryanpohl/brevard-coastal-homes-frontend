@@ -235,8 +235,23 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
         propertyType: countPropertyType,
         neighborhoodName,
       });
+      // COMMUNITY_SEO lots/condos views (2026-10-03) — the backend's title
+      // for these repeats the community name and gets cut off at 70
+      // characters ("Tortoise Island Land For Sale | Tortoise Island,
+      // Satellite Beach FL…"); use a short "{name} Lots/Condos for Sale |
+      // {area}, FL" title instead. Description stays the backend's.
+      const typeCommunity = COMMUNITY_SEO[slug];
+      const typeLabel = primaryType === 'Land' ? 'Lots' : primaryType === 'Condo' ? 'Condos' : null;
+      const typeTitle =
+        typeCommunity && typeLabel
+          ? [
+              `${typeCommunity.name} ${typeLabel} for Sale | ${typeCommunity.area || 'Viera'}, FL`,
+              `${typeCommunity.name} ${typeLabel} for Sale | Brevard County, FL`,
+              `${typeCommunity.name} ${typeLabel} for Sale`,
+            ].find((t) => t.length <= 60)
+          : null;
       return {
-        title: seo.title,
+        title: typeTitle || seo.title,
         description: combineDescription(countPrefix, seo.metaDescription),
         keywords: seo.keywords,
         // Canonical fix (2026-10-03): the backend's canonicalPath for a
@@ -951,6 +966,26 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
     ...(itemListSchema ? [itemListSchema] : []),
     ...(community
       ? buildCommunitySchema(slug, { latitude: neighborhood.latitude, longitude: neighborhood.longitude }, community)
+      : []),
+    ...(isBeachWoods
+      ? [
+          // Breadcrumb for Beach Woods (2026-10-03) — a synthetic page with
+          // no backend SEO row, so it never had one.
+          {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { name: 'Home', path: '' },
+              { name: 'Melbourne Beach', path: '/melbourne-beach' },
+              { name: 'Beach Woods', path: '/neighborhoods/beach-woods' },
+            ].map((crumb, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              name: crumb.name,
+              item: `https://brevardcoastalhomes.com${crumb.path || '/'}`,
+            })),
+          },
+        ]
       : []),
     ...(subCommunity
       ? [
@@ -1820,7 +1855,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           }}
         >
           <h2 style={{ fontSize: 24, marginBottom: 12, color: 'var(--color-ink)', fontFamily: 'var(--font-inter-tight)' }}>
-            About {community.name} {community.area || 'Viera'} Real Estate
+            {community.aboutHeading || `About ${community.name} ${community.area || 'Viera'} Real Estate`}
           </h2>
           {community.about.map((text) => (
             <p key={text.slice(0, 32)} style={{ marginBottom: 12 }}>
@@ -1843,10 +1878,14 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           )}
           <p>
             {community.agentLine}{' '}
-            <Link href={`/neighborhoods/${slug}/area-guide`} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
-              Read the full {community.name} Area Guide
-            </Link>{' '}
-            or{' '}
+            {NEIGHBORHOOD_AREA_GUIDE_CONTENT[slug] ? (
+              <>
+                <Link href={`/neighborhoods/${slug}/area-guide`} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+                  Read the full {community.name} Area Guide
+                </Link>{' '}
+                or{' '}
+              </>
+            ) : null}
             <Link
               href={community.secondaryLink?.href || '/new-construction-viera'}
               style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}
