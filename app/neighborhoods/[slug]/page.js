@@ -452,9 +452,10 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             : schema
         );
       }
-      // Adelaide/Aripeka breadcrumb (2026-10-03, per Ryan) — same pattern
+      // COMMUNITY_SEO breadcrumb (2026-10-03, per Ryan) — same pattern
       // as the Tortoise Island fix just above: the backend names Adelaide's
-      // parent city "Viera West" (/viera-west) and Aripeka's "Viera East",
+      // and Summer Lakes' parent city "Viera West" (/viera-west) and
+      // Aripeka's "Viera East",
       // which contradicts the "Viera" used in these pages' H1, title and
       // Area Guide (see COMMUNITY_SEO). Point both at Viera.
       if (COMMUNITY_SEO[slug] && Array.isArray(jsonLd)) {
@@ -822,7 +823,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
     pageStart: rangeStart,
   });
   // Community market snapshot + community/agent schema for COMMUNITY_SEO
-  // pages (Adelaide, Aripeka — 2026-10-03, per Ryan). A separate unfiltered
+  // pages (Adelaide, Aripeka, Summer Lakes — 2026-10-03, per Ryan). Uses
+  // the page's own base listingsFilterParams (Summer Lakes matches by
+  // subdivision name, not neighborhood), but a separate unfiltered
   // fetch (not `results` above, which reflects the visitor's price/beds/
   // baths/property-type filters and current page) so the "About {name}
   // Viera Real Estate" section below always describes the whole community.
@@ -831,7 +834,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   let communitySnapshot = null;
   if (community) {
     try {
-      const data = await api.getListings({ neighborhood: slug, pageSize: 100 });
+      const data = await api.getListings({ ...listingsFilterParams, pageSize: 100 });
       const prices = (data.results || [])
         .map((l) => l.price)
         .filter((p) => typeof p === 'number' && p > 0)
