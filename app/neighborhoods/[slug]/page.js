@@ -29,6 +29,7 @@ import {
   NEIGHBORHOOD_LISTINGS_FAQ,
   buildItemListSchema,
   COMMUNITY_SEO,
+  VIERA_BUILDERS_HUB_SEO,
   buildCommunitySchema,
   formatPrice,
 } from '@/lib/constants';
@@ -129,6 +130,9 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
   // COMMUNITY_SEO in lib/constants.js for the reasoning. Aripeka's lots-only
   // and Aquarina's condos-only views keep their backend titles (homeOnly).
   // Harbor Island Beach Club also has per-view titles (seoByType).
+  if (slug === 'viera-builders-communities-viera-west' && !searchParams.propertyType) {
+    return { ...VIERA_BUILDERS_HUB_SEO, alternates: { canonical: `/neighborhoods/${slug}` } };
+  }
   const communitySeo = COMMUNITY_SEO[slug];
   if (communitySeo) {
     const viewSeo = searchParams.propertyType ? communitySeo.seoByType?.[primaryType] : null;
@@ -874,7 +878,31 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // baths/property-type filters and current page) so the "About {name}
   // Viera Real Estate" section below always describes the whole community.
   // Same median calculation as the Area Guide page's getMarketSnapshot.
-  const community = COMMUNITY_SEO[slug];
+  //
+  // The 5 Viera Builders sub-community pages with Area Guide content get
+  // the same About section, snapshot and structured data (2026-10-03, per
+  // Ryan — they weren't showing up in Google), built from their existing
+  // NEIGHBORHOOD_AREA_GUIDE_CONTENT (amenities + homesites; the intro is
+  // already shown under the H1). Their titles/H1s are unchanged — they
+  // aren't COMMUNITY_SEO entries, so generateMetadata's own subCommunity
+  // branch still sets them. Atlin Cove (no Area Guide content yet) is
+  // skipped. The "no active MLS listings as of this writing" sentence some
+  // homesites entries carry is dropped here, since the live snapshot shows
+  // the real count.
+  const subCommunityGuide = subCommunity ? NEIGHBORHOOD_AREA_GUIDE_CONTENT[slug] : null;
+  const community =
+    COMMUNITY_SEO[slug] ||
+    (subCommunityGuide
+      ? {
+          name: subCommunity.name,
+          placeDescription: subCommunityGuide.intro,
+          about: [
+            subCommunityGuide.homesites.replace(/\s*Brevard Coastal Homes has no active MLS listings[^.]*\./, ''),
+            subCommunityGuide.amenities,
+          ],
+          agentLine: `Ryan Pohl of Brevard Coastal Homes helps buyers compare ${subCommunity.name} real estate with Viera Builders’ other communities, tour model homes, and negotiate new construction and resale purchases in Viera.`,
+        }
+      : null);
   let communitySnapshot = null;
   if (community) {
     try {
@@ -900,11 +928,51 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
     timeZone: 'America/New_York',
   });
 
+  // Per-community listing counts for the hub page's community list
+  // (2026-10-03, per Ryan) — same exact-subdivision match each community's
+  // own page uses. A failed lookup just leaves that count off.
+  let subCommunityCounts = {};
+  if (isVieraBuildersCommunitiesVieraWest) {
+    const entries = await Promise.all(
+      VIERA_BUILDERS_SUB_COMMUNITIES.map(async (c) => {
+        try {
+          const data = await api.getListings({ subdivision: c.name, pageSize: 1 });
+          return [c.slug, typeof data.total === 'number' ? data.total : null];
+        } catch {
+          return [c.slug, null];
+        }
+      })
+    );
+    subCommunityCounts = Object.fromEntries(entries);
+  }
+
   const combinedJsonLd = [
     ...(jsonLd || []),
     ...(itemListSchema ? [itemListSchema] : []),
     ...(community
-      ? buildCommunitySchema(slug, { latitude: neighborhood.latitude, longitude: neighborhood.longitude })
+      ? buildCommunitySchema(slug, { latitude: neighborhood.latitude, longitude: neighborhood.longitude }, community)
+      : []),
+    ...(subCommunity
+      ? [
+          // Breadcrumb for the synthetic sub-community pages (2026-10-03),
+          // which have no backend SEO row and so never had one:
+          // Home › Viera West › Viera Builders Communities › {name}.
+          {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { name: 'Home', path: '' },
+              { name: 'Viera West', path: '/viera-west' },
+              { name: 'Viera Builders Communities', path: '/neighborhoods/viera-builders-communities-viera-west' },
+              { name: subCommunity.name, path: `/neighborhoods/${slug}` },
+            ].map((crumb, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              name: crumb.name,
+              item: `https://brevardcoastalhomes.com${crumb.path || '/'}`,
+            })),
+          },
+        ]
       : []),
   ];
 
@@ -1095,6 +1163,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                   {c.name}
                 </Link>
                 {c.comingSoon ? ' (Coming Soon)' : ''}
+                {/* One-line description + live listing count under each
+                    link (2026-10-03, per Ryan) — see VIERA_BUILDERS_SUB_
+                    COMMUNITIES' blurb comment in lib/constants.js. */}
+                <div style={{ fontSize: 15, fontWeight: 400, lineHeight: 1.45, color: 'var(--color-muted-dark)', marginTop: 2 }}>
+                  {c.blurb}
+                  {subCommunityCounts[c.slug] > 0
+                    ? ` · ${subCommunityCounts[c.slug]} ${subCommunityCounts[c.slug] === 1 ? 'listing' : 'listings'} for sale`
+                    : ''}
+                </div>
               </li>
             ))}
           </ul>
