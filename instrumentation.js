@@ -18,6 +18,22 @@ export async function register() {
   const delayMs = Number(process.env.INDEXNOW_DELAY_MS ?? 60000);
   const timer = setTimeout(async () => {
     try {
+      // Hostinger runs two server processes per deploy, so only the first
+      // to claim this build's lock file sends the ping (otherwise every
+      // deploy submits twice). Keyed by .next/BUILD_ID, so each new deploy
+      // pings once.
+      const fs = await import('node:fs');
+      const os = await import('node:os');
+      const path = await import('node:path');
+      let buildId = 'unknown';
+      try {
+        buildId = fs.readFileSync(path.join(process.cwd(), '.next', 'BUILD_ID'), 'utf8').trim();
+      } catch {}
+      try {
+        fs.writeFileSync(path.join(os.tmpdir(), `indexnow-${buildId}.lock`), String(process.pid), { flag: 'wx' });
+      } catch {
+        return; // another process for this build already sent it
+      }
       const { pingIndexNow } = await import('./lib/indexnow');
       const { status, count } = await pingIndexNow();
       console.log(`IndexNow: submitted ${count} URLs (status ${status})`);
