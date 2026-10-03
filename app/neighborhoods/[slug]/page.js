@@ -28,8 +28,8 @@ import {
   NEIGHBORHOOD_AREA_GUIDE_CONTENT,
   NEIGHBORHOOD_LISTINGS_FAQ,
   buildItemListSchema,
-  ADELAIDE_SEO,
-  buildAdelaideCommunitySchema,
+  COMMUNITY_SEO,
+  buildCommunitySchema,
   formatPrice,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
@@ -123,12 +123,14 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
   const { slug } = params;
   const primaryType = (searchParams.propertyType || 'Home').split(',')[0];
 
-  // Adelaide (2026-10-03, per Ryan) — hand-written title/description/
-  // keywords targeting "Adelaide homes for sale" / "Adelaide Viera real
-  // estate" instead of the backend's templated page_seo row; see
-  // ADELAIDE_SEO in lib/constants.js for the reasoning.
-  if (slug === 'adelaide') {
-    return { ...ADELAIDE_SEO, alternates: { canonical: '/neighborhoods/adelaide' } };
+  // Adelaide/Aripeka (2026-10-03, per Ryan) — hand-written title/
+  // description/keywords targeting "{name} homes for sale" / "{name} Viera
+  // real estate" instead of the backend's templated page_seo row; see
+  // COMMUNITY_SEO in lib/constants.js for the reasoning. Aripeka's
+  // lots-only view (?propertyType=Land) keeps its backend "Lots" title.
+  const communitySeo = COMMUNITY_SEO[slug];
+  if (communitySeo && (!communitySeo.homeOnly || primaryType === 'Home')) {
+    return { ...communitySeo.seo, alternates: { canonical: `/neighborhoods/${slug}` } };
   }
 
   // Same flags/listingsFilterParams logic as the page component further
@@ -450,17 +452,18 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             : schema
         );
       }
-      // Adelaide breadcrumb (2026-10-03, per Ryan) — same pattern as the
-      // Tortoise Island fix just above: the backend names Adelaide's parent
-      // city "Viera West" (/viera-west), which contradicts the "Viera"
-      // used in this page's H1, title and Area Guide. Point it at Viera.
-      if (slug === 'adelaide' && Array.isArray(jsonLd)) {
+      // Adelaide/Aripeka breadcrumb (2026-10-03, per Ryan) — same pattern
+      // as the Tortoise Island fix just above: the backend names Adelaide's
+      // parent city "Viera West" (/viera-west) and Aripeka's "Viera East",
+      // which contradicts the "Viera" used in these pages' H1, title and
+      // Area Guide (see COMMUNITY_SEO). Point both at Viera.
+      if (COMMUNITY_SEO[slug] && Array.isArray(jsonLd)) {
         jsonLd = jsonLd.map((schema) =>
           schema?.['@type'] === 'BreadcrumbList' && Array.isArray(schema.itemListElement)
             ? {
                 ...schema,
                 itemListElement: schema.itemListElement.map((item) =>
-                  item.name === 'Viera West'
+                  item.name === 'Viera West' || item.name === 'Viera East'
                     ? { ...item, name: 'Viera', item: item.item?.replace('/viera-west', '/viera') }
                     : item
                 ),
@@ -818,21 +821,22 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
     total,
     pageStart: rangeStart,
   });
-  // Adelaide market snapshot + community/agent schema (2026-10-03, per
-  // Ryan). A separate unfiltered fetch (not `results` above, which reflects
-  // the visitor's price/beds/baths filters and current page) so the
-  // "About Adelaide Viera Real Estate" section below always describes the
-  // whole community. Same median calculation as the Area Guide page's
-  // getMarketSnapshot.
-  let adelaideSnapshot = null;
-  if (isAdelaide) {
+  // Community market snapshot + community/agent schema for COMMUNITY_SEO
+  // pages (Adelaide, Aripeka — 2026-10-03, per Ryan). A separate unfiltered
+  // fetch (not `results` above, which reflects the visitor's price/beds/
+  // baths/property-type filters and current page) so the "About {name}
+  // Viera Real Estate" section below always describes the whole community.
+  // Same median calculation as the Area Guide page's getMarketSnapshot.
+  const community = COMMUNITY_SEO[slug];
+  let communitySnapshot = null;
+  if (community) {
     try {
-      const data = await api.getListings({ neighborhood: 'adelaide', pageSize: 100 });
+      const data = await api.getListings({ neighborhood: slug, pageSize: 100 });
       const prices = (data.results || [])
         .map((l) => l.price)
         .filter((p) => typeof p === 'number' && p > 0)
         .sort((a, b) => a - b);
-      adelaideSnapshot = {
+      communitySnapshot = {
         count: typeof data.total === 'number' ? data.total : prices.length,
         median: prices.length ? prices[Math.floor(prices.length / 2)] : null,
         low: prices[0] ?? null,
@@ -842,7 +846,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
       // Leave the snapshot out rather than show wrong numbers.
     }
   }
-  const adelaideUpdated = new Date().toLocaleDateString('en-US', {
+  const snapshotUpdated = new Date().toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
@@ -852,8 +856,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   const combinedJsonLd = [
     ...(jsonLd || []),
     ...(itemListSchema ? [itemListSchema] : []),
-    ...(isAdelaide
-      ? buildAdelaideCommunitySchema({ latitude: neighborhood.latitude, longitude: neighborhood.longitude })
+    ...(community
+      ? buildCommunitySchema(slug, { latitude: neighborhood.latitude, longitude: neighborhood.longitude })
       : []),
   ];
 
@@ -1673,14 +1677,14 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         />
       </div>
 
-      {/* About Adelaide Viera Real Estate (2026-10-03, per Ryan) — a short,
+      {/* About {name} Viera Real Estate (2026-10-03, per Ryan) — a short,
           fact-dense summary on the listings page itself (the full detail
           lives on the Area Guide), so search engines and AI tools have
-          quotable copy for "Adelaide homes for sale" / "Adelaide Viera real
-          estate" right on the page that ranks for them. Facts come from
-          NEIGHBORHOOD_AREA_GUIDE_CONTENT.adelaide / NEIGHBORHOOD_LISTINGS_FAQ.
-          adelaide; the snapshot numbers are live from the MLS feed. */}
-      {isAdelaide && (
+          quotable copy for "{name} homes for sale" / "{name} Viera real
+          estate" right on the page that ranks for them. Copy lives in
+          COMMUNITY_SEO (lib/constants.js); the snapshot numbers are live
+          from the MLS feed. */}
+      {community && (
         <section
           className="container"
           style={{
@@ -1692,41 +1696,31 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           }}
         >
           <h2 style={{ fontSize: 24, marginBottom: 12, color: 'var(--color-ink)', fontFamily: 'var(--font-inter-tight)' }}>
-            About Adelaide Viera Real Estate
+            About {community.name} Viera Real Estate
           </h2>
-          <p style={{ marginBottom: 12 }}>
-            Adelaide is a 460-acre gated, custom-home community in northern Viera, Florida, built around Lake Adelaide
-            and a 25-acre water-to-wetlands preserve. Adelaide homes for sale sit in four sections — The Reserve, The
-            Preserve, The Lakes, and The Park — on homesites from about half an acre to over an acre, and more than a
-            third of the community is set aside as water or preserve.
-          </p>
-          <p style={{ marginBottom: 12 }}>
-            Adelaide is custom-build only, with three recognized builders: AR Homes (Rosewood Homes, Inc.), Christopher
-            Burton Luxury Homes, and Elan Builders. Based on recent MLS listings, completed and under-construction
-            homes run roughly 3,550–5,500 square feet and $2.35 million–$5.5 million. Residents share a staffed guard
-            gate, a 120-acre recreational lake with a dock and boardwalk, tennis courts, trails, a pavilion, and a
-            playground. Most homes are zoned for Manatee Elementary and Viera High School, and HOA fees run around
-            $1,225 per quarter.
-          </p>
-          {adelaideSnapshot && adelaideSnapshot.count > 0 && (
+          {community.about.map((text) => (
+            <p key={text.slice(0, 32)} style={{ marginBottom: 12 }}>
+              {text}
+            </p>
+          ))}
+          {communitySnapshot && communitySnapshot.count > 0 && (
             <p style={{ marginBottom: 12 }}>
-              <strong style={{ color: 'var(--color-ink)' }}>Adelaide market snapshot:</strong>{' '}
-              {adelaideSnapshot.count} active {adelaideSnapshot.count === 1 ? 'listing' : 'listings'}
-              {adelaideSnapshot.median != null && <>, median list price {formatPrice(adelaideSnapshot.median)}</>}
-              {adelaideSnapshot.low != null && adelaideSnapshot.high != null && adelaideSnapshot.low !== adelaideSnapshot.high && (
+              <strong style={{ color: 'var(--color-ink)' }}>{community.name} market snapshot:</strong>{' '}
+              {communitySnapshot.count} active {communitySnapshot.count === 1 ? 'listing' : 'listings'}
+              {communitySnapshot.median != null && <>, median list price {formatPrice(communitySnapshot.median)}</>}
+              {communitySnapshot.low != null && communitySnapshot.high != null && communitySnapshot.low !== communitySnapshot.high && (
                 <>
                   {' '}
-                  (from {formatPrice(adelaideSnapshot.low)} to {formatPrice(adelaideSnapshot.high)})
+                  (from {formatPrice(communitySnapshot.low)} to {formatPrice(communitySnapshot.high)})
                 </>
               )}
-              . Updated {adelaideUpdated}.
+              . Updated {snapshotUpdated}.
             </p>
           )}
           <p>
-            Ryan Pohl of Brevard Coastal Homes helps buyers compare Adelaide real estate across all three builders,
-            tour model homes, and negotiate new construction and resale contracts in Viera.{' '}
-            <Link href="/neighborhoods/adelaide/area-guide" style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
-              Read the full Adelaide Area Guide
+            {community.agentLine}{' '}
+            <Link href={`/neighborhoods/${slug}/area-guide`} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+              Read the full {community.name} Area Guide
             </Link>{' '}
             or{' '}
             <Link href="/new-construction-viera" style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>

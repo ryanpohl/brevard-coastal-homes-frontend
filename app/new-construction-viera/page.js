@@ -146,11 +146,11 @@ export default function NewConstructionVieraPage() {
         </p>
         <p>
           <Link href="/neighborhoods/aripeka" style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
-            See Aripeka Homes &rarr;
+            See Aripeka Homes for Sale &rarr;
           </Link>{' '}
           &middot;{' '}
           <Link href="/neighborhoods/aripeka?propertyType=Land" style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
-            See Aripeka Lots &rarr;
+            See Aripeka Lots for Sale &rarr;
           </Link>
         </p>
       </GuideSection>
