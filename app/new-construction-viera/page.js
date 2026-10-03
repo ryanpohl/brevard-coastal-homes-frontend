@@ -126,7 +126,7 @@ export default function NewConstructionVieraPage() {
         </p>
         <p>
           <Link href="/neighborhoods/adelaide" style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
-            See Adelaide Listings &rarr;
+            See Adelaide Homes for Sale &rarr;
           </Link>
         </p>
       </GuideSection>

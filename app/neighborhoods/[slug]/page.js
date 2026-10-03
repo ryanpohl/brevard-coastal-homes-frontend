@@ -28,6 +28,9 @@ import {
   NEIGHBORHOOD_AREA_GUIDE_CONTENT,
   NEIGHBORHOOD_LISTINGS_FAQ,
   buildItemListSchema,
+  ADELAIDE_SEO,
+  buildAdelaideCommunitySchema,
+  formatPrice,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -119,6 +122,14 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
   const [params, searchParams] = await Promise.all([paramsPromise, searchParamsPromise]);
   const { slug } = params;
   const primaryType = (searchParams.propertyType || 'Home').split(',')[0];
+
+  // Adelaide (2026-10-03, per Ryan) — hand-written title/description/
+  // keywords targeting "Adelaide homes for sale" / "Adelaide Viera real
+  // estate" instead of the backend's templated page_seo row; see
+  // ADELAIDE_SEO in lib/constants.js for the reasoning.
+  if (slug === 'adelaide') {
+    return { ...ADELAIDE_SEO, alternates: { canonical: '/neighborhoods/adelaide' } };
+  }
 
   // Same flags/listingsFilterParams logic as the page component further
   // below (kept in sync manually — generateMetadata and the page component
@@ -433,6 +444,24 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                 itemListElement: schema.itemListElement.map((item) =>
                   item.name === 'Melbourne Beach'
                     ? { ...item, name: 'Satellite Beach', item: item.item?.replace('/melbourne-beach', '/satellite-beach') }
+                    : item
+                ),
+              }
+            : schema
+        );
+      }
+      // Adelaide breadcrumb (2026-10-03, per Ryan) — same pattern as the
+      // Tortoise Island fix just above: the backend names Adelaide's parent
+      // city "Viera West" (/viera-west), which contradicts the "Viera"
+      // used in this page's H1, title and Area Guide. Point it at Viera.
+      if (slug === 'adelaide' && Array.isArray(jsonLd)) {
+        jsonLd = jsonLd.map((schema) =>
+          schema?.['@type'] === 'BreadcrumbList' && Array.isArray(schema.itemListElement)
+            ? {
+                ...schema,
+                itemListElement: schema.itemListElement.map((item) =>
+                  item.name === 'Viera West'
+                    ? { ...item, name: 'Viera', item: item.item?.replace('/viera-west', '/viera') }
                     : item
                 ),
               }
@@ -789,7 +818,44 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
     total,
     pageStart: rangeStart,
   });
-  const combinedJsonLd = [...(jsonLd || []), ...(itemListSchema ? [itemListSchema] : [])];
+  // Adelaide market snapshot + community/agent schema (2026-10-03, per
+  // Ryan). A separate unfiltered fetch (not `results` above, which reflects
+  // the visitor's price/beds/baths filters and current page) so the
+  // "About Adelaide Viera Real Estate" section below always describes the
+  // whole community. Same median calculation as the Area Guide page's
+  // getMarketSnapshot.
+  let adelaideSnapshot = null;
+  if (isAdelaide) {
+    try {
+      const data = await api.getListings({ neighborhood: 'adelaide', pageSize: 100 });
+      const prices = (data.results || [])
+        .map((l) => l.price)
+        .filter((p) => typeof p === 'number' && p > 0)
+        .sort((a, b) => a - b);
+      adelaideSnapshot = {
+        count: typeof data.total === 'number' ? data.total : prices.length,
+        median: prices.length ? prices[Math.floor(prices.length / 2)] : null,
+        low: prices[0] ?? null,
+        high: prices[prices.length - 1] ?? null,
+      };
+    } catch {
+      // Leave the snapshot out rather than show wrong numbers.
+    }
+  }
+  const adelaideUpdated = new Date().toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'America/New_York',
+  });
+
+  const combinedJsonLd = [
+    ...(jsonLd || []),
+    ...(itemListSchema ? [itemListSchema] : []),
+    ...(isAdelaide
+      ? buildAdelaideCommunitySchema({ latitude: neighborhood.latitude, longitude: neighborhood.longitude })
+      : []),
+  ];
 
   const mapCenter =
     neighborhood.latitude != null && neighborhood.longitude != null
@@ -1606,6 +1672,70 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           totalPages={totalPages}
         />
       </div>
+
+      {/* About Adelaide Viera Real Estate (2026-10-03, per Ryan) — a short,
+          fact-dense summary on the listings page itself (the full detail
+          lives on the Area Guide), so search engines and AI tools have
+          quotable copy for "Adelaide homes for sale" / "Adelaide Viera real
+          estate" right on the page that ranks for them. Facts come from
+          NEIGHBORHOOD_AREA_GUIDE_CONTENT.adelaide / NEIGHBORHOOD_LISTINGS_FAQ.
+          adelaide; the snapshot numbers are live from the MLS feed. */}
+      {isAdelaide && (
+        <section
+          className="container"
+          style={{
+            padding: '0 clamp(16px, 4vw, 56px) 48px',
+            maxWidth: 760,
+            fontSize: 17,
+            lineHeight: 1.65,
+            color: 'var(--color-muted-dark)',
+          }}
+        >
+          <h2 style={{ fontSize: 24, marginBottom: 12, color: 'var(--color-ink)', fontFamily: 'var(--font-inter-tight)' }}>
+            About Adelaide Viera Real Estate
+          </h2>
+          <p style={{ marginBottom: 12 }}>
+            Adelaide is a 460-acre gated, custom-home community in northern Viera, Florida, built around Lake Adelaide
+            and a 25-acre water-to-wetlands preserve. Adelaide homes for sale sit in four sections — The Reserve, The
+            Preserve, The Lakes, and The Park — on homesites from about half an acre to over an acre, and more than a
+            third of the community is set aside as water or preserve.
+          </p>
+          <p style={{ marginBottom: 12 }}>
+            Adelaide is custom-build only, with three recognized builders: AR Homes (Rosewood Homes, Inc.), Christopher
+            Burton Luxury Homes, and Elan Builders. Based on recent MLS listings, completed and under-construction
+            homes run roughly 3,550–5,500 square feet and $2.35 million–$5.5 million. Residents share a staffed guard
+            gate, a 120-acre recreational lake with a dock and boardwalk, tennis courts, trails, a pavilion, and a
+            playground. Most homes are zoned for Manatee Elementary and Viera High School, and HOA fees run around
+            $1,225 per quarter.
+          </p>
+          {adelaideSnapshot && adelaideSnapshot.count > 0 && (
+            <p style={{ marginBottom: 12 }}>
+              <strong style={{ color: 'var(--color-ink)' }}>Adelaide market snapshot:</strong>{' '}
+              {adelaideSnapshot.count} active {adelaideSnapshot.count === 1 ? 'listing' : 'listings'}
+              {adelaideSnapshot.median != null && <>, median list price {formatPrice(adelaideSnapshot.median)}</>}
+              {adelaideSnapshot.low != null && adelaideSnapshot.high != null && adelaideSnapshot.low !== adelaideSnapshot.high && (
+                <>
+                  {' '}
+                  (from {formatPrice(adelaideSnapshot.low)} to {formatPrice(adelaideSnapshot.high)})
+                </>
+              )}
+              . Updated {adelaideUpdated}.
+            </p>
+          )}
+          <p>
+            Ryan Pohl of Brevard Coastal Homes helps buyers compare Adelaide real estate across all three builders,
+            tour model homes, and negotiate new construction and resale contracts in Viera.{' '}
+            <Link href="/neighborhoods/adelaide/area-guide" style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+              Read the full Adelaide Area Guide
+            </Link>{' '}
+            or{' '}
+            <Link href="/new-construction-viera" style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+              compare new construction in Viera
+            </Link>
+            .
+          </p>
+        </section>
+      )}
 
       {/* Collapsed FAQ (2026-09-24, per Ryan — see listingsFaqItems above).
           Placed after the listing grid/pagination, same "below the
