@@ -218,7 +218,7 @@ export default async function CityAllListingsPage({ params, searchParams: search
   const listingsFaqItems = CITY_LISTINGS_FAQ[citySlug];
   const pageJsonLd = [
     ...(itemListSchema ? [itemListSchema] : []),
-    ...(citySeo ? buildCityPlaceSchema(citySlug, { latitude: city.latitude, longitude: city.longitude }) : []),
+    ...(listingsSeo ? buildCityPlaceSchema(citySlug, { latitude: city.latitude, longitude: city.longitude }) : []),
   ];
 
   return (
