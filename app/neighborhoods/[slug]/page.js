@@ -123,11 +123,11 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
   const { slug } = params;
   const primaryType = (searchParams.propertyType || 'Home').split(',')[0];
 
-  // Adelaide/Aripeka (2026-10-03, per Ryan) — hand-written title/
-  // description/keywords targeting "{name} homes for sale" / "{name} Viera
+  // COMMUNITY_SEO pages (2026-10-03, per Ryan) — hand-written title/
+  // description/keywords targeting "{name} homes for sale" / "{name} {area}
   // real estate" instead of the backend's templated page_seo row; see
-  // COMMUNITY_SEO in lib/constants.js for the reasoning. Aripeka's
-  // lots-only view (?propertyType=Land) keeps its backend "Lots" title.
+  // COMMUNITY_SEO in lib/constants.js for the reasoning. Aripeka's lots-only
+  // and Aquarina's condos-only views keep their backend titles (homeOnly).
   const communitySeo = COMMUNITY_SEO[slug];
   if (communitySeo && (!communitySeo.homeOnly || primaryType === 'Home')) {
     return { ...communitySeo.seo, alternates: { canonical: `/neighborhoods/${slug}` } };
@@ -823,7 +823,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
     pageStart: rangeStart,
   });
   // Community market snapshot + community/agent schema for COMMUNITY_SEO
-  // pages (Adelaide, Aripeka, Summer Lakes — 2026-10-03, per Ryan). Uses
+  // pages (Adelaide, Aripeka, Summer Lakes, Aquarina — 2026-10-03, per
+  // Ryan). Uses
   // the page's own base listingsFilterParams (Summer Lakes matches by
   // subdivision name, not neighborhood), but a separate unfiltered
   // fetch (not `results` above, which reflects the visitor's price/beds/
@@ -1680,10 +1681,10 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         />
       </div>
 
-      {/* About {name} Viera Real Estate (2026-10-03, per Ryan) — a short,
+      {/* About {name} {area} Real Estate (2026-10-03, per Ryan) — a short,
           fact-dense summary on the listings page itself (the full detail
           lives on the Area Guide), so search engines and AI tools have
-          quotable copy for "{name} homes for sale" / "{name} Viera real
+          quotable copy for "{name} homes for sale" / "{name} {area} real
           estate" right on the page that ranks for them. Copy lives in
           COMMUNITY_SEO (lib/constants.js); the snapshot numbers are live
           from the MLS feed. */}
@@ -1699,7 +1700,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           }}
         >
           <h2 style={{ fontSize: 24, marginBottom: 12, color: 'var(--color-ink)', fontFamily: 'var(--font-inter-tight)' }}>
-            About {community.name} Viera Real Estate
+            About {community.name} {community.area || 'Viera'} Real Estate
           </h2>
           {community.about.map((text) => (
             <p key={text.slice(0, 32)} style={{ marginBottom: 12 }}>
@@ -1726,8 +1727,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               Read the full {community.name} Area Guide
             </Link>{' '}
             or{' '}
-            <Link href="/new-construction-viera" style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
-              compare new construction in Viera
+            <Link
+              href={community.secondaryLink?.href || '/new-construction-viera'}
+              style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}
+            >
+              {community.secondaryLink?.label || 'compare new construction in Viera'}
             </Link>
             .
           </p>
