@@ -24,10 +24,11 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
  * community/builder sites + current MLS listings), plus vierabuilders.com
  * and viera.com/homes/builders confirming Viera Builders is a single
  * builder brand (not a multi-builder collective) operating Viera West's six
- * sub-communities. Land-availability framing for Adelaide and Aripeka
- * reflects live inventory checked 2026-09-30 (Aripeka had active homesites;
- * Adelaide currently has none) — phrased to stay accurate as that inventory
- * changes rather than hard-coding a count that will go stale.
+ * sub-communities. Land-availability framing for Aripeka reflects live
+ * inventory checked 2026-09-30 (Aripeka had active homesites) — phrased to
+ * stay accurate as that inventory changes rather than hard-coding a count
+ * that will go stale. Adelaide is homes only (per Ryan, 2026-10-03), so its
+ * section no longer mentions lots.
  */
 export const metadata = {
   title: "New Construction in Viera, FL: Adelaide, Aripeka & Viera Builders | Brevard Coastal Homes",
@@ -117,12 +118,14 @@ export default function NewConstructionVieraPage() {
           million&ndash;$5.5 million.
         </p>
         <p>
-          Adelaide&apos;s available homesites come and go in smaller numbers than a production community &mdash;
-          if you&apos;re specifically looking for a vacant lot to build on rather than an already-underway home,{' '}
+          {/* Reworded 2026-10-03 (per Ryan: "Adelaide just has homes...no
+              condos or lots") — was an invitation to ask about vacant lots. */}
+          Adelaide is homes only &mdash; no condos or vacant lots &mdash; and new and resale homes come up in smaller
+          numbers than in a production community. If you&apos;re looking for an Adelaide home,{' '}
           <strong>
             <ContactUsTrigger>contact us</ContactUsTrigger>
           </strong>{' '}
-          and we&apos;ll check current availability with the community&apos;s builders directly.
+          and we&apos;ll let you know about current availability, including homes the builders have underway.
         </p>
         <p>
           <Link href="/neighborhoods/adelaide" style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>

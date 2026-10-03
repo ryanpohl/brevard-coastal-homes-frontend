@@ -1763,11 +1763,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
 
       <FilterBar
         waterfrontFlags={waterfrontFlags}
-        // Tortoise Island added 2026-10-03 (per Ryan: "Tortoise island doesnt
-        // have condos or lots") — homes only, so no Property Type dropdown.
-        hidePropertyType={isAdelaide || isSummerLakes || isBeachWoods || isTortoiseIsland}
+        // Tortoise Island and Lansing Island added 2026-10-03 (per Ryan: neither
+        // has condos or lots) — homes only, so no Property Type dropdown.
+        hidePropertyType={isAdelaide || isSummerLakes || isBeachWoods || isTortoiseIsland || isLansingIsland}
         propertyTypeOptions={
-          isAripeka || isLansingIsland || isSouthMerrittIsland
+          isAripeka || isSouthMerrittIsland
             ? ARIPEKA_PROPERTY_TYPE_OPTIONS
             : isHarborIslandBeachClub
               ? HARBOR_ISLAND_BEACH_CLUB_PROPERTY_TYPE_OPTIONS
