@@ -249,11 +249,17 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
   // canonical in this codebase.
   if (subCommunity) {
     return {
-      title: `${subCommunity.name} | Viera West, FL | Brevard Coastal Homes`,
-      description: combineDescription(
-        countPrefix,
-        `Browse listings in ${subCommunity.name}, a Viera Builders community in Viera West, FL.`
-      ),
+      title: `${subCommunity.name} Homes for Sale in Viera, FL | Viera Builders`,
+      // Area-guide intro as the meta description (per Ryan, 2026-10-03) —
+      // falls back to the previous count-prefixed sentence for a
+      // sub-community with no NEIGHBORHOOD_AREA_GUIDE_CONTENT entry yet
+      // (currently Atlin Cove).
+      description:
+        NEIGHBORHOOD_AREA_GUIDE_CONTENT[slug]?.intro ||
+        combineDescription(
+          countPrefix,
+          `Browse listings in ${subCommunity.name}, a Viera Builders community in Viera West, FL.`
+        ),
       alternates: { canonical: `/neighborhoods/${slug}` },
     };
   }
@@ -740,8 +746,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
     ? HARBOR_ISLAND_BEACH_CLUB_H1
     : isVieraBuildersCommunitiesVieraWest
       ? VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_H1
-      : subCommunity?.comingSoon
-        ? `Homes for Sale in ${neighborhood.name}, FL (Coming Soon)`
+      : subCommunity
+        ? `${neighborhood.name} Homes for Sale – Viera, FL${subCommunity.comingSoon ? ' (Coming Soon)' : ''}`
         : isAripeka
           ? (hasExplicitPropertyTypeFilter ? ARIPEKA_H1 : ARIPEKA_COMBINED_H1) ||
             `Homes for Sale in ${neighborhood.name}, FL`
@@ -847,6 +853,23 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         >
           {h1Text}
         </h1>
+        {/* Sub-community intro (per Ryan, 2026-10-03) — the same area-guide
+            intro used as this page's meta description, shown right under
+            the H1. Renders nothing for a sub-community without an intro
+            (currently Atlin Cove). */}
+        {subCommunity && NEIGHBORHOOD_AREA_GUIDE_CONTENT[slug]?.intro && (
+          <p
+            style={{
+              fontFamily: 'var(--font-inter-tight)',
+              fontSize: 17,
+              lineHeight: 1.6,
+              maxWidth: 820,
+              marginBottom: 16,
+            }}
+          >
+            {NEIGHBORHOOD_AREA_GUIDE_CONTENT[slug].intro}
+          </p>
+        )}
         {/* Viera Builders Communities Viera West sub-community links
             (2026-09-15, per Ryan: "I would also like to create live links
             for each neighborhood by Viera Builders... list the
@@ -978,7 +1001,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             visitor sees an identical-looking link block no matter which of
             the 7 pages they land on, same as Ryan's reference screenshot.
             Rendered as an <h2>, not a second <h1> — each page's own H1
-            above ("Homes for Sale in {subCommunity.name}, FL") stays the
+            above ("{subCommunity.name} Homes for Sale – Viera, FL") stays the
             page's one true H1 for on-page SEO structure, so this heading
             is sized a step smaller (clamp(22px,3vw,30px) vs the H1's
             clamp(26px,3.5vw,38px)) while keeping the same bold Inter Tight
