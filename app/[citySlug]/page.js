@@ -1,6 +1,14 @@
 import { notFound } from 'next/navigation';
 import * as api from '@/lib/api';
-import { cityListingsQueryParams, buildItemListSchema, CITY_LISTINGS_FAQ } from '@/lib/constants';
+import {
+  cityListingsQueryParams,
+  buildItemListSchema,
+  CITY_LISTINGS_FAQ,
+  CITY_PAGE_SEO,
+  buildCityPlaceSchema,
+} from '@/lib/constants';
+import { getMarketSnapshot } from '@/lib/marketSnapshot';
+import CityAboutSection from '@/components/CityAboutSection';
 import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -59,6 +67,17 @@ export async function generateMetadata({ params }) {
   // dynamic route this session (see the other three page.js files with
   // this same comment).
   const { citySlug } = await params;
+  // CITY_PAGE_SEO cities (2026-10-03) — hand-written title/description;
+  // see that constant in lib/constants.js.
+  const listingsSeo = CITY_PAGE_SEO[citySlug]?.pages.listings;
+  if (listingsSeo) {
+    return {
+      title: listingsSeo.title,
+      description: listingsSeo.description,
+      keywords: listingsSeo.keywords,
+      alternates: { canonical: `/${citySlug}` },
+    };
+  }
   try {
     const { city } = await api.getCity(citySlug);
     return {
@@ -171,8 +190,17 @@ export default async function CityAllListingsPage({ params, searchParams: search
   // above — an "all types combined" view has no single-propertyType
   // page_seo row to fetch), so there's no existing BreadcrumbList jsonLd
   // here to merge with — this ItemList is the page's only structured data.
+  // CITY_PAGE_SEO cities (2026-10-03) — page-specific H1/intro, an About
+  // section with a live market snapshot, and town structured data; see
+  // CITY_PAGE_SEO in lib/constants.js.
+  const citySeo = CITY_PAGE_SEO[citySlug];
+  const listingsSeo = citySeo?.pages.listings;
+  const pageHeading = listingsSeo?.h1 || `${city.name} Listings — Homes, Condos & Land For Sale, FL`;
+  const snapshot = listingsSeo
+    ? await getMarketSnapshot({ ...cityListingsQueryParams(citySlug), propertyType: ['Home', 'Condo', 'Land'] })
+    : null;
   const itemListSchema = buildItemListSchema({
-    pageTitle: `${city.name} Listings — Homes, Condos & Land For Sale, FL`,
+    pageTitle: pageHeading,
     path: `/${citySlug}`,
     listings: results,
     total,
@@ -188,15 +216,19 @@ export default async function CityAllListingsPage({ params, searchParams: search
   // the cities CITY_LISTINGS_FAQ has content for today; Faq.js renders
   // nothing when items is undefined, so this is a no-op elsewhere.
   const listingsFaqItems = CITY_LISTINGS_FAQ[citySlug];
+  const pageJsonLd = [
+    ...(itemListSchema ? [itemListSchema] : []),
+    ...(citySeo ? buildCityPlaceSchema(citySlug, { latitude: city.latitude, longitude: city.longitude }) : []),
+  ];
 
   return (
     <div>
-      {itemListSchema && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
+      {pageJsonLd.length > 0 && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }} />
       )}
       <div className="container" style={{ padding: '32px clamp(16px, 4vw, 56px) 0' }}>
         <h1 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', marginBottom: 8, fontFamily: 'var(--font-inter-tight)' }}>
-          {city.name} Listings — Homes, Condos & Land For Sale, FL
+          {pageHeading}
         </h1>
         {/* Intro copy (2026-09-16, per Ryan, pasting the same "Search by
             City" dropdown screenshot that names this page — "Cocoa Beach
@@ -218,9 +250,13 @@ export default async function CityAllListingsPage({ params, searchParams: search
             pattern used everywhere else this copy has been added. */}
         <div style={{ marginBottom: 12 }}>
           <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
-            Discover properties for sale in {city.name}, Florida, and let us make your property search easier.
-            We&rsquo;ll help you compare properties, arrange private showings, negotiate with sellers, and guide you
-            through every step from your initial search to closing.
+            {listingsSeo?.intro || (
+              <>
+                Discover properties for sale in {city.name}, Florida, and let us make your property search easier.
+                We&rsquo;ll help you compare properties, arrange private showings, negotiate with sellers, and guide
+                you through every step from your initial search to closing.
+              </>
+            )}
           </p>
           <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
             Start your {city.name} property search today.{' '}
@@ -257,6 +293,10 @@ export default async function CityAllListingsPage({ params, searchParams: search
           totalPages={totalPages}
         />
       </div>
+
+      {listingsSeo && (
+        <CityAboutSection config={citySeo} page={listingsSeo} currentPath={`/${citySlug}`} snapshot={snapshot} />
+      )}
 
       {/* Collapsed FAQ (2026-09-24, per Ryan — see listingsFaqItems above).
           Placed after the listing grid/pagination, same "below the

@@ -15,7 +15,11 @@ import {
   CITY_LISTINGS_FAQ,
   cityListingsQueryParams,
   buildItemListSchema,
+  CITY_PAGE_SEO,
+  buildCityPlaceSchema,
 } from '@/lib/constants';
+import { getMarketSnapshot } from '@/lib/marketSnapshot';
+import CityAboutSection from '@/components/CityAboutSection';
 import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -304,6 +308,19 @@ export async function generateMetadata({ params }) {
   if (!propertyType && !isOceanfrontCombined && !isRiverfrontCombined) return {};
   if ((isOceanfront || isOceanfrontCombined) && !OCEANFRONT_CITY_SLUGS.includes(citySlug)) return {};
   if (isRiverfrontCombined && !RIVERFRONT_CITY_SLUGS.includes(citySlug)) return {};
+  // CITY_PAGE_SEO pages (2026-10-03) — hand-written title/description,
+  // replacing the backend's (whose Oceanfront titles run past its 65-
+  // character cap and get cut off with an ellipsis); see CITY_PAGE_SEO in
+  // lib/constants.js. Canonical is the same bare path the backend uses.
+  const pageSeoMeta = CITY_PAGE_SEO[citySlug]?.pages[propertySlug];
+  if (pageSeoMeta) {
+    return {
+      title: pageSeoMeta.title,
+      description: pageSeoMeta.description,
+      keywords: pageSeoMeta.keywords,
+      alternates: { canonical: `/${citySlug}/${propertySlug}` },
+    };
+  }
 
   // Fetched once up front (2026-09-22, added alongside the listing-count
   // prefix above) — every branch below now wants the city's display name,
@@ -713,11 +730,32 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   // the <h1> ternary just below — kept in sync manually, same "two
   // separate functions, no shared state" convention already used between
   // this file's generateMetadata and page component.
+  // CITY_PAGE_SEO pages (2026-10-03) — page-specific H1/intro, an About
+  // section with a live market snapshot, and town structured data; see
+  // CITY_PAGE_SEO in lib/constants.js. The snapshot always describes the
+  // page's whole unfiltered set; with no visitor filters applied its count
+  // uses the page's own total, which already drops the
+  // OCEANFRONT_PAGE_EXCLUDED_MLS_NUMBERS listings.
+  const citySeo = CITY_PAGE_SEO[citySlug];
+  const pageSeo = citySeo?.pages[propertySlug];
+  let snapshot = null;
+  if (pageSeo) {
+    snapshot = await getMarketSnapshot({
+      ...cityListingsQueryParams(citySlug),
+      propertyType: isOceanfrontCombined ? ['Home', 'Condo'] : isRiverfrontCombined ? ['Home', 'Condo', 'Land'] : [propertyType],
+      waterfront: isOceanfront || isOceanfrontCombined ? 'Oceanfront' : isRiverfrontCombined ? 'Riverfront' : undefined,
+    });
+    const hasVisitorFilters = ['propertyType', 'priceMin', 'priceMax', 'beds', 'baths', 'waterfront', 'seniorCommunity'].some(
+      (k) => searchParams[k]
+    );
+    if (snapshot && snapshot.count > 0 && !hasVisitorFilters) snapshot.count = total;
+  }
   const pageTitle = isOceanfrontCombined
     ? `Oceanfront Homes & Condos For Sale in ${city.name}, FL`
     : isRiverfrontCombined
       ? `Riverfront Homes, Condos & Land For Sale in ${city.name}, FL`
-      : seo?.h1 ||
+      : pageSeo?.h1 ||
+        seo?.h1 ||
         (isOceanfront
           ? `Oceanfront ${PROPERTY_TYPE_LABEL[propertyType]} For Sale in ${city.name}, FL`
           : `${PROPERTY_TYPE_LABEL[propertyType]} in ${city.name}, FL`);
@@ -728,7 +766,11 @@ export default async function CityListingsPage({ params, searchParams: searchPar
     total,
     pageStart: rangeStart,
   });
-  const combinedJsonLd = [...(jsonLd || []), ...(itemListSchema ? [itemListSchema] : [])];
+  const combinedJsonLd = [
+    ...(jsonLd || []),
+    ...(itemListSchema ? [itemListSchema] : []),
+    ...(pageSeo ? buildCityPlaceSchema(citySlug, { latitude: city.latitude, longitude: city.longitude }) : []),
+  ];
 
   // Real per-listing coordinates come from the Spark MLS sync (null until
   // then); the map center falls back to the city's own coordinate so it's
@@ -752,7 +794,8 @@ export default async function CityListingsPage({ params, searchParams: searchPar
             ? `Oceanfront Homes & Condos For Sale in ${city.name}, FL`
             : isRiverfrontCombined
               ? `Riverfront Homes, Condos & Land For Sale in ${city.name}, FL`
-              : seo?.h1 ||
+              : pageSeo?.h1 ||
+                seo?.h1 ||
                 (isOceanfront
                   ? `Oceanfront ${PROPERTY_TYPE_LABEL[propertyType]} For Sale in ${city.name}, FL`
                   : `${PROPERTY_TYPE_LABEL[propertyType]} in ${city.name}, FL`)}
@@ -778,9 +821,13 @@ export default async function CityListingsPage({ params, searchParams: searchPar
             consistency across every listing page on the site. */}
         <div style={{ marginBottom: 12 }}>
           <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
-            Discover {introTypeNoun} for sale in {city.name}, Florida, and let us make your {introSearchNoun} search
-            easier. We&rsquo;ll help you compare properties, arrange private showings, negotiate with sellers, and
-            guide you through every step from your initial search to closing.
+            {pageSeo?.intro || (
+              <>
+                Discover {introTypeNoun} for sale in {city.name}, Florida, and let us make your {introSearchNoun}{' '}
+                search easier. We&rsquo;ll help you compare properties, arrange private showings, negotiate with
+                sellers, and guide you through every step from your initial search to closing.
+              </>
+            )}
           </p>
           <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
             Start your {city.name} {introSearchNoun} search today.{' '}
@@ -907,6 +954,15 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           totalPages={totalPages}
         />
       </div>
+
+      {pageSeo && (
+        <CityAboutSection
+          config={citySeo}
+          page={pageSeo}
+          currentPath={`/${citySlug}/${propertySlug}`}
+          snapshot={snapshot}
+        />
+      )}
 
       {/* Collapsed FAQ (2026-09-24, per Ryan — see listingsFaqItems above).
           Placed after the listing grid/pagination, same "below the
