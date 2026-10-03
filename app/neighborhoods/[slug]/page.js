@@ -128,9 +128,16 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
   // real estate" instead of the backend's templated page_seo row; see
   // COMMUNITY_SEO in lib/constants.js for the reasoning. Aripeka's lots-only
   // and Aquarina's condos-only views keep their backend titles (homeOnly).
+  // Harbor Island Beach Club also has per-view titles (seoByType).
   const communitySeo = COMMUNITY_SEO[slug];
-  if (communitySeo && (!communitySeo.homeOnly || primaryType === 'Home')) {
-    return { ...communitySeo.seo, alternates: { canonical: `/neighborhoods/${slug}` } };
+  if (communitySeo) {
+    const viewSeo = searchParams.propertyType ? communitySeo.seoByType?.[primaryType] : null;
+    if (viewSeo) {
+      return { ...viewSeo, alternates: { canonical: `/neighborhoods/${slug}?propertyType=${primaryType}` } };
+    }
+    if (!communitySeo.homeOnly || primaryType === 'Home') {
+      return { ...communitySeo.seo, alternates: { canonical: `/neighborhoods/${slug}` } };
+    }
   }
 
   // Same flags/listingsFilterParams logic as the page component further
@@ -228,7 +235,16 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
         title: seo.title,
         description: combineDescription(countPrefix, seo.metaDescription),
         keywords: seo.keywords,
-        alternates: { canonical: seo.canonicalUrl || seo.canonicalPath },
+        // Canonical fix (2026-10-03): the backend's canonicalPath for a
+        // neighborhood's Condo/Land view is /neighborhoods/{slug}/condos-
+        // for-sale (or /land-for-sale), a route this site doesn't have (it
+        // 404s) — the real page is /neighborhoods/{slug}?propertyType=...
+        // Point those at the URL that actually renders this view.
+        alternates: {
+          canonical: (seo.canonicalUrl || seo.canonicalPath || '').includes(`/neighborhoods/${slug}/`)
+            ? `/neighborhoods/${slug}?propertyType=${searchParams.propertyType || primaryType}`
+            : seo.canonicalUrl || seo.canonicalPath,
+        },
       };
     } catch {
       // The SEO call fails two different ways here: the backend endpoint
@@ -454,18 +470,45 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
       }
       // COMMUNITY_SEO breadcrumb (2026-10-03, per Ryan) — same pattern
       // as the Tortoise Island fix just above: the backend names Adelaide's
-      // and Summer Lakes' parent city "Viera West" (/viera-west) and
-      // Aripeka's "Viera East",
-      // which contradicts the "Viera" used in these pages' H1, title and
-      // Area Guide (see COMMUNITY_SEO). Point both at Viera.
-      if (COMMUNITY_SEO[slug] && Array.isArray(jsonLd)) {
+      // and Summer Lakes' parent city "Viera West", Aripeka's "Viera East",
+      // and Harbor Island Beach Club's "Indian Harbour Beach", which
+      // contradicts the town used in these pages' H1, title and Area Guide.
+      // Point the parent crumb at the entry's area (default Viera).
+      const crumbCommunity = COMMUNITY_SEO[slug];
+      if (crumbCommunity && Array.isArray(jsonLd)) {
+        const areaName = crumbCommunity.area || 'Viera';
+        const areaPath = crumbCommunity.areaPath || '/viera';
         jsonLd = jsonLd.map((schema) =>
           schema?.['@type'] === 'BreadcrumbList' && Array.isArray(schema.itemListElement)
             ? {
                 ...schema,
                 itemListElement: schema.itemListElement.map((item) =>
-                  item.name === 'Viera West' || item.name === 'Viera East'
-                    ? { ...item, name: 'Viera', item: item.item?.replace('/viera-west', '/viera') }
+                  item.position === 2 && item.name !== crumbCommunity.name
+                    ? { ...item, name: areaName, item: item.item?.replace(/\/[^/]+$/, areaPath) }
+                    : item
+                ),
+              }
+            : schema
+        );
+      }
+      // Breadcrumb URL fix (2026-10-03) — same backend bug as the canonical
+      // fix in generateMetadata: a Condo/Land view's last crumb points at
+      // /neighborhoods/{slug}/condos-for-sale (or /land-for-sale), which
+      // 404s. Point it at the URL that actually renders this view.
+      if (Array.isArray(jsonLd)) {
+        const viewUrlFragment = `/neighborhoods/${slug}/`;
+        jsonLd = jsonLd.map((schema) =>
+          schema?.['@type'] === 'BreadcrumbList' && Array.isArray(schema.itemListElement)
+            ? {
+                ...schema,
+                itemListElement: schema.itemListElement.map((item) =>
+                  item.item?.includes(viewUrlFragment)
+                    ? {
+                        ...item,
+                        item: `${item.item.slice(0, item.item.indexOf(viewUrlFragment))}/neighborhoods/${slug}?propertyType=${
+                          searchParams.propertyType || primaryType
+                        }`,
+                      }
                     : item
                 ),
               }
