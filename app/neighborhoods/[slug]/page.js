@@ -117,6 +117,21 @@ async function buildNeighborhoodListingCountPrefix({ listingsFilterParams, prope
  * baked into the URL segment; it's driven entirely by the FilterBar/query
  * string, defaulting to showing all types.
  */
+// One-line model tour call to action near the top of the Adelaide and
+// Aripeka pages (2026-10-04, per Ryan) — a short version of the fuller
+// box in the About section, so buyers see it before scrolling.
+function ModelTourLine({ name }) {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, marginTop: 14 }}>
+      <p style={{ fontSize: 16, lineHeight: 1.5, color: 'var(--color-ink)', margin: 0 }}>
+        <strong>Touring the {name} model homes?</strong> Register with Ryan first so you keep your own
+        representation.
+      </p>
+      <ModelTourButton communityName={name} />
+    </div>
+  );
+}
+
 export async function generateMetadata({ params: paramsPromise, searchParams: searchParamsPromise }) {
   // Next.js 15 upgrade (2026-09-03) — `params`/`searchParams` became async
   // (Promises) in the App Router; await once at the top of each function
@@ -1518,6 +1533,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               </strong>{' '}
               to get started.
             </p>
+            <ModelTourLine name="Aripeka" />
           </div>
         )}
         {/* Aripeka Land ("Lots") copy — added 2026-09-22, per Ryan: "for SEO
@@ -1629,6 +1645,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               </strong>{' '}
               to get started.
             </p>
+            <ModelTourLine name="Adelaide" />
           </div>
         )}
         {/* Tortoise Island / Lansing Island / Summer Lakes / Aquarina / Suntree
