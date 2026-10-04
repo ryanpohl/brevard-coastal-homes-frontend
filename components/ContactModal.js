@@ -56,7 +56,7 @@ import ContactForm from './ContactForm';
  * passed true only here, not from the standalone /contact page's own
  * ContactForm usage, since this request was specifically about the popup.
  */
-export default function ContactModal({ onClose }) {
+export default function ContactModal({ onClose, title = 'Contact Us', initialMessage = '' }) {
   const modal = (
     <div className="modal-overlay" onClick={onClose}>
       <div
@@ -81,7 +81,7 @@ export default function ContactModal({ onClose }) {
           }}
         >
           <div style={{ fontFamily: 'var(--font-heading)', fontSize: 30, fontWeight: 600, color: 'var(--color-ink)' }}>
-            Contact Us
+            {title}
           </div>
           <button
             type="button"
@@ -102,7 +102,7 @@ export default function ContactModal({ onClose }) {
             Send us a message and we&apos;ll get back to you shortly.
           </p>
 
-          <ContactForm showContactPreference />
+          <ContactForm showContactPreference initialMessage={initialMessage} />
 
           {(AGENT_INFO.phone || AGENT_INFO.email) && (
             <div

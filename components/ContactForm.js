@@ -18,8 +18,10 @@ import * as api from '@/lib/api';
  * form untouched. Same `preferredContactMethod` field name the backend's
  * other inquiry endpoints already accept.
  */
-export default function ContactForm({ showContactPreference = false }) {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
+// initialMessage (2026-10-04) pre-fills the message box, e.g. "I'd like to
+// schedule a model home tour in Aripeka." from ModelTourButton.js.
+export default function ContactForm({ showContactPreference = false, initialMessage = '' }) {
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: initialMessage });
   const [contactMethods, setContactMethods] = useState([]);
   const [status, setStatus] = useState({ submitting: false, error: '', success: '' });
 

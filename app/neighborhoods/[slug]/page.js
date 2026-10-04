@@ -39,6 +39,7 @@ import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import HarborIslandForeclosuresTrigger from '@/components/HarborIslandForeclosuresTrigger';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+import ModelTourButton from '@/components/ModelTourButton';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import Faq from '@/components/Faq';
 
@@ -1917,6 +1918,26 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               {text}
             </p>
           ))}
+          {/* Model tour CTA (2026-10-04, per Ryan) — new-construction
+              communities with model homes (COMMUNITY_SEO modelTour). */}
+          {community.modelTour && (
+            <div
+              style={{
+                margin: '20px 0 24px',
+                padding: '20px 22px',
+                border: '1px solid var(--color-border-light)',
+                borderRadius: 8,
+                background: '#fff',
+              }}
+            >
+              <p style={{ marginBottom: 14, color: 'var(--color-ink)' }}>
+                <strong>Planning to tour the {community.name} models?</strong> Register with Ryan first — builders
+                may not allow an agent to represent you if you visit a model home on your own. There&rsquo;s
+                typically no cost to you &mdash; builders usually pay the buyer&rsquo;s agent.
+              </p>
+              <ModelTourButton communityName={community.name} />
+            </div>
+          )}
           {communitySnapshot && communitySnapshot.count > 0 && (
             <p style={{ marginBottom: 12 }}>
               <strong style={{ color: 'var(--color-ink)' }}>{community.name} market snapshot:</strong>{' '}
