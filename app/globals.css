@@ -432,7 +432,43 @@ h4 {
   .nav-brand-signin {
     position: static;
     margin-top: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
   }
+
+  /* Phone menu (2026-10-04, per Ryan): the six nav links hide behind the
+     ☰ Menu button (Nav.js) until it's tapped. !important overrides the
+     row's inline display:flex. */
+  .nav-brand-signin .nav-menu-toggle {
+    display: inline-block;
+  }
+
+  .nav-links-row {
+    display: none !important;
+  }
+
+  .nav-links-row.is-open {
+    display: flex !important;
+    padding-top: 4px !important;
+  }
+}
+
+/* ☰ Menu button — phones only (see the max-width: 640px rules above).
+   Matches the gold-outline Sign In/Register button beside it. */
+.nav-menu-toggle {
+  display: none;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  border-radius: 2px;
+  border: 1px solid var(--color-gold);
+  background: transparent;
+  color: var(--color-gold);
+  cursor: pointer;
 }
 
 /* Responsive grid for Nav.js's Search by City/Neighborhood dropdown

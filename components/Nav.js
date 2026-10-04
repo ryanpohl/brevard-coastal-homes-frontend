@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import {
   PROPERTY_TYPE_TO_SLUG,
@@ -79,6 +80,14 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
   // 'signin'/'join' merged into a single 'auth' key (2026-08-16) — see the
   // "Sign In/Register" NavLink below and AuthPanel.js's own top comment.
   const [openMenu, setOpenMenu] = useState(null); // 'city' | 'neighborhood' | 'oceanfront' | 'riverfront' | 'account' | 'auth' | null
+  // Phone menu (2026-10-04, per Ryan): below 640px the six nav links hide
+  // behind a "☰ Menu" button so the hero search shows without scrolling.
+  // Closes on every route change (Nav persists across client navigation).
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
   // Separate from openMenu, same reasoning as SearchBar.js's scheduleModalOpen:
   // this is a body-portaled modal (see ContactModal.js), not one of the
   // nav-anchored dropdown panels openMenu tracks.
@@ -251,6 +260,15 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
         </div>
 
         <div className="nav-brand-signin">
+          <button
+            type="button"
+            className="nav-menu-toggle"
+            aria-expanded={mobileOpen}
+            aria-controls="nav-links-row"
+            onClick={() => setMobileOpen((open) => !open)}
+          >
+            {mobileOpen ? '✕ Close' : '☰ Menu'}
+          </button>
           {signedIn ? (
             <NavLink label={`My Account`} href="/my-account" outline active={openMenu === 'account'} onEnter={() => openNow('account')} />
           ) : (
@@ -274,7 +292,8 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
       </div>
 
       <div
-        className="container"
+        id="nav-links-row"
+        className={`container nav-links-row${mobileOpen ? ' is-open' : ''}`}
         style={{
           display: 'flex',
           alignItems: 'center',
