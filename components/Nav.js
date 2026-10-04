@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
@@ -60,6 +60,24 @@ const CITY_LOTS_NAV_SLUGS = new Set(['merritt-island', 'cocoa-beach', 'melbourne
  * is open at a time. See design/README.md's "Header/filter dropdown menus"
  * section for the full spec this recreates.
  */
+// Search by City groups (2026-10-04, per Ryan): beach towns first, then
+// mainland cities, instead of the backend's mixed order. A city not listed
+// here (e.g. one added later) falls into Mainland so it never disappears.
+const CITY_NAV_GROUPS = [
+  { label: 'Beachside', slugs: ['cocoa-beach', 'satellite-beach', 'indian-harbour-beach', 'indialantic', 'melbourne-beach'] },
+  { label: 'Mainland', slugs: ['melbourne', 'rockledge', 'merritt-island', 'viera', 'viera-west'] },
+];
+
+function groupCitiesForNav(cities) {
+  const listed = new Set(CITY_NAV_GROUPS.flatMap((g) => g.slugs));
+  const groups = CITY_NAV_GROUPS.map((g) => ({
+    label: g.label,
+    cities: g.slugs.map((slug) => cities.find((c) => c.slug === slug)).filter(Boolean),
+  }));
+  groups[groups.length - 1].cities.push(...cities.filter((c) => !listed.has(c.slug)));
+  return groups.filter((g) => g.cities.length);
+}
+
 export default function Nav({ cities = [], neighborhoods = [] }) {
   const { signedIn, user, signOut } = useAuth();
   // "Search Oceanfront" (2026-08-22, per Ryan) — a dedicated top-level nav
@@ -329,58 +347,63 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           panel={
             openMenu === 'city' && (
               <DropdownPanel grid={5}>
-                {cities.map((city) => (
-                  <div key={city.slug}>
-                    {/* "<City> Listings" header made a live link (2026-09-01,
-                        per Ryan: "make the ... City Listings ... live
-                        links... When users click on the Listings page show
-                        all the listings which include Homes, Condos, & Lots")
-                        — goes to the new bare /{citySlug} route (see
-                        app/[citySlug]/page.js), which defaults to every
-                        property type combined instead of one type baked
-                        into the URL like the Homes/Condos/Lots links below. */}
-                    <Link
-                      href={`/${city.slug}`}
-                      className="hero-search-item nav-dropdown-label nav-dropdown-link"
-                      style={cityListingsLabelStyle}
-                      onClick={closeNow}
-                    >
-                      {city.name}
-                    </Link>
-                    <Link
-                      href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
-                      className="hero-search-item nav-dropdown-link"
-                      style={cityHomeLinkStyle}
-                      onClick={closeNow}
-                    >
-                      Homes
-                    </Link>
-                    {city.showCondosInNav !== false && (
-                      <Link
-                        href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Condo}`}
-                        className="hero-search-item-secondary nav-dropdown-link"
-                        // Condos keeps its own bottom padding (gridCondoLinkStyle)
-                        // when it's the last link in the stack, same as before —
-                        // but for CITY_LOTS_NAV_SLUGS cities, Lots (below) is now
-                        // last instead, so Condos drops to the "middle link"
-                        // padding (cityHomeLinkStyle) it would otherwise never use.
-                        style={CITY_LOTS_NAV_SLUGS.has(city.slug) ? cityHomeLinkStyle : gridCondoLinkStyle}
-                        onClick={closeNow}
-                      >
-                        Condos
-                      </Link>
-                    )}
-                    {CITY_LOTS_NAV_SLUGS.has(city.slug) && (
-                      <Link
-                        href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Land}`}
-                        className="hero-search-item-secondary nav-dropdown-link"
-                        style={gridCondoLinkStyle}
-                        onClick={closeNow}
-                      >
-                        Lots
-                      </Link>
-                    )}
-                  </div>
+                {groupCitiesForNav(cities).map((group) => (
+                  <Fragment key={group.label}>
+                    <div className="nav-group-label">{group.label}</div>
+                    {group.cities.map((city) => (
+                      <div key={city.slug}>
+                        {/* "<City> Listings" header made a live link (2026-09-01,
+                            per Ryan: "make the ... City Listings ... live
+                            links... When users click on the Listings page show
+                            all the listings which include Homes, Condos, & Lots")
+                            — goes to the new bare /{citySlug} route (see
+                            app/[citySlug]/page.js), which defaults to every
+                            property type combined instead of one type baked
+                            into the URL like the Homes/Condos/Lots links below. */}
+                        <Link
+                          href={`/${city.slug}`}
+                          className="hero-search-item nav-dropdown-label nav-dropdown-link"
+                          style={cityListingsLabelStyle}
+                          onClick={closeNow}
+                        >
+                          {city.name}
+                        </Link>
+                        <Link
+                          href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
+                          className="hero-search-item nav-dropdown-link"
+                          style={cityHomeLinkStyle}
+                          onClick={closeNow}
+                        >
+                          Homes
+                        </Link>
+                        {city.showCondosInNav !== false && (
+                          <Link
+                            href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Condo}`}
+                            className="hero-search-item-secondary nav-dropdown-link"
+                            // Condos keeps its own bottom padding (gridCondoLinkStyle)
+                            // when it's the last link in the stack, same as before —
+                            // but for CITY_LOTS_NAV_SLUGS cities, Lots (below) is now
+                            // last instead, so Condos drops to the "middle link"
+                            // padding (cityHomeLinkStyle) it would otherwise never use.
+                            style={CITY_LOTS_NAV_SLUGS.has(city.slug) ? cityHomeLinkStyle : gridCondoLinkStyle}
+                            onClick={closeNow}
+                          >
+                            Condos
+                          </Link>
+                        )}
+                        {CITY_LOTS_NAV_SLUGS.has(city.slug) && (
+                          <Link
+                            href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Land}`}
+                            className="hero-search-item-secondary nav-dropdown-link"
+                            style={gridCondoLinkStyle}
+                            onClick={closeNow}
+                          >
+                            Lots
+                          </Link>
+                        )}
+                      </div>
+                    ))}
+                  </Fragment>
                 ))}
               </DropdownPanel>
             )
@@ -885,7 +908,6 @@ const cityListingsLabelStyle = {
   display: 'block',
   padding: '8px 10px 0',
   fontWeight: 700,
-  color: '#fff',
   lineHeight: 1.3,
   borderRadius: 4,
 };
@@ -897,7 +919,7 @@ const cityHomeLinkStyle = { ...gridLinkStyle, padding: '2px 10px 0' };
 // Riverfront" NavLink's own comment for why), so it keeps full top AND
 // bottom padding from gridLinkStyle instead of cityListingsLabelStyle's
 // bottom-padding-dropped variant.
-const cityListingsOnlyLinkStyle = { ...gridLinkStyle, fontWeight: 700, color: '#fff', lineHeight: 1.3 };
+const cityListingsOnlyLinkStyle = { ...gridLinkStyle, fontWeight: 700, lineHeight: 1.3 };
 const gridCondoLinkStyle = {
   display: 'block',
   padding: '2px 10px 8px',

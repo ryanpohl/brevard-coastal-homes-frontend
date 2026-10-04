@@ -450,7 +450,25 @@ h4 {
 
   .nav-links-row.is-open {
     display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
     padding-top: 4px !important;
+  }
+
+  .nav-links-row.is-open > div {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* On phones a menu opens in place under its link (pushing the links below
+     it down) instead of floating, so it never runs off the screen edge. */
+  .nav-links-row .nav-dropdown-panel.nav-grid {
+    position: static !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 6px 0 10px !important;
+    text-align: left;
+    box-shadow: none;
   }
 }
 
@@ -706,6 +724,57 @@ textarea:focus {
     color: #ffffff;
     background-color: rgba(255, 255, 255, 0.1);
   }
+}
+
+/* Light nav dropdowns (2026-10-04, per Ryan: the solid black panel felt
+   heavy against the site's cream and gold). Scoped to the four nav menus
+   (.nav-dropdown-panel.nav-grid) — the Sign In/My Account panel and the
+   hero search dropdowns keep their dark styling. Place names are dark ink,
+   Homes/Condos/Lots one muted tone, and hover adds a gold underline. */
+.nav-dropdown-panel.nav-grid {
+  background: #fff;
+  border: 1px solid var(--color-border-light);
+  border-top: 2px solid var(--color-gold);
+  color: var(--color-ink);
+  box-shadow: 0 14px 36px rgba(16, 36, 44, 0.14);
+}
+
+.nav-dropdown-panel.nav-grid .hero-search-item,
+.nav-dropdown-panel.nav-grid .hero-search-item-secondary {
+  color: var(--color-muted-dark);
+  background: transparent;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+.nav-dropdown-panel.nav-grid .nav-dropdown-label {
+  color: var(--color-ink-dark);
+}
+
+@media (hover: hover) {
+  .nav-dropdown-panel.nav-grid .hero-search-item:hover,
+  .nav-dropdown-panel.nav-grid .hero-search-item-secondary:hover {
+    color: var(--color-ink-dark);
+    background: transparent;
+    text-decoration-color: var(--color-gold);
+  }
+}
+
+/* "Beachside" / "Mainland" group labels in Search by City — a full-width
+   row above each group of cities. */
+.nav-group-label {
+  grid-column: 1 / -1;
+  padding: 4px 10px 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  border-bottom: 1px solid var(--color-border-light);
+  padding-bottom: 6px;
 }
 
 .hero-search-input::placeholder {
