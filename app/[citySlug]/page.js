@@ -6,9 +6,11 @@ import {
   CITY_LISTINGS_FAQ,
   CITY_PAGE_SEO,
   buildCityPlaceSchema,
+  VIERA_WEST_NEIGHBORHOOD_LINKS,
 } from '@/lib/constants';
 import { getMarketSnapshot } from '@/lib/marketSnapshot';
 import CityAboutSection from '@/components/CityAboutSection';
+import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
 import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -269,6 +271,7 @@ export default async function CityAllListingsPage({ params, searchParams: search
             to get started.
           </p>
         </div>
+        {citySlug === 'viera-west' && <NeighborhoodLinkRow cityName={city.name} links={VIERA_WEST_NEIGHBORHOOD_LINKS} />}
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>

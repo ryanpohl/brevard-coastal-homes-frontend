@@ -29,6 +29,8 @@ import {
   NEIGHBORHOOD_LISTINGS_FAQ,
   buildItemListSchema,
   COMMUNITY_SEO,
+  VIERA_WEST_NEIGHBORHOOD_PAGES,
+  vieraWestNeighborhoodFilter,
   VIERA_BUILDERS_HUB_SEO,
   buildCommunitySchema,
   formatPrice,
@@ -373,9 +375,21 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // that declaration's own comment for the H1-driven reasoning it was
   // originally added for.)
   const isAquarina = slug === 'aquarina';
+  // Viera West neighborhood pages (2026-10-04) — synthetic like Beach Woods;
+  // see VIERA_WEST_NEIGHBORHOOD_PAGES in lib/constants.js.
+  const vieraWestPage = VIERA_WEST_NEIGHBORHOOD_PAGES[slug];
 
   let neighborhood;
-  if (subCommunity) {
+  if (vieraWestPage) {
+    neighborhood = {
+      slug,
+      name: vieraWestPage.name,
+      city: { slug: 'viera-west' },
+      latitude: null,
+      longitude: null,
+      mapZoom: null,
+    };
+  } else if (subCommunity) {
     neighborhood = {
       slug,
       name: subCommunity.name,
@@ -453,7 +467,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
 
   let seo = null;
   let jsonLd = null;
-  if (!subCommunity && !isBeachWoods) {
+  if (!subCommunity && !isBeachWoods && !vieraWestPage) {
     // Skipped for the 6 synthetic sub-community pages and Beach Woods
     // above — there's no backend SEO row for any of them (they don't
     // exist as real neighborhoods), so this would just be a
@@ -565,7 +579,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   //    isAquarina's comment above and AQUARINA_SUBDIVISION_NAMES in
   //    lib/constants.js for why the neighborhood_id link can't be trusted
   //    to include every one of its sub-associations.
-  const listingsFilterParams = subCommunity
+  const listingsFilterParams = vieraWestPage
+    ? vieraWestNeighborhoodFilter(slug)
+    : subCommunity
     ? { subdivision: subCommunity.name }
     : isVieraBuildersCommunitiesVieraWest
       ? { subdivision: searchParams.subdivision || VIERA_BUILDERS_SUB_COMMUNITIES.map((c) => c.name).join(',') }
@@ -840,7 +856,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // its (wrong) parent city name, so this is a plain string swap on the
   // backend's own generated H1 rather than a backend reseed.
   const TORTOISE_ISLAND_H1 = seo?.h1 ? seo.h1.replace('Melbourne Beach', 'Satellite Beach') : seo?.h1;
-  const h1Text = isHarborIslandBeachClub
+  const h1Text = vieraWestPage
+    ? vieraWestPage.h1
+    : isHarborIslandBeachClub
     ? HARBOR_ISLAND_BEACH_CLUB_H1
     : isVieraBuildersCommunitiesVieraWest
       ? VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_H1
@@ -981,6 +999,24 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               { name: 'Home', path: '' },
               { name: 'Melbourne Beach', path: '/melbourne-beach' },
               { name: 'Beach Woods', path: '/neighborhoods/beach-woods' },
+            ].map((crumb, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              name: crumb.name,
+              item: `https://brevardcoastalhomes.com${crumb.path || '/'}`,
+            })),
+          },
+        ]
+      : []),
+    ...(vieraWestPage
+      ? [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { name: 'Home', path: '' },
+              { name: 'Viera West', path: '/viera-west' },
+              { name: vieraWestPage.name, path: `/neighborhoods/${slug}` },
             ].map((crumb, i) => ({
               '@type': 'ListItem',
               position: i + 1,
@@ -1737,6 +1773,20 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             18px/muted-dark + bold/underlined ContactUsTrigger styling as
             every other neighborhood block on this page, just the one
             paragraph instead of two now. */}
+        {vieraWestPage && (
+          <div style={{ marginBottom: 12 }}>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
+              {vieraWestPage.intro}
+            </p>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+              Looking for a home in {vieraWestPage.name}?{' '}
+              <strong>
+                <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
+              </strong>{' '}
+              to get started.
+            </p>
+          </div>
+        )}
         {isBeachWoods && (
           <div style={{ marginBottom: 12 }}>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>

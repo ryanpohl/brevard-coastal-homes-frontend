@@ -8,6 +8,7 @@ import {
   RIVERFRONT_LISTINGS_SLUG,
   VIERA_BUILDERS_SUB_COMMUNITIES,
   NEIGHBORHOOD_AREA_GUIDE_CONTENT,
+  VIERA_WEST_NEIGHBORHOOD_PAGES,
 } from '@/lib/constants';
 
 // Native Next.js sitemap.xml (2026-09-11, SEO audit finding: brevardcoastalhomes.com/sitemap.xml
@@ -249,6 +250,17 @@ export default async function sitemap() {
     lastModified: now,
     changeFrequency: 'daily',
     priority: 0.7,
+  });
+
+  // Viera West neighborhood pages (2026-10-04) — synthetic like Beach Woods
+  // (no `neighborhoods` row), so listed explicitly.
+  Object.keys(VIERA_WEST_NEIGHBORHOOD_PAGES).forEach((slug) => {
+    entries.push({
+      url: `${SITE_URL}/neighborhoods/${slug}`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.7,
+    });
   });
 
   const listingIds = await getAllListingIds();
