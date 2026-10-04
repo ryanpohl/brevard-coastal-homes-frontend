@@ -52,7 +52,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Who builds in Aripeka, and can I still buy a vacant lot there?',
-    a: 'Aripeka is a custom-build community with four builders: CDS Builders (Live Oak model), Joyal Homes (Sandhill Key model), LifeStyle Homes (Key Largo model), and Stanley Homes (Emerald model). Vacant homesites do come up — based on current MLS listings, they’ve run $150,000–$255,000 for lots between roughly a quarter-acre and half an acre.',
+    a: 'Aripeka is a custom-build community with four builders: CDS Builders, Joyal Homes, LifeStyle Homes, and Stanley Homes. Vacant homesites do come up — based on current MLS listings, they’ve run $150,000–$255,000 for lots between roughly a quarter-acre and half an acre.',
   },
   {
     q: 'What’s the difference between Viera West, Adelaide, and Aripeka?',
@@ -138,8 +138,8 @@ export default function NewConstructionVieraPage() {
         <p>
           Aripeka is a roughly 400-acre gated community on the south side of Viera, laid out on former hunting land
           around its mature oak, palm, and pine trees rather than clearing them, giving it a wooded, old-Florida feel.
-          It&apos;s a custom-build community with four builders: CDS Builders (Live Oak model), Joyal Homes (Sandhill
-          Key model), LifeStyle Homes (Key Largo model), and Stanley Homes (Emerald model). Builder-quoted pricing
+          It&apos;s a custom-build community with four builders: CDS Builders, Joyal Homes, LifeStyle Homes, and
+          Stanley Homes. Builder-quoted pricing
           starts around $1.2 million for a new build.
         </p>
         <p>
