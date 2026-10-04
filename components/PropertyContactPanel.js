@@ -34,7 +34,8 @@ const inputStyle = { border: '1px solid var(--color-border-warm)' };
 // `status` (2026-10-04, per Ryan): Pending and Sold listings now show on the
 // site, so for those the panel drops Make an Offer and the Request Showing
 // form and invites the visitor to ask about similar homes instead (Ask a
-// Question stays, so the lead isn't lost).
+// Question stays, so the lead isn't lost). 'Contingent' keeps the full panel
+// (backup offers are often still accepted) with its own note.
 export default function PropertyContactPanel({ listingId, listingAddress, status }) {
   const { user } = useAuth();
   const unavailable = status === 'Pending' || status === 'Sold';
@@ -63,6 +64,8 @@ export default function PropertyContactPanel({ listingId, listingAddress, status
             ? 'This home has sold. Looking for something similar? Ask us below and we’ll send you matching homes.'
             : status === 'Pending'
               ? 'This home is under contract. Want to know if it comes back on the market, or see similar homes? Ask us below.'
+              : status === 'Contingent'
+                ? 'This home is under contract with contingencies. Backup offers may still be accepted — make an offer or ask us below.'
               : listingId != null
                 ? 'Want to make an offer or ask a question? Select one the buttons below.'
                 : 'Have a question? Select the button below.'}

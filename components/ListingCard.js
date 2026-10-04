@@ -187,7 +187,26 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
               )}
                 </div>
           )}
-{listing.status === 'Pending' && (
+{/* CONTINGENT badge (2026-10-04, per Ryan) — under contract with
+    contingencies (backup offers often still accepted); amber, between
+    Active and Pending's gold. statusLabel comes from the backend. */}
+{listing.statusLabel === 'Contingent' && (
+              <div
+               style={{
+                                 padding: '6px 12px',
+                                 borderRadius: 999,
+                                 background: '#d97706',
+                                 color: '#fff',
+                                 fontSize: 12,
+                                 fontWeight: 700,
+                                 letterSpacing: 0.4,
+                                 boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+               }}
+            >
+              CONTINGENT
+                </div>
+          )}
+{listing.status === 'Pending' && listing.statusLabel !== 'Contingent' && (
               <div
                style={{
                                  padding: '6px 12px',

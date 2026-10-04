@@ -12,6 +12,7 @@ import ListingMap from '@/components/ListingMap';
 const STATUS_COLOR = {
     Active: '#7c8a4c',
     Pending: 'var(--color-gold)',
+    Contingent: '#d97706',
     Sold: '#b42318',
     'Off Market': 'var(--color-muted)',
 };
@@ -53,7 +54,7 @@ export async function generateMetadata({ params }) {
                     listing.status === 'Sold'
                       ? `Sold: ${listing.address} | ${formatPrice(listing.closePrice ?? listing.price)} — Brevard Coastal Homes`
                       : listing.status === 'Pending'
-                        ? `Pending: ${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`
+                        ? `${listing.statusLabel === 'Contingent' ? 'Contingent' : 'Pending'}: ${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`
                         : `${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`,
                   description: buildListingMetaDescription(listing, typeLabel),
                   alternates: { canonical: `/listings/${id}` },
@@ -177,7 +178,7 @@ export default async function ListingDetailPage({ params }) {
             <PropertyGallery photos={photos} address={listing.address} />
             {/* Pending/Sold banner on the photo (2026-10-04, per Ryan) — sold
                 homes stay on the site for 30 days with the close date shown. */}
-            {(listing.status === 'Sold' || listing.status === 'Pending') && (
+            {(listing.status === 'Sold' || listing.status === 'Pending' || listing.statusLabel === 'Contingent') && (
               <div
                 style={{
                   position: 'absolute',
@@ -186,7 +187,8 @@ export default async function ListingDetailPage({ params }) {
                   padding: '8px 16px',
                   borderRadius: 16,
                   textAlign: 'center',
-                  background: listing.status === 'Sold' ? '#b42318' : 'var(--color-gold)',
+                  background:
+                    listing.status === 'Sold' ? '#b42318' : listing.statusLabel === 'Contingent' ? '#d97706' : 'var(--color-gold)',
                   color: '#fff',
                   fontSize: 15,
                   fontWeight: 700,
@@ -197,7 +199,9 @@ export default async function ListingDetailPage({ params }) {
               >
                 {listing.status === 'Sold'
                   ? `SOLD${formatSoldDate(listing.closeDate) ? ` ${formatSoldDate(listing.closeDate)}` : ''}`
-                  : 'PENDING'}
+                  : listing.statusLabel === 'Contingent'
+                    ? 'CONTINGENT'
+                    : 'PENDING'}
                 {/* Sold price under the SOLD wording (2026-10-04, per Ryan —
                     Space Coast MLS allows IDX sites to show sold data). */}
                 {listing.status === 'Sold' && listing.closePrice != null && (
@@ -231,10 +235,10 @@ export default async function ListingDetailPage({ params }) {
 {streetLine}
 {cityStateZip && (<><br />{cityStateZip}</>)}
 </h1>
-              <div style={{ fontSize: 12, letterSpacing: 0.8, fontWeight: 600, marginTop: 8, color: STATUS_COLOR[listing.status] || 'var(--color-muted)' }}>
+              <div style={{ fontSize: 12, letterSpacing: 0.8, fontWeight: 600, marginTop: 8, color: STATUS_COLOR[listing.statusLabel] || STATUS_COLOR[listing.status] || 'var(--color-muted)' }}>
 {listing.status === 'Sold' && formatSoldDate(listing.closeDate)
   ? `SOLD ${formatSoldDate(listing.closeDate)}`
-  : listing.status?.toUpperCase()}
+  : (listing.statusLabel || listing.status)?.toUpperCase()}
 </div>
   </div>
             <div style={{ textAlign: 'right' }}>
@@ -356,7 +360,11 @@ export default async function ListingDetailPage({ params }) {
               listingAddress auto-fills the "Address of Property" field in
               both the Make an Offer modal and the Request Showing form
               below (per Ryan, 2026-08-17) — still editable, not read-only. */}
-        <PropertyContactPanel listingId={listing.id} listingAddress={listing.address} status={listing.status} />
+        <PropertyContactPanel
+          listingId={listing.id}
+          listingAddress={listing.address}
+          status={listing.statusLabel === 'Contingent' ? 'Contingent' : listing.status}
+        />
           </div>
           </>
   );
