@@ -326,7 +326,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                       style={cityListingsLabelStyle}
                       onClick={closeNow}
                     >
-                      {city.name} Listings
+                      {city.name}
                     </Link>
                     <Link
                       href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
@@ -419,7 +419,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                       style={cityListingsLabelStyle}
                       onClick={closeNow}
                     >
-                      {n.name} Listings
+                      {n.name}
                     </Link>
                     {/* "Homes" normally means ?propertyType=Home only (see
                         the comment above). Widened to Home+Land for
@@ -513,7 +513,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                       style={cityListingsLabelStyle}
                       onClick={closeNow}
                     >
-                      {city.name} Listings
+                      {city.name}
                     </Link>
                     <Link
                       href={`/${city.slug}/${OCEANFRONT_PROPERTY_TYPE_TO_SLUG.Home}`}
@@ -574,7 +574,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                     style={cityListingsOnlyLinkStyle}
                     onClick={closeNow}
                   >
-                    {city.name} Listings
+                    {city.name}
                   </Link>
                 ))}
               </DropdownPanel>
@@ -860,6 +860,8 @@ const gridLinkStyle = {
 // Ryan's screenshot showed. Matches every link below it (gridLinkStyle/
 // gridCondoLinkStyle), which were already block-level and never had this
 // problem.
+// Menu headings show just the place name (2026-10-04, per Ryan) — the
+// trailing "Listings" added 2026-08-20 was dropped as repetitive.
 const cityListingsLabelStyle = {
   display: 'block',
   padding: '8px 10px 0',
