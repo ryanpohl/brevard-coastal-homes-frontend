@@ -48,11 +48,11 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Who builds in Adelaide?',
-    a: 'Adelaide is custom-build only, with three recognized builders: AR Homes (Rosewood Homes, Inc.), Christopher Burton Luxury Homes, and Elan Builders. Based on current MLS listings, completed and under-construction homes run roughly 3,550–5,500 sq ft and $2.35 million–$5.5 million.',
+    a: 'Adelaide is custom-build only, with three recognized builders: AR Homes (Rosewood Homes, Inc.), Christopher Burton Luxury Homes, and Elan Builders. Completed and under-construction homes run roughly 3,550–5,500 sq ft.',
   },
   {
     q: 'Who builds in Aripeka, and can I still buy a vacant lot there?',
-    a: 'Aripeka is a custom-build community with four builders: CDS Builders, Joyal Homes, LifeStyle Homes, and Stanley Homes. Vacant homesites do come up — based on current MLS listings, they’ve run $150,000–$255,000 for lots between roughly a quarter-acre and half an acre.',
+    a: 'Aripeka is a custom-build community with four builders: CDS Builders, Joyal Homes, LifeStyle Homes, and Stanley Homes. Vacant homesites, roughly a quarter-acre to half an acre, do come up.',
   },
   {
     q: 'What’s the difference between Viera West, Adelaide, and Aripeka?',
@@ -97,9 +97,7 @@ export default function NewConstructionVieraPage() {
         <p>
           Viera West is home to six Viera Builders communities &mdash; Laurasia, Pangea Park, Reeling Park,
           Crossmolina, Farallon Fields, and Atlin Cove &mdash; all built by Viera Builders, a single production
-          builder offering a set roster of floor plans across the group rather than a fully custom build. Based on
-          current listings, pricing across these communities typically starts in the $600,000s and climbs past $1
-          million depending on the community, floor plan, and lot.
+          builder offering a set roster of floor plans across the group rather than a fully custom build. Pricing varies by community, floor plan, and lot — the current listings show today’s prices.
         </p>
         <p>
           <Link href="/neighborhoods/viera-builders-communities-viera-west" style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
@@ -113,9 +111,7 @@ export default function NewConstructionVieraPage() {
           Adelaide is a 460-acre gated, custom-home-only community in northern Viera, built around Lake Adelaide and
           a 25-acre water-to-wetlands preserve, split into four sections (The Reserve, The Preserve, The Lakes, and
           The Park). There&apos;s no production-builder tract here &mdash; three recognized builders work in
-          Adelaide: AR Homes (Rosewood Homes, Inc.), Christopher Burton Luxury Homes, and Elan Builders. Based on
-          current MLS listings, completed and under-construction homes run roughly 3,550&ndash;5,500 sq ft and $2.35
-          million&ndash;$5.5 million.
+          Adelaide: AR Homes (Rosewood Homes, Inc.), Christopher Burton Luxury Homes, and Elan Builders. Completed and under-construction homes run roughly 3,550&ndash;5,500 sq ft.
         </p>
         <p>
           {/* Reworded 2026-10-03 (per Ryan: "Adelaide just has homes...no
@@ -139,13 +135,10 @@ export default function NewConstructionVieraPage() {
           Aripeka is a roughly 400-acre gated community on the south side of Viera, laid out on former hunting land
           around its mature oak, palm, and pine trees rather than clearing them, giving it a wooded, old-Florida feel.
           It&apos;s a custom-build community with four builders: CDS Builders, Joyal Homes, LifeStyle Homes, and
-          Stanley Homes. Builder-quoted pricing
-          starts around $1.2 million for a new build.
+          Stanley Homes. 
         </p>
         <p>
-          Aripeka is also one of the few Viera communities where buying just the land is realistic right now &mdash;
-          based on current MLS listings, available vacant homesites have run $150,000&ndash;$255,000 for lots between
-          roughly a quarter-acre and half an acre.
+          Aripeka is also one of the few Viera communities where buying just the land is realistic right now &mdash; vacant homesites run roughly a quarter-acre to half an acre.
         </p>
         <p>
           <Link href="/neighborhoods/aripeka" style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
