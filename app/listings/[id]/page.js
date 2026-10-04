@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import * as api from '@/lib/api';
-import { formatPrice, PROPERTY_TYPE_LABEL, isPricePerSqftPlausible, formatSoldDate } from '@/lib/constants';
+import { formatPrice, PROPERTY_TYPE_LABEL, isPricePerSqftPlausible, soldPricePerSqft, formatSoldDate } from '@/lib/constants';
 import FavoriteButton from '@/components/FavoriteButton';
 import PropertyGallery from '@/components/PropertyGallery';
 import PropertyContactPanel from '@/components/PropertyContactPanel';
@@ -297,7 +297,10 @@ export default async function ListingDetailPage({ params }) {
                               comment in lib/constants.js for the bounds and reasoning. The
                               plain Sq.Ft. stat just above is left untouched either way —
                               only this derived figure gets hidden when it's implausible. */}
-            {!isLand && isPricePerSqftPlausible(listing) && (
+            {/* Sold homes show Sold Price/SqFt instead (2026-10-04, per Ryan). */}
+            {!isLand && soldPricePerSqft(listing) != null ? (
+                            <StatItem value={`${formatPrice(soldPricePerSqft(listing))}/SqFt`} label="Sold Price/SqFt" />
+                          ) : !isLand && listing.status !== 'Sold' && isPricePerSqftPlausible(listing) && (
                             <StatItem value={`${formatPrice(listing.listPricePerSqft)}/SqFt`} label="List Price/SqFt" />
                           )}
             {/* "Year Built" (2026-08-26, per Ryan, referencing a Space Coast

@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import { formatPrice, formatAssocFee, isPricePerSqftPlausible, formatSoldDate } from '@/lib/constants';
+import { formatPrice, formatAssocFee, isPricePerSqftPlausible, soldPricePerSqft, formatSoldDate } from '@/lib/constants';
 import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
 
@@ -307,7 +307,12 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
               on the detail page — see its comment in lib/constants.js for
               the bounds and why this needed a shared check rather than
               trusting listPricePerSqft outright. */}
-{!isLand && isPricePerSqftPlausible(listing) && (
+{/* Sold homes show sold price/SqFt instead (2026-10-04, per Ryan). */}
+{!isLand && soldPricePerSqft(listing) != null ? (
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-muted-dark)' }}>
+{formatPrice(soldPricePerSqft(listing))}/SqFt
+              </span>
+          ) : !isLand && listing.status !== 'Sold' && isPricePerSqftPlausible(listing) && (
               <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-muted-dark)' }}>
 {formatPrice(listing.listPricePerSqft)}/SqFt
               </span>
