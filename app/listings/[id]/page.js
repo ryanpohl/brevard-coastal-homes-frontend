@@ -53,7 +53,7 @@ export async function generateMetadata({ params }) {
                   title:
                     listing.status === 'Sold'
                       ? `Sold: ${listing.address} | ${formatPrice(listing.closePrice ?? listing.price)} — Brevard Coastal Homes`
-                      : listing.status === 'Pending'
+                      : listing.status === 'Pending' || listing.statusLabel === 'Contingent'
                         ? `${listing.statusLabel === 'Contingent' ? 'Contingent' : 'Pending'}: ${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`
                         : `${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`,
                   description: buildListingMetaDescription(listing, typeLabel),
