@@ -152,6 +152,9 @@ export default async function CityAllListingsPage({ params, searchParams: search
       sort: searchParams.sort,
       page,
       pageSize: PAGE_SIZE,
+      // Pending + Sold-in-last-30-days listings too (2026-10-04, per Ryan),
+      // shown after Active ones with a PENDING/SOLD badge.
+      includeRecent: 1,
     });
     results = data.results || [];
     total = data.total ?? results.length;

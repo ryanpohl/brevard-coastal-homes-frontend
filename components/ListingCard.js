@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import { formatPrice, formatAssocFee, isPricePerSqftPlausible } from '@/lib/constants';
+import { formatPrice, formatAssocFee, isPricePerSqftPlausible, formatSoldDate } from '@/lib/constants';
 import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
 
@@ -162,6 +162,25 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
                 default excludes them), so this only ever needs to handle
                 Pending — matches the gold used for the same status on the
                 Property Detail page (app/listings/[id]/page.js's STATUS_COLOR). */}
+{/* SOLD badge with the close date (2026-10-04, per Ryan: show sold homes
+    for 30 days with the date they closed on the photo) — red to read as
+    clearly unavailable, unlike Pending's gold. */}
+{listing.status === 'Sold' && (
+              <div
+               style={{
+                                 padding: '6px 12px',
+                                 borderRadius: 999,
+                                 background: '#b42318',
+                                 color: '#fff',
+                                 fontSize: 12,
+                                 fontWeight: 700,
+                                 letterSpacing: 0.4,
+                                 boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+               }}
+            >
+              SOLD{formatSoldDate(listing.closeDate) ? ` ${formatSoldDate(listing.closeDate)}` : ''}
+                </div>
+          )}
 {listing.status === 'Pending' && (
               <div
                style={{
@@ -193,7 +212,7 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
                 case the badge is simply omitted rather than showing a
                 placeholder. Explicit `!= null` (not truthy) so a real "0 Days
                 on Market" listing (synced today) still shows the badge. */}
-{listing.daysOnMarket != null && (
+{listing.daysOnMarket != null && listing.status !== 'Sold' && (
               <div
                style={{
                                  padding: '6px 12px',
@@ -233,8 +252,10 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
 
       <div style={{ padding: 14 }}>
         <p style={{ display: 'flex', alignItems: 'baseline', gap: 6, fontSize: 18, fontWeight: 700, marginBottom: 4 }}>
-{formatPrice(listing.price)}
-{priceReduction != null && (
+{listing.status === 'Sold' && listing.closePrice != null
+  ? `Sold ${formatPrice(listing.closePrice)}`
+  : formatPrice(listing.price)}
+{priceReduction != null && listing.status !== 'Sold' && (
               <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-error)' }}>
 {/* Arrow enlarged (2026-08-15, per Ryan: "the red arrow ...
                     hard to see") — its own span at a bigger font-size than

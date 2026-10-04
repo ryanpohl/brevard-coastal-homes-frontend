@@ -31,8 +31,13 @@ const inputStyle = { border: '1px solid var(--color-border-warm)' };
  * phrasing would read as too technical. See each form's own state-
  * declaration comment for the full reasoning.
  */
-export default function PropertyContactPanel({ listingId, listingAddress }) {
+// `status` (2026-10-04, per Ryan): Pending and Sold listings now show on the
+// site, so for those the panel drops Make an Offer and the Request Showing
+// form and invites the visitor to ask about similar homes instead (Ask a
+// Question stays, so the lead isn't lost).
+export default function PropertyContactPanel({ listingId, listingAddress, status }) {
   const { user } = useAuth();
+  const unavailable = status === 'Pending' || status === 'Sold';
   const [offerOpen, setOfferOpen] = useState(false);
   const [askOpen, setAskOpen] = useState(false);
 
@@ -54,9 +59,13 @@ export default function PropertyContactPanel({ listingId, listingAddress }) {
         <div style={{ fontSize: 22, letterSpacing: 0.5, marginTop: 4 }}>{AGENT_INFO.businessName}</div>
         <div style={{ fontSize: 14, marginTop: 12, opacity: 0.9 }}>We are standing by to assist you.</div>
         <div style={{ fontSize: 13, marginTop: 16, opacity: 0.85 }}>
-          {listingId != null
-            ? 'Want to make an offer or ask a question? Select one the buttons below.'
-            : 'Have a question? Select the button below.'}
+          {status === 'Sold'
+            ? 'This home has sold. Looking for something similar? Ask us below and we’ll send you matching homes.'
+            : status === 'Pending'
+              ? 'This home is under contract. Want to know if it comes back on the market, or see similar homes? Ask us below.'
+              : listingId != null
+                ? 'Want to make an offer or ask a question? Select one the buttons below.'
+                : 'Have a question? Select the button below.'}
         </div>
         <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
           {/* Make an Offer only ever makes sense tied to a specific
@@ -72,7 +81,7 @@ export default function PropertyContactPanel({ listingId, listingAddress }) {
               requirement). Gated here instead of hiding it deeper in
               MakeOfferModal so the button + intro copy above disappear
               together. */}
-          {listingId != null && (
+          {listingId != null && !unavailable && (
             <button
               type="button"
               onClick={() => setOfferOpen(true)}
@@ -119,6 +128,8 @@ export default function PropertyContactPanel({ listingId, listingAddress }) {
         </div>
       </div>
 
+      {!unavailable && (
+        <>
       {/* "REQUEST SHOWING" label enlarged (per Ryan, 2026-09-02: "make the
           REQUEST SHOWING text larger & on all the pages & make it stand out
           more") — this is the one component rendering it, shared by every
@@ -143,6 +154,8 @@ export default function PropertyContactPanel({ listingId, listingAddress }) {
       </div>
 
       <RequestShowingForm listingId={listingId} listingAddress={listingAddress} dateOptions={dateOptions} user={user} />
+        </>
+      )}
 
       {offerOpen && <MakeOfferModal listingId={listingId} listingAddress={listingAddress} onClose={() => setOfferOpen(false)} />}
       {askOpen && <AskQuestionModal listingId={listingId} listingAddress={listingAddress} user={user} onClose={() => setAskOpen(false)} />}

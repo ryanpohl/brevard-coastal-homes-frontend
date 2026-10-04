@@ -612,6 +612,9 @@ export default async function CityListingsPage({ params, searchParams: searchPar
       sort: searchParams.sort,
       page,
       pageSize: PAGE_SIZE,
+      // Pending + Sold-in-last-30-days listings too (2026-10-04, per Ryan),
+      // shown after Active ones with a PENDING/SOLD badge.
+      includeRecent: 1,
     });
     results = data.results || [];
     total = data.total ?? results.length;
@@ -733,9 +736,8 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   // CITY_PAGE_SEO pages (2026-10-03) — page-specific H1/intro, an About
   // section with a live market snapshot, and town structured data; see
   // CITY_PAGE_SEO in lib/constants.js. The snapshot always describes the
-  // page's whole unfiltered set; with no visitor filters applied its count
-  // uses the page's own total, which already drops the
-  // OCEANFRONT_PAGE_EXCLUDED_MLS_NUMBERS listings.
+  // page's whole unfiltered set of Active listings (the grid's own total
+  // now also counts Pending/recently Sold listings, so it isn't reused).
   const citySeo = CITY_PAGE_SEO[citySlug];
   const pageSeo = citySeo?.pages[propertySlug];
   let snapshot = null;
@@ -745,10 +747,6 @@ export default async function CityListingsPage({ params, searchParams: searchPar
       propertyType: isOceanfrontCombined ? ['Home', 'Condo'] : isRiverfrontCombined ? ['Home', 'Condo', 'Land'] : [propertyType],
       waterfront: isOceanfront || isOceanfrontCombined ? 'Oceanfront' : isRiverfrontCombined ? 'Riverfront' : undefined,
     });
-    const hasVisitorFilters = ['propertyType', 'priceMin', 'priceMax', 'beds', 'baths', 'waterfront', 'seniorCommunity'].some(
-      (k) => searchParams[k]
-    );
-    if (snapshot && snapshot.count > 0 && !hasVisitorFilters) snapshot.count = total;
   }
   const pageTitle = isOceanfrontCombined
     ? `Oceanfront Homes & Condos For Sale in ${city.name}, FL`

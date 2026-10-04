@@ -48,6 +48,9 @@ export default async function SearchPage({ searchParams: searchParamsPromise }) 
         ...(isMlsNumber(q) ? { mlsNumber: q } : { address: q }),
         page,
         pageSize: PAGE_SIZE,
+        // Pending + Sold-in-last-30-days listings too (2026-10-04, per Ryan),
+        // shown after Active ones with a PENDING/SOLD badge.
+        includeRecent: 1,
       });
       results = data.results || [];
       total = data.total ?? results.length;

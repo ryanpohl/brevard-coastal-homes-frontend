@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import * as api from '@/lib/api';
-import { formatPrice, PROPERTY_TYPE_LABEL, isPricePerSqftPlausible } from '@/lib/constants';
+import { formatPrice, PROPERTY_TYPE_LABEL, isPricePerSqftPlausible, formatSoldDate } from '@/lib/constants';
 import FavoriteButton from '@/components/FavoriteButton';
 import PropertyGallery from '@/components/PropertyGallery';
 import PropertyContactPanel from '@/components/PropertyContactPanel';
@@ -12,7 +12,7 @@ import ListingMap from '@/components/ListingMap';
 const STATUS_COLOR = {
     Active: '#7c8a4c',
     Pending: 'var(--color-gold)',
-    Sold: 'var(--color-muted)',
+    Sold: '#b42318',
     'Off Market': 'var(--color-muted)',
 };
 
@@ -49,7 +49,12 @@ export async function generateMetadata({ params }) {
           const { listing } = await api.getListing(id);
           const typeLabel = PROPERTY_TYPE_LABEL[listing.propertyType] || listing.propertyType;
           return {
-                  title: `${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`,
+                  title:
+                    listing.status === 'Sold'
+                      ? `Sold: ${listing.address} | ${formatPrice(listing.closePrice ?? listing.price)} — Brevard Coastal Homes`
+                      : listing.status === 'Pending'
+                        ? `Pending: ${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`
+                        : `${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`,
                   description: buildListingMetaDescription(listing, typeLabel),
                   alternates: { canonical: `/listings/${id}` },
           };
@@ -170,6 +175,30 @@ export default async function ListingDetailPage({ params }) {
         <div>
                     <div style={{ position: 'relative' }}>
             <PropertyGallery photos={photos} address={listing.address} />
+            {/* Pending/Sold banner on the photo (2026-10-04, per Ryan) — sold
+                homes stay on the site for 30 days with the close date shown. */}
+            {(listing.status === 'Sold' || listing.status === 'Pending') && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 14,
+                  left: 14,
+                  padding: '8px 16px',
+                  borderRadius: 999,
+                  background: listing.status === 'Sold' ? '#b42318' : 'var(--color-gold)',
+                  color: '#fff',
+                  fontSize: 15,
+                  fontWeight: 700,
+                  letterSpacing: 0.5,
+                  boxShadow: '0 1px 6px rgba(0,0,0,0.3)',
+                  pointerEvents: 'none',
+                }}
+              >
+                {listing.status === 'Sold'
+                  ? `SOLD${formatSoldDate(listing.closeDate) ? ` ${formatSoldDate(listing.closeDate)}` : ''}`
+                  : 'PENDING'}
+              </div>
+            )}
             <div style={{ position: 'absolute', top: 14, right: 14 }}>
               <FavoriteButton listingId={listing.id} initialFavorited={listing.isFavorited} size={44} />
           </div>
@@ -197,13 +226,22 @@ export default async function ListingDetailPage({ params }) {
 {cityStateZip && (<><br />{cityStateZip}</>)}
 </h1>
               <div style={{ fontSize: 12, letterSpacing: 0.8, fontWeight: 600, marginTop: 8, color: STATUS_COLOR[listing.status] || 'var(--color-muted)' }}>
-{listing.status?.toUpperCase()}
+{listing.status === 'Sold' && formatSoldDate(listing.closeDate)
+  ? `SOLD ${formatSoldDate(listing.closeDate)}`
+  : listing.status?.toUpperCase()}
 </div>
   </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 600, color: 'var(--color-ink)' }}>{formatPrice(listing.price)}</span>
-                {priceReduction != null && (
+                <span style={{ fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 600, color: 'var(--color-ink)' }}>
+                  {listing.status === 'Sold' && listing.closePrice != null
+                    ? `Sold ${formatPrice(listing.closePrice)}`
+                    : formatPrice(listing.price)}
+                </span>
+                {listing.status === 'Sold' && listing.closePrice != null && (
+                  <span style={{ fontSize: 14, color: 'var(--color-muted)' }}>Listed at {formatPrice(listing.price)}</span>
+                )}
+                {priceReduction != null && listing.status !== 'Sold' && (
                   <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-error)' }}>
                     <span style={{ fontSize: 18, verticalAlign: -2 }}>↓</span> {formatPrice(priceReduction)}
                   </span>
@@ -312,7 +350,7 @@ export default async function ListingDetailPage({ params }) {
               listingAddress auto-fills the "Address of Property" field in
               both the Make an Offer modal and the Request Showing form
               below (per Ryan, 2026-08-17) — still editable, not read-only. */}
-        <PropertyContactPanel listingId={listing.id} listingAddress={listing.address} />
+        <PropertyContactPanel listingId={listing.id} listingAddress={listing.address} status={listing.status} />
           </div>
           </>
   );
