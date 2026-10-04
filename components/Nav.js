@@ -11,6 +11,8 @@ import {
   OCEANFRONT_LISTINGS_SLUG,
   RIVERFRONT_CITY_SLUGS,
   RIVERFRONT_LISTINGS_SLUG,
+  VIERA_BUILDERS_SUB_COMMUNITIES,
+  VIERA_WEST_NEIGHBORHOOD_PAGES,
 } from '@/lib/constants';
 import AuthPanel from './AuthPanel';
 import ContactModal from './ContactModal';
@@ -27,7 +29,7 @@ import ContactModal from './ContactModal';
 // though") extended the header + Homes treatment to every neighborhood, so
 // this set is now just the allowlist for the extra Condos link, not a gate
 // on the header/Homes treatment itself.
-const NEIGHBORHOOD_CONDO_PAGE_SLUGS = new Set(['harbor-island-beach-club', 'aquarina']);
+const NEIGHBORHOOD_CONDO_PAGE_SLUGS = new Set(['harbor-island-beach-club', 'aquarina', 'heritage-isle', 'pangea-park']);
 
 // Neighborhoods whose "Search by Neighborhood" dropdown entry also gets a
 // "Lots" link, filtered to that neighborhood's Land listings. Added
@@ -76,6 +78,57 @@ function groupCitiesForNav(cities) {
   }));
   groups[groups.length - 1].cities.push(...cities.filter((c) => !listed.has(c.slug)));
   return groups.filter((g) => g.cities.length);
+}
+
+// Search by Neighborhood groups (2026-10-04, per Ryan). Backend
+// neighborhoods are merged with the site's own neighborhood pages that
+// aren't backend rows (the Viera Builders communities and the Viera West
+// pages in VIERA_WEST_NEIGHBORHOOD_PAGES), then grouped by area with a
+// 55+ section. A neighborhood not listed here falls into the last group.
+const NEIGHBORHOOD_NAV_GROUPS = [
+  {
+    label: 'Viera & Viera West',
+    slugs: [
+      'adelaide',
+      'aripeka',
+      'summer-lakes',
+      'viera-builders-communities-viera-west',
+      'laurasia',
+      'pangea-park',
+      'reeling-park',
+      'arrivas-village',
+      'sonoma-at-viera',
+      'strom-park',
+    ],
+  },
+  { label: '55+ Communities', slugs: ['del-webb-viera', 'heritage-isle', 'bridgewater-at-viera'] },
+  { label: 'Beachside', slugs: ['aquarina', 'harbor-island-beach-club', 'lansing-island', 'tortoise-island'] },
+  { label: 'Mainland', slugs: ['suntree', 'south-merritt-island'] },
+];
+
+const NEIGHBORHOOD_NAV_LABELS = {
+  'viera-builders-communities-viera-west': 'Viera Builders Communities',
+};
+
+const EXTRA_NAV_NEIGHBORHOODS = [
+  ...VIERA_BUILDERS_SUB_COMMUNITIES.filter((c) => ['laurasia', 'pangea-park', 'reeling-park'].includes(c.slug)).map(
+    (c) => ({ slug: c.slug, name: c.name })
+  ),
+  ...Object.entries(VIERA_WEST_NEIGHBORHOOD_PAGES).map(([slug, page]) => ({ slug, name: page.name })),
+];
+
+function groupNeighborhoodsForNav(neighborhoods) {
+  const all = [...neighborhoods];
+  EXTRA_NAV_NEIGHBORHOODS.forEach((extra) => {
+    if (!all.some((n) => n.slug === extra.slug)) all.push(extra);
+  });
+  const listed = new Set(NEIGHBORHOOD_NAV_GROUPS.flatMap((g) => g.slugs));
+  const groups = NEIGHBORHOOD_NAV_GROUPS.map((g) => ({
+    label: g.label,
+    neighborhoods: g.slugs.map((slug) => all.find((n) => n.slug === slug)).filter(Boolean),
+  }));
+  groups[groups.length - 1].neighborhoods.push(...all.filter((n) => !listed.has(n.slug)));
+  return groups.filter((g) => g.neighborhoods.length);
 }
 
 export default function Nav({ cities = [], neighborhoods = [] }) {
@@ -443,70 +496,75 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                     already fully support that query param for every
                     neighborhood (page_seo already has Condo-type rows
                     seeded for all 10), so no new route/page was needed. */}
-                {neighborhoods.map((n) => (
-                  <div key={n.slug}>
-                    {/* "<Neighborhood> Listings" header made a live link
-                        (2026-09-01, per Ryan: "make the Neighborhood ...
-                        live links... When users click on the Listings page
-                        show all the listings which include Homes, Condos, &
-                        Lots") — goes to the plain /neighborhoods/{slug} URL
-                        with no ?propertyType= param, which this route
-                        already treats as "every type combined" (see this
-                        page's own top comment: "defaulting to showing all
-                        types"), so no new route was needed here unlike the
-                        City dropdown's header (see app/[citySlug]/page.js). */}
-                    <Link
-                      href={`/neighborhoods/${n.slug}`}
-                      className="hero-search-item nav-dropdown-label nav-dropdown-link"
-                      style={cityListingsLabelStyle}
-                      onClick={closeNow}
-                    >
-                      {n.name}
-                    </Link>
-                    {/* "Homes" normally means ?propertyType=Home only (see
-                        the comment above). Widened to Home+Land for
-                        neighborhoods in NEIGHBORHOOD_LOTS_PAGE_SLUGS (per
-                        Ryan, 2026-08-21: "also display the lots in the
-                        aripeka homes section. So on the Aripeka homes
-                        section display both homes & Lots") — currently
-                        Aripeka only. The standalone "Lots" link below still
-                        exists for a Land-only view; this just makes the
-                        Homes section itself include Land too, rather than
-                        requiring a visitor to combine them manually via the
-                        Property Type filter. */}
-                    <Link
-                      href={
-                        NEIGHBORHOOD_LOTS_PAGE_SLUGS.has(n.slug)
-                          ? `/neighborhoods/${n.slug}?propertyType=Home,Land`
-                          : `/neighborhoods/${n.slug}?propertyType=Home`
-                      }
-                      className="hero-search-item nav-dropdown-link"
-                      style={cityHomeLinkStyle}
-                      onClick={closeNow}
-                    >
-                      Homes
-                    </Link>
-                    {NEIGHBORHOOD_CONDO_PAGE_SLUGS.has(n.slug) && (
-                      <Link
-                        href={`/neighborhoods/${n.slug}?propertyType=Condo`}
-                        className="hero-search-item-secondary nav-dropdown-link"
-                        style={gridCondoLinkStyle}
-                        onClick={closeNow}
-                      >
-                        Condos
-                      </Link>
-                    )}
-                    {NEIGHBORHOOD_LOTS_PAGE_SLUGS.has(n.slug) && (
-                      <Link
-                        href={`/neighborhoods/${n.slug}?propertyType=Land`}
-                        className="hero-search-item-secondary nav-dropdown-link"
-                        style={gridCondoLinkStyle}
-                        onClick={closeNow}
-                      >
-                        Lots
-                      </Link>
-                    )}
-                  </div>
+                {groupNeighborhoodsForNav(neighborhoods).map((group) => (
+                  <Fragment key={group.label}>
+                    <div className="nav-group-label">{group.label}</div>
+                    {group.neighborhoods.map((n) => (
+                      <div key={n.slug}>
+                        {/* "<Neighborhood> Listings" header made a live link
+                            (2026-09-01, per Ryan: "make the Neighborhood ...
+                            live links... When users click on the Listings page
+                            show all the listings which include Homes, Condos, &
+                            Lots") — goes to the plain /neighborhoods/{slug} URL
+                            with no ?propertyType= param, which this route
+                            already treats as "every type combined" (see this
+                            page's own top comment: "defaulting to showing all
+                            types"), so no new route was needed here unlike the
+                            City dropdown's header (see app/[citySlug]/page.js). */}
+                        <Link
+                          href={`/neighborhoods/${n.slug}`}
+                          className="hero-search-item nav-dropdown-label nav-dropdown-link"
+                          style={cityListingsLabelStyle}
+                          onClick={closeNow}
+                        >
+                          {NEIGHBORHOOD_NAV_LABELS[n.slug] || n.name}
+                        </Link>
+                        {/* "Homes" normally means ?propertyType=Home only (see
+                            the comment above). Widened to Home+Land for
+                            neighborhoods in NEIGHBORHOOD_LOTS_PAGE_SLUGS (per
+                            Ryan, 2026-08-21: "also display the lots in the
+                            aripeka homes section. So on the Aripeka homes
+                            section display both homes & Lots") — currently
+                            Aripeka only. The standalone "Lots" link below still
+                            exists for a Land-only view; this just makes the
+                            Homes section itself include Land too, rather than
+                            requiring a visitor to combine them manually via the
+                            Property Type filter. */}
+                        <Link
+                          href={
+                            NEIGHBORHOOD_LOTS_PAGE_SLUGS.has(n.slug)
+                              ? `/neighborhoods/${n.slug}?propertyType=Home,Land`
+                              : `/neighborhoods/${n.slug}?propertyType=Home`
+                          }
+                          className="hero-search-item nav-dropdown-link"
+                          style={cityHomeLinkStyle}
+                          onClick={closeNow}
+                        >
+                          Homes
+                        </Link>
+                        {NEIGHBORHOOD_CONDO_PAGE_SLUGS.has(n.slug) && (
+                          <Link
+                            href={`/neighborhoods/${n.slug}?propertyType=Condo`}
+                            className="hero-search-item-secondary nav-dropdown-link"
+                            style={gridCondoLinkStyle}
+                            onClick={closeNow}
+                          >
+                            Condos
+                          </Link>
+                        )}
+                        {NEIGHBORHOOD_LOTS_PAGE_SLUGS.has(n.slug) && (
+                          <Link
+                            href={`/neighborhoods/${n.slug}?propertyType=Land`}
+                            className="hero-search-item-secondary nav-dropdown-link"
+                            style={gridCondoLinkStyle}
+                            onClick={closeNow}
+                          >
+                            Lots
+                          </Link>
+                        )}
+                      </div>
+                    ))}
+                  </Fragment>
                 ))}
               </DropdownPanel>
             )
