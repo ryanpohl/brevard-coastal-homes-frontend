@@ -87,23 +87,63 @@ function combineDescription(prefix, base, maxLen = META_DESCRIPTION_MAX_LEN) {
   const budget = maxLen - prefix.length;
   if (budget <= 20) return prefix.trim();
   if (base.length <= budget) return `${prefix}${base}`;
+  // Prefer ending on a full sentence (2026-10-04) over cutting mid-phrase.
+  const sentenceEnd = base.slice(0, budget).lastIndexOf('. ');
+  if (sentenceEnd >= 40) return `${prefix}${base.slice(0, sentenceEnd + 1)}`;
   let truncated = base.slice(0, budget);
   const lastSpace = truncated.lastIndexOf(' ');
   if (lastSpace > 0) truncated = truncated.slice(0, lastSpace);
-  truncated = truncated.replace(/[.,;:\s]+$/, '');
-  return `${prefix}${truncated}.`;
+  truncated = truncated.replace(/[.,;:—–\s]+$/, '');
+  return `${prefix}${truncated}…`;
+}
+
+// Live price floor for Google descriptions (2026-10-04, per Ryan: no
+// hand-typed prices that go stale). Lowest active list price and count for
+// a page's listing filter; priceMin skips rentals the MLS feed includes.
+async function fetchActivePriceFloor(listingsFilterParams, propertyType) {
+  try {
+    const data = await api.getListings({
+      ...listingsFilterParams,
+      propertyType,
+      priceMin: 10000,
+      sort: 'price_asc',
+      pageSize: 1,
+    });
+    const total = typeof data.total === 'number' ? data.total : null;
+    const low = data.results?.[0]?.price;
+    return { total, low: typeof low === 'number' && low > 0 ? low : null };
+  } catch {
+    return null;
+  }
+}
+
+// $725K, $1.2M, $1.25M — short enough for a search snippet.
+function formatShortPrice(price) {
+  if (price >= 1000000) return `$${Number((price / 1000000).toFixed(2))}M`;
+  return `$${Math.round(price / 1000)}K`;
+}
+
+// "Browse Laurasia homes for sale — a gated…" becomes "9 Laurasia homes for
+// sale from $725K — a gated…" while listings are active; otherwise the
+// hand-written description is used as is.
+function withLivePriceFloor(description, floor) {
+  if (!description || !floor?.low || !(floor.total >= 2)) return description;
+  const match = description.match(/^Browse (.+?) for sale — (.+)$/);
+  if (!match) return description;
+  return `${floor.total} ${match[1]} for sale from ${formatShortPrice(floor.low)} — ${match[2]}`;
 }
 
 async function buildNeighborhoodListingCountPrefix({ listingsFilterParams, propertyType, neighborhoodName }) {
   if (!neighborhoodName) return '';
   try {
-    const data = await api.getListings({ ...listingsFilterParams, propertyType, pageSize: 1 });
-    const total = typeof data.total === 'number' ? data.total : null;
+    const floor = await fetchActivePriceFloor(listingsFilterParams, propertyType);
+    const total = floor?.total ?? null;
     if (total == null) return '';
     const nounPair =
       Array.isArray(propertyType) && propertyType.length === 1 ? LISTING_COUNT_NOUN[propertyType[0]] || DEFAULT_COUNT_NOUN : DEFAULT_COUNT_NOUN;
     const noun = pickNoun(nounPair, total);
-    return `${total} ${noun} for sale in ${neighborhoodName}, FL. `;
+    const from = floor.low ? `, from ${formatShortPrice(floor.low)}` : '';
+    return `${total} ${noun} for sale in ${neighborhoodName}, FL${from}. `;
   } catch {
     // Count fetch failed — render the description without the prefix
     // rather than losing the page's metadata entirely over this.
@@ -151,17 +191,6 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
   if (slug === 'viera-builders-communities-viera-west' && !searchParams.propertyType) {
     return { ...VIERA_BUILDERS_HUB_SEO, alternates: { canonical: `/neighborhoods/${slug}` } };
   }
-  const communitySeo = COMMUNITY_SEO[slug];
-  if (communitySeo) {
-    const viewSeo = searchParams.propertyType ? communitySeo.seoByType?.[primaryType] : null;
-    if (viewSeo) {
-      return { ...viewSeo, alternates: { canonical: `/neighborhoods/${slug}?propertyType=${primaryType}` } };
-    }
-    if (!communitySeo.homeOnly || primaryType === 'Home') {
-      return { ...communitySeo.seo, alternates: { canonical: `/neighborhoods/${slug}` } };
-    }
-  }
-
   // Same flags/listingsFilterParams logic as the page component further
   // below (kept in sync manually — generateMetadata and the page component
   // run as two separate functions with no shared state). See
@@ -171,7 +200,9 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
   const isVieraBuildersCommunitiesVieraWest = slug === 'viera-builders-communities-viera-west';
   const isBeachWoods = slug === 'beach-woods';
   const isAquarina = slug === 'aquarina';
-  const listingsFilterParams = subCommunity
+  const listingsFilterParams = VIERA_WEST_NEIGHBORHOOD_PAGES[slug]
+    ? vieraWestNeighborhoodFilter(slug)
+    : subCommunity
     ? { subdivision: subCommunity.name }
     : isVieraBuildersCommunitiesVieraWest
       ? { subdivision: searchParams.subdivision || VIERA_BUILDERS_SUB_COMMUNITIES.map((c) => c.name).join(',') }
@@ -191,6 +222,23 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
                     ? { subdivision: SUNTREE_SUBDIVISION_NAMES.join(',') }
                     : { neighborhood: slug };
   const countPropertyType = searchParams.propertyType ? searchParams.propertyType.split(',') : undefined;
+
+  const communitySeo = COMMUNITY_SEO[slug];
+  if (communitySeo) {
+    const viewSeo = searchParams.propertyType ? communitySeo.seoByType?.[primaryType] : null;
+    if (viewSeo || !communitySeo.homeOnly || primaryType === 'Home') {
+      const baseSeo = viewSeo || communitySeo.seo;
+      const floor = await fetchActivePriceFloor(listingsFilterParams, countPropertyType);
+      return {
+        ...baseSeo,
+        description: withLivePriceFloor(baseSeo.description, floor),
+        alternates: {
+          canonical: viewSeo ? `/neighborhoods/${slug}?propertyType=${primaryType}` : `/neighborhoods/${slug}`,
+        },
+      };
+    }
+  }
+
 
   // Display name for the count sentence — subCommunity/Beach Woods already
   // know their own name without a lookup; every other neighborhood
@@ -320,12 +368,11 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
       // falls back to the previous count-prefixed sentence for a
       // sub-community with no NEIGHBORHOOD_AREA_GUIDE_CONTENT entry yet
       // (currently Atlin Cove).
-      description:
+      description: combineDescription(
+        countPrefix,
         NEIGHBORHOOD_AREA_GUIDE_CONTENT[slug]?.intro ||
-        combineDescription(
-          countPrefix,
           `Browse listings in ${subCommunity.name}, a Viera Builders community in Viera West, FL.`
-        ),
+      ),
       alternates: { canonical: `/neighborhoods/${slug}` },
     };
   }
