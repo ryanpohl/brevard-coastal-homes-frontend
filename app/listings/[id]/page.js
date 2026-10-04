@@ -49,15 +49,41 @@ export async function generateMetadata({ params }) {
     try {
           const { listing } = await api.getListing(id);
           const typeLabel = PROPERTY_TYPE_LABEL[listing.propertyType] || listing.propertyType;
-          return {
-                  title:
+          const title =
                     listing.status === 'Sold'
                       ? `Sold: ${listing.address} | ${formatPrice(listing.closePrice ?? listing.price)} — Brevard Coastal Homes`
                       : listing.status === 'Pending' || listing.statusLabel === 'Contingent'
                         ? `${listing.statusLabel === 'Contingent' ? 'Contingent' : 'Pending'}: ${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`
-                        : `${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`,
-                  description: buildListingMetaDescription(listing, typeLabel),
+                        : `${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`;
+          const description = buildListingMetaDescription(listing, typeLabel);
+          // Link previews (2026-10-04, per Ryan): a listing link texted or
+          // emailed to a buyer showed the site-wide hero photo from
+          // app/layout.js. Each listing now sets its own openGraph/twitter
+          // card with its first MLS photo, so iMessage/email/Facebook show
+          // the actual home. Next.js replaces the whole openGraph object
+          // when a page sets one, so siteName/type are repeated here.
+          const photo = listing.photos && listing.photos[0];
+          const previewImages = [photo
+            ? { url: photo, alt: `${listing.address}, ${listing.city.name}, FL` }
+            : { url: '/hero/brevard-hero.jpg', width: 1200, height: 630, alt: 'Brevard Coastal Homes' }];
+          return {
+                  title,
+                  description,
                   alternates: { canonical: `/listings/${id}` },
+                  openGraph: {
+                    type: 'website',
+                    siteName: 'Brevard Coastal Homes',
+                    url: `/listings/${id}`,
+                    title,
+                    description,
+                    images: previewImages,
+                  },
+                  twitter: {
+                    card: 'summary_large_image',
+                    title,
+                    description,
+                    images: previewImages.map((image) => image.url),
+                  },
           };
     } catch {
           return {};
