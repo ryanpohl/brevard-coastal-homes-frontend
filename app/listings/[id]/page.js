@@ -184,7 +184,8 @@ export default async function ListingDetailPage({ params }) {
                   top: 14,
                   left: 14,
                   padding: '8px 16px',
-                  borderRadius: 999,
+                  borderRadius: 16,
+                  textAlign: 'center',
                   background: listing.status === 'Sold' ? '#b42318' : 'var(--color-gold)',
                   color: '#fff',
                   fontSize: 15,
@@ -197,6 +198,11 @@ export default async function ListingDetailPage({ params }) {
                 {listing.status === 'Sold'
                   ? `SOLD${formatSoldDate(listing.closeDate) ? ` ${formatSoldDate(listing.closeDate)}` : ''}`
                   : 'PENDING'}
+                {/* Sold price under the SOLD wording (2026-10-04, per Ryan —
+                    Space Coast MLS allows IDX sites to show sold data). */}
+                {listing.status === 'Sold' && listing.closePrice != null && (
+                  <div style={{ fontSize: 17, letterSpacing: 0.2, marginTop: 2 }}>{formatPrice(listing.closePrice)}</div>
+                )}
               </div>
             )}
             <div style={{ position: 'absolute', top: 14, right: 14 }}>

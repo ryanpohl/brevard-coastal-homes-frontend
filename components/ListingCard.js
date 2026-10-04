@@ -169,7 +169,8 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
               <div
                style={{
                                  padding: '6px 12px',
-                                 borderRadius: 999,
+                                 borderRadius: 14,
+                                 textAlign: 'center',
                                  background: '#b42318',
                                  color: '#fff',
                                  fontSize: 12,
@@ -179,6 +180,11 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
                }}
             >
               SOLD{formatSoldDate(listing.closeDate) ? ` ${formatSoldDate(listing.closeDate)}` : ''}
+              {/* Sold price under the SOLD wording (2026-10-04, per Ryan —
+                  Space Coast MLS allows IDX sites to show sold data). */}
+              {listing.closePrice != null && (
+                <div style={{ fontSize: 13, letterSpacing: 0.2, marginTop: 2 }}>{formatPrice(listing.closePrice)}</div>
+              )}
                 </div>
           )}
 {listing.status === 'Pending' && (
