@@ -169,7 +169,7 @@ export default async function HomePage() {
       <div style={{ position: 'relative', width: '100%', minHeight: 692, background: 'var(--color-nav-bg)' }}>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 692, overflow: 'hidden' }}>
           <Image
-            src="/hero/brevard-hero.jpg"
+            src="/hero/brevard-hero-no-ship.jpg"
             alt="Beachfront estate with private pool overlooking the Brevard County coastline"
             fill
             priority
@@ -190,7 +190,7 @@ export default async function HomePage() {
               inset: 0,
               // Lightened to roughly half its previous opacity at each stop
               // (2026-09-17, per Ryan: "the hero picture ... seems a little
-              // dark to me"). The source photo (/hero/brevard-hero.jpg) is
+              // dark to me"). The source photo (/hero/brevard-hero-no-ship.jpg) is
               // bright and sunny on its own -- the darkness was coming
               // entirely from this overlay, which exists to keep the white
               // "Brevard County Listings" headline and the search bar

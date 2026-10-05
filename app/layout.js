@@ -80,7 +80,7 @@ export const metadata = {
     url: 'https://brevardcoastalhomes.com',
     images: [
       {
-        url: '/hero/brevard-hero.jpg',
+        url: '/hero/brevard-hero-no-ship.jpg',
         width: 1200,
         height: 630,
         alt: 'Brevard Coastal Homes',
@@ -91,7 +91,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Brevard Coastal Homes',
     description: 'Real estate search across Brevard County, FL — homes, condos, and land for sale.',
-    images: ['/hero/brevard-hero.jpg'],
+    images: ['/hero/brevard-hero-no-ship.jpg'],
   },
 };
 
