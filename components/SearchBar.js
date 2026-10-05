@@ -456,29 +456,14 @@ export default function SearchBar({ cities, neighborhoods }) {
         >
           Search
             </button>
-        <button
-          type="button"
-          onClick={() => setScheduleModalOpen(true)}
-          style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: '0 22px',
-                        height: 66,
-                        cursor: 'pointer',
-                        border: '1px solid rgba(139, 38, 38, 0.7)',
-                        borderRadius: 4,
-                        background: 'rgba(139, 38, 38, 0.65)',
-                        fontFamily: 'var(--font-inter-tight)',
-                        fontSize: 15,
-                        fontWeight: 600,
-                        letterSpacing: 1.2,
-                        textTransform: 'uppercase',
-                        color: '#ffffff',
-          }}
-        >
+        {/* Gold "Schedule a Showing" (2026-10-04, per Ryan: the red button
+            clashed with the navy/cream/gold brand). Styled by
+            .hero-showing-btn in globals.css. This top-row copy shows on
+            tablet/desktop; phones get the full-width copy below the filters
+            so the search box and filters stay together. */}
+        <button type="button" className="hero-showing-btn hero-showing-btn--inline" onClick={() => setScheduleModalOpen(true)}>
           Schedule a Showing
-            </button>
+        </button>
             </div>
 
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -782,6 +767,9 @@ export default function SearchBar({ cities, neighborhoods }) {
 </PillField>
             </div>
 
+<button type="button" className="hero-showing-btn hero-showing-btn--stacked" onClick={() => setScheduleModalOpen(true)}>
+        Schedule a Showing
+      </button>
 {scheduleModalOpen && <ScheduleShowingModal onClose={() => setScheduleModalOpen(false)} />}
 </form>
   );
