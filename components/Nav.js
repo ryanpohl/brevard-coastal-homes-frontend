@@ -33,7 +33,7 @@ import ContactModal from './ContactModal';
 // though") extended the header + Homes treatment to every neighborhood, so
 // this set is now just the allowlist for the extra Condos link, not a gate
 // on the header/Homes treatment itself.
-const NEIGHBORHOOD_CONDO_PAGE_SLUGS = new Set(['harbor-island-beach-club', 'aquarina', 'heritage-isle', 'pangea-park']);
+const NEIGHBORHOOD_CONDO_PAGE_SLUGS = new Set(['harbor-island-beach-club', 'aquarina', 'beach-woods', 'heritage-isle', 'pangea-park']);
 
 // Neighborhoods whose "Search by Neighborhood" dropdown entry also gets a
 // "Lots" link, filtered to that neighborhood's Land listings. Added
