@@ -62,10 +62,12 @@ const CITY_LOTS_NAV_SLUGS = new Set(['merritt-island', 'cocoa-beach', 'melbourne
  */
 // Search by City groups (2026-10-04, per Ryan): beach towns first, then
 // mainland cities, instead of the backend's mixed order. A city not listed
-// here (e.g. one added later) falls into Mainland so it never disappears.
+// here (e.g. one added later) falls into the last group so it never disappears.
 const CITY_NAV_GROUPS = [
   { label: 'Beachside', slugs: ['cocoa-beach', 'satellite-beach', 'indian-harbour-beach', 'indialantic', 'melbourne-beach'] },
-  { label: 'Mainland', slugs: ['melbourne', 'rockledge', 'merritt-island', 'viera', 'viera-west'] },
+  // Merritt Island is its own island (between the Indian and Banana Rivers),
+  // not mainland — named in the label per Ryan (2026-10-05).
+  { label: 'Mainland & Merritt Island', slugs: ['melbourne', 'rockledge', 'merritt-island', 'viera', 'viera-west'] },
 ];
 
 function groupCitiesForNav(cities) {
