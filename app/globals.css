@@ -128,7 +128,9 @@ h4 {
    mobile instead of being squished into 5 tiny columns. */
 .city-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  /* Two cards per row on phones (2026-10-04, per Ryan) — one per row made
+     the homepage ~10,000px tall on a phone. */
+  grid-template-columns: repeat(2, 1fr);
   gap: 18px;
 }
 
@@ -145,7 +147,11 @@ h4 {
    closer to its own photo than to the next one down. */
 @media (max-width: 639px) {
   .city-grid {
-    gap: 40px;
+    gap: 28px 12px;
+  }
+
+  .city-grid .place-card-label-wrap {
+    padding-top: 10px;
   }
 }
 
@@ -855,8 +861,11 @@ textarea:focus {
 
 @media (max-width: 640px) {
   .place-card-label {
-    /* Bumped from 16px alongside the desktop size above. */
-    font-size: 17px;
+    /* 13px (2026-10-04) now that phones show two cards per row (was 17px
+       for the old one-per-row layout), so long names like "Harbor Island
+       Beach Club" wrap cleanly in a half-width card. */
+    font-size: 13px;
+    letter-spacing: 0.05em;
   }
 }
 

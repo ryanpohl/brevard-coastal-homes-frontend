@@ -277,7 +277,7 @@ export default async function HomePage() {
                 name={city.name}
                 thumbnail={CITY_THUMBNAIL_OVERRIDE[city.slug] || city.thumbnail}
                 href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
-                sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 100vw"
+                sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
                 objectPosition={CITY_IMAGE_POSITION[city.slug]}
               />
             ))}
@@ -299,7 +299,7 @@ export default async function HomePage() {
                 name={n.name}
                 thumbnail={n.thumbnail}
                 href={`/neighborhoods/${n.slug}`}
-                sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 100vw"
+                sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
               />
             ))}
           </div>
