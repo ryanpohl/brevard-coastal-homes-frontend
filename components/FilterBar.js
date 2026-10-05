@@ -28,6 +28,13 @@ export default function FilterBar({
   neighborhoodOptions,
   show55Filter,
   hideAcreageSort,
+  // Clean neighborhood view URLs (2026-10-05): on /neighborhoods/{slug}/
+  // condos-for-sale the property type comes from the path, so the page
+  // passes it here plus the neighborhood's base path. Changing the type
+  // navigates to basePath?propertyType=…, which middleware.js 301s to the
+  // matching clean URL when there is one.
+  pathPropertyType,
+  basePath,
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -93,6 +100,7 @@ export default function FilterBar({
   const updateParams = useCallback(
     (updates) => {
       const params = new URLSearchParams(searchParams.toString());
+      const changesPathType = pathPropertyType && basePath && 'propertyType' in updates;
       Object.entries(updates).forEach(([key, value]) => {
         if (value === undefined || value === null || value === '') {
           params.delete(key);
@@ -101,19 +109,22 @@ export default function FilterBar({
         }
       });
       params.delete('page'); // any filter change resets pagination
-      router.push(`${pathname}?${params.toString()}`);
+      router.push(`${changesPathType ? basePath : pathname}?${params.toString()}`);
     },
-    [pathname, router, searchParams]
+    [pathname, router, searchParams, pathPropertyType, basePath]
   );
 
   const toggleMultiValue = (paramKey, value) => {
-    const current = (searchParams.get(paramKey) || '').split(',').filter(Boolean);
+    const current =
+      paramKey === 'propertyType'
+        ? currentPropertyTypes
+        : (searchParams.get(paramKey) || '').split(',').filter(Boolean);
     const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
     updateParams({ [paramKey]: next.join(',') });
   };
 
   const currentSubdivisions = (searchParams.get('subdivision') || '').split(',').filter(Boolean);
-  const currentPropertyTypes = (searchParams.get('propertyType') || '').split(',').filter(Boolean);
+  const currentPropertyTypes = (searchParams.get('propertyType') || pathPropertyType || '').split(',').filter(Boolean);
   const currentWaterfront = (searchParams.get('waterfront') || '').split(',').filter(Boolean);
   const currentSort = searchParams.get('sort') || 'newest';
   const currentBeds = searchParams.get('beds') || '';
