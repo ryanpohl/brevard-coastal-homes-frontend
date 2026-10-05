@@ -169,10 +169,15 @@ export default async function HomePage() {
       <div style={{ position: 'relative', width: '100%', minHeight: 692, background: 'var(--color-nav-bg)' }}>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 692, overflow: 'hidden' }}>
           <Image
-            src="/hero/brevard-hero.jpg"
+            src="/hero/brevard-hero-no-ship.jpg"
             alt="Beachfront estate with private pool overlooking the Brevard County coastline"
             fill
             priority
+            // Explicit fetchPriority (2026-10-04): `priority` alone wasn't
+            // emitting fetchpriority="high" on this LCP image, which mobile
+            // PageSpeed flagged.
+            fetchPriority="high"
+            sizes="100vw"
             // 2026-10-01, per Ryan — this is the page's LCP element (the
             // first full-bleed image painted), and mobile PageSpeed had
             // LCP at 5.7s, the single worst-scoring metric after the card
@@ -190,7 +195,7 @@ export default async function HomePage() {
               inset: 0,
               // Lightened to roughly half its previous opacity at each stop
               // (2026-09-17, per Ryan: "the hero picture ... seems a little
-              // dark to me"). The source photo (/hero/brevard-hero.jpg) is
+              // dark to me"). The source photo (/hero/brevard-hero-no-ship.jpg) is
               // bright and sunny on its own -- the darkness was coming
               // entirely from this overlay, which exists to keep the white
               // "Brevard County Listings" headline and the search bar
@@ -272,7 +277,7 @@ export default async function HomePage() {
                 name={city.name}
                 thumbnail={CITY_THUMBNAIL_OVERRIDE[city.slug] || city.thumbnail}
                 href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
-                sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 100vw"
+                sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
                 objectPosition={CITY_IMAGE_POSITION[city.slug]}
               />
             ))}
@@ -294,7 +299,7 @@ export default async function HomePage() {
                 name={n.name}
                 thumbnail={n.thumbnail}
                 href={`/neighborhoods/${n.slug}`}
-                sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 100vw"
+                sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
               />
             ))}
           </div>

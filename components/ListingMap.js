@@ -101,7 +101,15 @@ export default function ListingMap({ center, listings = [], zoom = 12, height = 
   // globals.css's design tokens) rather than var(--color-*), same
   // convention the original version of this function already used.
   function buildPopupContent(listing) {
-    const thumbnailPhoto = listing.photos && listing.photos.length ? listing.photos[0] : null;
+    // Popup thumbnails go through Next's image optimizer (2026-10-04, per
+    // Ryan: speed up page loads) instead of loading the full ~1024px MLS
+    // photo for a 220px-wide card — 384px covers high-DPI screens. Uses
+    // the same /_next/image endpoint next/image does; https MLS photos only.
+    const rawThumbnail = listing.photos && listing.photos.length ? listing.photos[0] : null;
+    const thumbnailPhoto =
+      rawThumbnail && rawThumbnail.startsWith('https://')
+        ? `/_next/image?url=${encodeURIComponent(rawThumbnail)}&w=384&q=70`
+        : rawThumbnail;
     const isLand = listing.propertyType === 'Land';
     const isCondo = listing.propertyType === 'Condo';
 

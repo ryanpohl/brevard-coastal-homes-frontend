@@ -65,7 +65,7 @@ export async function generateMetadata({ params }) {
           const photo = listing.photos && listing.photos[0];
           const previewImages = [photo
             ? { url: photo, alt: `${listing.address}, ${listing.city.name}, FL` }
-            : { url: '/hero/brevard-hero.jpg', width: 1200, height: 630, alt: 'Brevard Coastal Homes' }];
+            : { url: '/hero/brevard-hero-no-ship.jpg', width: 1200, height: 630, alt: 'Brevard Coastal Homes' }];
           return {
                   title,
                   description,

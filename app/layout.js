@@ -80,7 +80,7 @@ export const metadata = {
     url: 'https://brevardcoastalhomes.com',
     images: [
       {
-        url: '/hero/brevard-hero.jpg',
+        url: '/hero/brevard-hero-no-ship.jpg',
         width: 1200,
         height: 630,
         alt: 'Brevard Coastal Homes',
@@ -91,7 +91,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Brevard Coastal Homes',
     description: 'Real estate search across Brevard County, FL — homes, condos, and land for sale.',
-    images: ['/hero/brevard-hero.jpg'],
+    images: ['/hero/brevard-hero-no-ship.jpg'],
   },
 };
 
@@ -126,7 +126,11 @@ export default async function RootLayout({ children }) {
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: "document.getElementById('google-fonts-css').media='all';",
+            // Flip to media="all" only once the stylesheet has loaded
+            // (2026-10-04 fix) — flipping it immediately, as before, made
+            // the font CSS render-blocking again on slow mobile networks.
+            __html:
+              "(function(){var l=document.getElementById('google-fonts-css');if(!l)return;function on(){l.media='all';}if(l.sheet){on();}else{l.addEventListener('load',on);}})();",
           }}
         />
         <noscript>
