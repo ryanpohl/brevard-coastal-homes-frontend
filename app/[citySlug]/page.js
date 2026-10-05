@@ -6,7 +6,7 @@ import {
   CITY_LISTINGS_FAQ,
   CITY_PAGE_SEO,
   buildCityPlaceSchema,
-  VIERA_WEST_NEIGHBORHOOD_LINKS,
+  CITY_NEIGHBORHOOD_LINKS,
 } from '@/lib/constants';
 import { getMarketSnapshot } from '@/lib/marketSnapshot';
 import CityAboutSection from '@/components/CityAboutSection';
@@ -271,7 +271,7 @@ export default async function CityAllListingsPage({ params, searchParams: search
             to get started.
           </p>
         </div>
-        {citySlug === 'viera-west' && <NeighborhoodLinkRow cityName={city.name} links={VIERA_WEST_NEIGHBORHOOD_LINKS} />}
+        <NeighborhoodLinkRow cityName={city.name} links={CITY_NEIGHBORHOOD_LINKS[citySlug]} />
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>

@@ -31,6 +31,7 @@ import {
   buildItemListSchema,
   COMMUNITY_SEO,
   NEIGHBORHOOD_LANDING_PAGES,
+  siblingNeighborhoodLinks,
   neighborhoodLandingFilter,
   VIERA_BUILDERS_HUB_SEO,
   buildCommunitySchema,
@@ -43,6 +44,7 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
 import ModelTourButton from '@/components/ModelTourButton';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import Faq from '@/components/Faq';
+import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
 
 // Matches the reference design's "1-30 of 34 Homes" pagination — the
 // backend defaults to 24 if this isn't passed.
@@ -445,6 +447,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // pages — synthetic like Beach Woods; see NEIGHBORHOOD_LANDING_PAGES in
   // lib/constants.js.
   const landingPage = NEIGHBORHOOD_LANDING_PAGES[slug];
+  const siblingLinks = siblingNeighborhoodLinks(slug);
 
   let neighborhood;
   if (landingPage) {
@@ -1877,6 +1880,12 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               {neighborhood.name} Area Guide →
             </Link>
           </p>
+        )}
+        {/* Sibling neighborhood links (2026-10-05, per Ryan) — e.g. "Other
+            Melbourne Beach neighborhoods: ..." on each Melbourne Beach
+            neighborhood page; see siblingNeighborhoodLinks. */}
+        {siblingLinks && (
+          <NeighborhoodLinkRow cityName={`Other ${siblingLinks.cityName}`} links={siblingLinks.links} />
         )}
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}

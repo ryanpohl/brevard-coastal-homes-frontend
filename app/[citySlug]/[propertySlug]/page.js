@@ -17,7 +17,7 @@ import {
   buildItemListSchema,
   CITY_PAGE_SEO,
   buildCityPlaceSchema,
-  VIERA_WEST_NEIGHBORHOOD_LINKS,
+  CITY_NEIGHBORHOOD_LINKS,
 } from '@/lib/constants';
 import { getMarketSnapshot } from '@/lib/marketSnapshot';
 import CityAboutSection from '@/components/CityAboutSection';
@@ -849,7 +849,7 @@ export default async function CityListingsPage({ params, searchParams: searchPar
             </Link>
           </p>
         )}
-        {citySlug === 'viera-west' && <NeighborhoodLinkRow cityName={city.name} links={VIERA_WEST_NEIGHBORHOOD_LINKS} />}
+        <NeighborhoodLinkRow cityName={city.name} links={CITY_NEIGHBORHOOD_LINKS[citySlug]} />
         {/* Oceanfront cross-link (2026-09-26, per Ryan) — see
             showOceanfrontCrossLink's own comment above. Descriptive link
             text ("See Oceanfront Condos For Sale") rather than the "Click
