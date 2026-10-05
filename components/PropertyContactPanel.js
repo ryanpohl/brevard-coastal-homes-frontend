@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { AGENT_INFO } from '@/lib/constants';
 import * as api from '@/lib/api';
+import BrokerageNote from '@/components/BrokerageNote';
 
 const DOW = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 const MONTH = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
@@ -631,6 +632,7 @@ function AskQuestionModal({ listingId, listingAddress, user, onClose }) {
             confirmed empty on the live production bundle. */}
         <p style={{ color: 'var(--color-ink)', fontWeight: 600, marginBottom: 12, fontSize: 16 }}>
           Call or Text Us: <a href="tel:+13213507661" style={{ color: 'var(--color-ink)' }}>321-350-7661</a>
+          <BrokerageNote block />
         </p>
 
         {status.success ? (

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import * as api from '@/lib/api';
+import BrokerageNote from './BrokerageNote';
 
 /**
  * "Sell With Us" lead-capture section for the Looking to Sell page
@@ -90,6 +91,7 @@ export default function SellWithUsForm() {
           <a href="tel:+13213507661" style={{ color: 'inherit', textDecoration: 'none' }}>
             321-350-7661
           </a>
+          <BrokerageNote block />
         </p>
       </div>
 

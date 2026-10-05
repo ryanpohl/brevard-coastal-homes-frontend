@@ -18,6 +18,7 @@ import {
   groupNeighborhoodsForNav,
 } from '@/lib/neighborhoodNav';
 import AuthPanel from './AuthPanel';
+import BrokerageNote from './BrokerageNote';
 import ContactModal from './ContactModal';
 
 // Neighborhoods whose "Search by Neighborhood" dropdown entry also gets a
@@ -265,6 +266,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
         <a href="tel:+13213507661" style={{ color: 'inherit', textDecoration: 'none' }}>
           321-350-7661
         </a>
+        <BrokerageNote className="nav-strip-brokerage" />
       </div>
 
       {/* Centered wordmark + hairline rules, Sign In/Register moved into

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
+import BrokerageNote from '@/components/BrokerageNote';
 
 /**
  * "Schedule a Showing" and "Ask a Question" trigger buttons + modal forms.
@@ -185,6 +186,7 @@ export default function InquiryModals({
             {open === 'question' && (
               <p style={{ color: 'var(--color-ink)', fontWeight: 600, marginBottom: 12, fontSize: 16 }}>
                 Call or Text Us: <a href="tel:+13213507661" style={{ color: 'var(--color-ink)' }}>321-350-7661</a>
+                <BrokerageNote block />
               </p>
             )}
 

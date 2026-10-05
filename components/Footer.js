@@ -109,11 +109,22 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               soft line-break opportunity by default, so "321-350-7661" was
               splitting at one of its own hyphens. nowrap stops any break in
               this line, hyphen or otherwise. */}
-          <p style={{ color: 'var(--color-gold, #c9a15a)', fontWeight: 700, fontSize: 17, margin: '6px 0 12px', whiteSpace: 'nowrap' }}>
+          <p style={{ color: 'var(--color-gold, #c9a15a)', fontWeight: 700, fontSize: 17, margin: '6px 0 4px', whiteSpace: 'nowrap' }}>
             Call or Text:{' '}
             <a href="tel:+13213507661" style={{ color: 'inherit', textDecoration: 'none' }}>
               321-350-7661
             </a>
+          </p>
+          {/* Brokerage name and license right under the phone number
+              (2026-10-05, per Ryan): Florida Rule 61J2-10.025 requires the
+              brokerage's licensed name above, below or next to any contact
+              point. This replaces the Tropical Realty logo block that used to
+              sit under the Company links, far from the number. */}
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', margin: '0 0 2px', lineHeight: 1.5 }}>
+            {BROKERAGE_INFO.name}
+          </p>
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', margin: 0 }}>
+            Brokerage License #{BROKERAGE_INFO.licenseNumber}
           </p>
         </div>
 
@@ -297,55 +308,6 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
           <Link href="/home-value" className="footer-link" style={footerLinkStyle}>
             What&apos;s My Home Worth
           </Link>
-          <div style={{ height: 8 }} />
-          {/* Tropical Realty & Investments of Brevard logo (2026-08-21, per Ryan:
-              "put this logo under Brevard Coastal homes & the text on the homepage").
-              Moved here from the Brevard Coastal Homes column on 2026-09-12,
-              per Ryan: "move the tropical realty logo over under contact us &
-              looking to sell" — that column was the footer's tallest (headshot +
-              heading + name + phone + blurb + this logo), so moving the logo out
-              of it shortens the whole footer to roughly the height of the
-              Cities/Neighborhoods columns instead.
-              Plain <img> instead of next/image's <Image> deliberately: this is a
-              small, fixed-size 200x200 static logo that doesn't need responsive
-              optimization, and going through next/image's /_next/image optimizer
-              endpoint routes it through an extra hop that this project's Hostinger
-              hosting has a well-documented history of intermittently corrupting
-              (see CLAUDE.md's "hcdn CDN corrupts/caches broken streamed responses"
-              sections) — confirmed live 2026-08-21: the optimizer-served <Image>
-              loaded with naturalWidth/naturalHeight 0 (a corrupted/empty response
-              that the browser still marked "complete"), while 8/8 direct fetches
-              of the plain static file under /logos/ loaded correctly at 200x200. */}
-          <div style={{ marginTop: 16, background: '#fff', display: 'inline-block', padding: 8, borderRadius: 6 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            {/* alt text corrected 2026-09-26, per Ryan, to match the
-                brokerage's confirmed registered name (BROKERAGE_INFO.name
-                in lib/constants.js) rather than the old "...of Brevard"
-                spelling that was never quite right — see that constant's
-                comment for the full naming-inconsistency history. */}
-            <img
-              src="/logos/tropical-realty-logo.jpg"
-              alt={BROKERAGE_INFO.name}
-              style={{ display: 'block', width: 110, height: 110 }}
-            />
-          </div>
-          {/* Brokerage name + FL license number as real text (2026-09-25,
-              per Ryan, SEO audit finding — the logo above was the only
-              place the brokerage was named anywhere on the site, and only
-              via alt text; a license number appeared nowhere at all).
-              Plain text rather than folded into the logo's alt text so
-              it's legible to a visitor too, not just a crawler, and shows
-              on every page since Footer is rendered site-wide.
-              CORRECTED 2026-09-26, per Ryan: the number originally shown
-              here was his own individual license, not the brokerage's —
-              see AGENT_INFO/BROKERAGE_INFO's comments in lib/constants.js
-              for the full history. Now each entity gets its own name +
-              license number line: Ryan's individual license, then the
-              brokerage's corporate license (confirmed and approved for
-              publishing by Ryan on 2026-09-26). */}
-          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', marginTop: 10, lineHeight: 1.5 }}>
-            {BROKERAGE_INFO.name}, FL License #{BROKERAGE_INFO.licenseNumber}
-          </p>
         </div>
         </div>
       </div>

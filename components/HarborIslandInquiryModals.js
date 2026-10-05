@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import * as api from '@/lib/api';
 import { HARBOR_ISLAND_OPEN_FORECLOSURES_EVENT } from './HarborIslandForeclosuresTrigger';
+import BrokerageNote from '@/components/BrokerageNote';
 
 const CONTACT_METHODS = ['Call', 'Text', 'Email'];
 
@@ -201,6 +202,7 @@ export default function HarborIslandInquiryModals({ areaLabel = 'Harbor Island B
                 confirmed empty on the live production bundle. */}
             <p style={{ color: 'var(--color-ink)', fontWeight: 600, marginBottom: 12, fontSize: 16 }}>
               Call or Text Us: <a href="tel:+13213507661" style={{ color: 'var(--color-ink)' }}>321-350-7661</a>
+              <BrokerageNote block />
             </p>
 
             <p style={{ color: 'var(--color-muted-dark)', marginBottom: 16, lineHeight: 1.6 }}>

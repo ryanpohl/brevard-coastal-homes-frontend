@@ -997,3 +997,21 @@ textarea:focus {
   overflow: hidden;
   clip: rect(0 0 0 0);
 }
+
+/* Brokerage name beside the top strip's phone number (Florida Rule
+   61J2-10.025, 2026-10-05). Same line on desktop; its own line on phones. */
+.nav-strip-brokerage {
+  margin-left: 10px;
+  padding-left: 10px;
+  border-left: 1px solid var(--color-border-light);
+}
+@media (max-width: 640px) {
+  /* !important: BrokerageNote sets display/size inline. */
+  .brokerage-note.nav-strip-brokerage {
+    display: block !important;
+    margin: 2px 0 0;
+    padding: 0;
+    border: none;
+    font-size: 12px !important;
+  }
+}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import * as api from '@/lib/api';
+import BrokerageNote from '@/components/BrokerageNote';
 
 /**
  * Property Management inquiry modal for the Looking to Sell page, per
@@ -63,6 +64,7 @@ export default function PropertyManagementModal() {
                 confirmed empty on the live production bundle. */}
             <p style={{ color: 'var(--color-ink)', fontWeight: 600, marginBottom: 12, fontSize: 16 }}>
               Call or Text Us: <a href="tel:+13213507661" style={{ color: 'var(--color-ink)' }}>321-350-7661</a>
+              <BrokerageNote block />
             </p>
 
             {status.success ? (

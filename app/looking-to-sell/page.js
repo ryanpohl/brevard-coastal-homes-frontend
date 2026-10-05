@@ -1,6 +1,7 @@
 import * as api from '@/lib/api';
 import PropertyManagementModal from '@/components/PropertyManagementModal';
 import HomeValueForm from '@/components/HomeValueForm';
+import BrokerageNote from '@/components/BrokerageNote';
 
 export const metadata = {
   title: 'Looking to Sell Your Brevard County Home? | Brevard Coastal Homes',
@@ -94,6 +95,7 @@ export default async function LookingToSellPage() {
             321-350-7661
           </a>
           .
+          <BrokerageNote block />
         </p>
 
         <div className="card" style={{ padding: 32, textAlign: 'center' }}>

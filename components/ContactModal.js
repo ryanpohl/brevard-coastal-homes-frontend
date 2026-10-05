@@ -3,6 +3,7 @@
 import { createPortal } from 'react-dom';
 import { AGENT_INFO } from '@/lib/constants';
 import ContactForm from './ContactForm';
+import BrokerageNote from '@/components/BrokerageNote';
 
 /**
  * "Contact Us" nav link (components/Nav.js) opens this instead of
@@ -96,6 +97,7 @@ export default function ContactModal({ onClose, title = 'Contact Us', initialMes
         <div style={{ padding: '22px 26px 28px' }}>
           <p style={{ color: 'var(--color-ink)', fontWeight: 600, marginBottom: 12, fontSize: 16 }}>
             Call or Text Us - <a href="tel:+13213507661" style={{ color: 'var(--color-ink)' }}>321-350-7661</a>
+            <BrokerageNote block />
           </p>
 
           <p style={{ color: 'var(--color-muted-dark)', marginBottom: 18, fontSize: 18 }}>
