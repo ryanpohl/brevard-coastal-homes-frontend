@@ -262,11 +262,14 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           borderBottom: '1px solid var(--color-border-light)',
         }}
       >
-        Call or Text:{' '}
+        {/* Ryan's name leads, brokerage as small print beside it (2026-10-05,
+            per Ryan: focus on his own brand while keeping the brokerage name
+            next to the number, Florida Rule 61J2-10.025). */}
+        Ryan Pohl · Call or Text:{' '}
         <a href="tel:+13213507661" style={{ color: 'inherit', textDecoration: 'none' }}>
           321-350-7661
         </a>
-        <BrokerageNote className="nav-strip-brokerage" />
+        <BrokerageNote className="nav-strip-brokerage" agentName={false} style={{ fontSize: 12, color: 'var(--color-muted)' }} />
       </div>
 
       {/* Centered wordmark + hairline rules, Sign In/Register moved into
