@@ -478,9 +478,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                         Property Type filter. */}
                     <Link
                       href={
-                        NEIGHBORHOOD_LOTS_PAGE_SLUGS.has(n.slug)
-                          ? `/neighborhoods/${n.slug}?propertyType=Home,Land`
-                          : `/neighborhoods/${n.slug}?propertyType=Home`
+                        `/neighborhoods/${n.slug}/homes-for-sale`
                       }
                       className="hero-search-item nav-dropdown-link"
                       style={cityHomeLinkStyle}
@@ -490,7 +488,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                     </Link>
                     {NEIGHBORHOOD_CONDO_PAGE_SLUGS.has(n.slug) && (
                       <Link
-                        href={`/neighborhoods/${n.slug}?propertyType=Condo`}
+                        href={`/neighborhoods/${n.slug}/condos-for-sale`}
                         className="hero-search-item-secondary nav-dropdown-link"
                         style={gridCondoLinkStyle}
                         onClick={closeNow}
@@ -500,7 +498,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                     )}
                     {NEIGHBORHOOD_LOTS_PAGE_SLUGS.has(n.slug) && (
                       <Link
-                        href={`/neighborhoods/${n.slug}?propertyType=Land`}
+                        href={`/neighborhoods/${n.slug}/lots-for-sale`}
                         className="hero-search-item-secondary nav-dropdown-link"
                         style={gridCondoLinkStyle}
                         onClick={closeNow}

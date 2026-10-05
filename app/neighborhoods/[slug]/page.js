@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import * as api from '@/lib/api';
+import { neighborhoodViewPath } from '@/lib/neighborhoodViews';
 import {
   ADELAIDE_PRICE_BANDS,
   ADELAIDE_BED_OPTIONS,
@@ -233,7 +234,9 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
         ...baseSeo,
         description: withLivePriceFloor(baseSeo.description, floor),
         alternates: {
-          canonical: viewSeo ? `/neighborhoods/${slug}?propertyType=${primaryType}` : `/neighborhoods/${slug}`,
+          canonical: viewSeo
+            ? neighborhoodViewPath(slug, searchParams.propertyType || primaryType) || `/neighborhoods/${slug}?propertyType=${primaryType}`
+            : `/neighborhoods/${slug}`,
         },
       };
     }
@@ -320,14 +323,14 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
         title: typeTitle || seo.title,
         description: combineDescription(countPrefix, seo.metaDescription),
         keywords: seo.keywords,
-        // Canonical fix (2026-10-03): the backend's canonicalPath for a
-        // neighborhood's Condo/Land view is /neighborhoods/{slug}/condos-
-        // for-sale (or /land-for-sale), a route this site doesn't have (it
-        // 404s) — the real page is /neighborhoods/{slug}?propertyType=...
-        // Point those at the URL that actually renders this view.
+        // Canonical (2026-10-05): a single-type view's canonical is its
+        // clean URL (/neighborhoods/{slug}/condos-for-sale etc. — see
+        // lib/neighborhoodViews.js). The backend's canonicalPath uses
+        // /land-for-sale for Land, which the site serves as /lots-for-sale.
         alternates: {
           canonical: (seo.canonicalUrl || seo.canonicalPath || '').includes(`/neighborhoods/${slug}/`)
-            ? `/neighborhoods/${slug}?propertyType=${searchParams.propertyType || primaryType}`
+            ? neighborhoodViewPath(slug, searchParams.propertyType || primaryType) ||
+              `/neighborhoods/${slug}?propertyType=${searchParams.propertyType || primaryType}`
             : seo.canonicalUrl || seo.canonicalPath,
         },
       };
@@ -587,10 +590,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             : schema
         );
       }
-      // Breadcrumb URL fix (2026-10-03) — same backend bug as the canonical
-      // fix in generateMetadata: a Condo/Land view's last crumb points at
-      // /neighborhoods/{slug}/condos-for-sale (or /land-for-sale), which
-      // 404s. Point it at the URL that actually renders this view.
+      // Breadcrumb URL (2026-10-05): a single-type view's last crumb points
+      // at its clean URL (see lib/neighborhoodViews.js), mapping the
+      // backend's /land-for-sale to the site's /lots-for-sale.
       if (Array.isArray(jsonLd)) {
         const viewUrlFragment = `/neighborhoods/${slug}/`;
         jsonLd = jsonLd.map((schema) =>
@@ -601,8 +603,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                   item.item?.includes(viewUrlFragment)
                     ? {
                         ...item,
-                        item: `${item.item.slice(0, item.item.indexOf(viewUrlFragment))}/neighborhoods/${slug}?propertyType=${
-                          searchParams.propertyType || primaryType
+                        item: `${item.item.slice(0, item.item.indexOf(viewUrlFragment))}${
+                          neighborhoodViewPath(slug, searchParams.propertyType || primaryType) ||
+                          `/neighborhoods/${slug}?propertyType=${searchParams.propertyType || primaryType}`
                         }`,
                       }
                     : item
@@ -1510,7 +1513,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                   <>
                     Looking for a home instead? See{' '}
                     <Link
-                      href="/neighborhoods/harbor-island-beach-club?propertyType=Home"
+                      href="/neighborhoods/harbor-island-beach-club/homes-for-sale"
                       style={{ color: '#000', textDecoration: 'underline' }}
                     >
                       Harbor Island Beach Club Homes For Sale
@@ -1521,7 +1524,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                   <>
                     Looking for a condo instead? See{' '}
                     <Link
-                      href="/neighborhoods/harbor-island-beach-club?propertyType=Condo"
+                      href="/neighborhoods/harbor-island-beach-club/condos-for-sale"
                       style={{ color: '#000', textDecoration: 'underline' }}
                     >
                       Harbor Island Beach Club Condos For Sale
@@ -1632,7 +1635,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                 this Land copy. */}
             <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
               Looking for a home instead? See{' '}
-              <Link href="/neighborhoods/aripeka?propertyType=Home,Land" style={{ color: '#000', textDecoration: 'underline' }}>
+              <Link href="/neighborhoods/aripeka/homes-for-sale" style={{ color: '#000', textDecoration: 'underline' }}>
                 Aripeka Homes For Sale
               </Link>
               .
@@ -1795,7 +1798,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                 {primaryType === 'Condo' ? (
                   <>
                     Looking for a home instead? See{' '}
-                    <Link href="/neighborhoods/aquarina?propertyType=Home" style={{ color: '#000', textDecoration: 'underline' }}>
+                    <Link href="/neighborhoods/aquarina/homes-for-sale" style={{ color: '#000', textDecoration: 'underline' }}>
                       Aquarina Homes For Sale
                     </Link>
                     .
@@ -1803,7 +1806,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                 ) : (
                   <>
                     Looking for a condo instead? See{' '}
-                    <Link href="/neighborhoods/aquarina?propertyType=Condo" style={{ color: '#000', textDecoration: 'underline' }}>
+                    <Link href="/neighborhoods/aquarina/condos-for-sale" style={{ color: '#000', textDecoration: 'underline' }}>
                       Aquarina Condos For Sale
                     </Link>
                     .
@@ -1881,6 +1884,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
 
       <FilterBar
         waterfrontFlags={waterfrontFlags}
+        // Clean view URLs (/neighborhoods/{slug}/condos-for-sale) carry the
+        // property type in the path, not the query string — see
+        // app/neighborhoods/[slug]/[view]/page.js.
+        pathPropertyType={searchParams.__viewPropertyType}
+        basePath={`/neighborhoods/${slug}`}
         // Tortoise Island and Lansing Island added 2026-10-03 (per Ryan: neither
         // has condos or lots) — homes only, so no Property Type dropdown.
         hidePropertyType={isAdelaide || isSummerLakes || isBeachWoods || isTortoiseIsland || isLansingIsland}

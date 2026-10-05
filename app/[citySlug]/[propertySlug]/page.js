@@ -894,13 +894,13 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
             Looking for a specific community? See{' '}
             <Link
-              href="/neighborhoods/harbor-island-beach-club?propertyType=Condo"
+              href="/neighborhoods/harbor-island-beach-club/condos-for-sale"
               style={{ color: '#000', textDecoration: 'underline' }}
             >
               Harbor Island Beach Club Condos For Sale
             </Link>
             ,{' '}
-            <Link href="/neighborhoods/aquarina?propertyType=Condo" style={{ color: '#000', textDecoration: 'underline' }}>
+            <Link href="/neighborhoods/aquarina/condos-for-sale" style={{ color: '#000', textDecoration: 'underline' }}>
               Aquarina Condos For Sale
             </Link>
             , or{' '}

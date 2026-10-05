@@ -252,6 +252,19 @@ export default async function sitemap() {
     priority: 0.7,
   });
 
+  // Clean neighborhood property-type URLs (2026-10-05) that are their own
+  // canonical pages (hand-written per-type SEO or backend per-type rows) —
+  // see lib/neighborhoodViews.js. Views whose canonical is the main
+  // neighborhood page aren't listed.
+  [
+    '/neighborhoods/aquarina/condos-for-sale',
+    '/neighborhoods/harbor-island-beach-club/homes-for-sale',
+    '/neighborhoods/harbor-island-beach-club/condos-for-sale',
+    '/neighborhoods/aripeka/lots-for-sale',
+  ].forEach((path) => {
+    entries.push({ url: `${SITE_URL}${path}`, lastModified: now, changeFrequency: 'daily', priority: 0.6 });
+  });
+
   // Viera West neighborhood pages (2026-10-04) — synthetic like Beach Woods
   // (no `neighborhoods` row), so listed explicitly.
   Object.keys(VIERA_WEST_NEIGHBORHOOD_PAGES).forEach((slug) => {
