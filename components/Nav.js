@@ -82,18 +82,26 @@ function groupCitiesForNav(cities) {
   return groups.filter((g) => g.cities.length);
 }
 
-// Search by Neighborhood groups (2026-10-04, per Ryan). Backend
+// Search by Neighborhood tabs (2026-10-05, per Ryan). The dropdown opens on
+// Beachside; hovering or tapping the "Viera & Viera West" or "55+
+// Communities" tab header swaps the list below to that group. Suntree sits
+// with Viera and South Merritt Island with Beachside, per Ryan. Backend
 // neighborhoods are merged with the site's own neighborhood pages that
 // aren't backend rows (the Viera Builders communities and the Viera West
-// pages in VIERA_WEST_NEIGHBORHOOD_PAGES), then grouped by area with a
-// 55+ section. A neighborhood not listed here falls into the last group.
+// pages in VIERA_WEST_NEIGHBORHOOD_PAGES). A neighborhood not listed here
+// falls into the Viera tab, where every new neighborhood so far belongs.
 const NEIGHBORHOOD_NAV_GROUPS = [
+  {
+    label: 'Beachside',
+    slugs: ['aquarina', 'harbor-island-beach-club', 'lansing-island', 'tortoise-island', 'south-merritt-island'],
+  },
   {
     label: 'Viera & Viera West',
     slugs: [
       'adelaide',
       'aripeka',
       'summer-lakes',
+      'suntree',
       'viera-builders-communities-viera-west',
       'laurasia',
       'pangea-park',
@@ -101,21 +109,21 @@ const NEIGHBORHOOD_NAV_GROUPS = [
       'arrivas-village',
       'sonoma-at-viera',
       'strom-park',
+      'atlin-cove',
     ],
   },
   { label: '55+ Communities', slugs: ['del-webb-viera', 'heritage-isle', 'bridgewater-at-viera'] },
-  { label: 'Beachside', slugs: ['aquarina', 'harbor-island-beach-club', 'lansing-island', 'tortoise-island'] },
-  { label: 'Mainland', slugs: ['suntree', 'south-merritt-island'] },
 ];
+const NEIGHBORHOOD_CATCH_ALL_GROUP = 'Viera & Viera West';
 
 const NEIGHBORHOOD_NAV_LABELS = {
   'viera-builders-communities-viera-west': 'Viera Builders Communities',
 };
 
 const EXTRA_NAV_NEIGHBORHOODS = [
-  ...VIERA_BUILDERS_SUB_COMMUNITIES.filter((c) => ['laurasia', 'pangea-park', 'reeling-park'].includes(c.slug)).map(
-    (c) => ({ slug: c.slug, name: c.name })
-  ),
+  ...VIERA_BUILDERS_SUB_COMMUNITIES.filter((c) =>
+    ['laurasia', 'pangea-park', 'reeling-park', 'atlin-cove'].includes(c.slug)
+  ).map((c) => ({ slug: c.slug, name: c.name, comingSoon: Boolean(c.comingSoon) })),
   ...Object.entries(VIERA_WEST_NEIGHBORHOOD_PAGES).map(([slug, page]) => ({ slug, name: page.name })),
 ];
 
@@ -129,7 +137,9 @@ function groupNeighborhoodsForNav(neighborhoods) {
     label: g.label,
     neighborhoods: g.slugs.map((slug) => all.find((n) => n.slug === slug)).filter(Boolean),
   }));
-  groups[groups.length - 1].neighborhoods.push(...all.filter((n) => !listed.has(n.slug)));
+  groups
+    .find((g) => g.label === NEIGHBORHOOD_CATCH_ALL_GROUP)
+    .neighborhoods.push(...all.filter((n) => !listed.has(n.slug)));
   return groups.filter((g) => g.neighborhoods.length);
 }
 
@@ -157,6 +167,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
   // behind a "☰ Menu" button so the hero search shows without scrolling.
   // Closes on every route change (Nav persists across client navigation).
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [neighborhoodTab, setNeighborhoodTab] = useState(NEIGHBORHOOD_NAV_GROUPS[0].label);
   const pathname = usePathname();
   useEffect(() => {
     setMobileOpen(false);
@@ -468,8 +479,14 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           label="Search by Neighborhood"
           bare
           active={openMenu === 'neighborhood'}
-          onEnter={() => openNow('neighborhood')}
-          onToggle={() => toggleOnClick('neighborhood')}
+          onEnter={() => {
+            if (openMenu !== 'neighborhood') setNeighborhoodTab(NEIGHBORHOOD_NAV_GROUPS[0].label);
+            openNow('neighborhood');
+          }}
+          onToggle={() => {
+            if (openMenu !== 'neighborhood') setNeighborhoodTab(NEIGHBORHOOD_NAV_GROUPS[0].label);
+            toggleOnClick('neighborhood');
+          }}
           panel={
             openMenu === 'neighborhood' && (
               <DropdownPanel grid={5}>
@@ -498,9 +515,28 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                     already fully support that query param for every
                     neighborhood (page_seo already has Condo-type rows
                     seeded for all 10), so no new route/page was needed. */}
-                {groupNeighborhoodsForNav(neighborhoods).map((group) => (
-                  <Fragment key={group.label}>
-                    <div className="nav-group-label">{group.label}</div>
+                {(() => {
+                  const groups = groupNeighborhoodsForNav(neighborhoods);
+                  const group = groups.find((g) => g.label === neighborhoodTab) || groups[0];
+                  if (!group) return null;
+                  return (
+                  <Fragment>
+                    <div className="nav-tab-row" role="tablist">
+                      {groups.map((g) => (
+                        <button
+                          key={g.label}
+                          type="button"
+                          role="tab"
+                          aria-selected={g.label === group.label}
+                          className={`nav-tab${g.label === group.label ? ' is-active' : ''}`}
+                          onMouseEnter={() => supportsHover() && setNeighborhoodTab(g.label)}
+                          onFocus={() => setNeighborhoodTab(g.label)}
+                          onClick={() => setNeighborhoodTab(g.label)}
+                        >
+                          {g.label}
+                        </button>
+                      ))}
+                    </div>
                     {group.neighborhoods.map((n) => (
                       <div key={n.slug}>
                         {/* "<Neighborhood> Listings" header made a live link
@@ -520,6 +556,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                           onClick={closeNow}
                         >
                           {NEIGHBORHOOD_NAV_LABELS[n.slug] || n.name}
+                          {n.comingSoon && <span className="nav-coming-soon"> (Coming Soon)</span>}
                         </Link>
                         {/* "Homes" normally means ?propertyType=Home only (see
                             the comment above). Widened to Home+Land for
@@ -532,14 +569,16 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                             Homes section itself include Land too, rather than
                             requiring a visitor to combine them manually via the
                             Property Type filter. */}
-                        <Link
-                          href={`/neighborhoods/${n.slug}/homes-for-sale`}
-                          className="hero-search-item nav-dropdown-link"
-                          style={cityHomeLinkStyle}
-                          onClick={closeNow}
-                        >
-                          Homes
-                        </Link>
+                        {!n.comingSoon && (
+                          <Link
+                            href={`/neighborhoods/${n.slug}/homes-for-sale`}
+                            className="hero-search-item nav-dropdown-link"
+                            style={cityHomeLinkStyle}
+                            onClick={closeNow}
+                          >
+                            Homes
+                          </Link>
+                        )}
                         {NEIGHBORHOOD_CONDO_PAGE_SLUGS.has(n.slug) && (
                           <Link
                             href={`/neighborhoods/${n.slug}/condos-for-sale`}
@@ -563,7 +602,8 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                       </div>
                     ))}
                   </Fragment>
-                ))}
+                  );
+                })()}
               </DropdownPanel>
             )
           }
