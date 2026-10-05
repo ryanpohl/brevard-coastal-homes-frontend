@@ -1,6 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Inline the site's (small, ~4 KB) CSS into each page's HTML instead of a
+  // separate render-blocking stylesheet (2026-10-05, per Ryan's mobile
+  // PageSpeed report: the CSS file delayed first paint by ~240 ms).
+  experimental: {
+    inlineCss: true,
+  },
   images: {
     // Listing/city photos come from whatever URLs are stored in the backend
     // (placeholder images today, MLS photo URLs once Spark sync is live).
