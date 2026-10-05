@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { PROPERTY_TYPE_TO_SLUG, BROKERAGE_INFO, AGENT_INFO } from '@/lib/constants';
+import { NEIGHBORHOOD_NAV_LABELS, groupNeighborhoodsForNav } from '@/lib/neighborhoodNav';
 import ContactModal from './ContactModal';
 
 // Footer's "Contact Us" link now opens the same popup as the top nav's
@@ -131,16 +132,47 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
           ))}
         </div>
 
-        <div>
-          <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Neighborhoods</h4>
-          {neighborhoods.map((n) => (
-            <div key={n.slug} style={{ marginBottom: 8 }}>
-              <Link href={`/neighborhoods/${n.slug}`} className="footer-link" style={footerLinkStyle}>
-                {n.name}
-              </Link>
-            </div>
-          ))}
-        </div>
+        {/* Neighborhood columns (2026-10-05, per Ryan) use the same groups as
+            the nav's Search by Neighborhood tabs, so the newer pages (Viera
+            West neighborhoods, 55+ communities, Viera Builders communities)
+            get a link from every page, not just the backend's 10. Viera gets
+            its own column since it's the longest group; Coming Soon
+            communities are left out until they have listings. */}
+        {(() => {
+          const groups = groupNeighborhoodsForNav(neighborhoods).map((g) => ({
+            ...g,
+            neighborhoods: g.neighborhoods.filter((n) => !n.comingSoon),
+          }));
+          const viera = groups.find((g) => g.label === 'Viera & Viera West');
+          const others = groups.filter((g) => g !== viera);
+          const renderLinks = (g) =>
+            g.neighborhoods.map((n) => (
+              <div key={n.slug} style={{ marginBottom: 8 }}>
+                <Link href={`/neighborhoods/${n.slug}`} className="footer-link" style={footerLinkStyle}>
+                  {NEIGHBORHOOD_NAV_LABELS[n.slug] || n.name}
+                </Link>
+              </div>
+            ));
+          return (
+            <>
+              <div>
+                <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Neighborhoods</h4>
+                {others.map((g, i) => (
+                  <div key={g.label} style={{ marginTop: i ? 20 : 0 }}>
+                    <div style={footerSubheadStyle}>{g.label}</div>
+                    {renderLinks(g)}
+                  </div>
+                ))}
+              </div>
+              {viera && (
+                <div>
+                  <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>{viera.label}</h4>
+                  {renderLinks(viera)}
+                </div>
+              )}
+            </>
+          );
+        })()}
 
         {/* Buyer Guides column (2026-09-25, per Ryan: "put as many of
             these in the footer if possible") — a dedicated column rather
@@ -222,9 +254,8 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               VA Home Loans
             </Link>
           </div>
-        </div>
 
-        <div>
+        <div style={{ marginTop: 28 }}>
           <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Company</h4>
           {/* 8px spacers between links (2026-10-02, per Ryan) — were plain <br />s,
               which stacked these links tighter than the other columns'
@@ -316,6 +347,7 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
             {BROKERAGE_INFO.name}, FL License #{BROKERAGE_INFO.licenseNumber}
           </p>
         </div>
+        </div>
       </div>
 
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', padding: '16px clamp(16px, 4vw, 56px)', fontSize: 12 }}>
@@ -328,3 +360,11 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
 }
 
 const footerLinkStyle = { fontSize: 13, color: 'rgba(255,255,255,0.72)' };
+const footerSubheadStyle = {
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: 1.2,
+  textTransform: 'uppercase',
+  color: 'var(--color-gold)',
+  marginBottom: 10,
+};
