@@ -30,8 +30,8 @@ import {
   NEIGHBORHOOD_LISTINGS_FAQ,
   buildItemListSchema,
   COMMUNITY_SEO,
-  VIERA_WEST_NEIGHBORHOOD_PAGES,
-  vieraWestNeighborhoodFilter,
+  NEIGHBORHOOD_LANDING_PAGES,
+  neighborhoodLandingFilter,
   VIERA_BUILDERS_HUB_SEO,
   buildCommunitySchema,
   formatPrice,
@@ -201,8 +201,8 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
   const isVieraBuildersCommunitiesVieraWest = slug === 'viera-builders-communities-viera-west';
   const isBeachWoods = slug === 'beach-woods';
   const isAquarina = slug === 'aquarina';
-  const listingsFilterParams = VIERA_WEST_NEIGHBORHOOD_PAGES[slug]
-    ? vieraWestNeighborhoodFilter(slug)
+  const listingsFilterParams = NEIGHBORHOOD_LANDING_PAGES[slug]
+    ? neighborhoodLandingFilter(slug)
     : subCommunity
     ? { subdivision: subCommunity.name }
     : isVieraBuildersCommunitiesVieraWest
@@ -441,16 +441,17 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // that declaration's own comment for the H1-driven reasoning it was
   // originally added for.)
   const isAquarina = slug === 'aquarina';
-  // Viera West neighborhood pages (2026-10-04) — synthetic like Beach Woods;
-  // see VIERA_WEST_NEIGHBORHOOD_PAGES in lib/constants.js.
-  const vieraWestPage = VIERA_WEST_NEIGHBORHOOD_PAGES[slug];
+  // Viera West (2026-10-04) and Melbourne Beach (2026-10-05) neighborhood
+  // pages — synthetic like Beach Woods; see NEIGHBORHOOD_LANDING_PAGES in
+  // lib/constants.js.
+  const landingPage = NEIGHBORHOOD_LANDING_PAGES[slug];
 
   let neighborhood;
-  if (vieraWestPage) {
+  if (landingPage) {
     neighborhood = {
       slug,
-      name: vieraWestPage.name,
-      city: { slug: 'viera-west' },
+      name: landingPage.name,
+      city: { slug: landingPage.citySlug },
       latitude: null,
       longitude: null,
       mapZoom: null,
@@ -533,7 +534,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
 
   let seo = null;
   let jsonLd = null;
-  if (!subCommunity && !isBeachWoods && !vieraWestPage) {
+  if (!subCommunity && !isBeachWoods && !landingPage) {
     // Skipped for the 6 synthetic sub-community pages and Beach Woods
     // above — there's no backend SEO row for any of them (they don't
     // exist as real neighborhoods), so this would just be a
@@ -645,8 +646,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   //    isAquarina's comment above and AQUARINA_SUBDIVISION_NAMES in
   //    lib/constants.js for why the neighborhood_id link can't be trusted
   //    to include every one of its sub-associations.
-  const listingsFilterParams = vieraWestPage
-    ? vieraWestNeighborhoodFilter(slug)
+  const listingsFilterParams = landingPage
+    ? neighborhoodLandingFilter(slug)
     : subCommunity
     ? { subdivision: subCommunity.name }
     : isVieraBuildersCommunitiesVieraWest
@@ -922,8 +923,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // its (wrong) parent city name, so this is a plain string swap on the
   // backend's own generated H1 rather than a backend reseed.
   const TORTOISE_ISLAND_H1 = seo?.h1 ? seo.h1.replace('Melbourne Beach', 'Satellite Beach') : seo?.h1;
-  const h1Text = vieraWestPage
-    ? vieraWestPage.h1
+  const h1Text = landingPage
+    ? landingPage.h1
     : isHarborIslandBeachClub
     ? HARBOR_ISLAND_BEACH_CLUB_H1
     : isVieraBuildersCommunitiesVieraWest
@@ -1074,15 +1075,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           },
         ]
       : []),
-    ...(vieraWestPage
+    ...(landingPage
       ? [
           {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
               { name: 'Home', path: '' },
-              { name: 'Viera West', path: '/viera-west' },
-              { name: vieraWestPage.name, path: `/neighborhoods/${slug}` },
+              { name: landingPage.cityName, path: `/${landingPage.citySlug}` },
+              { name: landingPage.name, path: `/neighborhoods/${slug}` },
             ].map((crumb, i) => ({
               '@type': 'ListItem',
               position: i + 1,
@@ -1841,13 +1842,13 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             18px/muted-dark + bold/underlined ContactUsTrigger styling as
             every other neighborhood block on this page, just the one
             paragraph instead of two now. */}
-        {vieraWestPage && (
+        {landingPage && (
           <div style={{ marginBottom: 12 }}>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
-              {vieraWestPage.intro}
+              {landingPage.intro}
             </p>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
-              Looking for a home in {vieraWestPage.name}?{' '}
+              Looking for a home in {landingPage.name}?{' '}
               <strong>
                 <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
               </strong>{' '}

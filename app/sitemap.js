@@ -8,7 +8,7 @@ import {
   RIVERFRONT_LISTINGS_SLUG,
   VIERA_BUILDERS_SUB_COMMUNITIES,
   NEIGHBORHOOD_AREA_GUIDE_CONTENT,
-  VIERA_WEST_NEIGHBORHOOD_PAGES,
+  NEIGHBORHOOD_LANDING_PAGES,
 } from '@/lib/constants';
 
 // Native Next.js sitemap.xml (2026-09-11, SEO audit finding: brevardcoastalhomes.com/sitemap.xml
@@ -265,9 +265,10 @@ export default async function sitemap() {
     entries.push({ url: `${SITE_URL}${path}`, lastModified: now, changeFrequency: 'daily', priority: 0.6 });
   });
 
-  // Viera West neighborhood pages (2026-10-04) — synthetic like Beach Woods
-  // (no `neighborhoods` row), so listed explicitly.
-  Object.keys(VIERA_WEST_NEIGHBORHOOD_PAGES).forEach((slug) => {
+  // Viera West (2026-10-04) and Melbourne Beach (2026-10-05) neighborhood
+  // pages — synthetic like Beach Woods (no `neighborhoods` row), so listed
+  // explicitly.
+  Object.keys(NEIGHBORHOOD_LANDING_PAGES).forEach((slug) => {
     entries.push({
       url: `${SITE_URL}/neighborhoods/${slug}`,
       lastModified: now,
