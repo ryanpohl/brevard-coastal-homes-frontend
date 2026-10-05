@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+import { withSocialPreview } from '@/lib/socialPreview';
 
 /**
  * Hurricane & Homeowners Insurance guide (2026-09-25, per Ryan — third
@@ -35,12 +36,12 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
  * window cost per opening) are approximate market ranges from a local
  * inspector/insurer source, presented as "typically," not as quotes.
  */
-export const metadata = {
+export const metadata = withSocialPreview({
   title: 'Hurricane & Homeowners Insurance in Brevard County, FL | Brevard Coastal Homes',
   description:
     "A 2026 guide to hurricane insurance in Brevard County — the hurricane deductible, wind mitigation credits, 4-point inspections, and Citizens Property Insurance explained for buyers.",
   alternates: { canonical: '/hurricane-insurance' },
-};
+});
 
 const FAQ_ITEMS = [
   {

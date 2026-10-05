@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+import { withSocialPreview } from '@/lib/socialPreview';
 
 /**
  * Custom Waterfront Homes guide (2026-09-30, per Ryan — second of two new
@@ -27,12 +28,12 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
  * needs a human read again periodically, since city inventory shifts and a
  * thin city today could easily have real inventory again later.
  */
-export const metadata = {
+export const metadata = withSocialPreview({
   title: 'Custom Home Building & Renovation on Brevard’s Waterfront | Brevard Coastal Homes',
   description:
     'Building new or renovating directly on the water in Melbourne Beach, Indialantic, Merritt Island, Cocoa Beach, Indian Harbour Beach & Satellite Beach — what to know about land, coastal building requirements, and choosing a builder.',
   alternates: { canonical: '/custom-waterfront-homes' },
-};
+});
 
 const FAQ_ITEMS = [
   {

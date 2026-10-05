@@ -17,6 +17,7 @@ import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import BuildingInquiryModal from '@/components/BuildingInquiryModal';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import Faq from '@/components/Faq';
+import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 
 // Matches the reference design's "1-30 of 34 Homes" pagination — the
 // backend defaults to 24 if this isn't passed. Same value as the sibling
@@ -61,7 +62,15 @@ const CITIES_EXCLUDING_OCEANFRONT = ['melbourne', 'rockledge'];
  * page's getCitySeo/getNeighborhoodSeo calls), so this page's metadata is
  * hand-written from the city's own name rather than fetched.
  */
-export async function generateMetadata({ params }) {
+// Link preview card with this page's title and a current listing photo —
+// see lib/socialPreview.js.
+export async function generateMetadata(props) {
+  const { citySlug } = await props.params;
+  const [meta, photo] = await Promise.all([buildMetadata(props), listingPreviewPhoto({ city: citySlug })]);
+  return withSocialPreview(meta, photo);
+}
+
+async function buildMetadata({ params }) {
   // Next.js 15 upgrade (2026-09-03) — `params`/`searchParams` became async
   // (Promises) in the App Router; await once at the top of each
   // function and leave every downstream `citySlug`/`searchParams.x`

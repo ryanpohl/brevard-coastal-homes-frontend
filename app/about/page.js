@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { AGENT_INFO, BROKERAGE_INFO } from '@/lib/constants';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+import { withSocialPreview } from '@/lib/socialPreview';
 
 /**
  * About / agent bio page (2026-09-25, per Ryan — one of the 9 SEO/internal-
@@ -39,7 +40,7 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
  * this page — both omissions are intentional per Ryan, and neither one
  * makes any claim on the page false.
  */
-export const metadata = {
+export const metadata = withSocialPreview({
   title: 'About Ryan Pohl | Brevard Coastal Homes',
   // Brokerage name corrected 2026-09-26, per Ryan, to match
   // BROKERAGE_INFO.name's confirmed spelling — this was previously
@@ -47,7 +48,7 @@ export const metadata = {
   // own comment in lib/constants.js for the full naming history).
   description: `Meet Ryan Pohl, a Brevard County, FL real estate agent with ${BROKERAGE_INFO.name} — ranked in the top 3% of all Realtors, specializing in waterfront, luxury, first-time buyer, investment, and new construction properties.`,
   alternates: { canonical: '/about' },
-};
+});
 
 export default function AboutPage() {
   return (

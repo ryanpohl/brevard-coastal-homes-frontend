@@ -1,12 +1,13 @@
 import * as api from '@/lib/api';
 import HomeValueForm from '@/components/HomeValueForm';
+import { withSocialPreview } from '@/lib/socialPreview';
 
-export const metadata = {
+export const metadata = withSocialPreview({
   title: "What's My Home Worth? Free Brevard County Home Value Report | Brevard Coastal Homes",
   description:
     'Get a free, no-obligation home value report for your Brevard County, FL property — based on real comparable sales and current market conditions, not a generic algorithm.',
   alternates: { canonical: '/home-value' },
-};
+});
 
 // "What's My Home Worth" lead-capture page. Added 2026-10-02, per Ryan —
 // see components/HomeValueForm.js for the form itself and backend's

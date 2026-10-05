@@ -10,6 +10,7 @@ import {
 } from '@/lib/constants';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 
 /**
  * City "Area Guide" page (2026-09-24, per Ryan — see CITY_AREA_GUIDE_SLUGS/
@@ -28,7 +29,15 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
  * segment first, so this never collides with the [propertySlug] catch-all
  * that handles homes-for-sale/condos-for-sale/etc.
  */
-export async function generateMetadata({ params }) {
+// Link preview card with this page's title and a current listing photo —
+// see lib/socialPreview.js.
+export async function generateMetadata(props) {
+  const { citySlug } = await props.params;
+  const [meta, photo] = await Promise.all([buildMetadata(props), listingPreviewPhoto({ city: citySlug })]);
+  return withSocialPreview(meta, photo);
+}
+
+async function buildMetadata({ params }) {
   const { citySlug } = await params;
   if (!CITY_AREA_GUIDE_SLUGS.includes(citySlug)) return {};
   try {

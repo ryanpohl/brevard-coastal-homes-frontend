@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+import { withSocialPreview } from '@/lib/socialPreview';
 
 /**
  * New Construction in Viera guide (2026-09-30, per Ryan — new evergreen
@@ -30,12 +31,12 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
  * that will go stale. Adelaide is homes only (per Ryan, 2026-10-03), so its
  * section no longer mentions lots.
  */
-export const metadata = {
+export const metadata = withSocialPreview({
   title: "New Construction in Viera, FL: Adelaide, Aripeka & Viera Builders | Brevard Coastal Homes",
   description:
     "A buyer's guide to new construction in Viera, FL — Viera Builders' Viera West communities, and the custom-build communities of Adelaide and Aripeka, plus what a buyer's agent does for you that a builder's on-site rep won't.",
   alternates: { canonical: '/new-construction-viera' },
-};
+});
 
 const FAQ_ITEMS = [
   {

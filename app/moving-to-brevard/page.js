@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+import { withSocialPreview } from '@/lib/socialPreview';
 
 /**
  * Moving to Brevard County / Space Coast relocation guide (2026-09-25, per
@@ -38,12 +39,12 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
  * stay accurate) — points to each city's own Area Guide (live Market
  * Snapshot data) instead.
  */
-export const metadata = {
+export const metadata = withSocialPreview({
   title: 'Moving to Brevard County, FL: A Space Coast Relocation Guide | Brevard Coastal Homes',
   description:
     "A 2026 guide to relocating to Brevard County, FL — major employers, commute times, climate, and what to do to become a Florida resident after you buy.",
   alternates: { canonical: '/moving-to-brevard' },
-};
+});
 
 const FAQ_ITEMS = [
   {

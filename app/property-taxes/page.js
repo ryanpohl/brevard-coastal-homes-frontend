@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+import { withSocialPreview } from '@/lib/socialPreview';
 
 /**
  * Property Taxes & Florida Homestead Exemption guide (2026-09-25, per
@@ -39,12 +40,12 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
  *     used instead of the two realtor blogs' figures since it's the only
  *     one of the bunch citing a checkable underlying dataset
  */
-export const metadata = {
+export const metadata = withSocialPreview({
   title: 'Property Taxes & Homestead Exemption in Brevard County, FL | Brevard Coastal Homes',
   description:
     'A 2026 guide to Brevard County property taxes and the Florida homestead exemption — how much it saves, the Save Our Homes cap, portability, and how to file by March 1.',
   alternates: { canonical: '/property-taxes' },
-};
+});
 
 const FAQ_ITEMS = [
   {

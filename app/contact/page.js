@@ -1,11 +1,12 @@
 import { AGENT_INFO, BROKERAGE_INFO } from '@/lib/constants';
 import ContactForm from '@/components/ContactForm';
+import { withSocialPreview } from '@/lib/socialPreview';
 
-export const metadata = {
+export const metadata = withSocialPreview({
   title: 'Contact Us | Brevard Coastal Homes',
   description:
     'Get in touch with Brevard Coastal Homes about buying, selling, or renting a home, condo, or land in Brevard County, FL.',
-};
+});
 
 export default function ContactPage() {
   return (

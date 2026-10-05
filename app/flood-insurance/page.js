@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+import { withSocialPreview } from '@/lib/socialPreview';
 
 /**
  * Flood Zones & Flood Insurance guide (2026-09-25, per Ryan — second
@@ -25,12 +26,12 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
  * Heroes' county-specific income limit on the down-payment-assistance
  * page).
  */
-export const metadata = {
+export const metadata = withSocialPreview({
   title: 'Flood Insurance in Brevard County, FL | Brevard Coastal Homes',
   description:
     'A 2026 guide to Brevard County flood zones and flood insurance — how to find your zone, typical NFIP costs by zone, and when coverage is required.',
   alternates: { canonical: '/flood-insurance' },
-};
+});
 
 const FAQ_ITEMS = [
   {

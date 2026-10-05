@@ -45,6 +45,7 @@ import ModelTourButton from '@/components/ModelTourButton';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import Faq from '@/components/Faq';
 import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
+import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 
 // Matches the reference design's "1-30 of 34 Homes" pagination — the
 // backend defaults to 24 if this isn't passed.
@@ -175,7 +176,47 @@ function ModelTourLine({ name }) {
   );
 }
 
-export async function generateMetadata({ params: paramsPromise, searchParams: searchParamsPromise }) {
+// Listing filter generateMetadata uses for a neighborhood page (live price
+// floor and link preview photo); mirrors the page component's own
+// listingsFilterParams further below.
+function metadataListingsFilter(slug, searchParams) {
+  const subCommunity = VIERA_BUILDERS_SUB_COMMUNITIES.find((c) => c.slug === slug);
+  const isVieraBuildersCommunitiesVieraWest = slug === 'viera-builders-communities-viera-west';
+  const isBeachWoods = slug === 'beach-woods';
+  const isAquarina = slug === 'aquarina';
+  return NEIGHBORHOOD_LANDING_PAGES[slug]
+    ? neighborhoodLandingFilter(slug)
+    : subCommunity
+    ? { subdivision: subCommunity.name }
+    : isVieraBuildersCommunitiesVieraWest
+      ? { subdivision: searchParams.subdivision || VIERA_BUILDERS_SUB_COMMUNITIES.map((c) => c.name).join(',') }
+      : isBeachWoods
+        ? { subdivision: BEACH_WOODS_SUBDIVISION_NAMES.join(',') }
+        : isAquarina
+          ? { subdivision: AQUARINA_SUBDIVISION_NAMES.join(',') }
+          : slug === 'tortoise-island'
+            ? { subdivision: TORTOISE_ISLAND_SUBDIVISION_NAMES.join(',') }
+            : slug === 'summer-lakes'
+              ? { subdivision: SUMMER_LAKES_SUBDIVISION_NAMES.join(',') }
+              : slug === 'lansing-island'
+                ? { subdivision: LANSING_ISLAND_SUBDIVISION_NAMES.join(',') }
+                : slug === 'south-merritt-island'
+                  ? { city: 'merritt-island', latMax: SOUTH_MERRITT_ISLAND_LAT_MAX }
+                  : slug === 'suntree'
+                    ? { subdivision: SUNTREE_SUBDIVISION_NAMES.join(',') }
+                    : { neighborhood: slug };
+}
+
+// Link preview card with this page's title and a current listing photo —
+// see lib/socialPreview.js.
+export async function generateMetadata(props) {
+  const [{ slug }, searchParams] = await Promise.all([props.params, props.searchParams]);
+  const filter = { ...metadataListingsFilter(slug, searchParams), propertyType: searchParams.propertyType };
+  const [meta, photo] = await Promise.all([buildMetadata(props), listingPreviewPhoto(filter)]);
+  return withSocialPreview(meta, photo);
+}
+
+async function buildMetadata({ params: paramsPromise, searchParams: searchParamsPromise }) {
   // Next.js 15 upgrade (2026-09-03) — `params`/`searchParams` became async
   // (Promises) in the App Router; await once at the top of each function
   // into the same `params`/`searchParams` names and leave every downstream
@@ -200,30 +241,8 @@ export async function generateMetadata({ params: paramsPromise, searchParams: se
   // listingsFilterParams's own fuller comment down there for the
   // per-community reasoning.
   const subCommunity = VIERA_BUILDERS_SUB_COMMUNITIES.find((c) => c.slug === slug);
-  const isVieraBuildersCommunitiesVieraWest = slug === 'viera-builders-communities-viera-west';
   const isBeachWoods = slug === 'beach-woods';
-  const isAquarina = slug === 'aquarina';
-  const listingsFilterParams = NEIGHBORHOOD_LANDING_PAGES[slug]
-    ? neighborhoodLandingFilter(slug)
-    : subCommunity
-    ? { subdivision: subCommunity.name }
-    : isVieraBuildersCommunitiesVieraWest
-      ? { subdivision: searchParams.subdivision || VIERA_BUILDERS_SUB_COMMUNITIES.map((c) => c.name).join(',') }
-      : isBeachWoods
-        ? { subdivision: BEACH_WOODS_SUBDIVISION_NAMES.join(',') }
-        : isAquarina
-          ? { subdivision: AQUARINA_SUBDIVISION_NAMES.join(',') }
-          : slug === 'tortoise-island'
-            ? { subdivision: TORTOISE_ISLAND_SUBDIVISION_NAMES.join(',') }
-            : slug === 'summer-lakes'
-              ? { subdivision: SUMMER_LAKES_SUBDIVISION_NAMES.join(',') }
-              : slug === 'lansing-island'
-                ? { subdivision: LANSING_ISLAND_SUBDIVISION_NAMES.join(',') }
-                : slug === 'south-merritt-island'
-                  ? { city: 'merritt-island', latMax: SOUTH_MERRITT_ISLAND_LAT_MAX }
-                  : slug === 'suntree'
-                    ? { subdivision: SUNTREE_SUBDIVISION_NAMES.join(',') }
-                    : { neighborhood: slug };
+  const listingsFilterParams = metadataListingsFilter(slug, searchParams);
   const countPropertyType = searchParams.propertyType ? searchParams.propertyType.split(',') : undefined;
 
   const communitySeo = COMMUNITY_SEO[slug];

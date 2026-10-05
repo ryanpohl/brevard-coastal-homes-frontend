@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+import { withSocialPreview } from '@/lib/socialPreview';
 
 /**
  * Down Payment Assistance guide (2026-09-25, per Ryan — the site's first
@@ -32,12 +33,12 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
  * year to year, so the page says so explicitly rather than implying these
  * numbers are permanent.
  */
-export const metadata = {
+export const metadata = withSocialPreview({
   title: 'Brevard County Down Payment Assistance | Brevard Coastal Homes',
   description:
     'A 2026 guide to every down payment assistance program available to Brevard County home buyers — county, HFA, and Florida Hometown Heroes grants up to $75,000.',
   alternates: { canonical: '/down-payment-assistance' },
-};
+});
 
 const FAQ_ITEMS = [
   {

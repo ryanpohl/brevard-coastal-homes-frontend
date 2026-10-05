@@ -2,8 +2,9 @@ import * as api from '@/lib/api';
 import PropertyManagementModal from '@/components/PropertyManagementModal';
 import HomeValueForm from '@/components/HomeValueForm';
 import BrokerageNote from '@/components/BrokerageNote';
+import { withSocialPreview } from '@/lib/socialPreview';
 
-export const metadata = {
+export const metadata = withSocialPreview({
   title: 'Looking to Sell Your Brevard County Home? | Brevard Coastal Homes',
   description:
     'Thinking of selling your home, condo, or land in Brevard County, FL? Get a free market analysis and learn about our property management services.',
@@ -14,7 +15,7 @@ export const metadata = {
   // specifically). Same static string pattern as the homepage's own
   // `alternates: { canonical: '/' }` in app/page.js.
   alternates: { canonical: '/looking-to-sell' },
-};
+});
 
 // Fetches the Brevard city list for HomeValueForm's city dropdown — same
 // fallback pattern as app/home-value/page.js's own getCities: an empty list

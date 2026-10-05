@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+import { withSocialPreview } from '@/lib/socialPreview';
 
 /**
  * Buyer Resources hub page (2026-09-25, per Ryan — Task #68 from the SEO
@@ -22,12 +23,12 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
  *
  * GUIDES array order matches the footer's existing link order.
  */
-export const metadata = {
+export const metadata = withSocialPreview({
   title: 'Buyer Resources: Guides for Brevard County Home Buyers | Brevard Coastal Homes',
   description:
     'Every buyer guide in one place — down payment assistance, flood & hurricane insurance, property taxes, relocating to Brevard County, and VA home loans.',
   alternates: { canonical: '/buyer-resources' },
-};
+});
 
 const GUIDES = [
   {

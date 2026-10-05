@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+import { withSocialPreview } from '@/lib/socialPreview';
 
 /**
  * VA Home Loans guide (2026-09-25, per Ryan — sixth evergreen guide page,
@@ -39,12 +40,12 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
  * mechanics are lender- and case-specific) — points readers to a
  * VA-experienced lender for those instead.
  */
-export const metadata = {
+export const metadata = withSocialPreview({
   title: 'VA Home Loans in Brevard County, FL: A Veteran’s Buying Guide | Brevard Coastal Homes',
   description:
     'A 2026 guide to VA home loans for Brevard County veterans — eligibility, the VA funding fee, Florida appraisal quirks, and property tax exemptions for veterans.',
   alternates: { canonical: '/va-loans' },
-};
+});
 
 const FAQ_ITEMS = [
   {

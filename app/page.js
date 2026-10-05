@@ -3,6 +3,7 @@ import Link from 'next/link';
 import * as api from '@/lib/api';
 import { PROPERTY_TYPE_TO_SLUG, placePhotoUrl } from '@/lib/constants';
 import SearchBar from '@/components/SearchBar';
+import { withSocialPreview } from '@/lib/socialPreview';
 
 // Title shortened 2026-09-11 (SEO audit finding: the previous 75-character
 // title got truncated by Google around the ~60-char mark, per Google's
@@ -13,7 +14,7 @@ import SearchBar from '@/components/SearchBar';
 // backend-driven page already sets `alternates.canonical` — without one,
 // Google is left to guess the canonical URL among any tracking-param or
 // trailing-slash variants that get linked to or crawled.
-export const metadata = {
+export const metadata = withSocialPreview({
   title: 'Brevard Coastal Homes | Homes & Condos in Brevard County',
   description:
     // "Viera East" -> "Viera" (2026-09-24, per Ryan: "Lets do Viera then
@@ -31,7 +32,7 @@ export const metadata = {
     // per-city/neighborhood pages, not implied by this summary line).
     'Search homes, condos, and land for sale across Cocoa Beach, Melbourne Beach, Satellite Beach, Viera, and every coastal city in Brevard County, FL.',
   alternates: { canonical: '/' },
-};
+});
 
 // Per-city crop overrides for PlaceCard's cover photo. The default center
 // crop works for most thumbnails, but tall portrait source photos can lose

@@ -28,6 +28,7 @@ import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import BuildingInquiryModal from '@/components/BuildingInquiryModal';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import Faq from '@/components/Faq';
+import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 
 // City page intro copy (2026-09-16, per Ryan, pasting one template and
 // asking for it on every city page, with the city name and property type
@@ -285,7 +286,21 @@ const OCEANFRONT_PAGE_EXCLUDED_MLS_NUMBERS = [
  * the computed-on-the-fly /api/seo/oceanfront/:citySlug endpoint) —
  * never hand-write per-page meta here.
  */
-export async function generateMetadata({ params }) {
+// Link preview card with this page's title and a current listing photo
+// matching the page (oceanfront/riverfront/type) — see lib/socialPreview.js.
+export async function generateMetadata(props) {
+  const { citySlug, propertySlug } = await props.params;
+  let filter;
+  if (propertySlug === OCEANFRONT_LISTINGS_SLUG) filter = { city: citySlug, propertyType: 'Home,Condo', waterfront: 'Oceanfront' };
+  else if (OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug])
+    filter = { city: citySlug, propertyType: OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug], waterfront: 'Oceanfront' };
+  else if (propertySlug === RIVERFRONT_LISTINGS_SLUG) filter = { city: citySlug, waterfront: 'Riverfront' };
+  else filter = { city: citySlug, propertyType: SLUG_TO_PROPERTY_TYPE[propertySlug] };
+  const [meta, photo] = await Promise.all([buildMetadata(props), listingPreviewPhoto(filter)]);
+  return withSocialPreview(meta, photo);
+}
+
+async function buildMetadata({ params }) {
   // Next.js 15 upgrade (2026-09-03) — `params`/`searchParams` became async
   // (Promises) in the App Router; await once at the top of each function
   // and leave every downstream reference untouched, same pattern applied

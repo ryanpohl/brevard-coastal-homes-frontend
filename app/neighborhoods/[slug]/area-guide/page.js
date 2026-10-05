@@ -14,6 +14,7 @@ import {
 } from '@/lib/constants';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 
 // Mirrors app/neighborhoods/[slug]/page.js's own listingsFilterParams
 // switch (2026-09-24, added while wiring up the 5 Viera Builders Communities
@@ -69,7 +70,15 @@ function getListingsFilterParams(slug) {
  * NEIGHBORHOOD_AREA_GUIDE_CONTENT 404s rather than rendering an empty
  * page.
  */
-export async function generateMetadata({ params }) {
+// Link preview card with this page's title and a current listing photo —
+// see lib/socialPreview.js.
+export async function generateMetadata(props) {
+  const { slug } = await props.params;
+  const [meta, photo] = await Promise.all([buildMetadata(props), listingPreviewPhoto(getListingsFilterParams(slug))]);
+  return withSocialPreview(meta, photo);
+}
+
+async function buildMetadata({ params }) {
   const { slug } = await params;
   if (!NEIGHBORHOOD_AREA_GUIDE_CONTENT[slug]) return {};
   // The 6 Viera Builders Communities sub-communities (e.g. Pangea Park)

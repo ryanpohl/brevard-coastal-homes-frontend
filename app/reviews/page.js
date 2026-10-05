@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+import { withSocialPreview } from '@/lib/socialPreview';
 
 /**
  * Client Reviews / Testimonials page (2026-09-25, per Ryan — Task #67 from
@@ -44,12 +45,12 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
  * 0x...:0x... feature id): https://www.google.com/maps?cid=4331176909618130834
  * — confirmed live 2026-09-25 (name, 5.0★, 6 reviews all matched).
  */
-export const metadata = {
+export const metadata = withSocialPreview({
   title: 'Client Reviews | Brevard Coastal Homes',
   description:
     'Real client reviews for Ryan Pohl and Brevard Coastal Homes — see what buyers and sellers across Brevard County say about working with us.',
   alternates: { canonical: '/reviews' },
-};
+});
 
 const GOOGLE_REVIEWS_URL = 'https://www.google.com/maps?cid=4331176909618130834';
 
