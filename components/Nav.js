@@ -563,7 +563,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                       style={cityHomeLinkStyle}
                       onClick={closeNow}
                     >
-                      Oceanfront Homes
+                      Homes
                     </Link>
                     <Link
                       href={`/${city.slug}/${OCEANFRONT_PROPERTY_TYPE_TO_SLUG.Condo}`}
@@ -571,7 +571,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                       style={gridCondoLinkStyle}
                       onClick={closeNow}
                     >
-                      Oceanfront Condos
+                      Condos
                     </Link>
                   </div>
                 ))}
