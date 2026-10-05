@@ -126,7 +126,11 @@ export default async function RootLayout({ children }) {
         />
         <script
           dangerouslySetInnerHTML={{
-            __html: "document.getElementById('google-fonts-css').media='all';",
+            // Flip to media="all" only once the stylesheet has loaded
+            // (2026-10-04 fix) — flipping it immediately, as before, made
+            // the font CSS render-blocking again on slow mobile networks.
+            __html:
+              "(function(){var l=document.getElementById('google-fonts-css');if(!l)return;function on(){l.media='all';}if(l.sheet){on();}else{l.addEventListener('load',on);}})();",
           }}
         />
         <noscript>

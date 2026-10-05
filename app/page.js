@@ -173,6 +173,11 @@ export default async function HomePage() {
             alt="Beachfront estate with private pool overlooking the Brevard County coastline"
             fill
             priority
+            // Explicit fetchPriority (2026-10-04): `priority` alone wasn't
+            // emitting fetchpriority="high" on this LCP image, which mobile
+            // PageSpeed flagged.
+            fetchPriority="high"
+            sizes="100vw"
             // 2026-10-01, per Ryan — this is the page's LCP element (the
             // first full-bleed image painted), and mobile PageSpeed had
             // LCP at 5.7s, the single worst-scoring metric after the card
