@@ -783,6 +783,55 @@ textarea:focus {
   padding-bottom: 6px;
 }
 
+/* Homepage "Schedule a Showing" button (SearchBar.js) — solid brand gold
+   (2026-10-04, per Ryan; was a translucent red). The --inline copy sits
+   beside Search on tablet/desktop; below 640px it hides and the --stacked
+   copy shows full width under the filters. */
+.hero-showing-btn {
+  align-items: center;
+  justify-content: center;
+  padding: 0 22px;
+  height: 66px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  background: var(--color-gold);
+  font-family: var(--font-inter-tight);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--color-ink-dark);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  transition: background-color 0.15s ease;
+}
+
+.hero-showing-btn--inline {
+  display: flex;
+}
+
+.hero-showing-btn--stacked {
+  display: none;
+}
+
+@media (hover: hover) {
+  .hero-showing-btn:hover {
+    background: #d8b46e;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-showing-btn--inline {
+    display: none;
+  }
+
+  .hero-showing-btn--stacked {
+    display: flex;
+    width: 100%;
+    height: 56px;
+  }
+}
+
 .hero-search-input::placeholder {
   color: rgba(255, 255, 255, 0.65);
 }
