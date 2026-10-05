@@ -296,7 +296,7 @@ export default async function HomePage() {
             {neighborhoods.map((n) => (
               <PlaceCard
                 key={n.slug}
-                name={n.name}
+                name={NEIGHBORHOOD_CARD_LABEL[n.slug] || n.name}
                 thumbnail={n.thumbnail}
                 href={`/neighborhoods/${n.slug}`}
                 sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
@@ -318,6 +318,12 @@ export default async function HomePage() {
 // wordmark from the 2026-09-04 header redesign. The gold rule that
 // originally sat between photo and name was removed the same day, per
 // Ryan: "delete the line ... between the pictures & the names."
+// Shorter homepage card labels (2026-10-04, per Ryan) — the backend name
+// "Viera Builders Communities Viera West" wrapped to three lines.
+const NEIGHBORHOOD_CARD_LABEL = {
+  'viera-builders-communities-viera-west': 'Viera Builders Communities',
+};
+
 function PlaceCard({ name, thumbnail, href, sizes, objectPosition = 'center' }) {
   const src = placePhotoUrl(thumbnail);
   return (

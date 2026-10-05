@@ -114,9 +114,6 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               321-350-7661
             </a>
           </p>
-          <p style={{ fontSize: 13, lineHeight: 1.6 }}>
-            Local expertise across Brevard County&apos;s coastal cities and neighborhoods.
-          </p>
         </div>
 
         <div>
