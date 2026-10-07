@@ -20,7 +20,7 @@ import {
   CITY_NEIGHBORHOOD_LINKS,
 } from '@/lib/constants';
 import { getMarketSnapshot } from '@/lib/marketSnapshot';
-import { MARKET_REPORT_CITY_SLUGS, getCityMarketReport } from '@/lib/cityMarketReport';
+import { getCityMarketReport, showsMarketReport } from '@/lib/cityMarketReport';
 import CityMarketReport from '@/components/CityMarketReport';
 import CityAboutSection from '@/components/CityAboutSection';
 import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
@@ -768,9 +768,9 @@ export default async function CityListingsPage({ params, searchParams: searchPar
     });
   }
   // City market snapshot + neighborhood comparison (2026-10-07, per Ryan) on
-  // the plain Homes and Condos pages of cities in MARKET_REPORT_CITY_SLUGS.
+  // the plain Homes and Condos pages of every city (see showsMarketReport).
   const showMarketReport =
-    MARKET_REPORT_CITY_SLUGS.has(citySlug) &&
+    showsMarketReport(citySlug) &&
     !isOceanfront &&
     !isOceanfrontCombined &&
     !isRiverfrontCombined &&
