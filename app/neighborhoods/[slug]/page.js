@@ -20,7 +20,7 @@ import {
   VIERA_BUILDERS_PROPERTY_TYPE_OPTIONS,
   SOUTH_MERRITT_ISLAND_PRICE_BANDS,
   BEACH_WOODS_SUBDIVISION_NAMES,
-  AQUARINA_SUBDIVISION_NAMES,
+  AQUARINA_LISTINGS_FILTER,
   TORTOISE_ISLAND_SUBDIVISION_NAMES,
   SUMMER_LAKES_SUBDIVISION_NAMES,
   LANSING_ISLAND_SUBDIVISION_NAMES,
@@ -195,7 +195,7 @@ function metadataListingsFilter(slug, searchParams) {
       : isBeachWoods
         ? { subdivision: BEACH_WOODS_SUBDIVISION_NAMES.join(',') }
         : isAquarina
-          ? { subdivision: AQUARINA_SUBDIVISION_NAMES.join(',') }
+          ? AQUARINA_LISTINGS_FILTER
           : slug === 'tortoise-island'
             ? { subdivision: TORTOISE_ISLAND_SUBDIVISION_NAMES.join(',') }
             : slug === 'summer-lakes'
@@ -679,7 +679,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
       : isBeachWoods
         ? { subdivision: BEACH_WOODS_SUBDIVISION_NAMES.join(',') }
         : isAquarina
-          ? { subdivision: AQUARINA_SUBDIVISION_NAMES.join(',') }
+          ? AQUARINA_LISTINGS_FILTER
           : slug === 'tortoise-island'
             ? { subdivision: TORTOISE_ISLAND_SUBDIVISION_NAMES.join(',') }
             : slug === 'summer-lakes'

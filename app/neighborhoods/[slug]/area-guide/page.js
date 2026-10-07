@@ -5,7 +5,7 @@ import {
   NEIGHBORHOOD_AREA_GUIDE_CONTENT,
   NEIGHBORHOOD_LISTINGS_FAQ,
   VIERA_BUILDERS_SUB_COMMUNITIES,
-  AQUARINA_SUBDIVISION_NAMES,
+  AQUARINA_LISTINGS_FILTER,
   TORTOISE_ISLAND_SUBDIVISION_NAMES,
   SUMMER_LAKES_SUBDIVISION_NAMES,
   LANSING_ISLAND_SUBDIVISION_NAMES,
@@ -37,7 +37,7 @@ import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 function getListingsFilterParams(slug) {
   const subCommunity = VIERA_BUILDERS_SUB_COMMUNITIES.find((c) => c.slug === slug);
   if (subCommunity) return { subdivision: subCommunity.name };
-  if (slug === 'aquarina') return { subdivision: AQUARINA_SUBDIVISION_NAMES.join(',') };
+  if (slug === 'aquarina') return AQUARINA_LISTINGS_FILTER;
   if (slug === 'tortoise-island') return { subdivision: TORTOISE_ISLAND_SUBDIVISION_NAMES.join(',') };
   if (slug === 'summer-lakes') return { subdivision: SUMMER_LAKES_SUBDIVISION_NAMES.join(',') };
   if (slug === 'lansing-island') return { subdivision: LANSING_ISLAND_SUBDIVISION_NAMES.join(',') };
