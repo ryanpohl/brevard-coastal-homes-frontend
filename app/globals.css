@@ -1015,3 +1015,9 @@ textarea:focus {
     font-size: 11px !important;
   }
 }
+
+/* Recently Sold "Show more" toggle (components/RecentlySold.js). */
+.sold-more > summary::-webkit-details-marker { display: none; }
+.sold-more .sold-more-close { display: none; }
+.sold-more[open] .sold-more-open { display: none; }
+.sold-more[open] .sold-more-close { display: inline; }
