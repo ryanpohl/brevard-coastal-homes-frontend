@@ -45,6 +45,8 @@ import ModelTourButton from '@/components/ModelTourButton';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import Faq from '@/components/Faq';
 import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
+import RecentlySold from '@/components/RecentlySold';
+import { RECENTLY_SOLD_SLUGS, getRecentlySold } from '@/lib/recentlySold';
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 
 // Matches the reference design's "1-30 of 34 Homes" pagination — the
@@ -1172,7 +1174,25 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // has content for today (same set as showAreaGuideLink above); Faq.js
   // itself renders nothing when items is undefined/empty, so this is a
   // no-op everywhere else rather than a broken/empty section.
-  const listingsFaqItems = NEIGHBORHOOD_LISTINGS_FAQ[slug];
+  // Recently Sold section + live FAQ answers (2026-10-07, per Ryan) — see
+  // lib/recentlySold.js. Adelaide first.
+  const recentlySold = RECENTLY_SOLD_SLUGS.has(slug) ? await getRecentlySold(listingsFilterParams) : null;
+  const liveFaqItems = [];
+  if (recentlySold && slug === 'adelaide') {
+    if (recentlySold.activeCount != null) {
+      liveFaqItems.push({
+        q: 'How many homes are for sale in Adelaide right now?',
+        a: `There ${recentlySold.activeCount === 1 ? 'is' : 'are'} currently ${recentlySold.activeCount} active ${recentlySold.activeCount === 1 ? 'listing' : 'listings'} in Adelaide, Viera, updated hourly from the MLS. Custom builders also offer homesites and build-to-order homes that may not be listed — ask Ryan about current builder availability.`,
+      });
+    }
+    if (recentlySold.count && recentlySold.medianPrice) {
+      liveFaqItems.push({
+        q: 'What have homes sold for in Adelaide?',
+        a: `${recentlySold.count} ${recentlySold.count === 1 ? 'home' : 'homes'} sold in Adelaide in the last 12 months, with a median sold price of ${formatPrice(recentlySold.medianPrice)}${recentlySold.medianPerSqft ? ` (about ${formatPrice(recentlySold.medianPerSqft)} per square foot)` : ''}, based on Space Coast MLS data.`,
+      });
+    }
+  }
+  const listingsFaqItems = NEIGHBORHOOD_LISTINGS_FAQ[slug] && [...NEIGHBORHOOD_LISTINGS_FAQ[slug], ...liveFaqItems];
 
   return (
     <div>
@@ -1707,7 +1727,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {isAdelaide && (
           <div style={{ marginBottom: 12 }}>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
-              Explore new construction and existing homes for sale in Adelaide. With three custom home builders to
+              Explore new construction and existing homes for sale in Adelaide in Viera. With three custom home builders to
               choose from, we can help you compare options, set up private tours of the model homes, negotiate with
               builders, and navigate the entire buying process through closing.
             </p>
@@ -1992,6 +2012,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           totalPages={totalPages}
         />
       </div>
+
+      <RecentlySold name={neighborhood.name} data={recentlySold} />
 
       {/* About {name} {area} Real Estate (2026-10-03, per Ryan) — a short,
           fact-dense summary on the listings page itself (the full detail
