@@ -12,13 +12,17 @@ function pct(current, prior) {
   return Math.round(((current - prior) / prior) * 1000) / 10;
 }
 
-function Change({ value, suffix = '%' }) {
+// unit: '%' or a counted word ('day', 'pt') that gets an "s" unless it's 1.
+function Change({ value, unit = '%' }) {
   if (value == null || !Number.isFinite(value)) return null;
-  const sign = value > 0 ? '+' : value < 0 ? '−' : '';
+  if (value === 0) return <div className="market-tile-change">Same as prior year</div>;
+  const sign = value > 0 ? '+' : '−';
+  const size = Math.abs(value);
+  const suffix = unit === '%' ? '%' : ` ${unit}${size === 1 ? '' : 's'}`;
   return (
     <div className="market-tile-change">
       {sign}
-      {Math.abs(value)}
+      {size}
       {suffix} vs. prior year
     </div>
   );
@@ -44,7 +48,7 @@ export default function CityMarketReport({ cityName, typeLabel, report }) {
           label: 'Median days on market',
           value: `${city.medianDaysOnMarket}`,
           change: showChange && prior.medianDaysOnMarket != null ? city.medianDaysOnMarket - prior.medianDaysOnMarket : null,
-          suffix: ' days',
+          unit: 'day',
         }
       : null,
     city.medianSaleToListPct
@@ -52,7 +56,7 @@ export default function CityMarketReport({ cityName, typeLabel, report }) {
           label: 'Sold vs. list price',
           value: `${city.medianSaleToListPct}%`,
           change: showChange && prior.medianSaleToListPct ? Math.round((city.medianSaleToListPct - prior.medianSaleToListPct) * 10) / 10 : null,
-          suffix: ' pts',
+          unit: 'pt',
         }
       : null,
   ].filter(Boolean);
@@ -71,7 +75,7 @@ export default function CityMarketReport({ cityName, typeLabel, report }) {
           <div key={t.label} className="market-tile">
             <div className="market-tile-value">{t.value}</div>
             <div className="market-tile-label">{t.label}</div>
-            <Change value={t.change} suffix={t.suffix} />
+            <Change value={t.change} unit={t.unit} />
           </div>
         ))}
       </div>
