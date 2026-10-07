@@ -48,6 +48,7 @@ import Faq from '@/components/Faq';
 import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
 import RecentlySold from '@/components/RecentlySold';
 import { getRecentlySold, showsRecentlySold } from '@/lib/recentlySold';
+import { neighborhoodListingsFilter } from '@/lib/neighborhoodFilters';
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 
 // Matches the reference design's "1-30 of 34 Homes" pagination — the
@@ -179,38 +180,8 @@ function ModelTourLine({ name }) {
   );
 }
 
-// Listing filter generateMetadata uses for a neighborhood page (live price
-// floor and link preview photo); mirrors the page component's own
-// listingsFilterParams further below.
-function metadataListingsFilter(slug, searchParams) {
-  const subCommunity = VIERA_BUILDERS_SUB_COMMUNITIES.find((c) => c.slug === slug);
-  const isVieraBuildersCommunitiesVieraWest = slug === 'viera-builders-communities-viera-west';
-  const isBeachWoods = slug === 'beach-woods';
-  const isAquarina = slug === 'aquarina';
-  return NEIGHBORHOOD_LANDING_PAGES[slug]
-    ? neighborhoodLandingFilter(slug)
-    : subCommunity
-    ? { subdivision: subCommunity.name }
-    : isVieraBuildersCommunitiesVieraWest
-      ? { subdivision: searchParams.subdivision || VIERA_BUILDERS_SUB_COMMUNITIES.map((c) => c.name).join(',') }
-      : isBeachWoods
-        ? { subdivision: BEACH_WOODS_SUBDIVISION_NAMES.join(',') }
-        : isAquarina
-          ? AQUARINA_LISTINGS_FILTER
-          : slug === 'tortoise-island'
-            ? { subdivision: TORTOISE_ISLAND_SUBDIVISION_NAMES.join(',') }
-            : slug === 'summer-lakes'
-              ? { subdivision: SUMMER_LAKES_SUBDIVISION_NAMES.join(',') }
-              : slug === 'lansing-island'
-                ? { subdivision: LANSING_ISLAND_SUBDIVISION_NAMES.join(',') }
-                : slug === 'south-merritt-island'
-                  ? { city: 'merritt-island', latMax: SOUTH_MERRITT_ISLAND_LAT_MAX }
-                  : slug === 'suntree'
-                    ? { subdivision: SUNTREE_SUBDIVISION_NAMES.join(',') }
-                    : slug === 'aripeka'
-                      ? ARIPEKA_LISTINGS_FILTER
-                      : { neighborhood: slug };
-}
+// Listing filter for generateMetadata — see lib/neighborhoodFilters.js.
+const metadataListingsFilter = neighborhoodListingsFilter;
 
 // Link preview card with this page's title and a current listing photo —
 // see lib/socialPreview.js.

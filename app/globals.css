@@ -1021,3 +1021,59 @@ textarea:focus {
 .sold-more .sold-more-close { display: none; }
 .sold-more[open] .sold-more-open { display: none; }
 .sold-more[open] .sold-more-close { display: inline; }
+
+/* City market snapshot (components/CityMarketReport.js). */
+.market-tiles {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.market-tile {
+  background: #fff;
+  border: 1px solid var(--color-border-light);
+  border-radius: 6px;
+  padding: 14px 12px;
+}
+.market-tile-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-ink);
+  font-family: var(--font-inter-tight);
+}
+.market-tile-label {
+  font-size: 13px;
+  color: var(--color-muted-dark);
+  margin-top: 2px;
+}
+.market-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.market-table th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--color-muted-dark);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border-light);
+  white-space: nowrap;
+}
+.market-table td {
+  padding: 10px 14px;
+  border-top: 1px solid var(--color-border-light);
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .market-tiles { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 560px) {
+  .market-tiles { grid-template-columns: repeat(2, 1fr); }
+  .market-tile-value { font-size: 19px; }
+  .market-table { font-size: 14px; }
+  .market-table th, .market-table td { padding: 9px 8px; }
+  .market-table td:first-child { white-space: normal; }
+}

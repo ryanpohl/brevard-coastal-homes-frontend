@@ -20,6 +20,8 @@ import {
   CITY_NEIGHBORHOOD_LINKS,
 } from '@/lib/constants';
 import { getMarketSnapshot } from '@/lib/marketSnapshot';
+import { MARKET_REPORT_CITY_SLUGS, getCityMarketReport } from '@/lib/cityMarketReport';
+import CityMarketReport from '@/components/CityMarketReport';
 import CityAboutSection from '@/components/CityAboutSection';
 import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
 import FilterBar from '@/components/FilterBar';
@@ -765,6 +767,17 @@ export default async function CityListingsPage({ params, searchParams: searchPar
       waterfront: isOceanfront || isOceanfrontCombined ? 'Oceanfront' : isRiverfrontCombined ? 'Riverfront' : undefined,
     });
   }
+  // City market snapshot + neighborhood comparison (2026-10-07, per Ryan) on
+  // the plain Homes and Condos pages of cities in MARKET_REPORT_CITY_SLUGS.
+  const showMarketReport =
+    MARKET_REPORT_CITY_SLUGS.has(citySlug) &&
+    !isOceanfront &&
+    !isOceanfrontCombined &&
+    !isRiverfrontCombined &&
+    (propertyType === 'Home' || propertyType === 'Condo');
+  const marketReport = showMarketReport
+    ? await getCityMarketReport({ citySlug, cityFilter: cityListingsQueryParams(citySlug), propertyType })
+    : null;
   const pageTitle = isOceanfrontCombined
     ? `Oceanfront Homes & Condos For Sale in ${city.name}, FL`
     : isRiverfrontCombined
@@ -970,6 +983,10 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           totalPages={totalPages}
         />
       </div>
+
+      {marketReport && (
+        <CityMarketReport cityName={city.name} typeLabel={propertyType === 'Condo' ? 'Condos' : 'Homes'} report={marketReport} />
+      )}
 
       {pageSeo && (
         <CityAboutSection
