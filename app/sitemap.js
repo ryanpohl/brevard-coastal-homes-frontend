@@ -10,6 +10,7 @@ import {
   NEIGHBORHOOD_AREA_GUIDE_CONTENT,
   NEIGHBORHOOD_LANDING_PAGES,
 } from '@/lib/constants';
+import { MARKET_REPORTS } from '@/lib/marketReports';
 
 // Native Next.js sitemap.xml (2026-09-11, SEO audit finding: brevardcoastalhomes.com/sitemap.xml
 // 404s). Same root cause as robots.js's comment: the backend DOES generate a real sitemap
@@ -88,6 +89,9 @@ export default async function sitemap() {
     // guide page, see app/flood-insurance/page.js. Same priority as the
     // down payment guide.
     { url: `${SITE_URL}/flood-insurance`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    // Monthly Brevard County market report (2026-10-07) — see lib/marketReports.js.
+    { url: `${SITE_URL}/market-report`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
+    ...MARKET_REPORTS.slice(1).map((r) => ({ url: `${SITE_URL}/market-report/${r.slug}`, lastModified: now, changeFrequency: 'yearly', priority: 0.4 })),
     // Hurricane Insurance guide (2026-09-25, per Ryan) — third evergreen
     // guide page, see app/hurricane-insurance/page.js. Same priority tier
     // as the other two guides.

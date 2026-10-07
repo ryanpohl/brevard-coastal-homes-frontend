@@ -302,6 +302,11 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
             Looking to Sell
           </Link>
           <div style={{ height: 8 }} />
+          {/* Monthly market report (2026-10-07, per Ryan). */}
+          <Link href="/market-report" className="footer-link" style={footerLinkStyle}>
+            Brevard Market Report
+          </Link>
+          <div style={{ height: 8 }} />
           {/* What's My Home Worth (2026-10-02, per Ryan) — see
               app/home-value/page.js. Grouped right under Looking to Sell,
               same section, since both target a seller-intent visitor. */}
