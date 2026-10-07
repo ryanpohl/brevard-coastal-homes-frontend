@@ -46,7 +46,7 @@ import ListingResultsLayout from '@/components/ListingResultsLayout';
 import Faq from '@/components/Faq';
 import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
 import RecentlySold from '@/components/RecentlySold';
-import { RECENTLY_SOLD_SLUGS, getRecentlySold } from '@/lib/recentlySold';
+import { getRecentlySold, showsRecentlySold } from '@/lib/recentlySold';
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 
 // Matches the reference design's "1-30 of 34 Homes" pagination — the
@@ -1175,24 +1175,33 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // itself renders nothing when items is undefined/empty, so this is a
   // no-op everywhere else rather than a broken/empty section.
   // Recently Sold section + live FAQ answers (2026-10-07, per Ryan) — see
-  // lib/recentlySold.js. Adelaide first.
-  const recentlySold = RECENTLY_SOLD_SLUGS.has(slug) ? await getRecentlySold(listingsFilterParams) : null;
+  // lib/recentlySold.js. On a single-type view (e.g. /condos-for-sale) the
+  // sales are limited to that type too.
+  const recentlySold = showsRecentlySold(slug)
+    ? await getRecentlySold({ ...listingsFilterParams, propertyType: searchParams.propertyType })
+    : null;
+  const nbName = neighborhood.name;
   const liveFaqItems = [];
-  if (recentlySold && slug === 'adelaide') {
+  if (recentlySold) {
     if (recentlySold.activeCount != null) {
       liveFaqItems.push({
-        q: 'How many homes are for sale in Adelaide right now?',
-        a: `There ${recentlySold.activeCount === 1 ? 'is' : 'are'} currently ${recentlySold.activeCount} active ${recentlySold.activeCount === 1 ? 'listing' : 'listings'} in Adelaide, Viera, updated hourly from the MLS. Custom builders also offer homesites and build-to-order homes that may not be listed — ask Ryan about current builder availability.`,
+        q: `How many homes are for sale in ${nbName} right now?`,
+        a: `There ${recentlySold.activeCount === 1 ? 'is' : 'are'} currently ${recentlySold.activeCount} active ${recentlySold.activeCount === 1 ? 'listing' : 'listings'} in ${nbName}, updated hourly from the MLS.${slug === 'adelaide' ? ' Custom builders also offer homesites and build-to-order homes that may not be listed — ask Ryan about current builder availability.' : ''}`,
       });
     }
     if (recentlySold.count && recentlySold.medianPrice) {
       liveFaqItems.push({
-        q: 'What have homes sold for in Adelaide?',
-        a: `${recentlySold.count} ${recentlySold.count === 1 ? 'home' : 'homes'} sold in Adelaide in the last 12 months, with a median sold price of ${formatPrice(recentlySold.medianPrice)}${recentlySold.medianPerSqft ? ` (about ${formatPrice(recentlySold.medianPerSqft)} per square foot)` : ''}, based on Space Coast MLS data.`,
+        q: `What have homes sold for in ${nbName}?`,
+        a: `${recentlySold.count} ${recentlySold.count === 1 ? 'home' : 'homes'} sold in ${nbName} in the last 12 months, with a median sold price of ${formatPrice(recentlySold.medianPrice)}${recentlySold.medianPerSqft ? ` (about ${formatPrice(recentlySold.medianPerSqft)} per square foot)` : ''}, based on Space Coast MLS data.`,
       });
     }
   }
-  const listingsFaqItems = NEIGHBORHOOD_LISTINGS_FAQ[slug] && [...NEIGHBORHOOD_LISTINGS_FAQ[slug], ...liveFaqItems];
+  // Neighborhoods without written FAQ content still get the live answers.
+  const listingsFaqItems = NEIGHBORHOOD_LISTINGS_FAQ[slug]
+    ? [...NEIGHBORHOOD_LISTINGS_FAQ[slug], ...liveFaqItems]
+    : liveFaqItems.length
+      ? liveFaqItems
+      : undefined;
 
   return (
     <div>
