@@ -21,6 +21,7 @@ import {
   SOUTH_MERRITT_ISLAND_PRICE_BANDS,
   BEACH_WOODS_SUBDIVISION_NAMES,
   AQUARINA_LISTINGS_FILTER,
+  ARIPEKA_LISTINGS_FILTER,
   TORTOISE_ISLAND_SUBDIVISION_NAMES,
   SUMMER_LAKES_SUBDIVISION_NAMES,
   LANSING_ISLAND_SUBDIVISION_NAMES,
@@ -206,7 +207,9 @@ function metadataListingsFilter(slug, searchParams) {
                   ? { city: 'merritt-island', latMax: SOUTH_MERRITT_ISLAND_LAT_MAX }
                   : slug === 'suntree'
                     ? { subdivision: SUNTREE_SUBDIVISION_NAMES.join(',') }
-                    : { neighborhood: slug };
+                    : slug === 'aripeka'
+                      ? ARIPEKA_LISTINGS_FILTER
+                      : { neighborhood: slug };
 }
 
 // Link preview card with this page's title and a current listing photo —
@@ -690,7 +693,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                   ? { city: 'merritt-island', latMax: SOUTH_MERRITT_ISLAND_LAT_MAX }
                   : slug === 'suntree'
                     ? { subdivision: SUNTREE_SUBDIVISION_NAMES.join(',') }
-                    : { neighborhood: slug };
+                    : slug === 'aripeka'
+                      ? ARIPEKA_LISTINGS_FILTER
+                      : { neighborhood: slug };
 
   let results = [];
   let total = 0;
