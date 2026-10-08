@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import { formatPrice, formatAssocFee, isPricePerSqftPlausible, soldPricePerSqft, formatSoldDate } from '@/lib/constants';
+import { formatPrice, formatAssocFee, isPricePerSqftPlausible, soldPricePerSqft, formatSoldDate } from '@/lib/siteConstants';
 import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
 

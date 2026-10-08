@@ -1,3 +1,49 @@
+/* Fallback faces sized to match each web font's metrics (the same
+   technique next/font uses), so swapping in the real font once it loads
+   doesn't shift the page (2026-10-08: without them, the swap moved the
+   homepage hero and cost a 0.35 layout-shift score). Values computed from
+   the font files against Arial / Times New Roman; Liberation and Roboto
+   cover Linux and Android, which lack those. Inter Tight's fallback is
+   sized for the site's letter-spaced capital labels (93% rather than the
+   96.6% that matches lowercase text): at 96.6% the homepage hero's Beds
+   button wrapped to its own row until the font loaded. The ascent/descent
+   overrides keep the line height the same as the real font. */
+@font-face {
+  font-family: 'Inter Tight Fallback';
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans'), local('Helvetica'), local('Roboto');
+  size-adjust: 93%;
+  ascent-override: 104.17%;
+  descent-override: 25.94%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Playfair Display Fallback';
+  src: local('Times New Roman'), local('TimesNewRomanPSMT'), local('Liberation Serif'), local('Times'), local('Noto Serif');
+  size-adjust: 112.31%;
+  ascent-override: 96.34%;
+  descent-override: 22.35%;
+  line-gap-override: 0%;
+}
+
+/* Self-hosted fonts (2026-10-08) — see the Fonts comment in app/layout.js.
+   unicode-range matches Google Fonts' latin subset. */
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('/fonts/playfair-display-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter Tight';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/inter-tight-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* Fonts are loaded via <link rel="stylesheet"> tags in app/layout.js's
    <head> (2026-09-24, SEO/performance re-audit) rather than the @import
    that used to be here — moving the exact same Google Fonts request out of
@@ -47,11 +93,11 @@
   --shadow-nav-menu: 0 12px 32px rgba(0, 0, 0, 0.3);
   --shadow-filter-menu: 0 8px 24px rgba(0, 0, 0, 0.14);
 
-  --font-heading: 'Playfair Display', serif;
+  --font-heading: 'Playfair Display', 'Playfair Display Fallback', serif;
   /* Body font switched Jost -> Inter Tight (2026-10-02, per Ryan: font
      consistency pass — one serif for headings (Playfair Display, the
      logo font) and one sans for everything else). */
-  --font-body: 'Inter Tight', sans-serif;
+  --font-body: 'Inter Tight', 'Inter Tight Fallback', sans-serif;
   /* Added 2026-08-21 per Ryan ("Change the font to inter tight on all the
      pages city & neighborhood descriptions") — used specifically on the
      city/neighborhood listing pages' H1 (there's no separate visible
@@ -59,7 +105,7 @@
      "N results" line — the H1 is what Ryan's reference screenshots
      showed). See app/[citySlug]/[propertySlug]/page.js and
      app/neighborhoods/[slug]/page.js. */
-  --font-inter-tight: 'Inter Tight', sans-serif;
+  --font-inter-tight: 'Inter Tight', 'Inter Tight Fallback', sans-serif;
   /* Added 2026-09-04 per Ryan: matched a reference site's hero headline
      (high-contrast Didot-style serif, thin hairline serifs, tall
      proportions) after comparing it against the homepage hero in a

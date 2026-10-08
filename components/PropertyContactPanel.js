@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { AGENT_INFO } from '@/lib/constants';
+import { AGENT_INFO } from '@/lib/siteConstants';
 import * as api from '@/lib/api';
 import BrokerageNote from '@/components/BrokerageNote';
 

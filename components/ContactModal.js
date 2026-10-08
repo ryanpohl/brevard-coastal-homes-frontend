@@ -1,7 +1,7 @@
 'use client';
 
 import { createPortal } from 'react-dom';
-import { AGENT_INFO } from '@/lib/constants';
+import { AGENT_INFO } from '@/lib/siteConstants';
 import ContactForm from './ContactForm';
 import BrokerageNote from '@/components/BrokerageNote';
 

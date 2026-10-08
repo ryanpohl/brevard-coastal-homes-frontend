@@ -11,7 +11,7 @@ import {
   OCEANFRONT_LISTINGS_SLUG,
   RIVERFRONT_CITY_SLUGS,
   RIVERFRONT_LISTINGS_SLUG,
-} from '@/lib/constants';
+} from '@/lib/siteConstants';
 import {
   NEIGHBORHOOD_NAV_GROUPS,
   NEIGHBORHOOD_NAV_LABELS,

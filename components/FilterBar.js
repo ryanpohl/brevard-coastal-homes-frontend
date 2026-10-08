@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { SORT_OPTIONS, PRICE_BANDS, BED_OPTIONS, BATH_OPTIONS } from '@/lib/constants';
+import { SORT_OPTIONS, PRICE_BANDS, BED_OPTIONS, BATH_OPTIONS } from '@/lib/siteConstants';
 import InquiryModals from './InquiryModals';
 import ScheduleShowingModal from './ScheduleShowingModal';
 

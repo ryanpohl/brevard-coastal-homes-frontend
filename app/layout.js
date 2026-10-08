@@ -5,55 +5,15 @@ import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import AuthPromptHost from '@/components/AuthPromptHost';
 import * as api from '@/lib/api';
+import { navNeighborhoods } from '@/lib/navNeighborhoods';
 
-// Google Fonts (2026-09-24, SEO/performance re-audit) — this used to be a
-// `@import url('https://fonts.googleapis.com/...')` at the top of
-// globals.css, which is a textbook render-blocking chain: the browser has
-// to download globals.css, parse it, discover the @import, THEN fetch
-// fonts.googleapis.com's CSS, parse that, THEN finally fetch the actual
-// font files from fonts.gstatic.com — three serial round trips before any
-// of this site's custom-font text (including hero/H1 text that's often the
-// LCP element) could paint. PageSpeed Insights flagged ~1.35s of
-// render-blocking delay from this.
-//
-// First attempt was next/font/google (self-hosts the files at build time,
-// no external request at all) — reverted same day after it broke the
-// Hostinger build: `next build` failed with "TypeError: Cannot read
-// properties of null (reading '1')" inside next/font's Google-fonts
-// loader, almost certainly because this build sandbox can't reach
-// fonts.googleapis.com/fonts.gstatic.com during the build step (the site
-// itself never broke — Hostinger kept serving the last successful build
-// throughout). See deployment 01a0d4c3 in Hostinger's build log for the
-// full stack trace if this needs revisiting later (e.g. if Hostinger's
-// build environment gets broader network access).
-//
-// Second attempt was a plain <link rel="preconnect"> + <link
-// rel="stylesheet"> pair — this correctly moved *discovery* of the font
-// CSS request earlier (the browser's preload scanner finds it immediately
-// while parsing <head>, instead of only after globals.css finishes
-// downloading+parsing), but a synchronous <link rel="stylesheet"> is
-// STILL render-blocking no matter how early it's discovered. Re-running
-// PageSpeed Insights after that deploy confirmed it: "Render-blocking
-// requests" was still flagged with ~1.2s of estimated savings, barely
-// down from the original ~1.35s.
-//
-// This is the actual fix: the "loadCSS" pattern (a well-known technique,
-// not Next-specific). `media="print"` makes the browser fetch the
-// stylesheet WITHOUT blocking initial render (print stylesheets don't
-// apply to screen rendering, so they're never in the critical path); the
-// inline <script> immediately after runs synchronously during HTML
-// parsing and flips it to `media="all"` once loaded, so the fonts apply
-// normally a moment later. This has to be a plain inline <script> rather
-// than a React `onLoad` prop — RootLayout is an async Server Component,
-// and Server Components can't pass event-handler functions to Client
-// Component-style props (there's no client-side JS bundle to run them).
-// A vanilla <script> tag sidesteps that entirely: it's just HTML the
-// browser executes in document order, no React involved. <noscript>
-// keeps fonts working the normal way for the rare visitor with JS
-// disabled. Same font families/weights as before; still the same
-// fonts.googleapis.com/fonts.gstatic.com runtime request (no build-time
-// network dependency, so this doesn't reintroduce the Hostinger build
-// failure from the next/font attempt).
+// Fonts (2026-10-08, per Ryan's mobile PageSpeed report): Playfair Display
+// and Inter Tight are self-hosted from public/fonts (latin subset, variable
+// weight — the same files Google Fonts served) with @font-face rules at the
+// top of app/globals.css. That CSS is inlined into each page, so the
+// browser finds the fonts right away instead of waiting on
+// fonts.googleapis.com and then fonts.gstatic.com, as before. Both fonts
+// are SIL Open Font License.
 
 
 // Sitewide SEO defaults (2026-09-11) — metadataBase resolves every page's
@@ -102,11 +62,11 @@ export const metadata = {
 async function getNavData() {
   try {
     const [{ cities }, { neighborhoods }] = await Promise.all([api.getCities(), api.getNeighborhoods()]);
-    return { cities, neighborhoods };
+    return { cities, neighborhoods: navNeighborhoods(neighborhoods) };
   } catch {
     // Backend unreachable at build/request time — render nav/footer empty
     // rather than crashing the whole site.
-    return { cities: [], neighborhoods: [] };
+    return { cities: [], neighborhoods: navNeighborhoods([]) };
   }
 }
 
@@ -115,31 +75,6 @@ export default async function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          id="google-fonts-css"
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
-          media="print"
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            // Flip to media="all" only once the stylesheet has loaded
-            // (2026-10-04 fix) — flipping it immediately, as before, made
-            // the font CSS render-blocking again on slow mobile networks.
-            __html:
-              "(function(){var l=document.getElementById('google-fonts-css');if(!l)return;function on(){l.media='all';}if(l.sheet){on();}else{l.addEventListener('load',on);}})();",
-          }}
-        />
-        <noscript>
-          <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
-          />
-        </noscript>
-      </head>
       <body>
         {/* Google Ads conversion tracking (gtag.js), added 2026-08-20 per Ryan.
             Loaded here in the root layout so it's present on every page.

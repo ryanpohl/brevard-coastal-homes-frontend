@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { PROPERTY_TYPE_TO_SLUG, BROKERAGE_INFO, AGENT_INFO } from '@/lib/constants';
+import { PROPERTY_TYPE_TO_SLUG, BROKERAGE_INFO, AGENT_INFO } from '@/lib/siteConstants';
 import { NEIGHBORHOOD_NAV_LABELS, groupNeighborhoodsForNav } from '@/lib/neighborhoodNav';
 import ContactModal from './ContactModal';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { formatPrice, formatAssocFee } from '@/lib/constants';
+import { formatPrice, formatAssocFee } from '@/lib/siteConstants';
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 

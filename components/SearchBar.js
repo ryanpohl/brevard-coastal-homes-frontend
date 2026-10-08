@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PROPERTY_TYPE_TO_SLUG, BED_OPTIONS } from '@/lib/constants';
+import { PROPERTY_TYPE_TO_SLUG, BED_OPTIONS } from '@/lib/siteConstants';
 import * as api from '@/lib/api';
 import ScheduleShowingModal from './ScheduleShowingModal';
 

@@ -1,4 +1,4 @@
-import { BROKERAGE_INFO } from '@/lib/constants';
+import { BROKERAGE_INFO } from '@/lib/siteConstants';
 
 // Florida Rule 61J2-10.025 (2026-10-05, per Ryan): the brokerage's licensed
 // name has to appear above, below or next to every phone number or other
