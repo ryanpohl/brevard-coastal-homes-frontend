@@ -162,7 +162,7 @@ export default async function CondoBuildingPage({ params }) {
         )}
       </div>
 
-      {tiles.length > 0 && (
+      {tiles.length > 1 && (
         <div className="container" style={{ padding: '8px clamp(16px, 4vw, 56px) 8px', maxWidth: 760 }}>
           <section className="market-report neighborhood-market-stats" style={{ margin: '4px 0 20px' }}>
             <h2 className="market-report-title" style={{ fontSize: 20 }}>
