@@ -269,7 +269,15 @@ export default async function ListingDetailPage({ params }) {
   </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 'clamp(18px, 3vw, 22px)', fontWeight: 600, color: 'var(--color-ink)' }}>
+                {/* Sold price in the same red as the SOLD date and photo badge
+                    (2026-10-08, per Ryan); "Listed at" stays gray. */}
+                <span
+                  style={{
+                    fontSize: 'clamp(18px, 3vw, 22px)',
+                    fontWeight: 600,
+                    color: listing.status === 'Sold' && listing.closePrice != null ? STATUS_COLOR.Sold : 'var(--color-ink)',
+                  }}
+                >
                   {listing.status === 'Sold' && listing.closePrice != null
                     ? `Sold ${formatPrice(listing.closePrice)}`
                     : formatPrice(listing.price)}
@@ -325,7 +333,7 @@ export default async function ListingDetailPage({ params }) {
                               only this derived figure gets hidden when it's implausible. */}
             {/* Sold homes show Sold Price/SqFt instead (2026-10-04, per Ryan). */}
             {!isLand && soldPricePerSqft(listing) != null ? (
-                            <StatItem value={`${formatPrice(soldPricePerSqft(listing))}/SqFt`} label="Sold Price/SqFt" />
+                            <StatItem value={`${formatPrice(soldPricePerSqft(listing))}/SqFt`} label="Sold Price/SqFt" color={STATUS_COLOR.Sold} />
                           ) : !isLand && listing.status !== 'Sold' && isPricePerSqftPlausible(listing) && (
                             <StatItem value={`${formatPrice(listing.listPricePerSqft)}/SqFt`} label="List Price/SqFt" />
                           )}
@@ -399,10 +407,10 @@ export default async function ListingDetailPage({ params }) {
   );
 }
 
-function StatItem({ value, label, big }) {
+function StatItem({ value, label, big, color }) {
     return (
           <div style={{ textAlign: 'center' }}>
-      <div style={{ fontSize: big ? 18 : 22, fontWeight: 700, color: 'var(--color-ink)' }}>{value}</div>
+      <div style={{ fontSize: big ? 18 : 22, fontWeight: 700, color: color || 'var(--color-ink)' }}>{value}</div>
       <div style={{ fontSize: 11, letterSpacing: 0.5, color: 'var(--color-muted-light)', textTransform: 'uppercase' }}>{label}</div>
   </div>
   );
