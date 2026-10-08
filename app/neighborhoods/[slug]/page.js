@@ -1920,7 +1920,6 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {siblingLinks && (
           <NeighborhoodLinkRow cityName={`Other ${siblingLinks.cityName}`} links={siblingLinks.links} />
         )}
-        <NeighborhoodMarketStats name={neighborhood.name} stats={marketStats} />
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
@@ -2008,6 +2007,13 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         />
       </div>
 
+      {/* Market stats bar (2026-10-08) — below the listings, per Ryan, so
+          phones reach the listings first; right above Recently Sold. */}
+      {marketStats && (
+        <div className="container" style={{ padding: '8px clamp(16px, 4vw, 56px) 8px', maxWidth: 760 }}>
+          <NeighborhoodMarketStats name={neighborhood.name} stats={marketStats} />
+        </div>
+      )}
       <RecentlySold name={neighborhood.name} data={recentlySold} />
 
       {/* About {name} {area} Real Estate (2026-10-03, per Ryan) — a short,

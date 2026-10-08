@@ -1156,6 +1156,8 @@ textarea:focus {
 }
 /* Six tiles (neighborhood stats bar with homes and homesites): 3 x 2. */
 .market-tiles--six { grid-template-columns: repeat(3, 1fr); }
+/* Neighborhood stats bar sits in the 760px column with Recently Sold. */
+.neighborhood-market-stats .market-tiles { grid-template-columns: repeat(3, 1fr); }
 @media (max-width: 900px) {
   .market-tiles { grid-template-columns: repeat(3, 1fr); }
 }
@@ -1164,6 +1166,7 @@ textarea:focus {
   .market-report-title { font-size: 20px; }
   .market-report-sub { font-size: 13px; margin-bottom: 10px; }
   .market-tiles { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .neighborhood-market-stats .market-tiles { grid-template-columns: repeat(2, 1fr); }
   .market-tile { padding: 8px 10px; }
   .market-tile-value { font-size: 17px; }
   .market-tile-label { font-size: 12px; }
