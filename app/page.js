@@ -169,27 +169,38 @@ export default async function HomePage() {
       {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
       <div style={{ position: 'relative', width: '100%', minHeight: 692, background: 'var(--color-nav-bg)' }}>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 692, overflow: 'hidden' }}>
-          <Image
-            src="/hero/brevard-hero-no-ship.jpg"
-            alt="Beachfront estate with private pool overlooking the Brevard County coastline"
-            fill
-            priority
-            // Explicit fetchPriority (2026-10-04): `priority` alone wasn't
-            // emitting fetchpriority="high" on this LCP image, which mobile
-            // PageSpeed flagged.
-            fetchPriority="high"
-            sizes="100vw"
-            // 2026-10-01, per Ryan — this is the page's LCP element (the
-            // first full-bleed image painted), and mobile PageSpeed had
-            // LCP at 5.7s, the single worst-scoring metric after the card
-            // photo compression pass. A smaller quality cut than the card
-            // thumbnails' 65 (see next.config.js's images.qualities) since
-            // this photo is full-size and the first thing every visitor
-            // sees — 70 trims bytes without a visible difference at normal
-            // viewing distance.
-            quality={70}
-            style={{ objectFit: 'cover' }}
-          />
+          {/* Hero photo (2026-10-08, per Ryan's mobile PageSpeed report:
+              Largest Contentful Paint 2.6 s). Pre-compressed files in
+              public/hero instead of next/image, so the first visitor after
+              a deploy doesn't wait for the server to encode AVIF on the
+              fly. Phones (up to 640px wide) get hero-phone-*: the centered
+              slice of the photo a phone actually shows with object-fit:
+              cover in this 692px-tall box, so they skip downloading the
+              ~60% that gets cropped off. Made from brevard-hero-no-ship.jpg
+              (still used for link previews) with sharp (AVIF quality 40 for the
+              phone files, 50 for the others; WebP 70); regenerate all
+              eight if the photo changes. */}
+          <picture>
+            <source
+              media="(max-width: 640px)"
+              type="image/avif"
+              srcSet="/hero/hero-phone-480.avif 1x, /hero/hero-phone-640.avif 2x"
+            />
+            <source
+              media="(max-width: 640px)"
+              type="image/webp"
+              srcSet="/hero/hero-phone-480.webp 1x, /hero/hero-phone-640.webp 2x"
+            />
+            <source type="image/avif" srcSet="/hero/hero-1080.avif 1080w, /hero/hero-1544.avif 1544w" sizes="100vw" />
+            <img
+              src="/hero/hero-1080.webp"
+              srcSet="/hero/hero-1080.webp 1080w, /hero/hero-1544.webp 1544w"
+              sizes="100vw"
+              alt="Beachfront estate with private pool overlooking the Brevard County coastline"
+              fetchPriority="high"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          </picture>
           <div
             style={{
               position: 'absolute',
