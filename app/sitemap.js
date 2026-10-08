@@ -1,4 +1,5 @@
 import * as api from '@/lib/api';
+import { CONDO_BUILDINGS } from '@/lib/condoBuildings';
 import {
   PROPERTY_TYPE_TO_SLUG,
   OCEANFRONT_PROPERTY_TYPE_TO_SLUG,
@@ -278,6 +279,13 @@ export default async function sitemap() {
       lastModified: now,
       changeFrequency: 'daily',
       priority: 0.7,
+    });
+  });
+
+  // Condo building pages (2026-10-08) — see lib/condoBuildings.js.
+  Object.entries(CONDO_BUILDINGS).forEach(([citySlug, buildings]) => {
+    buildings.forEach((b) => {
+      entries.push({ url: `${SITE_URL}/${citySlug}/condos/${b.slug}`, lastModified: now, changeFrequency: 'daily', priority: 0.7 });
     });
   });
 

@@ -1232,3 +1232,41 @@ textarea:focus {
   .home-hero { min-height: 0; }
   .home-hero-content { padding: 72px 16px 40px; }
 }
+
+/* Condo building directory (components/CondoBuildingDirectory.js): A–Z,
+   filling top-to-bottom in 4 columns of 5 on desktop, 2 columns on phones. */
+.condo-directory {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  column-count: 4;
+  column-gap: 24px;
+}
+.condo-directory li {
+  break-inside: avoid;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+.condo-directory-link {
+  color: var(--color-ink);
+  font-weight: 600;
+  text-decoration: underline;
+}
+.condo-directory-detail {
+  display: block;
+  font-size: 13px;
+  color: var(--color-muted-dark);
+  margin-top: 2px;
+}
+@media (max-width: 900px) {
+  .condo-directory { column-count: 3; }
+}
+@media (max-width: 640px) {
+  .condo-directory { column-count: 2; column-gap: 16px; }
+}
+.condo-listing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  margin-top: 12px;
+}

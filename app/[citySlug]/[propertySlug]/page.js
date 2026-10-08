@@ -24,6 +24,7 @@ import { getCityMarketReport, showsMarketReport } from '@/lib/cityMarketReport';
 import CityMarketReport from '@/components/CityMarketReport';
 import CityAboutSection from '@/components/CityAboutSection';
 import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
+import CondoBuildingDirectory from '@/components/CondoBuildingDirectory';
 import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -983,6 +984,10 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           totalPages={totalPages}
         />
       </div>
+
+      {/* Condo building directory (2026-10-08, per Ryan) — Condos page only;
+          renders nothing for cities without buildings in lib/condoBuildings.js. */}
+      {propertySlug === 'condos-for-sale' && <CondoBuildingDirectory citySlug={citySlug} cityName={city.name} />}
 
       {marketReport && (
         <CityMarketReport cityName={city.name} typeLabel={propertyType === 'Condo' ? 'Condos' : 'Homes'} report={marketReport} />
