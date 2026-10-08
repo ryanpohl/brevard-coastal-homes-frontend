@@ -82,7 +82,7 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
                 border: '2px solid rgba(255,255,255,0.25)',
               }}
             />
-            <h4 style={{ color: '#fff', fontSize: 18, margin: 0 }}>Brevard Coastal Homes</h4>
+            <h2 style={{ color: '#fff', fontSize: 18, margin: 0 }}>Brevard Coastal Homes</h2>
             {/* Agent name (2026-09-12, per Ryan: "add my name Ryan Pohl below
                 Brevard coastal Homes & above the phone number") — sits right
                 under the brand heading, above the "Call or Text" line below. */}
@@ -129,7 +129,7 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
         </div>
 
         <div>
-          <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Cities</h4>
+          <h2 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Cities</h2>
           {/* One link per city (2026-10-02, per Ryan: footer "looks very
               busy") — was "Homes · Condos · Oceanfront" per city (~27 links,
               most wrapping to 2 lines). Each city's page still offers the
@@ -167,7 +167,7 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
           return (
             <>
               <div>
-                <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Neighborhoods</h4>
+                <h2 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Neighborhoods</h2>
                 {others.map((g, i) => (
                   <div key={g.label} style={{ marginTop: i ? 20 : 0 }}>
                     <div style={footerSubheadStyle}>{g.label}</div>
@@ -177,7 +177,7 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               </div>
               {viera && (
                 <div>
-                  <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>{viera.label}</h4>
+                  <h2 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>{viera.label}</h2>
                   {renderLinks(viera)}
                 </div>
               )}
@@ -203,7 +203,7 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
             guide beyond these 6 should be added to the hub page's GUIDES
             array, not to this column — this column is done growing. */}
         <div>
-          <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Buyer Guides</h4>
+          <h2 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Buyer Guides</h2>
           {/* Buyer Resources hub page (2026-09-25, per Ryan — Task #68).
               Listed first, above the 6 individual guides, since it's the
               "see everything" entry point into this column. */}
@@ -267,7 +267,7 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
           </div>
 
         <div style={{ marginTop: 28 }}>
-          <h4 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Company</h4>
+          <h2 style={{ color: '#fff', fontSize: 14, marginBottom: 16 }}>Company</h2>
           {/* 8px spacers between links (2026-10-02, per Ryan) — were plain <br />s,
               which stacked these links tighter than the other columns'
               (each of those links sits in a div with marginBottom: 8). */}

@@ -257,7 +257,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           padding: '6px 16px',
           fontSize: 15,
           fontWeight: 700,
-          color: 'var(--color-gold)',
+          color: 'var(--color-gold-text)',
           letterSpacing: 0.3,
           borderBottom: '1px solid var(--color-border-light)',
         }}
@@ -811,7 +811,7 @@ function NavLink({ label, href, bare, gold, outline, active, onEnter, onToggle, 
     // Account in the new white header. Replaces the old default (rgba
     // white-outline) branch below, which relied on the header being dark;
     // that branch is kept as-is for any future non-white usage.
-    style = { ...base, padding: '10px 22px', borderRadius: 2, border: '1px solid var(--color-gold)', background: 'transparent', color: 'var(--color-gold)' };
+    style = { ...base, padding: '10px 22px', borderRadius: 2, border: '1px solid var(--color-gold-text)', background: 'transparent', color: 'var(--color-gold-text)' };
   } else {
     style = { ...base, padding: '11px 20px', borderRadius: 3, border: '1px solid rgba(255,255,255,0.5)', background: 'transparent' };
   }

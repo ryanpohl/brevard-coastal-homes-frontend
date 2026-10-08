@@ -234,7 +234,7 @@ function RequestShowingForm({ listingId, listingAddress, dateOptions, user }) {
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, fontSize: 14, color: 'var(--color-ink)' }}>
               <span style={{ fontWeight: 700, fontSize: 15 }}>Set Up by Phone</span>
               <span style={{ color: 'var(--color-muted)', fontSize: 12 }}>(Call or Text)</span>
-              <span style={{ fontWeight: 700, color: 'var(--color-gold)' }}>{AGENT_INFO.phone}</span>
+              <span style={{ fontWeight: 700, color: 'var(--color-gold-text)' }}>{AGENT_INFO.phone}</span>
             </div>
           </>
         )}

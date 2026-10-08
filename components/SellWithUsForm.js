@@ -86,7 +86,7 @@ export default function SellWithUsForm() {
             Text" line on this site (ContactModal.js/Footer.js/Nav.js) —
             AGENT_INFO.phone (NEXT_PUBLIC_BUSINESS_PHONE) is confirmed empty
             on the live production bundle per CLAUDE.md's 2026-08-04 note. */}
-        <p style={{ color: 'var(--color-gold)', fontWeight: 700 }}>
+        <p style={{ color: 'var(--color-gold-text)', fontWeight: 700 }}>
           Call or Text:{' '}
           <a href="tel:+13213507661" style={{ color: 'inherit', textDecoration: 'none' }}>
             321-350-7661

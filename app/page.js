@@ -344,7 +344,9 @@ function PlaceCard({ name, thumbnail, href, sizes, objectPosition = 'center' }) 
         {src && (
           <Image
             src={src}
-            alt={name}
+            // Not just {name}: the name is printed under the photo, and
+            // screen readers would read it twice (PageSpeed accessibility).
+            alt={`${name}, Florida`}
             fill
             sizes={sizes}
             // 2026-09-30, per Ryan ("do image compression first") — mobile
