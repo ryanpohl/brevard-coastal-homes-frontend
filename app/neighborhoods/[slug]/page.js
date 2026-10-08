@@ -47,6 +47,8 @@ import ListingResultsLayout from '@/components/ListingResultsLayout';
 import Faq from '@/components/Faq';
 import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
 import RecentlySold from '@/components/RecentlySold';
+import NeighborhoodMarketStats from '@/components/NeighborhoodMarketStats';
+import { getNeighborhoodMarketStats, showsNeighborhoodMarketStats } from '@/lib/neighborhoodMarketStats';
 import { getRecentlySold, showsRecentlySold } from '@/lib/recentlySold';
 import { neighborhoodListingsFilter } from '@/lib/neighborhoodFilters';
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
@@ -1156,6 +1158,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   const recentlySold = showsRecentlySold(slug)
     ? await getRecentlySold({ ...listingsFilterParams, propertyType: searchParams.propertyType })
     : null;
+  // Market stats bar above the listings (2026-10-08, per Ryan; Adelaide) —
+  // see lib/neighborhoodMarketStats.js.
+  const marketStats = showsNeighborhoodMarketStats(slug)
+    ? await getNeighborhoodMarketStats({ ...listingsFilterParams, propertyType: searchParams.propertyType })
+    : null;
   const nbName = neighborhood.name;
   const liveFaqItems = [];
   if (recentlySold) {
@@ -1911,6 +1918,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {siblingLinks && (
           <NeighborhoodLinkRow cityName={`Other ${siblingLinks.cityName}`} links={siblingLinks.links} />
         )}
+        <NeighborhoodMarketStats name={neighborhood.name} stats={marketStats} />
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
@@ -2026,6 +2034,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               {text}
             </p>
           ))}
+          {community.nearby && (
+            <p style={{ marginBottom: 12 }}>
+              <strong style={{ color: 'var(--color-ink)' }}>Nearby:</strong>{' '}
+              <Link href={community.nearby.href} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+                {community.nearby.label}
+              </Link>
+              {community.nearby.note ? <> — {community.nearby.note}.</> : null}
+            </p>
+          )}
           {/* Model tour CTA (2026-10-04, per Ryan) — new-construction
               communities with model homes (COMMUNITY_SEO modelTour). */}
           {community.modelTour && (
