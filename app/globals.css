@@ -1261,6 +1261,7 @@ textarea:focus {
 @media (max-width: 900px) {
   .condo-directory { column-count: 3; }
 }
+.condo-directory.condo-directory--two { column-count: 2; max-width: 760px; }
 @media (max-width: 640px) {
   .condo-directory { column-count: 2; column-gap: 16px; }
 }
