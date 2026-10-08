@@ -1161,7 +1161,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // Market stats bar above the listings (2026-10-08, per Ryan; Adelaide) —
   // see lib/neighborhoodMarketStats.js.
   const marketStats = showsNeighborhoodMarketStats(slug)
-    ? await getNeighborhoodMarketStats({ ...listingsFilterParams, propertyType: searchParams.propertyType })
+    ? await getNeighborhoodMarketStats(slug, { ...listingsFilterParams, propertyType: searchParams.propertyType })
     : null;
   const nbName = neighborhood.name;
   const liveFaqItems = [];
