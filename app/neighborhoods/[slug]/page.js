@@ -444,7 +444,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // pages — synthetic like Beach Woods; see NEIGHBORHOOD_LANDING_PAGES in
   // lib/constants.js.
   const landingPage = NEIGHBORHOOD_LANDING_PAGES[slug];
-  const siblingLinks = siblingNeighborhoodLinks(slug);
+  // Pages with their own `related` links (Adelaide, Aripeka, Summer Lakes —
+  // COMMUNITY_SEO) skip the sibling row; see `related` there.
+  const siblingLinks = COMMUNITY_SEO[slug]?.related ? null : siblingNeighborhoodLinks(slug);
 
   let neighborhood;
   if (landingPage) {
@@ -2095,6 +2097,19 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             </Link>
             .
           </p>
+          {community.related && (
+            <p style={{ marginTop: 12 }}>
+              <strong style={{ color: 'var(--color-ink)' }}>{community.related.label}:</strong>{' '}
+              {community.related.links.map((l, i) => (
+                <span key={l.href}>
+                  {i > 0 && ' · '}
+                  <Link href={l.href} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+                    {l.label}
+                  </Link>
+                </span>
+              ))}
+            </p>
+          )}
         </section>
       )}
 
