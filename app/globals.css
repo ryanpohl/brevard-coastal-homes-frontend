@@ -1222,3 +1222,13 @@ textarea:focus {
   .report-tiles { grid-template-columns: repeat(2, 1fr); }
   .report-tile-value { font-size: 24px; }
 }
+
+/* Homepage hero height (2026-10-08, per Ryan: at 692px it filled the whole
+   first screen). Desktop ~560px; phones fit the content with less empty
+   sky above the headline, so Search by City peeks in below. */
+.home-hero { min-height: 560px; }
+.home-hero-content { padding: 140px 16px 72px; }
+@media (max-width: 640px) {
+  .home-hero { min-height: 0; }
+  .home-hero-content { padding: 72px 16px 40px; }
+}

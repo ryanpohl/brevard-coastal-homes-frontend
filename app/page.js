@@ -167,15 +167,19 @@ export default async function HomePage() {
   return (
     <div>
       {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
-      <div style={{ position: 'relative', width: '100%', minHeight: 692, background: 'var(--color-nav-bg)' }}>
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 692, overflow: 'hidden' }}>
+      {/* Hero height (2026-10-08, per Ryan: it filled the whole first screen):
+          .home-hero / .home-hero-content in app/globals.css — about 560px on
+          desktop and sized to its content on phones, so the top of Search by
+          City peeks in below. */}
+      <div className="home-hero" style={{ position: 'relative', width: '100%', background: 'var(--color-nav-bg)' }}>
+        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
           {/* Hero photo (2026-10-08, per Ryan's mobile PageSpeed report:
               Largest Contentful Paint 2.6 s). Pre-compressed files in
               public/hero instead of next/image, so the first visitor after
               a deploy doesn't wait for the server to encode AVIF on the
               fly. Phones (up to 640px wide) get hero-phone-*: the centered
               slice of the photo a phone actually shows with object-fit:
-              cover in this 692px-tall box, so they skip downloading the
+              cover in the hero, so they skip downloading the
               ~60% that gets cropped off. Made from brevard-hero-no-ship.jpg
               (still used for link previews) with sharp (AVIF quality 40 for the
               phone files, 50 for the others; WebP 70); regenerate all
@@ -225,13 +229,13 @@ export default async function HomePage() {
         </div>
 
         <div
+          className="home-hero-content"
           style={{
             position: 'relative',
             zIndex: 5,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            padding: '188px 16px 104px',
           }}
         >
           <h1
