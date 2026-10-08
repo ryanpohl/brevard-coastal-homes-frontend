@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { preload } from 'react-dom';
 import * as api from '@/lib/api';
 import { PROPERTY_TYPE_TO_SLUG, placePhotoUrl } from '@/lib/constants';
 import SearchBar from '@/components/SearchBar';
@@ -163,6 +164,26 @@ export default async function HomePage() {
   } catch {
     // No SEO data available — render the page without JSON-LD rather than crashing.
   }
+
+  // Preload the hero photo from <head> (2026-10-08): next/image's
+  // `priority` used to do this, and the <picture> below doesn't get React's
+  // automatic image preload. One per screen size, so phones only fetch the
+  // phone file.
+  preload('/hero/hero-phone-640.avif', {
+    as: 'image',
+    type: 'image/avif',
+    media: '(max-width: 640px)',
+    imageSrcSet: '/hero/hero-phone-480.avif 1x, /hero/hero-phone-640.avif 2x',
+    fetchPriority: 'high',
+  });
+  preload('/hero/hero-1544.avif', {
+    as: 'image',
+    type: 'image/avif',
+    media: '(min-width: 641px)',
+    imageSrcSet: '/hero/hero-1080.avif 1080w, /hero/hero-1544.avif 1544w',
+    imageSizes: '100vw',
+    fetchPriority: 'high',
+  });
 
   return (
     <div>

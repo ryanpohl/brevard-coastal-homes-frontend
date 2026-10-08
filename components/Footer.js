@@ -71,6 +71,10 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
             <img
               src="/team/ryan-headshot.jpg"
               alt="Ryan, Brevard Coastal Homes"
+              // Lazy (2026-10-08): without it React preloads this footer photo
+              // at the top of every page, ahead of the homepage hero.
+              loading="lazy"
+              decoding="async"
               style={{
                 display: 'block',
                 width: 130,
