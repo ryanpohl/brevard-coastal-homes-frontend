@@ -510,16 +510,6 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   const isRiverfrontCombined = propertySlug === RIVERFRONT_LISTINGS_SLUG;
   const propertyType = isOceanfront ? OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug] : SLUG_TO_PROPERTY_TYPE[propertySlug];
   if (!propertyType && !isOceanfrontCombined && !isRiverfrontCombined) notFound();
-  // Beach Woods cross-link (per Ryan, 2026-09-19: "put a link for this page
-  // on the Melbourne Beach Condos page" — see the new
-  // /neighborhoods/beach-woods page and lib/constants.js's
-  // BEACH_WOODS_SUBDIVISION_NAMES). Scoped to this city's own plain Condos
-  // route specifically (not the Oceanfront Condos variant or the combined
-  // Oceanfront Listings page) — Ryan named "the Melbourne Beach Condos
-  // page" singular, and Beach Woods isn't marketed as an oceanfront
-  // community, so the plain Condos page is the more accurate place to
-  // surface it.
-  const isMelbourneBeachCondos = citySlug === 'melbourne-beach' && propertyType === 'Condo' && !isOceanfront && !isOceanfrontCombined;
   // Oceanfront cross-link (2026-09-26, per Ryan — he asked whether it'd be
   // worth adding oceanfront links across all 5 barrier-island city pages;
   // this is the "Looking for oceanfront homes/condos in {city}?" line he
@@ -919,26 +909,10 @@ export default async function CityListingsPage({ params, searchParams: searchPar
             then Beach Woods last, per Ryan's explicit reorder request
             (2026-09-19, same day) — originally Beach Woods was listed
             first. */}
-        {isMelbourneBeachCondos && (
-          <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
-            Looking for a specific community? See{' '}
-            <Link
-              href="/neighborhoods/harbor-island-beach-club/condos-for-sale"
-              style={{ color: '#000', textDecoration: 'underline' }}
-            >
-              Harbor Island Beach Club Condos For Sale
-            </Link>
-            ,{' '}
-            <Link href="/neighborhoods/aquarina/condos-for-sale" style={{ color: '#000', textDecoration: 'underline' }}>
-              Aquarina Condos For Sale
-            </Link>
-            , or{' '}
-            <Link href="/neighborhoods/beach-woods" style={{ color: '#000', textDecoration: 'underline' }}>
-              Beach Woods Condos &amp; Townhomes For Sale
-            </Link>
-            .
-          </p>
-        )}
+        {/* The "Looking for a specific community?" sentence (Harbor Island
+            Beach Club, Aquarina, Beach Woods) moved into the Melbourne Beach
+            Condo Communities & Buildings directory below the listings
+            (2026-10-08, per Ryan) — see lib/condoBuildings.js. */}
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
@@ -987,7 +961,18 @@ export default async function CityListingsPage({ params, searchParams: searchPar
 
       {/* Condo building directory (2026-10-08, per Ryan) — Condos page only;
           renders nothing for cities without buildings in lib/condoBuildings.js. */}
-      {propertySlug === 'condos-for-sale' && <CondoBuildingDirectory citySlug={citySlug} cityName={city.name} />}
+      {propertySlug === 'condos-for-sale' && (
+        <CondoBuildingDirectory
+          citySlug={citySlug}
+          cityName={city.name}
+          heading={citySlug === 'melbourne-beach' ? 'Melbourne Beach Condo Communities & Buildings' : undefined}
+          intro={
+            citySlug === 'melbourne-beach'
+              ? 'Condo communities and buildings in Melbourne Beach with their own pages: listings, recent sales, HOA fees and rental rules, A–Z.'
+              : undefined
+          }
+        />
+      )}
 
       {marketReport && (
         <CityMarketReport cityName={city.name} typeLabel={propertyType === 'Condo' ? 'Condos' : 'Homes'} report={marketReport} />

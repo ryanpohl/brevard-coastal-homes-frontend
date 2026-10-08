@@ -284,7 +284,7 @@ export default async function sitemap() {
 
   // Condo building pages (2026-10-08) — see lib/condoBuildings.js.
   Object.entries(CONDO_BUILDINGS).forEach(([citySlug, buildings]) => {
-    buildings.forEach((b) => {
+    buildings.filter((b) => !b.href).forEach((b) => {
       entries.push({ url: `${SITE_URL}/${citySlug}/condos/${b.slug}`, lastModified: now, changeFrequency: 'daily', priority: 0.7 });
     });
   });
