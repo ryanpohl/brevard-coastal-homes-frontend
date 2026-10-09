@@ -17,7 +17,9 @@ import Pagination from './Pagination';
  * site's map-search UX: hovering a property card highlights the card and
  * shows the visitor where it sits on the map.
  */
-export default function ListingResultsLayout({ mapCenter, results, mapZoom, resultsLabel, page, totalPages }) {
+// `labelExtra` (optional) sits on the results-count line, e.g. the
+// "Get alerts" jump link (ListingAlertSignup.js, 2026-10-09).
+export default function ListingResultsLayout({ mapCenter, results, mapZoom, resultsLabel, labelExtra, page, totalPages }) {
     const [hoveredId, setHoveredId] = useState(null);
 
   return (
@@ -27,7 +29,10 @@ export default function ListingResultsLayout({ mapCenter, results, mapZoom, resu
     </div>
 
       <div>
-            <div style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 16 }}>{resultsLabel}</div>
+            <div className="results-label-row">
+              <span>{resultsLabel}</span>
+              {labelExtra}
+            </div>
 
         <div
           style={{

@@ -1417,3 +1417,33 @@ textarea:focus {
     flex: 1 1 100%;
   }
 }
+
+/* Results-count line on listing grids; can hold the "Get alerts" jump link. */
+.results-label-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 16px;
+  font-size: 13px;
+  color: var(--color-muted);
+  margin-bottom: 16px;
+}
+
+/* "🔔 Get alerts for new listings & price drops" — scrolls to the
+   signup box (ListingAlertSignup.js). */
+.listing-alert-jump {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-gold-text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.listing-alert-jump:hover {
+  text-decoration: underline;
+}
+
+.listing-alert {
+  scroll-margin-top: 24px;
+}

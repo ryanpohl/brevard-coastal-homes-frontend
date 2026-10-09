@@ -44,7 +44,7 @@ import HarborIslandForeclosuresTrigger from '@/components/HarborIslandForeclosur
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import ModelTourButton from '@/components/ModelTourButton';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
-import ListingAlertSignup from '@/components/ListingAlertSignup';
+import ListingAlertSignup, { ListingAlertJumpLink } from '@/components/ListingAlertSignup';
 import Faq from '@/components/Faq';
 import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
 import RecentlySold from '@/components/RecentlySold';
@@ -2003,6 +2003,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           results={results}
           mapZoom={neighborhood.mapZoom || 15}
           resultsLabel={total === 0 ? '0 results' : `${rangeStart}-${rangeEnd} of ${total} Homes`}
+          labelExtra={<ListingAlertJumpLink />}
           page={page}
           totalPages={totalPages}
         />

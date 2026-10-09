@@ -10,7 +10,7 @@ import {
 } from '@/lib/condoBuildings';
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 import ListingCard from '@/components/ListingCard';
-import ListingAlertSignup from '@/components/ListingAlertSignup';
+import ListingAlertSignup, { ListingAlertJumpLink } from '@/components/ListingAlertSignup';
 import RecentlySold from '@/components/RecentlySold';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
@@ -152,6 +152,13 @@ export default async function CondoBuildingPage({ params }) {
             ? `${data.activeCount} ${name} ${data.activeCount === 1 ? 'Condo' : 'Condos'} for Sale`
             : `${name} Condos for Sale`}
         </h2>
+        {/* Jump link to the alerts box below — only worth it when listings
+            sit between the two. */}
+        {data && data.active.length > 3 && (
+          <div style={{ margin: '2px 0 14px' }}>
+            <ListingAlertJumpLink />
+          </div>
+        )}
         {data && data.active.length > 0 ? (
           <div className="condo-listing-grid">
             {data.active.map((l) => (

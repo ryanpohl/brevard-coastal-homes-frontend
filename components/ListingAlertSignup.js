@@ -13,6 +13,28 @@ import * as api from '@/lib/api';
  * right after the hourly MLS update (backend src/services/listingAlerts.service.js), and
  * notifies Ryan + the CRM of the signup.
  */
+// Small "Get alerts" line near the top of a page that scrolls down to the
+// signup box, so visitors see the option without the box pushing the
+// listings down (2026-10-09, per Ryan).
+export function ListingAlertJumpLink() {
+  return (
+    <a
+      href="#listing-alerts"
+      className="listing-alert-jump"
+      onClick={(e) => {
+        const box = document.getElementById('listing-alerts');
+        if (!box) return;
+        e.preventDefault();
+        box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Put the cursor in the email box once it's in view.
+        setTimeout(() => box.querySelector('input')?.focus({ preventScroll: true }), 500);
+      }}
+    >
+      <span aria-hidden="true">🔔</span> Get alerts for new listings &amp; price drops
+    </a>
+  );
+}
+
 export default function ListingAlertSignup({ label, filter, kind = 'home' }) {
   const pathname = usePathname();
   const [email, setEmail] = useState('');
@@ -35,7 +57,7 @@ export default function ListingAlertSignup({ label, filter, kind = 'home' }) {
   }
 
   return (
-    <section className="listing-alert" aria-label={`New listing alerts for ${label}`}>
+    <section id="listing-alerts" className="listing-alert" aria-label={`Listing alerts for ${label}`}>
       <div className="listing-alert__text">
         <div className="listing-alert__title">Get {label} listings &amp; price drops by email</div>
         <div className="listing-alert__sub">
@@ -58,7 +80,7 @@ export default function ListingAlertSignup({ label, filter, kind = 'home' }) {
             onChange={(e) => setEmail(e.target.value)}
           />
           <button type="submit" className="btn btn-gold" disabled={status.sending}>
-            {status.sending ? 'Signing up…' : 'Email Me New Listings'}
+            {status.sending ? 'Signing up…' : 'Get Alerts'}
           </button>
           {status.error && <p className="error-text listing-alert__error">{status.error}</p>}
         </form>
