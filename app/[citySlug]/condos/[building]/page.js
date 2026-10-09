@@ -10,6 +10,7 @@ import {
 } from '@/lib/condoBuildings';
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 import ListingCard from '@/components/ListingCard';
+import ListingAlertSignup from '@/components/ListingAlertSignup';
 import RecentlySold from '@/components/RecentlySold';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
@@ -159,10 +160,11 @@ export default async function CondoBuildingPage({ params }) {
           </div>
         ) : (
           <p style={{ fontSize: 16, color: 'var(--color-muted-dark)', marginBottom: 8 }}>
-            Nothing is listed at {name} right now. Units here come up regularly &mdash;{' '}
-            <ContactUsTrigger>ask Ryan to let you know</ContactUsTrigger> when one does.
+            Nothing is listed at {name} right now. Units here come up regularly &mdash; sign up below to get an
+            email when one does.
           </p>
         )}
+        <ListingAlertSignup label={name} filter={condoBuildingFilter(citySlug, building)} kind="condo" />
       </div>
 
       {tiles.length > 1 && (

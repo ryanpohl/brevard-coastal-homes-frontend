@@ -44,6 +44,7 @@ import HarborIslandForeclosuresTrigger from '@/components/HarborIslandForeclosur
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import ModelTourButton from '@/components/ModelTourButton';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
+import ListingAlertSignup from '@/components/ListingAlertSignup';
 import Faq from '@/components/Faq';
 import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
 import RecentlySold from '@/components/RecentlySold';
@@ -2004,6 +2005,21 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           resultsLabel={total === 0 ? '0 results' : `${rangeStart}-${rangeEnd} of ${total} Homes`}
           page={page}
           totalPages={totalPages}
+        />
+        {/* New-listing email alerts (2026-10-09, per Ryan) — matches this
+            page's own listings (and its Homes/Condos view, if any), not the
+            visitor's price/bed filters. See ListingAlertSignup.js. */}
+        <ListingAlertSignup
+          label={neighborhood.name}
+          kind={searchParams.__viewPropertyType === 'Condo' ? 'condo' : 'home'}
+          filter={Object.fromEntries(
+            Object.entries({
+              ...listingsFilterParams,
+              propertyType: searchParams.__viewPropertyType,
+            })
+              .filter(([, v]) => v !== undefined && v !== null && v !== '')
+              .map(([k, v]) => [k, Array.isArray(v) ? v.join(',') : v])
+          )}
         />
       </div>
 
