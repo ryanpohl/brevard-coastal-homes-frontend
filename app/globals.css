@@ -1293,3 +1293,55 @@ textarea:focus {
 .nearby-group-summary { grid-column: 1 / -1; grid-row: 2; font-size: 14px; color: var(--color-muted-dark); }
 .nearby-group-arrow { grid-column: 2; grid-row: 1; color: var(--color-ink); transition: transform 0.15s; }
 .nearby-group[open] .nearby-group-arrow { transform: rotate(180deg); }
+
+/* Call / Text Ryan bar pinned to the bottom on phones (2026-10-09) —
+   components/MobileContactBar.js. Desktop already shows the phone number
+   in the header and the listing sidebar. Sits under modals (z-index 100). */
+.mobile-contact-bar {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .mobile-contact-bar {
+    display: flex;
+    gap: 10px;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 90;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: var(--color-ink-dark);
+    box-shadow: 0 -2px 12px rgba(16, 36, 44, 0.25);
+  }
+
+  .mobile-contact-bar__btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 46px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .mobile-contact-bar__btn--text {
+    flex: 1.4;
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+    color: var(--color-ink-dark);
+  }
+
+  /* Room (in the footer's own dark color) so the bar never covers the
+     end of the footer. */
+  footer::after {
+    content: '';
+    display: block;
+    height: calc(66px + env(safe-area-inset-bottom));
+  }
+}

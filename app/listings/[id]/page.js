@@ -4,6 +4,7 @@ import { formatPrice, PROPERTY_TYPE_LABEL, isPricePerSqftPlausible, soldPricePer
 import FavoriteButton from '@/components/FavoriteButton';
 import PropertyGallery from '@/components/PropertyGallery';
 import PropertyContactPanel from '@/components/PropertyContactPanel';
+import { ContactBarMessage } from '@/components/MobileContactBar';
 import ListingMap from '@/components/ListingMap';
 
 // Status badge color — matches design/design_files/Property Detail.dc.html's
@@ -397,6 +398,10 @@ export default async function ListingDetailPage({ params }) {
               listingAddress auto-fills the "Address of Property" field in
               both the Make an Offer modal and the Request Showing form
               below (per Ryan, 2026-08-17) — still editable, not read-only. */}
+        {/* Starter text for the phone Call / Text bar (MobileContactBar.js). */}
+        <ContactBarMessage
+          message={`Hi Ryan, I'm interested in ${listing.address}${listing.mlsNumber ? ` (MLS# ${listing.mlsNumber})` : ''}. `}
+        />
         <PropertyContactPanel
           listingId={listing.id}
           listingAddress={listing.address}
