@@ -1271,3 +1271,5 @@ textarea:focus {
   gap: 20px;
   margin-top: 12px;
 }
+/* "What's Near" tables on condo building pages: let names and addresses wrap. */
+.nearby-table td, .nearby-table td:first-child { white-space: normal; }

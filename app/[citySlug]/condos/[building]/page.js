@@ -15,6 +15,7 @@ import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import CondoBuildingDirectory from '@/components/CondoBuildingDirectory';
 import BrokerageNote from '@/components/BrokerageNote';
+import { formatMiles, nearbyFor } from '@/lib/nearby';
 
 // Condo building page (2026-10-08, per Ryan): /{city}/condos/{building} —
 // see lib/condoBuildings.js for which buildings and why. Live from the MLS:
@@ -110,6 +111,8 @@ export default async function CondoBuildingPage({ params }) {
     }
   }
 
+  const nearby = data?.center ? nearbyFor(citySlug, data.center) : null;
+
   const breadcrumb = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -189,6 +192,31 @@ export default async function CondoBuildingPage({ params }) {
 
       {data && <RecentlySold name={name} data={data.recentlySold} />}
 
+      {nearby && (
+        <section className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 40px', maxWidth: 760 }}>
+          <h2 className="market-report-title">What&rsquo;s Near {name}</h2>
+          <p className="market-report-sub">Distances from {name}; nearby places are straight-line miles.</p>
+          {nearby.restaurants.length > 0 && (
+            <NearbyTable heading="Restaurants" rows={nearby.restaurants.map((r) => [r.name, r.detail ? `${r.address} · ${r.detail}` : r.address, formatMiles(r.mi)])} />
+          )}
+          <NearbyTable
+            heading="Beach, Shopping & Landmarks"
+            rows={[
+              ...(building.oceanfront ? [['The beach', 'Oceanfront building', 'On the beach']] : []),
+              ...nearby.landmarks.map((r) => [r.name, r.address, formatMiles(r.mi)]),
+            ]}
+          />
+          <NearbyTable
+            heading="Further Away"
+            columns={['Place', 'Driving', 'Typical drive']}
+            rows={nearby.far.map((f) => [f.name, `About ${f.miles} mi`, f.drive])}
+          />
+          <p style={{ fontSize: 13, color: 'var(--color-muted)', marginTop: 8 }}>
+            Drive times are typical without traffic; Orlando trips use the SR 528 toll road, and rush hour adds time.
+          </p>
+        </section>
+      )}
+
       <section className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 40px', maxWidth: 760, fontSize: 17, lineHeight: 1.65, color: 'var(--color-muted-dark)' }}>
         <h2 style={{ fontSize: 24, marginBottom: 12, color: 'var(--color-ink)', fontFamily: 'var(--font-inter-tight)' }}>
           Buying at {name}
@@ -213,6 +241,36 @@ export default async function CondoBuildingPage({ params }) {
           <Faq items={faq} />
         </div>
       )}
+    </div>
+  );
+}
+
+// One "What's Near" table: name, address (or driving miles), distance.
+function NearbyTable({ heading, rows, columns = ['Place', 'Address', 'Distance'] }) {
+  if (!rows.length) return null;
+  return (
+    <div style={{ marginTop: 18 }}>
+      <h3 style={{ fontSize: 17, marginBottom: 8, color: 'var(--color-ink)', fontFamily: 'var(--font-inter-tight)' }}>{heading}</h3>
+      <div style={{ overflowX: 'auto', border: '1px solid var(--color-border-light)', borderRadius: 6, background: '#fff' }}>
+        <table className="market-table nearby-table">
+          <thead>
+            <tr>
+              {columns.map((c) => (
+                <th key={c}>{c}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r[0]}>
+                <td style={{ fontWeight: 600, color: 'var(--color-ink)' }}>{r[0]}</td>
+                <td>{r[1]}</td>
+                <td style={{ whiteSpace: 'nowrap' }}>{r[2]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
