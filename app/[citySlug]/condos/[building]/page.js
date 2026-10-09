@@ -197,10 +197,20 @@ export default async function CondoBuildingPage({ params }) {
           <h2 className="market-report-title">What&rsquo;s Near {name}</h2>
           <p className="market-report-sub">Distances from {name}; nearby places are straight-line miles.</p>
           {nearby.restaurants.length > 0 && (
-            <NearbyTable heading="Restaurants" rows={nearby.restaurants.map((r) => [r.name, r.detail ? `${r.address} · ${r.detail}` : r.address, formatMiles(r.mi)])} />
+            <NearbyTable
+              heading="Restaurants"
+              summary={`${nearby.restaurants.length} places · closest: ${nearby.restaurants[0].name}, ${formatMiles(nearby.restaurants[0].mi)}`}
+              rows={nearby.restaurants.map((r) => [r.name, r.detail ? `${r.address} · ${r.detail}` : r.address, formatMiles(r.mi)])}
+            />
           )}
           <NearbyTable
             heading="Beach, Shopping & Landmarks"
+            summary={[
+              building.oceanfront ? 'On the beach' : null,
+              ...nearby.landmarks.map((r) => `${r.name} ${formatMiles(r.mi)}`),
+            ]
+              .filter(Boolean)
+              .join(' · ')}
             rows={[
               ...(building.oceanfront ? [['The beach', 'Oceanfront building', 'On the beach']] : []),
               ...nearby.landmarks.map((r) => [r.name, r.address, formatMiles(r.mi)]),
@@ -208,6 +218,10 @@ export default async function CondoBuildingPage({ params }) {
           />
           <NearbyTable
             heading="Further Away"
+            summary={nearby.far
+              .filter((f) => /cruise|Disney/.test(f.name))
+              .map((f) => `${f.name.replace(' cruise terminals', ' cruises')} ${f.drive}`)
+              .join(' · ')}
             columns={['Place', 'Driving', 'Typical drive']}
             rows={nearby.far.map((f) => [f.name, `About ${f.miles} mi`, f.drive])}
           />
@@ -246,12 +260,19 @@ export default async function CondoBuildingPage({ params }) {
 }
 
 // One "What's Near" table: name, address (or driving miles), distance.
-function NearbyTable({ heading, rows, columns = ['Place', 'Address', 'Distance'] }) {
+// Collapsed by default (2026-10-09, per Ryan) so the section stays short;
+// the closed bar shows a one-line summary. The table is still in the page's
+// HTML for search engines.
+function NearbyTable({ heading, summary, rows, columns = ['Place', 'Address', 'Distance'] }) {
   if (!rows.length) return null;
   return (
-    <div style={{ marginTop: 18 }}>
-      <h3 style={{ fontSize: 17, marginBottom: 8, color: 'var(--color-ink)', fontFamily: 'var(--font-inter-tight)' }}>{heading}</h3>
-      <div style={{ overflowX: 'auto', border: '1px solid var(--color-border-light)', borderRadius: 6, background: '#fff' }}>
+    <details className="nearby-group">
+      <summary>
+        <span className="nearby-group-heading">{heading}</span>
+        {summary && <span className="nearby-group-summary">{summary}</span>}
+        <span className="nearby-group-arrow" aria-hidden="true">▾</span>
+      </summary>
+      <div style={{ overflowX: 'auto', border: '1px solid var(--color-border-light)', borderRadius: 6, background: '#fff', marginTop: 8 }}>
         <table className="market-table nearby-table">
           <thead>
             <tr>
@@ -271,6 +292,6 @@ function NearbyTable({ heading, rows, columns = ['Place', 'Address', 'Distance']
           </tbody>
         </table>
       </div>
-    </div>
+    </details>
   );
 }

@@ -1273,3 +1273,23 @@ textarea:focus {
 }
 /* "What's Near" tables on condo building pages: let names and addresses wrap. */
 .nearby-table td, .nearby-table td:first-child { white-space: normal; }
+
+/* Collapsible "What's Near" groups on condo building pages. */
+.nearby-group { margin-top: 10px; }
+.nearby-group > summary {
+  list-style: none;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 10px;
+  row-gap: 2px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid var(--color-border-light);
+  border-radius: 6px;
+}
+.nearby-group > summary::-webkit-details-marker { display: none; }
+.nearby-group-heading { font-weight: 700; font-size: 16px; color: var(--color-ink); font-family: var(--font-inter-tight); }
+.nearby-group-summary { grid-column: 1 / -1; grid-row: 2; font-size: 14px; color: var(--color-muted-dark); }
+.nearby-group-arrow { grid-column: 2; grid-row: 1; color: var(--color-ink); transition: transform 0.15s; }
+.nearby-group[open] .nearby-group-arrow { transform: rotate(180deg); }
