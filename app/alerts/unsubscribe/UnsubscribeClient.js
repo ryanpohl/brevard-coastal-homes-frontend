@@ -26,7 +26,7 @@ export default function UnsubscribeClient({ token }) {
         <p style={{ fontSize: 16, lineHeight: 1.6 }}>{state.done}</p>
       ) : (
         <>
-          <p style={{ fontSize: 16, lineHeight: 1.6, marginBottom: 22 }}>Stop getting new-listing emails for this building or neighborhood?</p>
+          <p style={{ fontSize: 16, lineHeight: 1.6, marginBottom: 22 }}>Stop getting listing and price-drop emails for this building or neighborhood?</p>
           {token && (
             <button type="button" className="btn btn-primary" onClick={confirm} disabled={state.busy}>
               {state.busy ? 'Unsubscribing…' : 'Yes, unsubscribe me'}

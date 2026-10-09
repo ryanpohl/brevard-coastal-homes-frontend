@@ -5,12 +5,12 @@ import { usePathname } from 'next/navigation';
 import * as api from '@/lib/api';
 
 /**
- * "Email me when a home is listed in {label}" box for condo building and
- * neighborhood pages (2026-10-09, per Ryan). Just an email address — no
+ * "Get {label} listings & price drops by email" box for condo building and
+ * neighborhood pages (2026-10-09, per Ryan; price drops added the same day). Just an email address — no
  * account. `filter` is the page's own listings filter (the same params its
  * listing grid uses), so the alert matches exactly what the page shows.
- * The backend emails each new matching listing once, right after the
- * hourly MLS update (backend src/services/listingAlerts.service.js), and
+ * The backend emails each new matching listing once, and any price drop,
+ * right after the hourly MLS update (backend src/services/listingAlerts.service.js), and
  * notifies Ryan + the CRM of the signup.
  */
 export default function ListingAlertSignup({ label, filter, kind = 'home' }) {
@@ -37,9 +37,10 @@ export default function ListingAlertSignup({ label, filter, kind = 'home' }) {
   return (
     <section className="listing-alert" aria-label={`New listing alerts for ${label}`}>
       <div className="listing-alert__text">
-        <div className="listing-alert__title">Get new {label} listings by email</div>
+        <div className="listing-alert__title">Get {label} listings &amp; price drops by email</div>
         <div className="listing-alert__sub">
-          Be the first to know when a {kind} is listed in {label}. No account needed — unsubscribe anytime.
+          Be the first to know when a {kind} is listed in {label} or drops its price. No account needed — unsubscribe
+          anytime.
         </div>
       </div>
       {status.done ? (
