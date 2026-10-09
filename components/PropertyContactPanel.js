@@ -316,12 +316,18 @@ function RequestShowingForm({ listingId, listingAddress, dateOptions, user }) {
         </div>
       </div>
 
-      <input
-        placeholder="Address of Property"
-        value={form.propertyAddress}
-        onChange={(e) => update('propertyAddress', e.target.value)}
-        style={{ ...inputStyle, marginBottom: 10 }}
-      />
+      {/* Hidden on a listing's own page, where the address is already known
+          and still sent with the request (2026-10-09, per Ryan: one less
+          field to look at). The general Schedule a Showing popup, which has
+          no listing, still asks for it. */}
+      {!listingAddress && (
+        <input
+          placeholder="Address of Property"
+          value={form.propertyAddress}
+          onChange={(e) => update('propertyAddress', e.target.value)}
+          style={{ ...inputStyle, marginBottom: 10 }}
+        />
+      )}
       <input placeholder="Name" required value={form.name} onChange={(e) => update('name', e.target.value)} style={{ ...inputStyle, marginBottom: 10 }} />
       <input
         type="email"
@@ -369,7 +375,7 @@ function RequestShowingForm({ listingId, listingAddress, dateOptions, user }) {
           opacity: status.submitting ? 0.7 : 1,
         }}
       >
-        {status.submitting ? 'Submitting…' : 'Submit'}
+        {status.submitting ? 'Sending…' : 'Request Showing'}
       </button>
     </form>
   );
