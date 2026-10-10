@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { formatPrice, formatAssocFee, isPricePerSqftPlausible, soldPricePerSqft, formatSoldDate } from '@/lib/siteConstants';
 import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
+import CardAlertButton from './CardAlertButton';
 
 export default function ListingCard({ listing, onHoverChange, priority = false }) {
     const { signedIn, token, promptSignIn } = useAuth();
@@ -273,6 +274,9 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
         >
 {favorited ? '♥' : '♡'}
 </button>
+{/* 🔔 price-drop alerts for this one home, left of the heart (2026-10-10,
+    per Ryan) — CardAlertButton.js. Not on sold homes. */}
+{listing.status !== 'Sold' && <CardAlertButton listing={listing} />}
   </div>
 
       <div style={{ padding: 14 }}>
