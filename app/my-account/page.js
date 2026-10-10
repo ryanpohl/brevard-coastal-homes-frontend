@@ -120,7 +120,13 @@ function FavoritesSection({ id, token }) {
 
   return (
     <div id={id}>
-      <h2 style={{ fontSize: 18, marginBottom: 16 }}>Favorite Properties</h2>
+      <h2 style={{ fontSize: 18, marginBottom: favorites?.length ? 6 : 16 }}>Favorite Properties</h2>
+      {/* Hearting a home turns on its price/status alerts (2026-10-10). */}
+      {favorites && favorites.length > 0 && (
+        <p style={{ fontSize: 14, color: 'var(--color-muted)', margin: '0 0 16px' }}>
+          🔔 We&apos;ll email you if any of these drop in price, go under contract, or sell.
+        </p>
+      )}
 
       {error && <p className="error-text">{error}</p>}
       {favorites === null && !error && <p style={{ color: 'var(--color-muted)' }}>Loading your favorites…</p>}

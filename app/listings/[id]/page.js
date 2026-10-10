@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import * as api from '@/lib/api';
 import { formatPrice, PROPERTY_TYPE_LABEL, isPricePerSqftPlausible, soldPricePerSqft, formatSoldDate } from '@/lib/constants';
 import FavoriteButton from '@/components/FavoriteButton';
+import { HomeAlertSignup } from '@/components/ListingAlertSignup';
 import PropertyGallery from '@/components/PropertyGallery';
 import PropertyContactPanel from '@/components/PropertyContactPanel';
 import { ContactBarMessage } from '@/components/MobileContactBar';
@@ -292,6 +293,11 @@ export default async function ListingDetailPage({ params }) {
                   </span>
                 )}
               </div>
+              {/* Price-drop/status alerts for this one home (2026-10-10, per
+                  Ryan) — not for sold or off-market homes. */}
+              {(listing.status === 'Active' || listing.status === 'Pending') && (
+                <HomeAlertSignup listingId={listing.id} status={listing.statusLabel === 'Contingent' ? 'Contingent' : listing.status} />
+              )}
   </div>
   </div>
 

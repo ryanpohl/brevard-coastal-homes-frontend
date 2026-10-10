@@ -6,13 +6,13 @@ import * as api from '@/lib/api';
 
 // Asks before unsubscribing, so link scanners in email systems (which open
 // every link) can't unsubscribe someone by accident.
-export default function UnsubscribeClient({ token }) {
+export default function UnsubscribeClient({ token, all = false }) {
   const [state, setState] = useState({ busy: false, done: '', error: token ? '' : 'This unsubscribe link is missing its code.' });
 
   async function confirm() {
     setState({ busy: true, done: '', error: '' });
     try {
-      const res = await api.unsubscribeListingAlert(token);
+      const res = await api.unsubscribeListingAlert(token, all);
       setState({ busy: false, done: res.message, error: '' });
     } catch (err) {
       setState({ busy: false, done: '', error: err.message || 'Something went wrong. Please try again.' });
@@ -26,7 +26,7 @@ export default function UnsubscribeClient({ token }) {
         <p style={{ fontSize: 16, lineHeight: 1.6 }}>{state.done}</p>
       ) : (
         <>
-          <p style={{ fontSize: 16, lineHeight: 1.6, marginBottom: 22 }}>Stop getting listing and price-drop emails for this building or neighborhood?</p>
+          <p style={{ fontSize: 16, lineHeight: 1.6, marginBottom: 22 }}>{all ? 'Stop getting price and status emails for all the homes you’re watching?' : 'Stop getting these listing alert emails?'}</p>
           {token && (
             <button type="button" className="btn btn-primary" onClick={confirm} disabled={state.busy}>
               {state.busy ? 'Unsubscribing…' : 'Yes, unsubscribe me'}

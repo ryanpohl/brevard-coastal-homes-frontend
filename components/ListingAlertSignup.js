@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import * as api from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 
 /**
  * "Get {label} listings & price drops by email" box for condo building and
@@ -86,5 +87,80 @@ export default function ListingAlertSignup({ label, filter, kind = 'home' }) {
         </form>
       )}
     </section>
+  );
+}
+
+/**
+ * "🔔 Get price-drop alerts for this home" under the price on a listing page
+ * (2026-10-10, per Ryan). A small link that opens an email box in place, so
+ * it doesn't crowd the page. The backend (src/services/homeWatch.service.js)
+ * emails when this home drops its price, goes under contract, sells, or
+ * comes back on the market. Signed-in visitors get their email filled in;
+ * hearting a home turns the same alerts on.
+ */
+export function HomeAlertSignup({ listingId, status }) {
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [state, setState] = useState({ sending: false, error: '', done: '' });
+  const underContract = status === 'Pending' || status === 'Contingent';
+
+  async function submit(e) {
+    e.preventDefault();
+    setState({ sending: true, error: '', done: '' });
+    try {
+      await api.watchHome(listingId, email.trim());
+      setState({ sending: false, error: '', done: 'You’re signed up for alerts on this home.' });
+      try {
+        window.gtag?.('event', 'home_alert_signup', { event_category: 'lead', event_label: String(listingId) });
+      } catch {
+        // Tracking never blocks the signup.
+      }
+    } catch (err) {
+      setState({ sending: false, error: err.message || 'Something went wrong. Please try again.', done: '' });
+    }
+  }
+
+  if (state.done) {
+    return (
+      <div className="home-alert home-alert__done" role="status">
+        ✓ {state.done}
+      </div>
+    );
+  }
+  if (!open) {
+    return (
+      <div className="home-alert">
+        <button
+          type="button"
+          className="home-alert__toggle"
+          onClick={() => {
+            setOpen(true);
+            if (!email && user?.email) setEmail(user.email);
+          }}
+        >
+          <span aria-hidden="true">🔔</span>{' '}
+          {underContract ? 'Get an alert if this home comes back on the market' : 'Get price-drop alerts for this home'}
+        </button>
+      </div>
+    );
+  }
+  return (
+    <form className="home-alert home-alert__form" onSubmit={submit}>
+      <input
+        type="email"
+        required
+        autoFocus
+        placeholder="Your email"
+        aria-label="Your email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <button type="submit" className="btn btn-gold" disabled={state.sending}>
+        {state.sending ? 'Signing up…' : 'Get Alerts'}
+      </button>
+      <p className="home-alert__note">Price drops &amp; status changes for this home. No account needed — unsubscribe anytime.</p>
+      {state.error && <p className="error-text home-alert__note">{state.error}</p>}
+    </form>
   );
 }
