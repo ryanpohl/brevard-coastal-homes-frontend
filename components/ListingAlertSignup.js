@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import * as api from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { rememberAlertEmail, rememberWatchedHome, rememberedAlertEmail } from '@/lib/alertMemory';
 
 /**
  * "Get {label} listings & price drops by email" box for condo building and
@@ -41,11 +42,17 @@ export default function ListingAlertSignup({ label, filter, kind = 'home' }) {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState({ sending: false, error: '', done: '' });
 
+  // Prefill with the email from an earlier alert signup on this device.
+  useEffect(() => {
+    setEmail((current) => current || rememberedAlertEmail());
+  }, []);
+
   async function submit(e) {
     e.preventDefault();
     setStatus({ sending: true, error: '', done: '' });
     try {
       const res = await api.subscribeListingAlert({ email: email.trim(), label, pagePath: pathname, filter });
+      rememberAlertEmail(email);
       setStatus({ sending: false, error: '', done: res.message || 'You’re signed up!' });
       try {
         window.gtag?.('event', 'listing_alert_signup', { event_category: 'lead', event_label: label });
@@ -110,6 +117,8 @@ export function HomeAlertSignup({ listingId, status }) {
     setState({ sending: true, error: '', done: '' });
     try {
       await api.watchHome(listingId, email.trim());
+      rememberAlertEmail(email);
+      rememberWatchedHome(listingId);
       setState({ sending: false, error: '', done: 'You’re signed up for alerts on this home.' });
       try {
         window.gtag?.('event', 'home_alert_signup', { event_category: 'lead', event_label: String(listingId) });
@@ -136,7 +145,7 @@ export function HomeAlertSignup({ listingId, status }) {
           className="home-alert__toggle"
           onClick={() => {
             setOpen(true);
-            if (!email && user?.email) setEmail(user.email);
+            if (!email) setEmail(user?.email || rememberedAlertEmail());
           }}
         >
           <span aria-hidden="true">🔔</span>{' '}

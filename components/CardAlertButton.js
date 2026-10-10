@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
+import { isWatchedHome, rememberAlertEmail, rememberWatchedHome, rememberedAlertEmail } from '@/lib/alertMemory';
 
 /**
  * 🔔 button on each listing card, next to the heart (2026-10-10, per Ryan):
@@ -15,29 +16,10 @@ import * as api from '@/lib/api';
  * The first time, a small popup asks for an email. After that the email is
  * remembered on this device (or taken from the signed-in account), so
  * another home is one tap, confirmed by a short toast. Homes watched from
- * this device show a gold bell. Both are per-browser conveniences only;
- * the backend is the record.
+ * this device show a gold bell. See lib/alertMemory.js — the listing-page
+ * link and the building/neighborhood box save the email there too.
  */
-const EMAIL_KEY = 'bch-alert-email';
-const WATCHED_KEY = 'bch-watched-homes';
 const TOAST_EVENT = 'bch-card-alert-toast';
-
-function readStore(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function writeStore(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // Storage blocked: the signup still works, it just isn't remembered.
-  }
-}
 
 function shortAddress(address) {
   return String(address || '').split(',')[0];
@@ -52,7 +34,7 @@ export default function CardAlertButton({ listing }) {
   const [toast, setToast] = useState('');
 
   useEffect(() => {
-    setWatching(readStore(WATCHED_KEY, []).includes(listing.id));
+    setWatching(isWatchedHome(listing.id));
   }, [listing.id]);
 
   useEffect(() => {
@@ -80,9 +62,8 @@ export default function CardAlertButton({ listing }) {
     setState({ sending: true, error: '' });
     try {
       await api.watchHome(listing.id, address);
-      writeStore(EMAIL_KEY, address);
-      const watched = readStore(WATCHED_KEY, []);
-      if (!watched.includes(listing.id)) writeStore(WATCHED_KEY, [...watched, listing.id].slice(-200));
+      rememberAlertEmail(address);
+      rememberWatchedHome(listing.id);
       setWatching(true);
       setPopup(false);
       setState({ sending: false, error: '' });
@@ -107,7 +88,7 @@ export default function CardAlertButton({ listing }) {
       showToast(`🔔 You're already watching ${shortAddress(listing.address)}`);
       return;
     }
-    const known = user?.email || readStore(EMAIL_KEY, '');
+    const known = user?.email || rememberedAlertEmail();
     if (known) {
       subscribe(known);
       return;
