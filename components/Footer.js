@@ -262,6 +262,12 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               Free Relocation Guide
             </Link>
           </div>
+          {/* Mortgage calculator (2026-10-11, per Ryan). */}
+          <div style={{ marginBottom: 8 }}>
+            <Link href="/mortgage-calculator" className="footer-link" style={footerLinkStyle}>
+              Mortgage Calculator
+            </Link>
+          </div>
           {/* VA Home Loans guide (2026-09-25, per Ryan — see
               app/va-loans/page.js). Sixth guide in this column — now past
               the ~5-6 link threshold this column's top comment has been

@@ -33,6 +33,13 @@ export const metadata = withSocialPreview({
 
 const GUIDES = [
   {
+    title: 'Mortgage Calculator',
+    href: '/mortgage-calculator',
+    cta: 'Open the calculator →',
+    description:
+      'Your full monthly payment on a Brevard County home: principal and interest plus taxes, wind and flood insurance, HOA fees and PMI.',
+  },
+  {
     title: 'Down Payment Assistance',
     href: '/down-payment-assistance',
     description:
@@ -113,7 +120,7 @@ export default function BuyerResourcesPage() {
             <p style={{ fontSize: 15, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
               {guide.description}
             </p>
-            <span style={{ fontSize: 14, fontWeight: 600, textDecoration: 'underline' }}>Read the guide →</span>
+            <span style={{ fontSize: 14, fontWeight: 600, textDecoration: 'underline' }}>{guide.cta || 'Read the guide →'}</span>
           </Link>
         ))}
       </div>

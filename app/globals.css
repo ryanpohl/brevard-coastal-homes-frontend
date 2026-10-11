@@ -1946,3 +1946,265 @@ textarea:focus {
 .guide-promo--light .guide-promo__cover {
   box-shadow: 0 4px 14px rgba(16, 36, 44, 0.2);
 }
+
+/* Mortgage calculator (2026-10-11) — components/MortgageCalculator.js. */
+.mcalc-summary {
+  display: flex;
+  align-items: baseline;
+  gap: 4px 14px;
+  flex-wrap: wrap;
+  font-size: 15px;
+  color: var(--color-muted-dark);
+  margin-top: 10px;
+}
+
+.mcalc-summary strong {
+  color: var(--color-ink-dark);
+  font-size: 16px;
+}
+
+.mcalc-summary__btn,
+.mcalc__close {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-gold-text);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.mcalc {
+  text-align: left;
+  background: var(--color-card);
+  border: 1px solid var(--color-border-warm);
+  border-radius: var(--radius-card);
+  padding: 22px;
+}
+
+.mcalc--compact {
+  margin-top: 16px;
+}
+
+.mcalc__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 14px;
+}
+
+.mcalc__head h2 {
+  font-size: 20px;
+  font-family: var(--font-inter-tight);
+  margin: 0;
+}
+
+.mcalc__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.mcalc--compact .mcalc__grid {
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.mcalc__inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mcalc__row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.mcalc__field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mcalc__label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-muted-dark);
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mcalc__hint {
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+.mcalc__note {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+.mcalc select,
+.mcalc__affix {
+  min-height: 42px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: #fff;
+  font-size: 15px;
+  color: var(--color-ink);
+}
+
+.mcalc select {
+  padding: 8px 10px;
+  width: 100%;
+}
+
+.mcalc__affix {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 6px;
+}
+
+.mcalc__affix span {
+  color: var(--color-muted);
+}
+
+.mcalc__affix input {
+  border: none;
+  outline: none;
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  padding: 9px 0;
+  background: transparent;
+  color: var(--color-ink);
+}
+
+.mcalc__affix:focus-within {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 2px rgba(201, 161, 90, 0.25);
+}
+
+.mcalc__flood {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mcalc__check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-muted-dark);
+  cursor: pointer;
+}
+
+.mcalc__check input {
+  width: 18px;
+  height: 18px;
+}
+
+.mcalc__result {
+  background: var(--color-bg);
+  border-radius: var(--radius-card);
+  padding: 20px;
+}
+
+.mcalc__total-label {
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-gold-text);
+  font-weight: 700;
+}
+
+.mcalc__total {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--color-ink-dark);
+  font-family: var(--font-inter-tight);
+  margin: 2px 0 12px;
+}
+
+.mcalc__total::after {
+  content: '/mo';
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-muted);
+  margin-left: 4px;
+}
+
+.mcalc__bar {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  gap: 2px;
+  margin-bottom: 14px;
+}
+
+.mcalc__list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
+}
+
+.mcalc__list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: 14px;
+  color: var(--color-muted-dark);
+}
+
+.mcalc__list li strong {
+  margin-left: auto;
+  color: var(--color-ink-dark);
+}
+
+.mcalc__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.mcalc__small {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-muted);
+  margin: 0 0 12px;
+}
+
+.mcalc__small a {
+  color: inherit;
+}
+
+.mcalc__cta {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-muted-dark);
+  border-top: 1px solid var(--color-border-light);
+  padding-top: 12px;
+}
+
+@media (max-width: 760px) {
+  .mcalc__grid {
+    grid-template-columns: 1fr;
+  }
+  .mcalc {
+    padding: 16px;
+  }
+}

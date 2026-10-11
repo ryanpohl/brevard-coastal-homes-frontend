@@ -3,6 +3,8 @@ import * as api from '@/lib/api';
 import { formatPrice, PROPERTY_TYPE_LABEL, isPricePerSqftPlausible, soldPricePerSqft, formatSoldDate } from '@/lib/constants';
 import FavoriteButton from '@/components/FavoriteButton';
 import { HomeAlertSignup } from '@/components/ListingAlertSignup';
+import MortgageCalculator from '@/components/MortgageCalculator';
+import { homeKind, monthlyHoa } from '@/lib/mortgage';
 import PropertyGallery from '@/components/PropertyGallery';
 import PropertyContactPanel from '@/components/PropertyContactPanel';
 import { ContactBarMessage } from '@/components/MobileContactBar';
@@ -297,6 +299,17 @@ export default async function ListingDetailPage({ params }) {
                   Ryan) — not for sold or off-market homes. */}
               {(listing.status === 'Active' || listing.status === 'Pending') && (
                 <HomeAlertSignup listingId={listing.id} status={listing.statusLabel === 'Contingent' ? 'Contingent' : listing.status} />
+              )}
+              {/* Estimated monthly payment (2026-10-11, per Ryan) — opens the
+                  full calculator, pre-filled with this home. Not for land or
+                  sold homes. */}
+              {(listing.status === 'Active' || listing.status === 'Pending') && !isLand && listing.price > 0 && (
+                <MortgageCalculator
+                  compact
+                  price={listing.price}
+                  kind={homeKind(listing.propertyType, listing.yearBuilt)}
+                  hoaMonth={monthlyHoa(listing.assocFee, listing.assocFeeFrequency)}
+                />
               )}
   </div>
   </div>
