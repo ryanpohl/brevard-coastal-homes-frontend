@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import { withSocialPreview } from '@/lib/socialPreview';
+import RelocationGuidePromo from '@/components/RelocationGuidePromo';
 
 /**
  * Buyer Resources hub page (2026-09-25, per Ryan — Task #68 from the SEO
@@ -96,6 +97,9 @@ export default function BuyerResourcesPage() {
         Everything we&apos;ve put together to help you buy in Brevard County with confidence — insurance, taxes,
         financing, and what to expect moving here. Pick a topic below.
       </p>
+
+      {/* Free relocation guide offer (2026-10-11, per Ryan). */}
+      <RelocationGuidePromo variant="light" />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, marginBottom: 48 }}>
         {GUIDES.map((guide) => (

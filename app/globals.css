@@ -1921,3 +1921,28 @@ textarea:focus {
     flex-direction: column;
   }
 }
+
+/* Light version of the relocation guide offer, for cream page sections
+   (homepage, Buyer Resources). */
+.guide-promo--light {
+  background: var(--color-card);
+  color: var(--color-ink);
+  border: 1px solid var(--color-border-warm);
+  border-left: 4px solid var(--color-gold);
+}
+
+.guide-promo--light .guide-promo__eyebrow {
+  color: var(--color-gold-text);
+}
+
+.guide-promo--light .guide-promo__title {
+  color: var(--color-ink-dark);
+}
+
+.guide-promo--light .guide-promo__sub {
+  color: var(--color-muted-dark);
+}
+
+.guide-promo--light .guide-promo__cover {
+  box-shadow: 0 4px 14px rgba(16, 36, 44, 0.2);
+}

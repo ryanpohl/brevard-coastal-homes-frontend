@@ -320,8 +320,6 @@ export default async function HomePage() {
               />
             ))}
           </div>
-          {/* Free relocation guide offer (2026-10-11) — RelocationGuidePromo.js. */}
-          <RelocationGuidePromo />
         </section>
       </div>
 
@@ -343,6 +341,14 @@ export default async function HomePage() {
               />
             ))}
           </div>
+        </section>
+      </div>
+
+      {/* Free relocation guide (2026-10-11, per Ryan): its own light section
+          at the end of the page — between the photo grids it read as an ad. */}
+      <div style={{ background: 'var(--color-bg)', padding: '0 0 64px' }}>
+        <section className="wide-container">
+          <RelocationGuidePromo variant="light" />
         </section>
       </div>
     </div>

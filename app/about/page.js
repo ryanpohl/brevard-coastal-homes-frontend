@@ -128,6 +128,15 @@ export default function AboutPage() {
         </Link>
       </p>
 
+      {/* Free relocation guide (2026-10-11, per Ryan) — for out-of-state
+          buyers checking Ryan out before they reach out. */}
+      <p style={{ fontSize: 15, marginTop: -20, marginBottom: 36 }}>
+        Moving from out of state?{' '}
+        <Link href="/brevard-relocation-guide" style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+          Get my free Brevard County Relocation Guide →
+        </Link>
+      </p>
+
       <div className="card" style={{ padding: 24, textAlign: 'center' }}>
         <p style={{ fontSize: 16, marginBottom: 14 }}>Ready to start your search, or have a question first?</p>
         <p style={{ fontSize: 15 }}>
