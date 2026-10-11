@@ -101,8 +101,8 @@ export default function ListingAlertSignup({ label, filter, kind = 'home' }) {
  * "🔔 Get price-drop alerts for this home" under the price on a listing page
  * (2026-10-10, per Ryan). A small link that opens an email box in place, so
  * it doesn't crowd the page. The backend (src/services/homeWatch.service.js)
- * emails when this home drops its price, goes under contract, sells, or
- * comes back on the market. Signed-in visitors get their email filled in;
+ * emails when this home drops its price, goes under contract or sells, or
+ * comes back on the market after a contract falls through. Signed-in visitors get their email filled in;
  * hearting a home turns the same alerts on.
  */
 export function HomeAlertSignup({ listingId, status }) {
@@ -168,7 +168,12 @@ export function HomeAlertSignup({ listingId, status }) {
       <button type="submit" className="btn btn-gold" disabled={state.sending}>
         {state.sending ? 'Signing up…' : 'Get Alerts'}
       </button>
-      <p className="home-alert__note">Price drops &amp; status changes for this home. No account needed — unsubscribe anytime.</p>
+      <p className="home-alert__note">
+        {underContract
+          ? 'We’ll email you if it comes back on the market or when it sells.'
+          : 'We’ll email you if the price drops, it goes under contract, or it sells.'}{' '}
+        No account needed — unsubscribe anytime.
+      </p>
       {state.error && <p className="error-text home-alert__note">{state.error}</p>}
     </form>
   );

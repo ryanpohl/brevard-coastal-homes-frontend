@@ -141,8 +141,11 @@ export default function CardAlertButton({ listing }) {
               </div>
               <div className="card-alert-popup__address">{listing.address}</div>
               <p className="card-alert-popup__note">
-                We&rsquo;ll email you the full property report now, then let you know if the price drops, it goes under
-                contract, sells, or comes back on the market. No account needed &mdash; unsubscribe anytime.
+                We&rsquo;ll email you the full property report now, then let you know{' '}
+                {underContract
+                  ? 'if it comes back on the market or when it sells.'
+                  : 'if the price drops, it goes under contract, or it sells.'}{' '}
+                No account needed &mdash; unsubscribe anytime.
               </p>
               <input
                 type="email"
