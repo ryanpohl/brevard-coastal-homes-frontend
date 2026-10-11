@@ -42,7 +42,7 @@ export default function ContactPage() {
                 number, Ryan's individual license and the brokerage's
                 corporate license. */}
             <p style={{ fontSize: 12, color: 'var(--color-muted)', marginTop: 10, lineHeight: 1.5 }}>
-              {AGENT_INFO.name}, FL License #{AGENT_INFO.licenseNumber}
+              {AGENT_INFO.licensedName}, FL License #{AGENT_INFO.licenseNumber}
               <br />
               {BROKERAGE_INFO.name}, FL License #{BROKERAGE_INFO.licenseNumber}
             </p>

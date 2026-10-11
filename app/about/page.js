@@ -113,7 +113,7 @@ export default function AboutPage() {
               for the full history. Now each entity gets its own license
               number, Ryan's individual license and the brokerage's
               corporate license. */}
-          {AGENT_INFO.name}, FL License #{AGENT_INFO.licenseNumber}
+          {AGENT_INFO.licensedName}, FL License #{AGENT_INFO.licenseNumber}
           <br />
           {BROKERAGE_INFO.name}, FL License #{BROKERAGE_INFO.licenseNumber}
         </p>
