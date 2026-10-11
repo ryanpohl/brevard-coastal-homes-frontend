@@ -33,6 +33,42 @@ export default function CityAboutSection({ config, page, currentPath, snapshot }
           {text}
         </p>
       ))}
+      {/* Optional where-to-buy list with links (2026-10-11) — page.areas in
+          CITY_PAGE_SEO; an entry has text + href, or a row of links. */}
+      {page.areas && (
+        <>
+          <h3 style={{ fontSize: 18, margin: '20px 0 8px', color: 'var(--color-ink)', fontFamily: 'var(--font-inter-tight)' }}>
+            {page.areasHeading}
+          </h3>
+          <ul style={{ paddingLeft: 20, marginBottom: 16 }}>
+            {page.areas.map((a) => (
+              <li key={a.label} style={{ marginBottom: 8 }}>
+                {a.href ? (
+                  <Link href={a.href} style={{ color: '#000', fontWeight: 600 }}>
+                    {a.label}
+                  </Link>
+                ) : (
+                  <strong style={{ color: 'var(--color-ink)' }}>{a.label}</strong>
+                )}
+                {a.text && <>: {a.text}</>}
+                {a.links && (
+                  <>
+                    :{' '}
+                    {a.links.map((l, i) => (
+                      <span key={l.href}>
+                        {i > 0 && ' · '}
+                        <Link href={l.href} style={{ color: '#000', textDecoration: 'underline' }}>
+                          {l.label}
+                        </Link>
+                      </span>
+                    ))}
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
       {snapshot && snapshot.count > 0 && (
         <p style={{ marginBottom: 12 }}>
           <strong style={{ color: 'var(--color-ink)' }}>Market snapshot:</strong> {snapshot.count} active{' '}

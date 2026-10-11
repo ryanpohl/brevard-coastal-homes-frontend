@@ -335,9 +335,19 @@ async function buildMetadata({ params }) {
   // lib/constants.js. Canonical is the same bare path the backend uses.
   const pageSeoMeta = CITY_PAGE_SEO[citySlug]?.pages[propertySlug];
   if (pageSeoMeta) {
+    // liveCount (2026-10-11): start the description with the live listing
+    // count, e.g. "37 homes for sale in Melbourne Beach, FL."
+    const countPrefix = pageSeoMeta.liveCount
+      ? await buildListingCountPrefix({
+          citySlug,
+          cityName: CITY_PAGE_SEO[citySlug].name,
+          propertyType,
+          waterfront: isOceanfront ? 'Oceanfront' : undefined,
+        })
+      : '';
     return {
       title: pageSeoMeta.title,
-      description: pageSeoMeta.description,
+      description: `${countPrefix}${pageSeoMeta.description}`,
       keywords: pageSeoMeta.keywords,
       alternates: { canonical: `/${citySlug}/${propertySlug}` },
     };

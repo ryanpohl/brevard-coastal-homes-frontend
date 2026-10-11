@@ -38,9 +38,12 @@ import { withSocialPreview } from '@/lib/socialPreview';
  * inspector/insurer source, presented as "typically," not as quotes.
  */
 export const metadata = withSocialPreview({
-  title: 'Hurricane & Homeowners Insurance in Brevard County, FL | Brevard Coastal Homes',
+  // Search Console (2026-10-11, per Ryan): "wind mitigation brevard county"
+  // ranked ~#10 with no clicks, so wind mitigation now leads the title and
+  // description.
+  title: 'Wind Mitigation & Hurricane Insurance in Brevard County, FL',
   description:
-    "A 2026 guide to hurricane insurance in Brevard County — the hurricane deductible, wind mitigation credits, 4-point inspections, and Citizens Property Insurance explained for buyers.",
+    "How a wind mitigation inspection can lower your Brevard County insurance premium, plus the hurricane deductible, 4-point inspections and Citizens explained.",
   alternates: { canonical: '/hurricane-insurance' },
 });
 
@@ -71,7 +74,7 @@ export default function HurricaneInsurancePage() {
   return (
     <div className="container" style={{ padding: '32px clamp(16px, 4vw, 56px) 64px', maxWidth: 760 }}>
       <h1 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', marginBottom: 12, fontFamily: 'var(--font-inter-tight)' }}>
-        Hurricane &amp; Homeowners Insurance in Brevard County: What Buyers Need to Know
+        Hurricane Insurance &amp; Wind Mitigation in Brevard County: What Buyers Need to Know
       </h1>
       <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
         Insurance is one of the biggest ongoing costs of owning a home in Brevard County, and hurricane risk is a big
@@ -118,7 +121,7 @@ export default function HurricaneInsurancePage() {
         </p>
       </GuideSection>
 
-      <GuideSection title="Wind mitigation inspections & credits">
+      <GuideSection title="Wind mitigation inspections in Brevard County">
         <p>
           A wind mitigation inspection uses the state&apos;s official form (OIR-B1-1802) to document how well a home is
           built to resist hurricane winds: roof covering and age, how the roof deck attaches to the trusses, how the
