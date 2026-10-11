@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import RelocationGuidePromo from '@/components/RelocationGuidePromo';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import { withSocialPreview } from '@/lib/socialPreview';
@@ -171,6 +172,9 @@ export default function HurricaneInsurancePage() {
           directly for current eligibility and whether the program is accepting applications.
         </p>
       </GuideSection>
+
+      {/* Free relocation guide offer (2026-10-11) — RelocationGuidePromo.js. */}
+      <RelocationGuidePromo compact />
 
       <section style={{ marginBottom: 36 }}>
         <Faq items={FAQ_ITEMS} heading="Hurricane Insurance FAQ" />

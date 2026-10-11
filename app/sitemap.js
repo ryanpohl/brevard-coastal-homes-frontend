@@ -105,6 +105,8 @@ export default async function sitemap() {
     // fifth evergreen guide page, see app/moving-to-brevard/page.js. Same
     // priority tier as the other guides.
     { url: `${SITE_URL}/moving-to-brevard`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    // Free relocation guide landing page (2026-10-11), see app/brevard-relocation-guide.
+    { url: `${SITE_URL}/brevard-relocation-guide`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
     // Client Reviews page (2026-09-25, per Ryan) — see app/reviews/page.js.
     // Same priority tier as the other static informational pages.
     { url: `${SITE_URL}/reviews`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import RelocationGuidePromo from '@/components/RelocationGuidePromo';
 import Link from 'next/link';
 import { preload } from 'react-dom';
 import * as api from '@/lib/api';
@@ -319,6 +320,8 @@ export default async function HomePage() {
               />
             ))}
           </div>
+          {/* Free relocation guide offer (2026-10-11) — RelocationGuidePromo.js. */}
+          <RelocationGuidePromo />
         </section>
       </div>
 

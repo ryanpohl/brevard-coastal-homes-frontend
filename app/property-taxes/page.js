@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import RelocationGuidePromo from '@/components/RelocationGuidePromo';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import { withSocialPreview } from '@/lib/socialPreview';
@@ -180,6 +181,9 @@ export default function PropertyTaxesPage() {
           — it covers these exemptions alongside VA financing itself.
         </p>
       </GuideSection>
+
+      {/* Free relocation guide offer (2026-10-11) — RelocationGuidePromo.js. */}
+      <RelocationGuidePromo compact />
 
       <section style={{ marginBottom: 36 }}>
         <Faq items={FAQ_ITEMS} heading="Property Taxes & Homestead Exemption FAQ" />

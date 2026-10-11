@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import RelocationGuidePromo from '@/components/RelocationGuidePromo';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import { withSocialPreview } from '@/lib/socialPreview';
@@ -84,6 +85,9 @@ export default function MovingToBrevardPage() {
         Figures below are current as of 2026 and sourced from official state and regional sources where available.
         This page is general information, not financial, tax, or legal advice.
       </p>
+
+      {/* Free relocation guide offer (2026-10-11) — RelocationGuidePromo.js. */}
+      <RelocationGuidePromo compact />
 
       <GuideSection title="Why people move to the Space Coast">
         <p>
