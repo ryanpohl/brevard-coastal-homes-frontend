@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { AGENT_INFO } from '@/lib/siteConstants';
 import * as api from '@/lib/api';
 import BrokerageNote from '@/components/BrokerageNote';
 
@@ -65,9 +64,10 @@ export default function PropertyContactPanel({ listingId, listingAddress, status
           </a>
         </div>
         <BrokerageNote block agentName={false} style={{ color: 'rgba(255,255,255,0.75)', fontSize: 12 }} />
-        <div style={{ fontSize: 22, letterSpacing: 0.5, marginTop: 4 }}>{AGENT_INFO.businessName}</div>
-        <div style={{ fontSize: 14, marginTop: 12, opacity: 0.9 }}>We are standing by to assist you.</div>
-        <div style={{ fontSize: 13, marginTop: 16, opacity: 0.85 }}>
+        {/* "Brevard Coastal Homes" and "We are standing by to assist you."
+            removed 2026-10-12, per Ryan. The brokerage name stays right
+            under the number (Florida Rule 61J2-10.025). */}
+        <div style={{ fontSize: 14, marginTop: 14, opacity: 0.9 }}>
           {status === 'Sold'
             ? 'This home has sold. Looking for something similar? Ask us below and we’ll send you matching homes.'
             : status === 'Pending'
@@ -75,7 +75,7 @@ export default function PropertyContactPanel({ listingId, listingAddress, status
               : status === 'Contingent'
                 ? 'This home is under contract with contingencies. Backup offers may still be accepted — make an offer or ask us below.'
               : listingId != null
-                ? 'Want to make an offer or ask a question? Select one the buttons below.'
+                ? 'Want to make an offer or ask a question? Select one of the buttons below.'
                 : 'Have a question? Select the button below.'}
         </div>
         <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
