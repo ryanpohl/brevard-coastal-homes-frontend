@@ -233,7 +233,9 @@ export default async function HomePage() {
               ~60% that gets cropped off. Made from brevard-hero-no-ship.jpg
               (still used for link previews) with sharp (AVIF quality 40 for the
               phone files, 50 for the others; WebP 70); regenerate all
-              eight if the photo changes. */}
+              eight if the photo changes. 2026-10-12, per Ryan: replaced with
+              a golden-hour sunrise version (AVIF 32 phone / 40 others, WebP
+              62, to keep the files about the old sizes). */}
           <picture>
             <source
               media="(max-width: 640px)"
@@ -272,7 +274,10 @@ export default async function HomePage() {
               // (darker top and bottom, lighter middle) rather than
               // removing it outright, since the headline still crosses the
               // brighter sky portion of the photo.
-              background: 'linear-gradient(180deg, rgba(15,35,45,0.18) 0%, rgba(15,35,45,0.08) 40%, rgba(10,25,32,0.28) 100%)',
+              // Darkened a little again (2026-10-12) with the golden-hour
+              // sunrise hero, per Ryan: its bright clouds behind the
+              // headline needed slightly more contrast than the old photo.
+              background: 'linear-gradient(180deg, rgba(15,35,45,0.28) 0%, rgba(15,35,45,0.20) 40%, rgba(10,25,32,0.30) 100%)',
               pointerEvents: 'none',
             }}
           />
