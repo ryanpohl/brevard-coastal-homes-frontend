@@ -104,6 +104,11 @@ const CITY_IMAGE_POSITION = {};
 const CITY_THUMBNAIL_OVERRIDE = {
   'viera-west': 'viera-west-city.jpg',
   viera: 'viera-east-sign.jpg',
+  // New aerial photo saved over the same filename (2026-10-12); the ?v=2
+  // gives it a new address so the image cache (minimumCacheTTL, a day)
+  // and browsers can't keep serving the old pier-sign photo. Bump it on
+  // the next swap of this file.
+  'cocoa-beach': 'cocoa-beach-pier.jpg?v=2',
 };
 
 // Homepage "Search By Neighborhood" display order (2026-09-07, per Ryan:
