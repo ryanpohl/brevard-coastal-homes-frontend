@@ -109,14 +109,14 @@ const CITY_THUMBNAIL_OVERRIDE = {
   // cache (minimumCacheTTL, a day) and browsers can't keep serving the old
   // photo. Bump the number on the next swap of a file. Merritt Island and
   // Viera West keep their photos.
-  viera: 'viera-east-sign.jpg?v=2',
+  viera: 'viera-east-sign.jpg?v=3',
   'cocoa-beach': 'cocoa-beach-pier.jpg?v=3',
-  indialantic: 'indialantic.jpg?v=2',
-  'indian-harbour-beach': 'indian-harbour-beach.jpg?v=2',
-  melbourne: 'melbourne.jpg?v=2',
-  'melbourne-beach': 'melbourne-beach.jpg?v=2',
-  rockledge: 'rockledge.jpg?v=2',
-  'satellite-beach': 'satellite-beach.jpg?v=2',
+  indialantic: 'indialantic.jpg?v=3',
+  'indian-harbour-beach': 'indian-harbour-beach.jpg?v=3',
+  melbourne: 'melbourne.jpg?v=3',
+  'melbourne-beach': 'melbourne-beach.jpg?v=3',
+  rockledge: 'rockledge.jpg?v=3',
+  'satellite-beach': 'satellite-beach.jpg?v=3',
 };
 
 // Homepage "Search By Neighborhood" display order (2026-09-07, per Ryan:
@@ -198,18 +198,18 @@ export default async function HomePage() {
   // `priority` used to do this, and the <picture> below doesn't get React's
   // automatic image preload. One per screen size, so phones only fetch the
   // phone file.
-  preload('/hero/hero-phone-640.avif?v=2', {
+  preload('/hero/hero-phone-640.avif?v=3', {
     as: 'image',
     type: 'image/avif',
     media: '(max-width: 640px)',
-    imageSrcSet: '/hero/hero-phone-480.avif?v=2 1x, /hero/hero-phone-640.avif?v=2 2x',
+    imageSrcSet: '/hero/hero-phone-480.avif?v=3 1x, /hero/hero-phone-640.avif?v=3 2x',
     fetchPriority: 'high',
   });
-  preload('/hero/hero-1544.avif?v=2', {
+  preload('/hero/hero-1544.avif?v=3', {
     as: 'image',
     type: 'image/avif',
     media: '(min-width: 641px)',
-    imageSrcSet: '/hero/hero-1080.avif?v=2 1080w, /hero/hero-1544.avif?v=2 1544w',
+    imageSrcSet: '/hero/hero-1080.avif?v=3 1080w, /hero/hero-1544.avif?v=3 1544w',
     imageSizes: '100vw',
     fetchPriority: 'high',
   });
@@ -237,23 +237,23 @@ export default async function HomePage() {
               a golden-hour sunrise version (AVIF 32 phone / 40 others, WebP
               62, to keep the files about the old sizes), then toned down
               (brightness 0.9, saturation 0.85) per Ryan: "that's really
-              bright". ?v=2 makes browsers fetch the new files; bump it when
+              bright". ?v=3 makes browsers fetch the new files; bump it when
               the photo changes again. */}
           <picture>
             <source
               media="(max-width: 640px)"
               type="image/avif"
-              srcSet="/hero/hero-phone-480.avif?v=2 1x, /hero/hero-phone-640.avif?v=2 2x"
+              srcSet="/hero/hero-phone-480.avif?v=3 1x, /hero/hero-phone-640.avif?v=3 2x"
             />
             <source
               media="(max-width: 640px)"
               type="image/webp"
-              srcSet="/hero/hero-phone-480.webp?v=2 1x, /hero/hero-phone-640.webp?v=2 2x"
+              srcSet="/hero/hero-phone-480.webp?v=3 1x, /hero/hero-phone-640.webp?v=3 2x"
             />
-            <source type="image/avif" srcSet="/hero/hero-1080.avif?v=2 1080w, /hero/hero-1544.avif?v=2 1544w" sizes="100vw" />
+            <source type="image/avif" srcSet="/hero/hero-1080.avif?v=3 1080w, /hero/hero-1544.avif?v=3 1544w" sizes="100vw" />
             <img
-              src="/hero/hero-1080.webp?v=2"
-              srcSet="/hero/hero-1080.webp?v=2 1080w, /hero/hero-1544.webp?v=2 1544w"
+              src="/hero/hero-1080.webp?v=3"
+              srcSet="/hero/hero-1080.webp?v=3 1080w, /hero/hero-1544.webp?v=3 1544w"
               sizes="100vw"
               alt="Beachfront estate with private pool overlooking the Brevard County coastline"
               fetchPriority="high"
@@ -277,10 +277,10 @@ export default async function HomePage() {
               // (darker top and bottom, lighter middle) rather than
               // removing it outright, since the headline still crosses the
               // brighter sky portion of the photo.
-              // Darkened a little again (2026-10-12, twice) with the golden-hour
+              // Re-tuned (2026-10-12) for the twilight hero, which is darker on its own; was darker for the bright golden-hour
               // sunrise hero, per Ryan: its bright clouds behind the
               // headline needed slightly more contrast than the old photo.
-              background: 'linear-gradient(180deg, rgba(15,35,45,0.32) 0%, rgba(15,35,45,0.24) 40%, rgba(10,25,32,0.34) 100%)',
+              background: 'linear-gradient(180deg, rgba(15,35,45,0.22) 0%, rgba(15,35,45,0.12) 40%, rgba(10,25,32,0.28) 100%)',
               pointerEvents: 'none',
             }}
           />
