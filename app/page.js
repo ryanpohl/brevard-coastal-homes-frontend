@@ -142,6 +142,24 @@ const HOMEPAGE_NEIGHBORHOOD_ORDER = [
   'south-merritt-island',
 ];
 
+// Homepage "Search By City" display order (2026-10-12, per Ryan): Merritt
+// Island moved ahead of Viera so the Satellite Beach and Viera aerials,
+// which look alike, aren't side by side, and the two Viera cards sit
+// together. Display only (the search dropdowns keep the backend order);
+// same fallback rules as the neighborhood order above.
+const HOMEPAGE_CITY_ORDER = [
+  'cocoa-beach',
+  'indialantic',
+  'indian-harbour-beach',
+  'melbourne',
+  'melbourne-beach',
+  'rockledge',
+  'satellite-beach',
+  'merritt-island',
+  'viera',
+  'viera-west',
+];
+
 function sortByDisplayOrder(items, order) {
   const orderIndex = new Map(order.map((slug, i) => [slug, i]));
   return [...items].sort((a, b) => {
@@ -319,7 +337,7 @@ export default async function HomePage() {
             Search By City
           </h2>
           <div className="city-grid">
-            {cities.map((city) => (
+            {sortByDisplayOrder(cities, HOMEPAGE_CITY_ORDER).map((city) => (
               <PlaceCard
                 key={city.slug}
                 name={city.name}
