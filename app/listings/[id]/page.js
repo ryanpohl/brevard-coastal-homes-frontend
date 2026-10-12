@@ -302,7 +302,7 @@ export default async function ListingDetailPage({ params }) {
               <div className="listing-price-phone">
                 Questions about this home? Call or text Ryan:{' '}
                 <a href="tel:+13213507661">321-350-7661</a>
-                <BrokerageNote block agentName={false} style={{ fontSize: 12 }} />
+                <BrokerageNote block agentName={false} />
               </div>
               {/* Price-drop/status alerts for this one home (2026-10-10, per
                   Ryan) — not for sold or off-market homes. */}
