@@ -55,9 +55,16 @@ export default function PropertyContactPanel({ listingId, listingAddress, status
   return (
     <div style={{ background: '#fff', borderRadius: 6, overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.10)' }}>
       <div style={{ background: 'var(--color-ink-dark)', color: '#fff', textAlign: 'center', padding: '28px 24px' }}>
-        {AGENT_INFO.phone && (
-          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 600 }}>Call or Text {AGENT_INFO.phone}</div>
-        )}
+        {/* Hardcoded (2026-10-12): AGENT_INFO.phone is empty on the live
+            site, so this line never showed — same reason as the other
+            hardcoded "Call or Text" lines (see Nav.js). */}
+        <div style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 600 }}>
+          Call or Text{' '}
+          <a href="tel:+13213507661" style={{ color: 'inherit', textDecoration: 'none' }}>
+            321-350-7661
+          </a>
+        </div>
+        <BrokerageNote block agentName={false} style={{ color: 'rgba(255,255,255,0.75)', fontSize: 12 }} />
         <div style={{ fontSize: 22, letterSpacing: 0.5, marginTop: 4 }}>{AGENT_INFO.businessName}</div>
         <div style={{ fontSize: 14, marginTop: 12, opacity: 0.9 }}>We are standing by to assist you.</div>
         <div style={{ fontSize: 13, marginTop: 16, opacity: 0.85 }}>
@@ -220,24 +227,21 @@ function RequestShowingForm({ listingId, listingAddress, dateOptions, user }) {
 
   if (status.success) {
     return (
-      <div style={{ padding: '20px 24px 28px', textAlign: 'center', color: 'var(--color-success)', fontSize: 14 }}>{status.success}</div>
+      <div id="request-showing" style={{ padding: '20px 24px 28px', textAlign: 'center', color: 'var(--color-success)', fontSize: 14 }}>{status.success}</div>
     );
   }
 
   return (
-    <form onSubmit={submit} style={{ padding: '20px 24px 28px' }}>
+    <form id="request-showing" onSubmit={submit} style={{ padding: '20px 24px 28px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 12, flexWrap: 'wrap', textAlign: 'center' }}>
         <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-muted-dark)' }}>Select a Preferred Date</div>
-        {AGENT_INFO.phone && (
-          <>
-            <span style={{ fontSize: 11, color: 'var(--color-muted-light)', letterSpacing: 1, textTransform: 'uppercase' }}>Or</span>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, fontSize: 14, color: 'var(--color-ink)' }}>
-              <span style={{ fontWeight: 700, fontSize: 15 }}>Set Up by Phone</span>
-              <span style={{ color: 'var(--color-muted)', fontSize: 12 }}>(Call or Text)</span>
-              <span style={{ fontWeight: 700, color: 'var(--color-gold-text)' }}>{AGENT_INFO.phone}</span>
-            </div>
-          </>
-        )}
+        {/* Hardcoded number (2026-10-12) — AGENT_INFO.phone is empty live. */}
+        <span style={{ fontSize: 11, color: 'var(--color-muted-light)', letterSpacing: 1, textTransform: 'uppercase' }}>Or</span>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, fontSize: 14, color: 'var(--color-ink)' }}>
+          <span style={{ fontWeight: 700, fontSize: 15 }}>Set Up by Phone</span>
+          <span style={{ color: 'var(--color-muted)', fontSize: 12 }}>(Call or Text)</span>
+          <a href="tel:+13213507661" style={{ fontWeight: 700, color: 'var(--color-gold-text)', textDecoration: 'none' }}>321-350-7661</a>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8, marginBottom: 16 }}>

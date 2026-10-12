@@ -2208,3 +2208,184 @@ textarea:focus {
     padding: 16px;
   }
 }
+
+/* Phone number in the header's top-left corner, balancing My Account on the
+   right (2026-10-12, per Ryan: didn't like the thin strip across the top).
+   Only from 1100px up, where there's room beside the centered wordmark;
+   narrower screens keep the strip (.nav-phone-strip). */
+.nav-brand-phone {
+  display: none;
+}
+
+@media (min-width: 1100px) {
+  .nav-phone-strip {
+    display: none;
+  }
+
+  .nav-brand-phone {
+    position: absolute;
+    top: 26px;
+    left: clamp(16px, 4vw, 56px);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--color-ink);
+  }
+
+  .nav-brand-phone__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 1px solid var(--color-gold);
+    color: var(--color-gold-text);
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .nav-brand-phone:hover .nav-brand-phone__icon {
+    background: var(--color-gold);
+    color: #fff;
+  }
+
+  .nav-brand-phone__text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+
+  .nav-brand-phone__label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--color-muted-dark);
+  }
+
+  .nav-brand-phone__number {
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--color-gold-text);
+    margin-top: 2px;
+  }
+
+  /* !important: BrokerageNote sets its size and color inline. */
+  .brokerage-note.nav-brand-phone__brokerage {
+    font-size: 11px !important;
+    color: var(--color-muted) !important;
+    margin-top: 3px !important;
+  }
+}
+
+/* Slim phone bar that slides down from the top on wider screens once the
+   header scrolls away (2026-10-12) — components/StickyContactBar.js.
+   Phones use the bottom Call / Text bar instead. Under modals (z-index 100). */
+.sticky-contact-bar {
+  display: none;
+}
+
+@media (min-width: 721px) {
+  .sticky-contact-bar {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 90;
+    background: #fff;
+    border-bottom: 1px solid var(--color-border-light);
+    box-shadow: 0 2px 12px rgba(16, 36, 44, 0.12);
+    transform: translateY(-100%);
+    visibility: hidden;
+    transition: transform 0.25s ease, visibility 0.25s;
+  }
+
+  .sticky-contact-bar.is-shown {
+    transform: translateY(0);
+    visibility: visible;
+  }
+
+  .sticky-contact-bar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 9px clamp(16px, 4vw, 56px);
+  }
+
+  .sticky-contact-bar__brand {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--color-ink);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .sticky-contact-bar__phone {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-ink);
+    text-align: center;
+  }
+
+  .sticky-contact-bar__phone a {
+    color: var(--color-gold-text);
+    font-weight: 700;
+    font-size: 18px;
+    text-decoration: none;
+  }
+
+  .sticky-contact-bar__brokerage {
+    margin-left: 10px;
+    padding-left: 10px;
+    border-left: 1px solid var(--color-border-light);
+  }
+
+  .sticky-contact-bar__btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 3px;
+    background: var(--color-gold);
+    color: var(--color-ink-dark);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .sticky-contact-bar__btn:hover {
+    filter: brightness(1.06);
+  }
+}
+
+/* Narrower tablets: drop the wordmark so the number and button fit on one line. */
+@media (min-width: 721px) and (max-width: 1050px) {
+  .sticky-contact-bar__brand {
+    display: none;
+  }
+}
+
+/* Phone line under the price on listing pages (2026-10-12). */
+.listing-price-phone {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--color-muted-dark);
+}
+
+.listing-price-phone a {
+  color: var(--color-gold-text);
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+  white-space: nowrap;
+}

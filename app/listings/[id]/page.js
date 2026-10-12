@@ -7,6 +7,7 @@ import MortgageCalculator from '@/components/MortgageCalculator';
 import { homeKind, monthlyHoa } from '@/lib/mortgage';
 import PropertyGallery from '@/components/PropertyGallery';
 import PropertyContactPanel from '@/components/PropertyContactPanel';
+import BrokerageNote from '@/components/BrokerageNote';
 import { ContactBarMessage } from '@/components/MobileContactBar';
 import ListingMap from '@/components/ListingMap';
 
@@ -294,6 +295,14 @@ export default async function ListingDetailPage({ params }) {
                     <span style={{ fontSize: 18, verticalAlign: -2 }}>↓</span> {formatPrice(priceReduction)}
                   </span>
                 )}
+              </div>
+              {/* Phone line right under the price (2026-10-12, per Ryan) —
+                  until now the number only showed down in the contact panel.
+                  Brokerage name beside it, Florida Rule 61J2-10.025. */}
+              <div className="listing-price-phone">
+                Questions about this home? Call or text Ryan:{' '}
+                <a href="tel:+13213507661">321-350-7661</a>
+                <BrokerageNote block agentName={false} style={{ fontSize: 12 }} />
               </div>
               {/* Price-drop/status alerts for this one home (2026-10-10, per
                   Ryan) — not for sold or off-market homes. */}

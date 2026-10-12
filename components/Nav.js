@@ -251,7 +251,11 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           (the old rgba(255,255,255,0.08) was invisible against white).
           fontSize bumped 13 -> 15 (2026-09-08, per Ryan: "make ... Call or
           Text 321-350-7661 a little larger on the top of the homepage"). */}
+      {/* Wide screens show the number in the header's left corner instead
+          (.nav-brand-phone below, 2026-10-12, per Ryan: "I don't like how it
+          looks"), so this strip only shows on phones and tablets. */}
       <div
+        className="nav-phone-strip"
         style={{
           textAlign: 'center',
           padding: '6px 16px',
@@ -280,6 +284,22 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           top-right slot, same pattern as the "My Account" panel below
           already used against the outer container). */}
       <div className="container nav-brand-row">
+        {/* Phone number in the top-left corner, balancing My Account on the
+            right (2026-10-12, per Ryan) — wide screens only, see
+            .nav-brand-phone in globals.css. Brokerage name directly under
+            it (Florida Rule 61J2-10.025). */}
+        <a href="tel:+13213507661" className="nav-brand-phone">
+          <span className="nav-brand-phone__icon" aria-hidden="true">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z" />
+            </svg>
+          </span>
+          <span className="nav-brand-phone__text">
+            <span className="nav-brand-phone__label">Call or Text Ryan</span>
+            <span className="nav-brand-phone__number">321-350-7661</span>
+            <BrokerageNote block agentName={false} className="nav-brand-phone__brokerage" />
+          </span>
+        </a>
         <div className="nav-brand-center">
           <Link href="/" onMouseEnter={closeNow} className="nav-brand-wordmark">
             Brevard Coastal Homes
