@@ -36,14 +36,11 @@ export const metadata = withSocialPreview({
   alternates: { canonical: '/' },
 });
 
-// Per-city crop overrides for PlaceCard's cover photo. The default center
-// crop works for most thumbnails, but tall portrait source photos can lose
-// their focal point (e.g. the Cocoa Beach Pier sign sits near the top of
-// its source image and gets cropped out by a center crop) — override those
-// here rather than re-cropping the source file.
-const CITY_IMAGE_POSITION = {
-  'cocoa-beach': 'top',
-};
+// Per-city crop overrides for PlaceCard's cover photo, for source photos
+// whose focal point a center crop would cut off. Empty since 2026-10-12:
+// Cocoa Beach's tall pier-sign photo (which needed 'top') was replaced, per
+// Ryan, by an aerial of the pier, beach and condos, pre-cropped to 4:3.
+const CITY_IMAGE_POSITION = {};
 
 // City-level thumbnail override (2026-09-10, per Ryan: "Replace the viera
 // west picture with this one under search by city" — a stadium photo for
