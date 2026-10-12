@@ -142,22 +142,23 @@ const HOMEPAGE_NEIGHBORHOOD_ORDER = [
   'south-merritt-island',
 ];
 
-// Homepage "Search By City" display order (2026-10-12, per Ryan): Merritt
-// Island moved ahead of Viera so the Satellite Beach and Viera aerials,
-// which look alike, aren't side by side, and the two Viera cards sit
-// together. Display only (the search dropdowns keep the backend order);
+// Homepage "Search By City" display order (2026-10-12, per Ryan): warm
+// orange-sky photos alternate with cooler blue-sky ones so no two similar
+// cards sit side by side at 2, 3 or 5 cards per row (it started with the
+// Satellite Beach and Viera aerials, then Cocoa Beach and Indialantic on
+// phones). Display only (the search dropdowns keep the backend order);
 // same fallback rules as the neighborhood order above.
 const HOMEPAGE_CITY_ORDER = [
   'cocoa-beach',
-  'indialantic',
-  'indian-harbour-beach',
   'melbourne',
-  'melbourne-beach',
-  'rockledge',
-  'satellite-beach',
+  'indialantic',
   'merritt-island',
-  'viera',
+  'melbourne-beach',
+  'satellite-beach',
+  'indian-harbour-beach',
   'viera-west',
+  'rockledge',
+  'viera',
 ];
 
 function sortByDisplayOrder(items, order) {
