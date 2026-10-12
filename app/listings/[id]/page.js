@@ -7,7 +7,6 @@ import MortgageCalculator from '@/components/MortgageCalculator';
 import { homeKind, monthlyHoa } from '@/lib/mortgage';
 import PropertyGallery from '@/components/PropertyGallery';
 import PropertyContactPanel from '@/components/PropertyContactPanel';
-import BrokerageNote from '@/components/BrokerageNote';
 import { ContactBarMessage } from '@/components/MobileContactBar';
 import ListingMap from '@/components/ListingMap';
 
@@ -271,9 +270,15 @@ export default async function ListingDetailPage({ params }) {
   ? `SOLD ${formatSoldDate(listing.closeDate)}`
   : (listing.statusLabel || listing.status)?.toUpperCase()}
 </div>
+              {/* Price-drop/status alerts for this one home (2026-10-10, per
+                  Ryan) — not for sold or off-market homes. Under the address
+                  since 2026-10-12 (per Ryan: the price side was too busy). */}
+              {(listing.status === 'Active' || listing.status === 'Pending') && (
+                <HomeAlertSignup listingId={listing.id} status={listing.statusLabel === 'Contingent' ? 'Contingent' : listing.status} />
+              )}
   </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+            <div className="listing-price-col" style={{ textAlign: 'right' }}>
+              <div className="listing-price-row" style={{ display: 'flex', alignItems: 'baseline', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                 {/* Sold price in the same red as the SOLD date and photo badge
                     (2026-10-08, per Ryan); "Listed at" stays gray. */}
                 <span
@@ -296,19 +301,6 @@ export default async function ListingDetailPage({ params }) {
                   </span>
                 )}
               </div>
-              {/* Phone line right under the price (2026-10-12, per Ryan) —
-                  until now the number only showed down in the contact panel.
-                  Brokerage name beside it, Florida Rule 61J2-10.025. */}
-              <div className="listing-price-phone">
-                Questions about this home? Call or text Ryan:{' '}
-                <a href="tel:+13213507661">321-350-7661</a>
-                <BrokerageNote block agentName={false} />
-              </div>
-              {/* Price-drop/status alerts for this one home (2026-10-10, per
-                  Ryan) — not for sold or off-market homes. */}
-              {(listing.status === 'Active' || listing.status === 'Pending') && (
-                <HomeAlertSignup listingId={listing.id} status={listing.statusLabel === 'Contingent' ? 'Contingent' : listing.status} />
-              )}
               {/* Estimated monthly payment (2026-10-11, per Ryan) — opens the
                   full calculator, pre-filled with this home. Not for land or
                   sold homes. */}

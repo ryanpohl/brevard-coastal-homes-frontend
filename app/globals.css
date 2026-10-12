@@ -1448,12 +1448,13 @@ textarea:focus {
   scroll-margin-top: 24px;
 }
 
-/* "🔔 Get price-drop alerts for this home" under the price on a listing
-   page (ListingAlertSignup.js's HomeAlertSignup). */
+/* "🔔 Get price-drop alerts for this home" under the address on a listing
+   page (ListingAlertSignup.js's HomeAlertSignup) — moved from under the
+   price and left-aligned 2026-10-12, per Ryan: the price side was too busy. */
 .home-alert {
-  margin-top: 8px;
+  margin-top: 10px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .home-alert__toggle {
@@ -1465,7 +1466,7 @@ textarea:focus {
   font-weight: 600;
   color: var(--color-gold-text);
   cursor: pointer;
-  text-align: right;
+  text-align: left;
 }
 
 .home-alert__toggle:hover {
@@ -1476,7 +1477,6 @@ textarea:focus {
   flex-wrap: wrap;
   gap: 8px;
   max-width: 320px;
-  margin-left: auto;
 }
 
 .home-alert__form input {
@@ -1499,16 +1499,15 @@ textarea:focus {
   margin: 0;
   font-size: 12px;
   color: var(--color-muted);
-  text-align: right;
+  text-align: left;
 }
 
 .home-alert__done {
   max-width: 320px;
-  margin-left: auto;
   color: var(--color-success);
   font-weight: 600;
   font-size: 14px;
-  text-align: right;
+  text-align: left;
 }
 
 @media (max-width: 640px) {
@@ -2381,24 +2380,13 @@ textarea:focus {
   }
 }
 
-/* Phone line under the price on listing pages (2026-10-12). Brokerage
-   name kept small and light (per Ryan) — still required next to the number. */
-.listing-price-phone .brokerage-note {
-  font-size: 11px !important;
-  color: var(--color-muted-light) !important;
-  margin-top: 2px !important;
-}
-
-.listing-price-phone {
-  margin-top: 8px;
-  font-size: 14px;
-  color: var(--color-muted-dark);
-}
-
-.listing-price-phone a {
-  color: var(--color-gold-text);
-  font-weight: 700;
-  font-size: 15px;
-  text-decoration: none;
-  white-space: nowrap;
+/* Listing page: on phones the price wraps under the address, so it lines up
+   on the left with everything else (2026-10-12). !important: inline styles. */
+@media (max-width: 640px) {
+  .listing-price-col {
+    text-align: left !important;
+  }
+  .listing-price-row {
+    justify-content: flex-start !important;
+  }
 }
