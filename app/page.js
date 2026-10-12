@@ -109,14 +109,14 @@ const CITY_THUMBNAIL_OVERRIDE = {
   // cache (minimumCacheTTL, a day) and browsers can't keep serving the old
   // photo. Bump the number on the next swap of a file. Merritt Island and
   // Viera West keep their photos.
-  viera: 'viera-east-sign.jpg?v=4',
-  'cocoa-beach': 'cocoa-beach-pier.jpg?v=4',
-  indialantic: 'indialantic.jpg?v=4',
-  'indian-harbour-beach': 'indian-harbour-beach.jpg?v=4',
-  melbourne: 'melbourne.jpg?v=4',
-  'melbourne-beach': 'melbourne-beach.jpg?v=4',
-  rockledge: 'rockledge.jpg?v=4',
-  'satellite-beach': 'satellite-beach.jpg?v=4',
+  viera: 'viera-east-sign.jpg?v=5',
+  'cocoa-beach': 'cocoa-beach-pier.jpg?v=5',
+  indialantic: 'indialantic.jpg?v=5',
+  'indian-harbour-beach': 'indian-harbour-beach.jpg?v=5',
+  melbourne: 'melbourne.jpg?v=5',
+  'melbourne-beach': 'melbourne-beach.jpg?v=5',
+  rockledge: 'rockledge.jpg?v=5',
+  'satellite-beach': 'satellite-beach.jpg?v=5',
 };
 
 // Homepage "Search By Neighborhood" display order (2026-09-07, per Ryan:
@@ -198,18 +198,18 @@ export default async function HomePage() {
   // `priority` used to do this, and the <picture> below doesn't get React's
   // automatic image preload. One per screen size, so phones only fetch the
   // phone file.
-  preload('/hero/hero-phone-640.avif?v=4', {
+  preload('/hero/hero-phone-640.avif?v=5', {
     as: 'image',
     type: 'image/avif',
     media: '(max-width: 640px)',
-    imageSrcSet: '/hero/hero-phone-480.avif?v=4 1x, /hero/hero-phone-640.avif?v=4 2x',
+    imageSrcSet: '/hero/hero-phone-480.avif?v=5 1x, /hero/hero-phone-640.avif?v=5 2x',
     fetchPriority: 'high',
   });
-  preload('/hero/hero-1544.avif?v=4', {
+  preload('/hero/hero-1544.avif?v=5', {
     as: 'image',
     type: 'image/avif',
     media: '(min-width: 641px)',
-    imageSrcSet: '/hero/hero-1080.avif?v=4 1080w, /hero/hero-1544.avif?v=4 1544w',
+    imageSrcSet: '/hero/hero-1080.avif?v=5 1080w, /hero/hero-1544.avif?v=5 1544w',
     imageSizes: '100vw',
     fetchPriority: 'high',
   });
@@ -237,23 +237,23 @@ export default async function HomePage() {
               a golden-hour sunrise version (AVIF 32 phone / 40 others, WebP
               62, to keep the files about the old sizes), then toned down
               (brightness 0.9, saturation 0.85) per Ryan: "that's really
-              bright". ?v=4 makes browsers fetch the new files; bump it when
+              bright". ?v=5 makes browsers fetch the new files; bump it when
               the photo changes again. */}
           <picture>
             <source
               media="(max-width: 640px)"
               type="image/avif"
-              srcSet="/hero/hero-phone-480.avif?v=4 1x, /hero/hero-phone-640.avif?v=4 2x"
+              srcSet="/hero/hero-phone-480.avif?v=5 1x, /hero/hero-phone-640.avif?v=5 2x"
             />
             <source
               media="(max-width: 640px)"
               type="image/webp"
-              srcSet="/hero/hero-phone-480.webp?v=4 1x, /hero/hero-phone-640.webp?v=4 2x"
+              srcSet="/hero/hero-phone-480.webp?v=5 1x, /hero/hero-phone-640.webp?v=5 2x"
             />
-            <source type="image/avif" srcSet="/hero/hero-1080.avif?v=4 1080w, /hero/hero-1544.avif?v=4 1544w" sizes="100vw" />
+            <source type="image/avif" srcSet="/hero/hero-1080.avif?v=5 1080w, /hero/hero-1544.avif?v=5 1544w" sizes="100vw" />
             <img
-              src="/hero/hero-1080.webp?v=4"
-              srcSet="/hero/hero-1080.webp?v=4 1080w, /hero/hero-1544.webp?v=4 1544w"
+              src="/hero/hero-1080.webp?v=5"
+              srcSet="/hero/hero-1080.webp?v=5 1080w, /hero/hero-1544.webp?v=5 1544w"
               sizes="100vw"
               alt="Beachfront estate with private pool overlooking the Brevard County coastline"
               fetchPriority="high"
