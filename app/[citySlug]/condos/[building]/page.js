@@ -156,7 +156,7 @@ export default async function CondoBuildingPage({ params }) {
             sit between the two. */}
         {data && data.active.length > 3 && (
           <div style={{ margin: '2px 0 14px' }}>
-            <ListingAlertJumpLink />
+            <ListingAlertJumpLink label={name} />
           </div>
         )}
         {data && data.active.length > 0 ? (

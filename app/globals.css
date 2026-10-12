@@ -1440,6 +1440,13 @@ textarea:focus {
   white-space: nowrap;
 }
 
+/* Long names ("...price drops in Harbor Island Beach Club") wrap on phones. */
+@media (max-width: 640px) {
+  .listing-alert-jump {
+    white-space: normal;
+  }
+}
+
 .listing-alert-jump:hover {
   text-decoration: underline;
 }

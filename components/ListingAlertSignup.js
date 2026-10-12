@@ -18,7 +18,8 @@ import { rememberAlertEmail, rememberWatchedHome, rememberedAlertEmail } from '@
 // Small "Get alerts" line near the top of a page that scrolls down to the
 // signup box, so visitors see the option without the box pushing the
 // listings down (2026-10-09, per Ryan).
-export function ListingAlertJumpLink() {
+// `label` names the place (2026-10-12, per Ryan): "...price drops in Adelaide".
+export function ListingAlertJumpLink({ label }) {
   return (
     <a
       href="#listing-alerts"
@@ -32,7 +33,7 @@ export function ListingAlertJumpLink() {
         setTimeout(() => box.querySelector('input')?.focus({ preventScroll: true }), 500);
       }}
     >
-      <span aria-hidden="true">🔔</span> Get alerts for new listings &amp; price drops
+      <span aria-hidden="true">🔔</span> Get alerts for new listings &amp; price drops{label ? ` in ${label}` : ''}
     </a>
   );
 }

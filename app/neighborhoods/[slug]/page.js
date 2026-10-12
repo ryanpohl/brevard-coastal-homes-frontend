@@ -2003,7 +2003,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           results={results}
           mapZoom={neighborhood.mapZoom || 15}
           resultsLabel={total === 0 ? '0 results' : `${rangeStart}-${rangeEnd} of ${total} Homes`}
-          labelExtra={<ListingAlertJumpLink />}
+          labelExtra={<ListingAlertJumpLink label={neighborhood.name} />}
           page={page}
           totalPages={totalPages}
         />
