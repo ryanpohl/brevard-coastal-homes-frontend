@@ -103,12 +103,20 @@ const CITY_IMAGE_POSITION = {};
 // established file-upload flow only adds/replaces, doesn't delete).
 const CITY_THUMBNAIL_OVERRIDE = {
   'viera-west': 'viera-west-city.jpg',
-  viera: 'viera-east-sign.jpg',
-  // New aerial photo saved over the same filename (2026-10-12); the ?v=2
-  // gives it a new address so the image cache (minimumCacheTTL, a day)
-  // and browsers can't keep serving the old pier-sign photo. Bump it on
-  // the next swap of this file.
-  'cocoa-beach': 'cocoa-beach-pier.jpg?v=2',
+  // Golden-hour city photo set (2026-10-12, per Ryan): new photos saved
+  // over the existing filenames (new files under public/ have lagged on
+  // Hostinger, see above), and ?v= gives each a new address so the image
+  // cache (minimumCacheTTL, a day) and browsers can't keep serving the old
+  // photo. Bump the number on the next swap of a file. Merritt Island and
+  // Viera West keep their photos.
+  viera: 'viera-east-sign.jpg?v=2',
+  'cocoa-beach': 'cocoa-beach-pier.jpg?v=3',
+  indialantic: 'indialantic.jpg?v=2',
+  'indian-harbour-beach': 'indian-harbour-beach.jpg?v=2',
+  melbourne: 'melbourne.jpg?v=2',
+  'melbourne-beach': 'melbourne-beach.jpg?v=2',
+  rockledge: 'rockledge.jpg?v=2',
+  'satellite-beach': 'satellite-beach.jpg?v=2',
 };
 
 // Homepage "Search By Neighborhood" display order (2026-09-07, per Ryan:
