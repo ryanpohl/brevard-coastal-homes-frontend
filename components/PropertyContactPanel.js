@@ -63,10 +63,8 @@ export default function PropertyContactPanel({ listingId, listingAddress, status
             321-350-7661
           </a>
         </div>
-        <BrokerageNote block agentName={false} style={{ color: 'rgba(255,255,255,0.75)', fontSize: 12 }} />
-        {/* "Brevard Coastal Homes" and "We are standing by to assist you."
-            removed 2026-10-12, per Ryan. The brokerage name stays right
-            under the number (Florida Rule 61J2-10.025). */}
+        {/* "Brevard Coastal Homes", "We are standing by to assist you." and
+            the brokerage line removed 2026-10-12, per Ryan. */}
         <div style={{ fontSize: 14, marginTop: 14, opacity: 0.9 }}>
           {status === 'Sold'
             ? 'This home has sold. Looking for something similar? Ask us below and we’ll send you matching homes.'
