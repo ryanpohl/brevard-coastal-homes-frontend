@@ -1050,24 +1050,6 @@ textarea:focus {
   clip: rect(0 0 0 0);
 }
 
-/* Brokerage name beside the top strip's phone number (Florida Rule
-   61J2-10.025, 2026-10-05). Same line on desktop; its own line on phones. */
-.nav-strip-brokerage {
-  margin-left: 10px;
-  padding-left: 10px;
-  border-left: 1px solid var(--color-border-light);
-}
-@media (max-width: 640px) {
-  /* !important: BrokerageNote sets display/size inline. */
-  .brokerage-note.nav-strip-brokerage {
-    display: block !important;
-    margin: 2px 0 0;
-    padding: 0;
-    border: none;
-    font-size: 11px !important;
-  }
-}
-
 /* Recently Sold "Show more" toggle (components/RecentlySold.js). */
 .sold-more > summary::-webkit-details-marker { display: none; }
 .sold-more .sold-more-close { display: none; }
@@ -2212,78 +2194,6 @@ textarea:focus {
   }
   .mcalc {
     padding: 16px;
-  }
-}
-
-/* Phone number in the header's top-left corner, balancing My Account on the
-   right (2026-10-12, per Ryan: didn't like the thin strip across the top).
-   Only from 1100px up, where there's room beside the centered wordmark;
-   narrower screens keep the strip (.nav-phone-strip). */
-.nav-brand-phone {
-  display: none;
-}
-
-@media (min-width: 1100px) {
-  .nav-phone-strip {
-    display: none;
-  }
-
-  .nav-brand-phone {
-    position: absolute;
-    top: 26px;
-    left: clamp(16px, 4vw, 56px);
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    text-decoration: none;
-    color: var(--color-ink);
-  }
-
-  .nav-brand-phone__icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    flex-shrink: 0;
-    border-radius: 50%;
-    border: 1px solid var(--color-gold);
-    color: var(--color-gold-text);
-    transition: background 0.15s, color 0.15s;
-  }
-
-  .nav-brand-phone:hover .nav-brand-phone__icon {
-    background: var(--color-gold);
-    color: #fff;
-  }
-
-  .nav-brand-phone__text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
-  }
-
-  .nav-brand-phone__label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--color-muted-dark);
-  }
-
-  .nav-brand-phone__number {
-    font-size: 21px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    color: var(--color-gold-text);
-    margin-top: 2px;
-  }
-
-  /* !important: BrokerageNote sets its size and color inline. */
-  .brokerage-note.nav-brand-phone__brokerage {
-    font-size: 10.5px !important;
-    color: var(--color-muted-light) !important;
-    margin-top: 3px !important;
   }
 }
 
