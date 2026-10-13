@@ -209,11 +209,11 @@ export default async function HomePage() {
     imageSrcSet: '/hero/hero-phone-480.avif?v=13 1x, /hero/hero-phone-640.avif?v=13 2x',
     fetchPriority: 'high',
   });
-  preload('/hero/hero-1544.avif?v=7', {
+  preload('/hero/hero-1544.avif?v=8', {
     as: 'image',
     type: 'image/avif',
     media: '(min-width: 641px)',
-    imageSrcSet: '/hero/hero-1080.avif?v=7 1080w, /hero/hero-1544.avif?v=7 1544w',
+    imageSrcSet: '/hero/hero-1080.avif?v=8 1080w, /hero/hero-1544.avif?v=8 1544w',
     imageSizes: '100vw',
     fetchPriority: 'high',
   });
@@ -261,10 +261,10 @@ export default async function HomePage() {
               type="image/webp"
               srcSet="/hero/hero-phone-480.webp?v=13 1x, /hero/hero-phone-640.webp?v=13 2x"
             />
-            <source type="image/avif" srcSet="/hero/hero-1080.avif?v=7 1080w, /hero/hero-1544.avif?v=7 1544w" sizes="100vw" />
+            <source type="image/avif" srcSet="/hero/hero-1080.avif?v=8 1080w, /hero/hero-1544.avif?v=8 1544w" sizes="100vw" />
             <img
-              src="/hero/hero-1080.webp?v=7"
-              srcSet="/hero/hero-1080.webp?v=7 1080w, /hero/hero-1544.webp?v=7 1544w"
+              src="/hero/hero-1080.webp?v=8"
+              srcSet="/hero/hero-1080.webp?v=8 1080w, /hero/hero-1544.webp?v=8 1544w"
               sizes="100vw"
               alt="Beachfront estate with private pool overlooking the Brevard County coastline"
               fetchPriority="high"
