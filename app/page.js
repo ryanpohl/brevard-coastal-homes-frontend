@@ -148,17 +148,20 @@ const HOMEPAGE_NEIGHBORHOOD_ORDER = [
 // Satellite Beach and Viera aerials, then Cocoa Beach and Indialantic on
 // phones). Display only (the search dropdowns keep the backend order);
 // same fallback rules as the neighborhood order above.
+// Re-ordered 2026-10-13, per Ryan: the cities he most wants to push
+// (Melbourne Beach, Viera West) lead, the ones he least wants to push
+// (Rockledge, Melbourne) come last; warm and blue photos still alternate.
 const HOMEPAGE_CITY_ORDER = [
-  'cocoa-beach',
-  'melbourne',
-  'indialantic',
-  'merritt-island',
   'melbourne-beach',
+  'viera-west',
+  'cocoa-beach',
+  'merritt-island',
+  'indialantic',
   'satellite-beach',
   'indian-harbour-beach',
-  'viera-west',
-  'rockledge',
   'viera',
+  'rockledge',
+  'melbourne',
 ];
 
 function sortByDisplayOrder(items, order) {
