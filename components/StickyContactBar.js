@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import BrokerageNote from './BrokerageNote';
 import ScheduleShowingModal from './ScheduleShowingModal';
 
 /**
@@ -14,7 +13,8 @@ import ScheduleShowingModal from './ScheduleShowingModal';
  * (MobileContactBar.js); the CSS hides this one at 720px and narrower.
  * On a listing page the button scrolls to that home's Request Showing form
  * (#request-showing in PropertyContactPanel.js); elsewhere it opens the
- * general Schedule a Showing popup.
+ * general Schedule a Showing popup. Brokerage line removed 2026-10-13, per
+ * Ryan: just "Call or Text Ryan: 321-350-7661".
  */
 export default function StickyContactBar() {
   const pathname = usePathname();
@@ -52,7 +52,6 @@ export default function StickyContactBar() {
             <a href="tel:+13213507661" tabIndex={shown ? 0 : -1}>
               321-350-7661
             </a>
-            <BrokerageNote agentName={false} className="sticky-contact-bar__brokerage" />
           </div>
           <button type="button" className="sticky-contact-bar__btn" onClick={showing} tabIndex={shown ? 0 : -1}>
             {onListing ? 'Request a Showing' : 'Schedule a Showing'}
