@@ -8,6 +8,7 @@ import { homeKind, monthlyHoa } from '@/lib/mortgage';
 import PropertyGallery from '@/components/PropertyGallery';
 import PropertyContactPanel from '@/components/PropertyContactPanel';
 import { ContactBarMessage } from '@/components/MobileContactBar';
+import ListingEmailPrompt from '@/components/ListingEmailPrompt';
 import ListingMap from '@/components/ListingMap';
 
 // Status badge color — matches design/design_files/Property Detail.dc.html's
@@ -419,6 +420,14 @@ export default async function ListingDetailPage({ params }) {
               both the Make an Offer modal and the Request Showing form
               below (per Ryan, 2026-08-17) — still editable, not read-only. */}
         {/* Starter text for the phone Call / Text bar (MobileContactBar.js). */}
+        {/* Email prompt on a visitor's third listing (2026-10-13) — ListingEmailPrompt.js. */}
+        {/* Rendered on every listing so sold homes count toward the 3 views;
+            it only ever shows on Active / Pending homes. */}
+        <ListingEmailPrompt
+          listingId={listing.id}
+          address={listing.address}
+          status={listing.statusLabel === 'Contingent' ? 'Contingent' : listing.status}
+        />
         <ContactBarMessage
           message={`Hi Ryan, I'm interested in ${listing.address}${listing.mlsNumber ? ` (MLS# ${listing.mlsNumber})` : ''}. `}
         />

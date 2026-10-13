@@ -29,11 +29,6 @@ export default function GuideForm({ town }) {
         pagePath: window.location.pathname + window.location.search,
       });
       setState({ sending: false, error: '', done: res.message });
-      try {
-        window.gtag?.('event', 'relocation_guide_request', { event_category: 'lead', event_label: town || 'brevard' });
-      } catch {
-        // Tracking never blocks the request.
-      }
     } catch (err) {
       setState({ sending: false, error: err.message || 'Something went wrong. Please try again.', done: '' });
     }

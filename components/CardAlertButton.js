@@ -61,18 +61,13 @@ export default function CardAlertButton({ listing }) {
   async function subscribe(address) {
     setState({ sending: true, error: '' });
     try {
-      await api.watchHome(listing.id, address);
+      await api.watchHome(listing.id, address, 'card_bell');
       rememberAlertEmail(address);
       rememberWatchedHome(listing.id);
       setWatching(true);
       setPopup(false);
       setState({ sending: false, error: '' });
       showToast(`🔔 Watching ${shortAddress(listing.address)} — alerts go to ${address}`);
-      try {
-        window.gtag?.('event', 'home_alert_signup', { event_category: 'lead', event_label: `card:${listing.id}` });
-      } catch {
-        // Tracking never blocks the signup.
-      }
     } catch (err) {
       setState({ sending: false, error: err.message || 'Something went wrong. Please try again.' });
       setPopup(true);

@@ -55,11 +55,6 @@ export default function ListingAlertSignup({ label, filter, kind = 'home' }) {
       const res = await api.subscribeListingAlert({ email: email.trim(), label, pagePath: pathname, filter });
       rememberAlertEmail(email);
       setStatus({ sending: false, error: '', done: res.message || 'You’re signed up!' });
-      try {
-        window.gtag?.('event', 'listing_alert_signup', { event_category: 'lead', event_label: label });
-      } catch {
-        // Tracking never blocks the signup.
-      }
     } catch (err) {
       setStatus({ sending: false, error: err.message || 'Something went wrong. Please try again.', done: '' });
     }
@@ -121,11 +116,6 @@ export function HomeAlertSignup({ listingId, status }) {
       rememberAlertEmail(email);
       rememberWatchedHome(listingId);
       setState({ sending: false, error: '', done: 'You’re signed up for alerts on this home.' });
-      try {
-        window.gtag?.('event', 'home_alert_signup', { event_category: 'lead', event_label: String(listingId) });
-      } catch {
-        // Tracking never blocks the signup.
-      }
     } catch (err) {
       setState({ sending: false, error: err.message || 'Something went wrong. Please try again.', done: '' });
     }

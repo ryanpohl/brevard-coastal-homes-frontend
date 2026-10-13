@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import AuthPromptHost from '@/components/AuthPromptHost';
 import MobileContactBar, { ContactBarProvider } from '@/components/MobileContactBar';
 import StickyContactBar from '@/components/StickyContactBar';
+import LeadClickTracker from '@/components/LeadClickTracker';
 import * as api from '@/lib/api';
 import { navNeighborhoods } from '@/lib/navNeighborhoods';
 
@@ -116,6 +117,8 @@ export default async function RootLayout({ children }) {
             <MobileContactBar />
             {/* Phone number bar at the top on wider screens once the header scrolls away (2026-10-12). */}
             <StickyContactBar />
+            {/* Phone / text / email link taps as lead events (2026-10-13) — lib/track.js. */}
+            <LeadClickTracker />
           </ContactBarProvider>
           {/* Global "sign in to save a property" popup (2026-08-29) — see
               AuthPromptHost.js/AuthPromptModal.js. Mounted once here,

@@ -2307,3 +2307,126 @@ textarea:focus {
     justify-content: flex-start !important;
   }
 }
+
+/* Email prompt on listing pages (2026-10-13) — components/ListingEmailPrompt.js.
+   Bottom-right card on computers; on phones it sits just above the
+   Call / Text bar. Under modals (z-index 100). */
+.email-prompt {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 95;
+  width: min(380px, calc(100vw - 32px));
+  padding: 22px 22px 16px;
+  background: #fff;
+  border-top: 3px solid var(--color-gold);
+  border-radius: 6px;
+  box-shadow: 0 16px 40px rgba(16, 36, 44, 0.28);
+  animation: email-prompt-in 0.35s ease-out;
+}
+
+@keyframes email-prompt-in {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.email-prompt__close {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  border: none;
+  background: none;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.email-prompt__title {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin: 0 18px 6px 0;
+}
+
+.email-prompt__text,
+.email-prompt__done p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-muted-dark);
+  margin: 0 0 12px;
+}
+
+.email-prompt__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.email-prompt__row input {
+  flex: 1 1 170px;
+  min-width: 0;
+  min-height: 42px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 15px;
+}
+
+.email-prompt__row .btn {
+  min-height: 42px;
+  flex: 0 0 auto;
+}
+
+.email-prompt__note {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin: 10px 0 0;
+}
+
+.email-prompt__skip {
+  border: none;
+  background: none;
+  padding: 0;
+  margin-left: 6px;
+  font: inherit;
+  color: var(--color-muted);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (max-width: 720px) {
+  .email-prompt {
+    right: 12px;
+    left: 12px;
+    width: auto;
+    padding: 14px 14px 10px;
+    bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+  .email-prompt__title {
+    font-size: 17px;
+    margin-bottom: 4px;
+  }
+  .email-prompt__text,
+  .email-prompt__done p {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  .email-prompt__row {
+    flex-wrap: nowrap;
+  }
+  .email-prompt__row input {
+    flex: 1 1 auto;
+    min-height: 40px;
+    font-size: 16px; /* 16px stops iPhones zooming in on focus */
+  }
+  .email-prompt__row .btn {
+    min-height: 40px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+  .email-prompt__note {
+    margin-top: 6px;
+  }
+}
