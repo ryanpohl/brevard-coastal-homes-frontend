@@ -1212,6 +1212,10 @@ textarea:focus {
 @media (max-width: 640px) {
   .home-hero { min-height: 0; }
   .home-hero-content { padding: 72px 16px 150px; } /* room below the search form for the pool and house (2026-10-13) */
+  /* The phone photo is tall; on wider phones the hero is shorter than the
+     photo, so keep its bottom (house and pool) in view and trim sky instead
+     (2026-10-13, per Ryan: the pool didn't show). */
+  .home-hero picture img { object-position: center 85%; }
 }
 
 /* Condo building directory (components/CondoBuildingDirectory.js): A–Z,

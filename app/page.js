@@ -199,11 +199,11 @@ export default async function HomePage() {
   // `priority` used to do this, and the <picture> below doesn't get React's
   // automatic image preload. One per screen size, so phones only fetch the
   // phone file.
-  preload('/hero/hero-phone-640.avif?v=9', {
+  preload('/hero/hero-phone-640.avif?v=10', {
     as: 'image',
     type: 'image/avif',
     media: '(max-width: 640px)',
-    imageSrcSet: '/hero/hero-phone-480.avif?v=9 1x, /hero/hero-phone-640.avif?v=9 2x',
+    imageSrcSet: '/hero/hero-phone-480.avif?v=10 1x, /hero/hero-phone-640.avif?v=10 2x',
     fetchPriority: 'high',
   });
   preload('/hero/hero-1544.avif?v=7', {
@@ -244,17 +244,19 @@ export default async function HomePage() {
               lit house beside the search form; they load as ?v=8. Replaced
               2026-10-13 (?v=9) by Ryan's vertical version of the same photo
               (sky on top, house and pool below), cropped toward the house,
-              so the house shows below the search form on phones. */}
+              so the house shows below the search form on phones. ?v=10: wider
+              crop (x 120-1024 of the 1024px photo) so a little ocean shows on
+              the left, and globals.css keeps the photo's bottom (pool) in view. */}
           <picture>
             <source
               media="(max-width: 640px)"
               type="image/avif"
-              srcSet="/hero/hero-phone-480.avif?v=9 1x, /hero/hero-phone-640.avif?v=9 2x"
+              srcSet="/hero/hero-phone-480.avif?v=10 1x, /hero/hero-phone-640.avif?v=10 2x"
             />
             <source
               media="(max-width: 640px)"
               type="image/webp"
-              srcSet="/hero/hero-phone-480.webp?v=9 1x, /hero/hero-phone-640.webp?v=9 2x"
+              srcSet="/hero/hero-phone-480.webp?v=10 1x, /hero/hero-phone-640.webp?v=10 2x"
             />
             <source type="image/avif" srcSet="/hero/hero-1080.avif?v=7 1080w, /hero/hero-1544.avif?v=7 1544w" sizes="100vw" />
             <img
