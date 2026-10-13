@@ -121,8 +121,23 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
   const closeTimer = useRef(null);
   const containerRef = useRef(null);
 
+  // Sign In/Register opened by mere hover (2026-10-13, per Ryan: "the sign
+  // in/register pop up stays up for a long time"). Hovering the button on
+  // the way somewhere else opened the panel, and the auth exemptions below
+  // then kept it up until an outside click. The panel is now "pinned" only
+  // once the visitor clicks the button or clicks/focuses inside the panel;
+  // until then it closes on mouse-out like the dropdown menus do.
+  const authPinned = useRef(false);
+
   const openNow = useCallback((key) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
+    if (key === 'auth') {
+      setOpenMenu((current) => {
+        if (current !== 'auth') authPinned.current = false;
+        return 'auth';
+      });
+      return;
+    }
     setOpenMenu(key);
   }, []);
 
@@ -135,6 +150,20 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
   // sure the website is very mobile friendly").
   const toggleOnClick = useCallback((key) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
+    if (key === 'auth') {
+      // A click on a hover-opened panel pins it instead of closing it —
+      // otherwise hover-then-click (the normal mouse path) shut the panel
+      // the visitor was trying to open.
+      setOpenMenu((current) => {
+        if (current === 'auth' && !authPinned.current) {
+          authPinned.current = true;
+          return 'auth';
+        }
+        authPinned.current = current !== 'auth';
+        return current === 'auth' ? null : 'auth';
+      });
+      return;
+    }
     setOpenMenu((current) => (current === key ? null : key));
   }, []);
 
@@ -155,7 +184,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
   // — just never via this hover-timeout. ('signin'/'join' merged into
   // 'auth' 2026-08-16, see the NavLink below.)
   const scheduleClose = useCallback(() => {
-    if (openMenu === 'auth' || openMenu === 'account') return;
+    if ((openMenu === 'auth' && authPinned.current) || openMenu === 'account') return;
     closeTimer.current = setTimeout(() => setOpenMenu(null), 250);
   }, [openMenu]);
 
@@ -724,7 +753,15 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
         </div>
       )}
 
-      {openMenu === 'auth' && <AuthPanel onClose={() => setOpenMenu(null)} />}
+      {openMenu === 'auth' && (
+        <div
+          style={{ display: 'contents' }}
+          onPointerDownCapture={() => { authPinned.current = true; }}
+          onFocusCapture={() => { authPinned.current = true; }}
+        >
+          <AuthPanel onClose={() => setOpenMenu(null)} />
+        </div>
+      )}
       {contactModalOpen && <ContactModal onClose={() => setContactModalOpen(false)} />}
     </div>
   );
