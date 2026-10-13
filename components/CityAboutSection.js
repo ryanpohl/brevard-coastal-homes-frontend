@@ -83,9 +83,18 @@ export default function CityAboutSection({ config, page, currentPath, snapshot }
           . Updated {updated}.
         </p>
       )}
+      {/* "Realtor" wording (2026-10-13, per Ryan): his keyword list targets
+          "Realtors {city}" / "Real estate agents {city}" / "Sell my house
+          {city}", and no page named him as a local Realtor or linked
+          sellers anywhere but the footer. */}
       <p style={{ marginBottom: 16 }}>
-        Ryan Pohl of Brevard Coastal Homes helps buyers compare {config.name} {page.agentNoun}, arrange private
-        showings, and negotiate purchases from first search to closing.
+        Ryan Pohl, a {config.name} Realtor® and real estate agent with Brevard Coastal Homes, helps buyers compare{' '}
+        {config.name} {page.agentNoun}, arrange private showings, and negotiate purchases from first search to
+        closing. Thinking of selling?{' '}
+        <Link href="/looking-to-sell" style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+          Find out what your {config.name} home is worth
+        </Link>{' '}
+        or call or text Ryan at <a href="tel:+13213507661" style={{ color: '#000', textDecoration: 'underline' }}>321-350-7661</a>.
       </p>
       <h3 style={{ fontSize: 18, marginBottom: 8, color: 'var(--color-ink)', fontFamily: 'var(--font-inter-tight)' }}>
         More {config.name} real estate
