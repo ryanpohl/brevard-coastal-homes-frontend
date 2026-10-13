@@ -24,7 +24,9 @@ import ContactModal from './ContactModal';
  * Nav.js needed. Reusable anywhere on the site an inline "Contact us"
  * link should open this same popup, not just the Adelaide page.
  */
-export default function ContactUsTrigger({ children }) {
+// `initialMessage` prefills the popup's message box (2026-10-12, e.g. the
+// Aripeka off-MLS lots request).
+export default function ContactUsTrigger({ children, initialMessage = '' }) {
   const [open, setOpen] = useState(false);
 
   function openModal() {
@@ -47,7 +49,7 @@ export default function ContactUsTrigger({ children }) {
       >
         {children}
       </span>
-      {open && <ContactModal onClose={() => setOpen(false)} />}
+      {open && <ContactModal initialMessage={initialMessage} onClose={() => setOpen(false)} />}
     </>
   );
 }

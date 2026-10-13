@@ -42,6 +42,7 @@ import FilterBar from '@/components/FilterBar';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import HarborIslandForeclosuresTrigger from '@/components/HarborIslandForeclosuresTrigger';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
+
 import ModelTourButton from '@/components/ModelTourButton';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import ListingAlertSignup, { ListingAlertJumpLink } from '@/components/ListingAlertSignup';
@@ -53,6 +54,8 @@ import { getNeighborhoodMarketStats, showsNeighborhoodMarketStats } from '@/lib/
 import { getRecentlySold, showsRecentlySold } from '@/lib/recentlySold';
 import { neighborhoodListingsFilter } from '@/lib/neighborhoodFilters';
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
+// Prefilled message for the Aripeka off-MLS lots link (2026-10-12, per Ryan).
+const ARIPEKA_LOTS_MESSAGE = "Hi Ryan, please send me the full list of Aripeka lots that aren't currently on the MLS.";
 
 // Matches the reference design's "1-30 of 34 Homes" pagination — the
 // backend defaults to 24 if this isn't passed.
@@ -1621,6 +1624,18 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               </strong>{' '}
               to get started.
             </p>
+            {/* Off-MLS builder lots (2026-10-12, per Ryan): the builders have
+                lots in Aripeka that aren't listed on the MLS. */}
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginTop: 12 }}>
+              Planning to build in Aripeka? Aripeka&rsquo;s builders don&rsquo;t list all of their available lots on
+              the MLS. They have more lots available in their own inventory that you won&rsquo;t find here or on
+              Zillow, Realtor.com or other home search sites. We work directly with the builders and can share every
+              available lot, including its size, location and price.{' '}
+              <strong>
+                <ContactUsTrigger initialMessage={ARIPEKA_LOTS_MESSAGE}>Contact Us</ContactUsTrigger>
+              </strong>{' '}
+              for a full list of lots not currently on the MLS.
+            </p>
             <ModelTourLine name="Aripeka" />
           </div>
         )}
@@ -1652,11 +1667,14 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               you through every step from your initial search to closing.
             </p>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
-              Start your Aripeka land or lot search today.{' '}
+              The lots shown below are only part of what&rsquo;s available. Aripeka&rsquo;s builders don&rsquo;t list
+              all of their available lots on the MLS. They have more lots available in their own inventory that
+              you won&rsquo;t find here or on Zillow, Realtor.com or other home search sites. We work directly with
+              the builders and can share every available lot, including its size, location and price.{' '}
               <strong>
-                <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
+                <ContactUsTrigger initialMessage={ARIPEKA_LOTS_MESSAGE}>Contact Us Today</ContactUsTrigger>
               </strong>{' '}
-              to get started.
+              for a full list of lots not currently on the MLS.
             </p>
             {/* Cross-link to Aripeka's Homes view (per Ryan, 2026-09-22: "add
                 a link in there for the page aripeka homes for sale") — same
