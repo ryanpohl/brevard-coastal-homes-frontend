@@ -256,7 +256,13 @@ export default function InquiryModals({
                   value={form.email}
                   onChange={(e) => update('email', e.target.value)}
                 />
-                <input placeholder="Phone (optional)" value={form.phone} onChange={(e) => update('phone', e.target.value)} />
+                <input
+                  type="tel"
+                  placeholder={open === 'schedule' ? 'Mobile phone' : 'Phone (optional)'}
+                  required={open === 'schedule'}
+                  value={form.phone}
+                  onChange={(e) => update('phone', e.target.value)}
+                />
                 {open === 'schedule' && (
                   <div style={{ display: 'flex', gap: 10 }}>
                     <input

@@ -339,8 +339,11 @@ function RequestShowingForm({ listingId, listingAddress, dateOptions, user }) {
         onChange={(e) => update('email', e.target.value)}
         style={{ ...inputStyle, marginBottom: 10 }}
       />
+      {/* Phone required on Request Showing and Make an Offer (2026-10-13,
+          per Ryan: he calls or texts these right away). */}
       <input
         type="tel"
+        required
         placeholder="Mobile Phone"
         value={form.phone}
         onChange={(e) => update('phone', e.target.value)}
@@ -467,7 +470,7 @@ function MakeOfferModal({ listingId, listingAddress, onClose }) {
               <label style={{ fontSize: 13, color: 'var(--color-ink)' }}>Email</label>
               <input type="email" required value={form.email} onChange={(e) => update('email', e.target.value)} style={inputStyle} />
               <label style={{ fontSize: 13, color: 'var(--color-ink)' }}>Mobile Phone</label>
-              <input type="tel" value={form.phone} onChange={(e) => update('phone', e.target.value)} style={inputStyle} />
+              <input type="tel" required value={form.phone} onChange={(e) => update('phone', e.target.value)} style={inputStyle} />
               <label style={{ fontSize: 13, color: 'var(--color-ink)' }}>Address of Property</label>
               <input
                 value={form.propertyAddress}
@@ -694,7 +697,7 @@ function AskQuestionModal({ listingId, listingAddress, user, onClose }) {
             />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10, marginBottom: 10 }}>
               <input placeholder="Name" required value={form.name} onChange={(e) => update('name', e.target.value)} style={inputStyle} />
-              <input type="tel" placeholder="Phone" value={form.phone} onChange={(e) => update('phone', e.target.value)} style={inputStyle} />
+              <input type="tel" placeholder="Phone (optional)" value={form.phone} onChange={(e) => update('phone', e.target.value)} style={inputStyle} />
             </div>
             <input
               type="email"

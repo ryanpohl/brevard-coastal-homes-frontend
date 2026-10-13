@@ -241,7 +241,13 @@ export default async function ListingDetailPage({ params }) {
               </div>
             )}
             <div style={{ position: 'absolute', top: 14, right: 14 }}>
-              <FavoriteButton listingId={listing.id} initialFavorited={listing.isFavorited} size={44} />
+              <FavoriteButton
+                listingId={listing.id}
+                initialFavorited={listing.isFavorited}
+                size={44}
+                address={listing.address}
+                status={listing.statusLabel === 'Contingent' ? 'Contingent' : listing.status}
+              />
           </div>
           </div>
 

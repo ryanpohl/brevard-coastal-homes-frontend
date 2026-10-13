@@ -1,5 +1,7 @@
 import { notFound } from 'next/navigation';
 import RelocationGuidePromo from '@/components/RelocationGuidePromo';
+import PageEmailPrompt from '@/components/PageEmailPrompt';
+import { GUIDE_TOWNS } from '@/lib/relocationGuide';
 import Link from 'next/link';
 import * as api from '@/lib/api';
 import {
@@ -970,6 +972,8 @@ export default async function CityListingsPage({ params, searchParams: searchPar
         />
         {/* Free relocation guide offer, opening with this town (2026-10-11). */}
         <RelocationGuidePromo townSlug={citySlug} />
+        {/* Relocation guide as a gentle pop-up offer (2026-10-13) — PageEmailPrompt.js. */}
+        {GUIDE_TOWNS[citySlug] && <PageEmailPrompt townSlug={citySlug} townName={GUIDE_TOWNS[citySlug]} />}
       </div>
 
       {/* Condo building directory (2026-10-08, per Ryan) — Condos page only;

@@ -11,6 +11,7 @@ import {
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 import ListingCard from '@/components/ListingCard';
 import ListingAlertSignup, { ListingAlertJumpLink } from '@/components/ListingAlertSignup';
+import PageEmailPrompt from '@/components/PageEmailPrompt';
 import RecentlySold from '@/components/RecentlySold';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
@@ -172,6 +173,8 @@ export default async function CondoBuildingPage({ params }) {
           </p>
         )}
         <ListingAlertSignup label={name} filter={condoBuildingFilter(citySlug, building)} kind="condo" />
+        {/* Same alerts as a gentle pop-up offer (2026-10-13) — PageEmailPrompt.js. */}
+        <PageEmailPrompt label={name} filter={condoBuildingFilter(citySlug, building)} kind="condo" />
       </div>
 
       {tiles.length > 1 && (

@@ -2,15 +2,28 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { formatPrice, formatAssocFee, isPricePerSqftPlausible, soldPricePerSqft, formatSoldDate } from '@/lib/siteConstants';
 import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
 import CardAlertButton from './CardAlertButton';
+import { isWatchedHome } from '@/lib/alertMemory';
+import { SAVED_EVENT, requestSaveHome } from './SaveHomeHost';
 
 export default function ListingCard({ listing, onHoverChange, priority = false }) {
-    const { signedIn, token, promptSignIn } = useAuth();
+    const { signedIn, token } = useAuth();
     const [favorited, setFavorited] = useState(listing.isFavorited);
+    // Signed-out visitors who saved this home by email (SaveHomeHost.js).
+    const [savedByEmail, setSavedByEmail] = useState(false);
+    useEffect(() => {
+        if (signedIn) return undefined;
+        setSavedByEmail(isWatchedHome(listing.id));
+        const onSaved = (e) => {
+            if (e.detail === listing.id) setSavedByEmail(true);
+        };
+        window.addEventListener(SAVED_EVENT, onSaved);
+        return () => window.removeEventListener(SAVED_EVENT, onSaved);
+    }, [signedIn, listing.id]);
     const [busy, setBusy] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
     const photo = listing.photos && listing.photos[0];
@@ -59,7 +72,12 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
         e.preventDefault();
         if (busy) return;
         if (!signedIn) {
-                promptSignIn('Sign in to save this property to your favorites.');
+                // Email-only save (2026-10-13) — see SaveHomeHost.js.
+                requestSaveHome({
+                        id: listing.id,
+                        address: listing.address,
+                        status: listing.statusLabel === 'Contingent' ? 'Contingent' : listing.status,
+                });
                 return;
         }
         setBusy(true);
@@ -257,7 +275,7 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
         <button
           type="button"
           onClick={toggleFavorite}
-          aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
+          aria-label={favorited || savedByEmail ? 'Saved' : 'Save this home'}
           title={signedIn ? undefined : 'Sign in to save favorites'}
           style={{
                         position: 'absolute',
@@ -272,7 +290,7 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
                         fontSize: 16,
           }}
         >
-{favorited ? '♥' : '♡'}
+{favorited || (!signedIn && savedByEmail) ? '♥' : '♡'}
 </button>
 {/* 🔔 price-drop alerts for this one home, left of the heart (2026-10-10,
     per Ryan) — CardAlertButton.js. Not on sold homes. */}

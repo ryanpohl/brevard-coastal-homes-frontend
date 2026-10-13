@@ -46,6 +46,7 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
 import ModelTourButton from '@/components/ModelTourButton';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import ListingAlertSignup, { ListingAlertJumpLink } from '@/components/ListingAlertSignup';
+import PageEmailPrompt from '@/components/PageEmailPrompt';
 import Faq from '@/components/Faq';
 import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
 import RecentlySold from '@/components/RecentlySold';
@@ -675,6 +676,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                     : slug === 'aripeka'
                       ? ARIPEKA_LISTINGS_FILTER
                       : { neighborhood: slug };
+  // Listing-alert filter: this page's own listings (and its Homes/Condos
+  // view), not the visitor's price/bed filters. Used by the Get Alerts box
+  // and the pop-up offer.
+  const alertKind = searchParams.__viewPropertyType === 'Condo' ? 'condo' : 'home';
+  const alertFilter = Object.fromEntries(
+    Object.entries({ ...listingsFilterParams, propertyType: searchParams.__viewPropertyType })
+      .filter(([, v]) => v !== undefined && v !== null && v !== '')
+      .map(([k, v]) => [k, Array.isArray(v) ? v.join(',') : v])
+  );
 
   let results = [];
   let total = 0;
@@ -2028,18 +2038,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {/* New-listing email alerts (2026-10-09, per Ryan) — matches this
             page's own listings (and its Homes/Condos view, if any), not the
             visitor's price/bed filters. See ListingAlertSignup.js. */}
-        <ListingAlertSignup
-          label={neighborhood.name}
-          kind={searchParams.__viewPropertyType === 'Condo' ? 'condo' : 'home'}
-          filter={Object.fromEntries(
-            Object.entries({
-              ...listingsFilterParams,
-              propertyType: searchParams.__viewPropertyType,
-            })
-              .filter(([, v]) => v !== undefined && v !== null && v !== '')
-              .map(([k, v]) => [k, Array.isArray(v) ? v.join(',') : v])
-          )}
-        />
+        <ListingAlertSignup label={neighborhood.name} kind={alertKind} filter={alertFilter} />
+        {/* Same alerts as a gentle pop-up offer (2026-10-13) — PageEmailPrompt.js. */}
+        <PageEmailPrompt label={neighborhood.name} kind={alertKind} filter={alertFilter} />
       </div>
 
       {/* Market stats bar (2026-10-08) — below the listings, per Ryan, so

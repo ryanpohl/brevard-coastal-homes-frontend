@@ -274,7 +274,7 @@ export default function HarborIslandInquiryModals({ areaLabel = 'Harbor Island B
                     style={{ flex: 1 }}
                   />
                   <input
-                    placeholder="Phone"
+                    placeholder="Phone (optional)"
                     value={form.phone}
                     onChange={(e) => update('phone', e.target.value)}
                     style={{ flex: 1 }}

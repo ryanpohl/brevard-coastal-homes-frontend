@@ -43,7 +43,6 @@ export default function AuthPanel({ onClose, message, embedded = false }) {
     name: '',
     email: '',
     password: '',
-    confirmPassword: '',
     phone: '',
     workingWithAgent: false,
     remember: true,
@@ -61,7 +60,6 @@ export default function AuthPanel({ onClose, message, embedded = false }) {
   // other. Both default to false (masked), matching how every browser's own
   // native password-reveal control starts.
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   function update(key, value) {
     setFields((f) => ({ ...f, [key]: value }));
@@ -96,12 +94,8 @@ export default function AuthPanel({ onClose, message, embedded = false }) {
     setError('');
     setNotice('');
 
-    // Confirm Password is a client-side-only check (2026-08-16, Register
-    // tab) — the backend never sees confirmPassword, just password.
-    if (mode === 'join' && fields.password !== fields.confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
+    // Confirm Password removed 2026-10-13 (per Ryan: shorter Register form);
+    // the password field's show/hide eye covers typos.
 
     setSubmitting(true);
     try {
@@ -248,39 +242,7 @@ export default function AuthPanel({ onClose, message, embedded = false }) {
           </Field>
         )}
         {mode === 'join' && (
-          <Field label="Confirm Password">
-            <div style={passwordFieldWrapperStyle}>
-              <input
-                required
-                minLength={8}
-                value={fields.confirmPassword}
-                onChange={(e) => update('confirmPassword', e.target.value)}
-                type={showConfirmPassword ? 'text' : 'password'}
-                style={passwordInputStyle}
-              />
-              <button
-                type="button"
-                onClick={(e) => {
-                  // Same outside-click-listener fix as the Password field's
-                  // own toggle above (including the stopImmediatePropagation
-                  // detail — see that button's comment for the full
-                  // explanation of why plain stopPropagation(), even on
-                  // e.nativeEvent, wasn't enough).
-                  e.nativeEvent.stopImmediatePropagation();
-                  setShowConfirmPassword((v) => !v);
-                }}
-                onMouseDown={(e) => e.nativeEvent.stopImmediatePropagation()}
-                onTouchStart={(e) => e.nativeEvent.stopImmediatePropagation()}
-                style={passwordToggleBtnStyle}
-                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-              >
-                {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
-              </button>
-            </div>
-          </Field>
-        )}
-        {mode === 'join' && (
-          <Field label="Phone Number">
+          <Field label="Phone Number (optional)">
             <input value={fields.phone} onChange={(e) => update('phone', e.target.value)} type="tel" />
           </Field>
         )}
