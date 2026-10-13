@@ -924,15 +924,14 @@ textarea:focus {
   }
 }
 
+/* Phones: no Schedule a Showing button in the homepage hero (2026-10-13,
+   per Ryan): the Call / Text bar is pinned below, and listing, city and
+   neighborhood pages have their own showing buttons. Frees the hero so the
+   photo's pool and house show under the search form. */
 @media (max-width: 640px) {
-  .hero-showing-btn--inline {
-    display: none;
-  }
-
+  .hero-showing-btn--inline,
   .hero-showing-btn--stacked {
-    display: flex;
-    width: 100%;
-    height: 56px;
+    display: none;
   }
 }
 
@@ -1212,7 +1211,7 @@ textarea:focus {
 .home-hero-content { padding: 140px 16px 72px; }
 @media (max-width: 640px) {
   .home-hero { min-height: 0; }
-  .home-hero-content { padding: 72px 16px 40px; }
+  .home-hero-content { padding: 72px 16px 150px; } /* room below the search form for the pool and house (2026-10-13) */
 }
 
 /* Condo building directory (components/CondoBuildingDirectory.js): A–Z,
