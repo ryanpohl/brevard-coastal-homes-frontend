@@ -392,19 +392,6 @@ async function buildMetadata({ params: paramsPromise, searchParams: searchParams
       alternates: { canonical: `/neighborhoods/${slug}` },
     };
   }
-  // Aripeka lots page (2026-10-12, per Ryan): the backend has no SEO row for
-  // Aripeka Land, so it fell to the generic title below, with its canonical
-  // pointing at the main Aripeka page instead of /lots-for-sale.
-  if (slug === 'aripeka' && primaryType === 'Land') {
-    return {
-      title: 'Aripeka Lots for Sale | Viera, FL Builder Lots',
-      description: combineDescription(
-        countPrefix,
-        'Browse lots for sale in Aripeka, Viera, FL, plus builder lots not listed on the MLS. Ask for the full list of available lots.'
-      ),
-      alternates: { canonical: '/neighborhoods/aripeka/lots-for-sale' },
-    };
-  }
   if (neighborhoodName) {
     return {
       title: `${neighborhoodName} Real Estate | Brevard Coastal Homes`,
@@ -953,9 +940,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
       : subCommunity
         ? `${neighborhood.name} Homes for Sale – Viera, FL${subCommunity.comingSoon ? ' (Coming Soon)' : ''}`
         : isAripeka
-          ? primaryType === 'Land'
-            ? 'Aripeka Lots for Sale - Viera, Florida' // 2026-10-12, per Ryan (was "Homes for Sale in Aripeka, FL")
-            : (hasExplicitPropertyTypeFilter ? ARIPEKA_H1 : ARIPEKA_COMBINED_H1) ||
+          ? (hasExplicitPropertyTypeFilter ? ARIPEKA_H1 : ARIPEKA_COMBINED_H1) ||
             `Homes for Sale in ${neighborhood.name}, FL`
           : isAdelaide
             ? ADELAIDE_H1
