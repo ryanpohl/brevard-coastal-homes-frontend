@@ -199,11 +199,11 @@ export default async function HomePage() {
   // `priority` used to do this, and the <picture> below doesn't get React's
   // automatic image preload. One per screen size, so phones only fetch the
   // phone file.
-  preload('/hero/hero-phone-640.avif?v=8', {
+  preload('/hero/hero-phone-640.avif?v=9', {
     as: 'image',
     type: 'image/avif',
     media: '(max-width: 640px)',
-    imageSrcSet: '/hero/hero-phone-480.avif?v=8 1x, /hero/hero-phone-640.avif?v=8 2x',
+    imageSrcSet: '/hero/hero-phone-480.avif?v=9 1x, /hero/hero-phone-640.avif?v=9 2x',
     fetchPriority: 'high',
   });
   preload('/hero/hero-1544.avif?v=7', {
@@ -241,17 +241,20 @@ export default async function HomePage() {
               bright". ?v=7 makes browsers fetch the new files; bump it when
               the photo changes again. Phone files (hero-phone-*) cropped 170px
               right of center since 2026-10-13, per Ryan, to show more of the
-              lit house beside the search form; they load as ?v=8. */}
+              lit house beside the search form; they load as ?v=8. Replaced
+              2026-10-13 (?v=9) by Ryan's vertical version of the same photo
+              (sky on top, house and pool below), cropped toward the house,
+              so the house shows below the search form on phones. */}
           <picture>
             <source
               media="(max-width: 640px)"
               type="image/avif"
-              srcSet="/hero/hero-phone-480.avif?v=8 1x, /hero/hero-phone-640.avif?v=8 2x"
+              srcSet="/hero/hero-phone-480.avif?v=9 1x, /hero/hero-phone-640.avif?v=9 2x"
             />
             <source
               media="(max-width: 640px)"
               type="image/webp"
-              srcSet="/hero/hero-phone-480.webp?v=8 1x, /hero/hero-phone-640.webp?v=8 2x"
+              srcSet="/hero/hero-phone-480.webp?v=9 1x, /hero/hero-phone-640.webp?v=9 2x"
             />
             <source type="image/avif" srcSet="/hero/hero-1080.avif?v=7 1080w, /hero/hero-1544.avif?v=7 1544w" sizes="100vw" />
             <img
