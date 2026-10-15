@@ -88,7 +88,7 @@ export default function CityAboutSection({ config, page, currentPath, snapshot }
           {city}", and no page named him as a local Realtor or linked
           sellers anywhere but the footer. */}
       <p style={{ marginBottom: 16 }}>
-        Ryan Pohl, a {config.name} Realtor® and real estate agent with Brevard Coastal Homes, helps buyers compare{' '}
+        Ryan Pohl, {/^[AEIOU]/i.test(config.name) ? 'an' : 'a'} {config.name} Realtor® and real estate agent with Brevard Coastal Homes, helps buyers compare{' '}
         {config.name} {page.agentNoun}, arrange private showings, and negotiate purchases from first search to
         closing. Thinking of selling?{' '}
         <Link href="/looking-to-sell" style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
