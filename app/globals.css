@@ -2328,6 +2328,39 @@ textarea:focus {
   animation: email-prompt-in 0.35s ease-out;
 }
 
+/* Exit popup (2026-10-14): same card, centered over a light backdrop. */
+.email-prompt--exit {
+  right: auto;
+  bottom: auto;
+  top: 50%;
+  left: 50%;
+  width: min(440px, calc(100vw - 32px));
+  padding: 28px 28px 18px;
+  transform: translate(-50%, -50%);
+  animation: email-prompt-exit-in 0.25s ease-out;
+}
+
+.email-prompt-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 94;
+  background: rgba(16, 36, 44, 0.45);
+}
+
+.email-prompt__kicker {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-gold-text);
+  margin-bottom: 4px;
+}
+
+@keyframes email-prompt-exit-in {
+  from { transform: translate(-50%, -46%); opacity: 0; }
+  to { transform: translate(-50%, -50%); opacity: 1; }
+}
+
 @keyframes email-prompt-in {
   from { transform: translateY(16px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
