@@ -28,6 +28,8 @@ import CityMarketReport from '@/components/CityMarketReport';
 import CityAboutSection from '@/components/CityAboutSection';
 import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
 import CondoBuildingDirectory from '@/components/CondoBuildingDirectory';
+import CondoBuildingComparison from '@/components/CondoBuildingComparison';
+import { getCondoBuildingComparison } from '@/lib/condoBuildings';
 import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
@@ -779,6 +781,13 @@ export default async function CityListingsPage({ params, searchParams: searchPar
     !isOceanfrontCombined &&
     !isRiverfrontCombined &&
     (propertyType === 'Home' || propertyType === 'Condo');
+  // Condo building comparison table (2026-10-15) on the Condos and
+  // Oceanfront Condos pages of cities in COMPARISON_CITIES.
+  const comparisonOceanfront = propertySlug === 'oceanfront-condos-for-sale';
+  const condoComparison =
+    propertySlug === 'condos-for-sale' || comparisonOceanfront
+      ? await getCondoBuildingComparison(citySlug, { oceanfrontOnly: comparisonOceanfront })
+      : null;
   const marketReport = showMarketReport
     ? await getCityMarketReport({ citySlug, cityFilter: cityListingsQueryParams(citySlug), propertyType })
     : null;
@@ -975,6 +984,13 @@ export default async function CityListingsPage({ params, searchParams: searchPar
         {/* Relocation guide as a gentle pop-up offer (2026-10-13) — PageEmailPrompt.js. */}
         {GUIDE_TOWNS[citySlug] && <PageEmailPrompt townSlug={citySlug} townName={GUIDE_TOWNS[citySlug]} />}
       </div>
+
+      <CondoBuildingComparison
+        rows={condoComparison}
+        citySlug={citySlug}
+        cityName={city.name}
+        oceanfrontOnly={comparisonOceanfront}
+      />
 
       {/* Condo building directory (2026-10-08, per Ryan) — Condos page only;
           renders nothing for cities without buildings in lib/condoBuildings.js. */}

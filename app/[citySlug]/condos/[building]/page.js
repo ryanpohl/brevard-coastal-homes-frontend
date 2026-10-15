@@ -257,6 +257,19 @@ export default async function CondoBuildingPage({ params }) {
           <Link href={`/${citySlug}/condos-for-sale`} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
             See all {cityName} condos for sale &rarr;
           </Link>
+          {/* Oceanfront buildings also link the city's oceanfront condo page
+              (2026-10-15), which Google was ranking below a building page. */}
+          {building.oceanfront && (
+            <>
+              {' · '}
+              <Link
+                href={`/${citySlug}/oceanfront-condos-for-sale`}
+                style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}
+              >
+                {cityName} oceanfront condos for sale &rarr;
+              </Link>
+            </>
+          )}
         </p>
       </section>
 
