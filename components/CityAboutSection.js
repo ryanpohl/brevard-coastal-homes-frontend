@@ -50,7 +50,7 @@ export default function CityAboutSection({ config, page, currentPath, snapshot }
                 ) : (
                   <strong style={{ color: 'var(--color-ink)' }}>{a.label}</strong>
                 )}
-                {a.text && <>: {a.text}</>}
+                {a.text && !a.links && <>: {a.text}</>}
                 {a.links && (
                   <>
                     :{' '}
@@ -62,6 +62,7 @@ export default function CityAboutSection({ config, page, currentPath, snapshot }
                         </Link>
                       </span>
                     ))}
+                    {a.text && <> — {a.text}</>}
                   </>
                 )}
               </li>
