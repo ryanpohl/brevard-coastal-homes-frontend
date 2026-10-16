@@ -281,7 +281,8 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           Text 321-350-7661 a little larger on the top of the homepage"). */}
       {/* Back on every screen size (2026-10-12, per Ryan), now just
           "Call or Text: 321-350-7661" with no name or brokerage line; the
-          header-corner version was removed. */}
+          header-corner version was removed. "Showings & Questions:" added
+          2026-10-16, per Ryan. */}
       <div
         className="nav-phone-strip"
         style={{
@@ -294,7 +295,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           borderBottom: '1px solid var(--color-border-light)',
         }}
       >
-        Call or Text:{' '}
+        Showings &amp; Questions: Call or Text{' '}
         <a href="tel:+13213507661" style={{ color: 'inherit', textDecoration: 'none' }}>
           321-350-7661
         </a>

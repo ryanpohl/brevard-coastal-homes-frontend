@@ -2524,3 +2524,9 @@ textarea:focus {
     display: block;
   }
 }
+
+/* "Showings & Questions: Call or Text ..." strip (Nav.js) fits on one
+   line on the narrowest phones (2026-10-16). */
+@media (max-width: 380px) {
+  .nav-phone-strip { font-size: 13px !important; letter-spacing: 0 !important; padding-left: 8px !important; padding-right: 8px !important; }
+}
