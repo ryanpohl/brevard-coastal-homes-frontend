@@ -9,7 +9,7 @@ import {
   ARIPEKA_LISTINGS_FILTER,
   TORTOISE_ISLAND_SUBDIVISION_NAMES,
   SUMMER_LAKES_SUBDIVISION_NAMES,
-  LANSING_ISLAND_SUBDIVISION_NAMES,
+  LANSING_ISLAND_LISTINGS_FILTER,
   SUNTREE_SUBDIVISION_NAMES,
   formatPrice,
 } from '@/lib/constants';
@@ -41,7 +41,7 @@ function getListingsFilterParams(slug) {
   if (slug === 'aquarina') return AQUARINA_LISTINGS_FILTER;
   if (slug === 'tortoise-island') return { subdivision: TORTOISE_ISLAND_SUBDIVISION_NAMES.join(',') };
   if (slug === 'summer-lakes') return { subdivision: SUMMER_LAKES_SUBDIVISION_NAMES.join(',') };
-  if (slug === 'lansing-island') return { subdivision: LANSING_ISLAND_SUBDIVISION_NAMES.join(',') };
+  if (slug === 'lansing-island') return LANSING_ISLAND_LISTINGS_FILTER;
   if (slug === 'suntree') return { subdivision: SUNTREE_SUBDIVISION_NAMES.join(',') };
   if (slug === 'aripeka') return ARIPEKA_LISTINGS_FILTER;
   return { neighborhood: slug };

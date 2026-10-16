@@ -24,7 +24,7 @@ import {
   ARIPEKA_LISTINGS_FILTER,
   TORTOISE_ISLAND_SUBDIVISION_NAMES,
   SUMMER_LAKES_SUBDIVISION_NAMES,
-  LANSING_ISLAND_SUBDIVISION_NAMES,
+  LANSING_ISLAND_LISTINGS_FILTER,
   SOUTH_MERRITT_ISLAND_LAT_MAX,
   SUNTREE_SUBDIVISION_NAMES,
   NEIGHBORHOOD_AREA_GUIDE_CONTENT,
@@ -668,7 +668,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             : slug === 'summer-lakes'
               ? { subdivision: SUMMER_LAKES_SUBDIVISION_NAMES.join(',') }
               : slug === 'lansing-island'
-                ? { subdivision: LANSING_ISLAND_SUBDIVISION_NAMES.join(',') }
+                ? LANSING_ISLAND_LISTINGS_FILTER
                 : slug === 'south-merritt-island'
                   ? { city: 'merritt-island', latMax: SOUTH_MERRITT_ISLAND_LAT_MAX }
                   : slug === 'suntree'
