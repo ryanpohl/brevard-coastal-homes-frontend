@@ -340,13 +340,17 @@ async function buildMetadata({ params }) {
   const pageSeoMeta = CITY_PAGE_SEO[citySlug]?.pages[propertySlug];
   if (pageSeoMeta) {
     // liveCount (2026-10-11): start the description with the live listing
-    // count, e.g. "37 homes for sale in Melbourne Beach, FL."
+    // count, e.g. "37 homes for sale in Melbourne Beach, FL." The combined
+    // riverfront/oceanfront pages count every type as "properties"
+    // (2026-10-16).
+    const isCombined = isRiverfrontCombined || isOceanfrontCombined;
     const countPrefix = pageSeoMeta.liveCount
       ? await buildListingCountPrefix({
           citySlug,
           cityName: CITY_PAGE_SEO[citySlug].name,
-          propertyType,
-          waterfront: isOceanfront ? 'Oceanfront' : undefined,
+          propertyType: isCombined ? ['Home', 'Condo', 'Land'] : propertyType,
+          waterfront: isOceanfront || isOceanfrontCombined ? 'Oceanfront' : isRiverfrontCombined ? 'Riverfront' : undefined,
+          noun: isCombined ? { singular: 'property', plural: 'properties' } : undefined,
         })
       : '';
     return {
