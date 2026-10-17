@@ -176,10 +176,10 @@ async function buildNeighborhoodListingCountPrefix({ listingsFilterParams, prope
 // Aripeka pages (2026-10-04, per Ryan) — a short version of the fuller
 // box in the About section, so buyers see it before scrolling.
 // Who Ryan sets the model tours up with (2026-10-17, per Ryan): the number
-// of builders where there are several, so buyers see the legwork they skip.
+// of builders only for Aripeka, so buyers see the legwork they skip (not
+// Adelaide: Elan Builders has no model home there, per Ryan).
 const MODEL_TOUR_WITH = {
   Aripeka: 'all 4 builders’ sales agents',
-  Adelaide: 'all 3 builders’ sales agents',
   'Pangea Park': 'Viera Builders’ sales team',
   'Reeling Park': 'Viera Builders’ sales team',
   Laurasia: 'Viera Builders’ sales team',
