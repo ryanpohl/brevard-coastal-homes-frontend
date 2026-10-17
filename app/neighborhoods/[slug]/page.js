@@ -175,12 +175,26 @@ async function buildNeighborhoodListingCountPrefix({ listingsFilterParams, prope
 // One-line model tour call to action near the top of the Adelaide and
 // Aripeka pages (2026-10-04, per Ryan) — a short version of the fuller
 // box in the About section, so buyers see it before scrolling.
+// Who Ryan sets the model tours up with (2026-10-17, per Ryan): the number
+// of builders where there are several, so buyers see the legwork they skip.
+const MODEL_TOUR_WITH = {
+  Aripeka: 'all 4 builders’ sales agents',
+  Adelaide: 'all 3 builders’ sales agents',
+  'Pangea Park': 'Viera Builders’ sales team',
+  'Reeling Park': 'Viera Builders’ sales team',
+  Laurasia: 'Viera Builders’ sales team',
+};
+function modelTourWith(name) {
+  return MODEL_TOUR_WITH[name] || 'the builders’ sales agents';
+}
+
 function ModelTourLine({ name }) {
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, marginTop: 14 }}>
       <p style={{ fontSize: 16, lineHeight: 1.5, color: 'var(--color-ink)', margin: 0 }}>
-        <strong>Touring the {name} model homes?</strong> Register with Ryan first so you keep your own
-        representation.
+        {/* Reworded 2026-10-17 (per Ryan: the old line was confusing). */}
+        <strong>Contact Ryan before you visit the {name} model homes.</strong> He&rsquo;ll set up private tours with{' '}
+        {modelTourWith(name)} and go with you to answer any questions. Use Ryan at zero cost to you.
       </p>
       <ModelTourButton communityName={name} />
     </div>
@@ -2100,9 +2114,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               }}
             >
               <p style={{ marginBottom: 14, color: 'var(--color-ink)' }}>
-                <strong>Planning to tour the {community.name} models?</strong> Register with Ryan first — builders
-                may not allow an agent to represent you if you visit a model home on your own. There&rsquo;s
-                typically no cost to you &mdash; builders usually pay the buyer&rsquo;s agent.
+                <strong>Contact Ryan before you visit the {community.name} model homes.</strong> He&rsquo;ll set up
+                private tours with {modelTourWith(community.name)} and go with you to answer any questions. Use Ryan
+                at zero cost to you.
               </p>
               <ModelTourButton communityName={community.name} />
             </div>
