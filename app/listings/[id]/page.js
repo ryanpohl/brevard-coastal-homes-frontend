@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import * as api from '@/lib/api';
 import { formatPrice, PROPERTY_TYPE_LABEL, isPricePerSqftPlausible, soldPricePerSqft, formatSoldDate } from '@/lib/constants';
 import FavoriteButton from '@/components/FavoriteButton';
-import { HomeAlertSignup } from '@/components/ListingAlertSignup';
+import { HomeAlertSignup, InfoSheetRequest } from '@/components/ListingAlertSignup';
 import ListingQuestionButtons from '@/components/ListingQuestionButtons';
 import MortgageCalculator from '@/components/MortgageCalculator';
 import { homeKind, monthlyHoa } from '@/lib/mortgage';
@@ -313,6 +313,8 @@ export default async function ListingDetailPage({ params }) {
               {(listing.status === 'Active' || listing.status === 'Pending') && (
                 <HomeAlertSignup listingId={listing.id} status={listing.statusLabel === 'Contingent' ? 'Contingent' : listing.status} />
               )}
+              {/* The property info sheet by email (2026-10-18, per Ryan). */}
+              {(listing.status === 'Active' || listing.status === 'Pending') && <InfoSheetRequest listingId={listing.id} />}
               {/* Ready-made questions (2026-10-18, per Ryan). */}
               {listing.status === 'Active' && (
                 <ListingQuestionButtons />

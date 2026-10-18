@@ -169,3 +169,71 @@ export function HomeAlertSignup({ listingId, status }) {
     </form>
   );
 }
+
+/**
+ * "📄 Email me this property's info sheet" under the price-drop link on a
+ * listing page (2026-10-18, per Ryan). Just the property report (the same
+ * one the showing and question emails send), with no alerts — those stay
+ * on the 🔔 link above, kept separate per Ryan. Ryan gets a notification
+ * and a CRM lead.
+ */
+export function InfoSheetRequest({ listingId }) {
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [state, setState] = useState({ sending: false, error: '', done: '' });
+
+  async function submit(e) {
+    e.preventDefault();
+    setState({ sending: true, error: '', done: '' });
+    try {
+      await api.requestInfoSheet(listingId, email.trim());
+      rememberAlertEmail(email);
+      setState({ sending: false, error: '', done: 'Sent! Check your email for the info sheet.' });
+    } catch (err) {
+      setState({ sending: false, error: err.message || 'Something went wrong. Please try again.', done: '' });
+    }
+  }
+
+  if (state.done) {
+    return (
+      <div className="home-alert home-alert__done" role="status">
+        ✓ {state.done}
+      </div>
+    );
+  }
+  if (!open) {
+    return (
+      <div className="home-alert">
+        <button
+          type="button"
+          className="home-alert__toggle"
+          onClick={() => {
+            setOpen(true);
+            if (!email) setEmail(user?.email || rememberedAlertEmail());
+          }}
+        >
+          <span aria-hidden="true">📄</span> Email me this property’s info sheet
+        </button>
+      </div>
+    );
+  }
+  return (
+    <form className="home-alert home-alert__form" onSubmit={submit}>
+      <input
+        type="email"
+        required
+        autoFocus
+        placeholder="Your email"
+        aria-label="Your email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <button type="submit" className="btn btn-gold" disabled={state.sending}>
+        {state.sending ? 'Sending…' : 'Send It'}
+      </button>
+      <p className="home-alert__note">Photos, details and schools for this home, sent to your inbox. No account needed.</p>
+      {state.error && <p className="error-text home-alert__note">{state.error}</p>}
+    </form>
+  );
+}
