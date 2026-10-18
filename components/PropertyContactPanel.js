@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
 import BrokerageNote from '@/components/BrokerageNote';
-import { ASK_AVAILABLE_EVENT, SCHEDULE_TOUR_EVENT } from '@/lib/listingAsk';
+import { ASK_QUESTION_EVENT, SCHEDULE_TOUR_EVENT } from '@/lib/listingAsk';
 import SimilarHomesSignup from '@/components/SimilarHomesSignup';
 
 const DOW = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
@@ -43,13 +43,13 @@ export default function PropertyContactPanel({ listingId, listingAddress, status
   const unavailable = status === 'Pending' || status === 'Sold';
   const [offerOpen, setOfferOpen] = useState(false);
   const [askOpen, setAskOpen] = useState(false);
-  // false | true | 'available' — 'available' opens Ask a Question with
-  // "Is this home still available?" already written (lib/listingAsk.js).
+  // false | true | 'available' | 'offers' — a string opens Ask a Question
+  // with that ready-made question already written (lib/listingAsk.js).
   useEffect(() => {
     if (listingId == null) return undefined;
-    const open = () => setAskOpen('available');
-    window.addEventListener(ASK_AVAILABLE_EVENT, open);
-    return () => window.removeEventListener(ASK_AVAILABLE_EVENT, open);
+    const open = (e) => setAskOpen(e.detail?.question || 'available');
+    window.addEventListener(ASK_QUESTION_EVENT, open);
+    return () => window.removeEventListener(ASK_QUESTION_EVENT, open);
   }, [listingId]);
   // "Schedule a Tour" on the photos (lib/listingAsk.js) opens the Request
   // Showing form in a popup — scrolling to the sidebar form barely moved
@@ -217,7 +217,7 @@ export default function PropertyContactPanel({ listingId, listingAddress, status
         </ModalShell>
       )}
       {offerOpen && <MakeOfferModal listingId={listingId} listingAddress={listingAddress} onClose={() => setOfferOpen(false)} />}
-      {askOpen && <AskQuestionModal key={String(askOpen)} listingId={listingId} listingAddress={listingAddress} user={user} availability={askOpen === 'available'} onClose={() => setAskOpen(false)} />}
+      {askOpen && <AskQuestionModal key={String(askOpen)} listingId={listingId} listingAddress={listingAddress} user={user} preset={typeof askOpen === 'string' ? askOpen : null} onClose={() => setAskOpen(false)} />}
     </div>
   );
 }
@@ -620,7 +620,15 @@ function MakeOfferModal({ listingId, listingAddress, onClose }) {
   );
 }
 
-function AskQuestionModal({ listingId, listingAddress, user, availability = false, onClose }) {
+// Ready-made questions (lib/listingAsk.js): the popup's heading and the
+// question written into the message.
+const ASK_PRESETS = {
+  available: { heading: 'Is This Home Still Available?', message: (address) => `Is ${address} still available?` },
+  offers: { heading: 'Have There Been Any Other Offers?', message: (address) => `Have there been any other offers on ${address}?` },
+};
+
+function AskQuestionModal({ listingId, listingAddress, user, preset = null, onClose }) {
+  const presetQuestion = ASK_PRESETS[preset] || null;
   const [contactMethods, setContactMethods] = useState([]); // ['Call', 'Text', 'Email']
   // "Are you currently working with an agent?" (optional Yes/No) — added
   // 2026-09-27, per Ryan, same reasoning as RequestShowingForm above (see
@@ -638,7 +646,7 @@ function AskQuestionModal({ listingId, listingAddress, user, availability = fals
   // pattern as RequestShowingForm/MakeOfferModal above, still a normal
   // editable input, not read-only. Falls back to '' when there's no listing
   // (the general-inquiry popups), same as the other two forms.
-  const [form, setForm] = useState({ propertyAddress: listingAddress || '', name: user?.name || '', email: user?.email || '', phone: '', message: availability ? `Is ${listingAddress || 'this home'} still available?` : '' });
+  const [form, setForm] = useState({ propertyAddress: listingAddress || '', name: user?.name || '', email: user?.email || '', phone: '', message: presetQuestion ? presetQuestion.message(listingAddress || 'this home') : '' });
   const [status, setStatus] = useState({ submitting: false, error: '', success: '' });
 
   function update(field, value) {
@@ -677,7 +685,7 @@ function AskQuestionModal({ listingId, listingAddress, user, availability = fals
           borderBottom: '1px solid var(--color-border-light)',
         }}
       >
-        <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 600, color: 'var(--color-ink)' }}>{availability ? 'Is This Home Still Available?' : 'Ask a Question Here'}</div>
+        <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 600, color: 'var(--color-ink)' }}>{presetQuestion ? presetQuestion.heading : 'Ask a Question Here'}</div>
         <button
           type="button"
           onClick={onClose}
