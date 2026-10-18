@@ -2695,3 +2695,53 @@ textarea:focus {
     font-size: 13px;
   }
 }
+
+/* Open house banner at the top of a listing (OpenHouseBanner.js, 2026-10-18). */
+.open-house-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  border-radius: 4px;
+  background: var(--color-ink-dark);
+  color: #fff;
+}
+
+.open-house-banner__times {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.open-house-banner__label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+.open-house-banner__time {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.open-house-banner__btn {
+  padding: 9px 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--color-gold);
+  color: var(--color-ink-dark);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .open-house-banner__btn {
+    flex: 1 1 100%;
+  }
+}

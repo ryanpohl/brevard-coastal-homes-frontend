@@ -9,6 +9,7 @@ import MortgageCalculator from '@/components/MortgageCalculator';
 import { homeKind, monthlyHoa } from '@/lib/mortgage';
 import { listingPhotoAlt } from '@/lib/listingPhotoAlt';
 import PropertyGallery from '@/components/PropertyGallery';
+import OpenHouseBanner from '@/components/OpenHouseBanner';
 import PropertyContactPanel from '@/components/PropertyContactPanel';
 import { ContactBarMessage } from '@/components/MobileContactBar';
 import ListingEmailPrompt from '@/components/ListingEmailPrompt';
@@ -208,6 +209,8 @@ export default async function ListingDetailPage({ params }) {
 
 {/* LEFT: photos, header, stats, description, map */}
         <div>
+          {/* Open house times from the MLS (2026-10-18, per Ryan). */}
+          {listing.status === 'Active' && <OpenHouseBanner openHouses={listing.openHouses} />}
                     <div style={{ position: 'relative' }}>
             <PropertyGallery photos={photos} address={listing.address} alt={listingPhotoAlt(listing)} tourButton={listing.status !== 'Pending' && listing.status !== 'Sold'} />
             {/* Pending/Sold banner on the photo (2026-10-04, per Ryan) — sold
