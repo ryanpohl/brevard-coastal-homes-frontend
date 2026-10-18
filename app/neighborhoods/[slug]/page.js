@@ -16,6 +16,7 @@ import {
   HARBOR_ISLAND_BEACH_CLUB_BATH_OPTIONS,
   VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_NEIGHBORHOOD_OPTIONS,
   VIERA_BUILDERS_SUB_COMMUNITIES,
+  VIERA_BUILDERS_GRID_EXTRAS,
   VIERA_BUILDERS_PRICE_BANDS,
   VIERA_BUILDERS_PROPERTY_TYPE_OPTIONS,
   SOUTH_MERRITT_ISLAND_PRICE_BANDS,
@@ -185,6 +186,14 @@ const MODEL_TOUR_WITH = {
   'Reeling Park': 'Viera Builders’ sales team',
   Laurasia: 'Viera Builders’ sales team',
 };
+// Viera Builders link grid: the sub-communities with the extra Viera
+// Builders communities (Avalonia) slotted in before any Coming Soon one.
+const VIERA_BUILDERS_GRID = [
+  ...VIERA_BUILDERS_SUB_COMMUNITIES.filter((c) => !c.comingSoon),
+  ...VIERA_BUILDERS_GRID_EXTRAS,
+  ...VIERA_BUILDERS_SUB_COMMUNITIES.filter((c) => c.comingSoon),
+];
+
 function modelTourWith(name) {
   return MODEL_TOUR_WITH[name] || 'the builders’ sales agents';
 }
@@ -1378,7 +1387,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               paddingLeft: 22,
             }}
           >
-            {VIERA_BUILDERS_SUB_COMMUNITIES.map((c) => (
+            {VIERA_BUILDERS_GRID.map((c) => (
               <li key={c.slug}>
                 <Link
                   href={`/neighborhoods/${c.slug}`}
@@ -1459,7 +1468,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                 paddingLeft: 22,
               }}
             >
-              {VIERA_BUILDERS_SUB_COMMUNITIES.filter((c) => c.slug !== subCommunity.slug).map((c) => (
+              {VIERA_BUILDERS_GRID.filter((c) => c.slug !== subCommunity.slug).map((c) => (
                 <li key={c.slug}>
                   <Link
                     href={`/neighborhoods/${c.slug}`}
