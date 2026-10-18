@@ -3,6 +3,7 @@ import * as api from '@/lib/api';
 import { formatPrice, PROPERTY_TYPE_LABEL, isPricePerSqftPlausible, soldPricePerSqft, formatSoldDate } from '@/lib/constants';
 import FavoriteButton from '@/components/FavoriteButton';
 import { HomeAlertSignup } from '@/components/ListingAlertSignup';
+import AvailabilityButton from '@/components/AvailabilityButton';
 import MortgageCalculator from '@/components/MortgageCalculator';
 import { homeKind, monthlyHoa } from '@/lib/mortgage';
 import { listingPhotoAlt } from '@/lib/listingPhotoAlt';
@@ -283,6 +284,12 @@ export default async function ListingDetailPage({ params }) {
                   since 2026-10-12 (per Ryan: the price side was too busy). */}
               {(listing.status === 'Active' || listing.status === 'Pending') && (
                 <HomeAlertSignup listingId={listing.id} status={listing.statusLabel === 'Contingent' ? 'Contingent' : listing.status} />
+              )}
+              {/* "Is this home still available?" (2026-10-18, per Ryan). */}
+              {listing.status === 'Active' && (
+                <div>
+                  <AvailabilityButton />
+                </div>
               )}
   </div>
             <div className="listing-price-col" style={{ textAlign: 'right' }}>

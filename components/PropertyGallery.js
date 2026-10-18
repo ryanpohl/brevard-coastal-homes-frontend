@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
+import { askIfAvailable, scrollToShowingForm } from '@/lib/listingAsk';
 
 // Number of thumbnails shown per "page" of the strip below the hero photo.
 const THUMBS_PER_PAGE = 6;
@@ -30,10 +31,16 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
     // Index of the first thumbnail visible in the current "page" of the strip.
   const [thumbStart, setThumbStart] = useState(0);
     const [tab, setTab] = useState('photos'); // 'photos' | 'tour'
+  // Card over the last photo (2026-10-18, per Ryan): someone who flipped
+  // through every photo is interested, so offer a tour or the "still
+  // available?" question. Shown with tourButton (active listings); "View
+  // last photo" hides it until they leave and come back to the end.
+  const [endCardHidden, setEndCardHidden] = useState(false);
 
   const hasPhotos = photos.length > 0;
     const total = photos.length;
     const heroPhoto = hasPhotos ? photos[Math.min(activeIndex, total - 1)] : null;
+  const showEndCard = tourButton && total > 1 && activeIndex === total - 1 && !endCardHidden;
 
   // Thumbnail strip shows a THUMBS_PER_PAGE-wide window starting at
   // thumbStart; the page-arrows below shift that window without touching
@@ -50,6 +57,7 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
         if (total < 2) return;
         const next = (activeIndex - 1 + total) % total;
         setActiveIndex(next);
+        setEndCardHidden(false);
         syncThumbWindow(next);
   }
 
@@ -57,6 +65,7 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
         if (total < 2) return;
         const next = (activeIndex + 1) % total;
         setActiveIndex(next);
+        setEndCardHidden(false);
         syncThumbWindow(next);
   }
 
@@ -66,12 +75,6 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
 
   function pageThumbsNext() {
         setThumbStart((s) => Math.min(Math.max(0, total - THUMBS_PER_PAGE), s + THUMBS_PER_PAGE));
-  }
-
-  function scrollToShowingForm() {
-    const form = document.getElementById('request-showing');
-    if (!form) return;
-    window.scrollTo({ top: form.getBoundingClientRect().top + window.scrollY - 140, behavior: 'smooth' });
   }
 
   return (
@@ -113,6 +116,7 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
                       onClick={showPrevPhoto}
                       aria-label="Previous photo"
                       style={{
+                      zIndex: 2,
                                             position: 'absolute',
                                             top: '50%',
                                             left: 12,
@@ -138,6 +142,7 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
                      onClick={showNextPhoto}
                      aria-label="Next photo"
                      style={{
+                      zIndex: 2,
                        position: 'absolute',
                                            top: '50%',
                                            right: 12,
@@ -176,7 +181,29 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
   </>
             )}
 
-{tourButton && (
+{showEndCard && (
+              <div className="gallery-end-card">
+                <div className="gallery-end-card__box">
+                  <div className="gallery-end-card__title">Want to see it in person?</div>
+                  <div className="gallery-end-card__text">Ryan can set up a private tour, or find out if it’s still available.</div>
+                  <div className="gallery-end-card__actions">
+                    <button type="button" className="gallery-end-card__primary" onClick={scrollToShowingForm}>
+                      Schedule a Tour
+                    </button>
+                    <button type="button" className="gallery-end-card__secondary" onClick={askIfAvailable}>
+                      Is it still available?
+                    </button>
+                  </div>
+                  <div className="gallery-end-card__links">
+                    <button type="button" onClick={() => { setActiveIndex(0); syncThumbWindow(0); }}>Back to first photo</button>
+                    <span aria-hidden="true">·</span>
+                    <button type="button" onClick={() => setEndCardHidden(true)}>View last photo</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+{tourButton && !showEndCard && (
               <button type="button" onClick={scrollToShowingForm} className="gallery-tour-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <rect x="3" y="4" width="18" height="18" rx="2" />
@@ -222,7 +249,7 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
                                           <button
                         key={photoIndex}
                         type="button"
-                        onClick={() => setActiveIndex(photoIndex)}
+                        onClick={() => { setActiveIndex(photoIndex); setEndCardHidden(false); }}
                         aria-label={`Show photo ${photoIndex + 1}`}
                                       style={{
                           position: 'relative',
