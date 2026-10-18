@@ -1,6 +1,7 @@
 import * as api from '@/lib/api';
 import { CONDO_BUILDINGS } from '@/lib/condoBuildings';
 import {
+  COMMUNITY_PHOTOS,
   PROPERTY_TYPE_TO_SLUG,
   OCEANFRONT_PROPERTY_TYPE_TO_SLUG,
   OCEANFRONT_CITY_SLUGS,
@@ -39,6 +40,13 @@ export const revalidate = 3600;
 const LISTING_PAGE_SIZE = 200;
 const MAX_LISTING_PAGES = 20;
 
+// Image sitemap URLs (2026-10-18, per Ryan: get the site's photos into
+// Google Images). Next writes <image:loc> values as-is, so escape them.
+function sitemapImage(url) {
+  return String(url).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+const LISTING_SITEMAP_PHOTOS = 3;
+
 async function getAllListingIds() {
   const ids = [];
   let page = 1;
@@ -48,7 +56,7 @@ async function getAllListingIds() {
       const data = await api.getListings({ page, pageSize: LISTING_PAGE_SIZE });
       const results = (data && data.results) || [];
       if (!results.length) break;
-      results.forEach((listing) => ids.push(listing.id));
+      results.forEach((listing) => ids.push({ id: listing.id, photos: listing.photos || [] }));
       const totalPages = data.totalPages || 1;
       if (page >= totalPages) break;
       page += 1;
@@ -293,13 +301,20 @@ export default async function sitemap() {
     });
   });
 
+  // Community photos on each community's own page (COMMUNITY_PHOTOS).
+  entries.forEach((entry) => {
+    const slug = entry.url.startsWith(`${SITE_URL}/neighborhoods/`) && entry.url.slice(`${SITE_URL}/neighborhoods/`.length);
+    if (slug && COMMUNITY_PHOTOS[slug]) entry.images = [sitemapImage(`${SITE_URL}${COMMUNITY_PHOTOS[slug].src}`)];
+  });
+
   const listingIds = await getAllListingIds();
-  listingIds.forEach((id) => {
+  listingIds.forEach(({ id, photos }) => {
     entries.push({
       url: `${SITE_URL}/listings/${id}`,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.6,
+      ...(photos.length && { images: photos.slice(0, LISTING_SITEMAP_PHOTOS).map(sitemapImage) }),
     });
   });
 

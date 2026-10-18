@@ -18,7 +18,9 @@ const THUMBS_PER_PAGE = 6;
  * yet (no MLS field for it), so that tab shows a placeholder instead of
  * crashing or silently doing nothing.
  */
-export default function PropertyGallery({ photos = [], address }) {
+export default function PropertyGallery({ photos = [], address, alt }) {
+  // `alt` (2026-10-18): photo description from lib/listingPhotoAlt.js.
+  const altBase = alt || address;
     const [activeIndex, setActiveIndex] = useState(0);
     // Index of the first thumbnail visible in the current "page" of the strip.
   const [thumbStart, setThumbStart] = useState(0);
@@ -76,7 +78,7 @@ export default function PropertyGallery({ photos = [], address }) {
                }}
               >
    {heroPhoto ? (
-                   <Image src={heroPhoto} alt={address} fill priority sizes="(max-width: 900px) 100vw, 60vw" style={{ objectFit: 'cover' }} />
+                   <Image src={heroPhoto} alt={altBase} fill priority sizes="(max-width: 900px) 100vw, 60vw" style={{ objectFit: 'cover' }} />
                  ) : (
                    <div
                      style={{
@@ -212,7 +214,7 @@ export default function PropertyGallery({ photos = [], address }) {
                           background: 'var(--color-border-light)',
 }}
                     >
-                      <Image src={photo} alt={`${address} photo ${photoIndex + 1}`} fill sizes="120px" style={{ objectFit: 'cover' }} />
+                      <Image src={photo} alt={`${altBase}, photo ${photoIndex + 1}`} fill sizes="120px" style={{ objectFit: 'cover' }} />
                       </button>
                   );
 })}

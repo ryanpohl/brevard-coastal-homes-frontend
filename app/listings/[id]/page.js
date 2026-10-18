@@ -5,6 +5,7 @@ import FavoriteButton from '@/components/FavoriteButton';
 import { HomeAlertSignup } from '@/components/ListingAlertSignup';
 import MortgageCalculator from '@/components/MortgageCalculator';
 import { homeKind, monthlyHoa } from '@/lib/mortgage';
+import { listingPhotoAlt } from '@/lib/listingPhotoAlt';
 import PropertyGallery from '@/components/PropertyGallery';
 import PropertyContactPanel from '@/components/PropertyContactPanel';
 import { ContactBarMessage } from '@/components/MobileContactBar';
@@ -206,7 +207,7 @@ export default async function ListingDetailPage({ params }) {
 {/* LEFT: photos, header, stats, description, map */}
         <div>
                     <div style={{ position: 'relative' }}>
-            <PropertyGallery photos={photos} address={listing.address} />
+            <PropertyGallery photos={photos} address={listing.address} alt={listingPhotoAlt(listing)} />
             {/* Pending/Sold banner on the photo (2026-10-04, per Ryan) — sold
                 homes stay on the site for 30 days with the close date shown. */}
             {(listing.status === 'Sold' || listing.status === 'Pending' || listing.statusLabel === 'Contingent') && (

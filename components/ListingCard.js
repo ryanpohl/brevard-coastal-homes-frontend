@@ -1,5 +1,7 @@
 'use client';
 
+import { listingPhotoAlt } from '@/lib/listingPhotoAlt';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -163,7 +165,7 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
             // <head> — everything below the fold stays lazy as before.
             <Image
               src={photo}
-              alt={listing.address}
+              alt={listingPhotoAlt(listing)}
               fill
               sizes="(max-width: 768px) 100vw, 25vw"
               style={{ objectFit: 'cover' }}
