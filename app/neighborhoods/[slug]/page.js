@@ -51,6 +51,7 @@ import ListingResultsLayout from '@/components/ListingResultsLayout';
 import ListingAlertSignup, { ListingAlertJumpLink } from '@/components/ListingAlertSignup';
 import PageEmailPrompt from '@/components/PageEmailPrompt';
 import Faq from '@/components/Faq';
+import { REALTOR_PAGES } from '@/lib/realtorPages';
 import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
 import RecentlySold from '@/components/RecentlySold';
 import NeighborhoodMarketStats from '@/components/NeighborhoodMarketStats';
@@ -2076,6 +2077,19 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         </div>
       )}
       <RecentlySold name={neighborhood.name} data={recentlySold} />
+      {/* One-line link to this area's Realtor page (2026-10-18, per Ryan:
+          links under the listings, pages kept uncluttered); see
+          lib/realtorPages.js. */}
+      {REALTOR_PAGES[slug] && (
+        <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px)', margin: '8px 0 28px' }}>
+          <p style={{ fontSize: 17, margin: 0 }}>
+            <strong style={{ color: 'var(--color-ink)' }}>Buying or selling in {REALTOR_PAGES[slug].name}?</strong>{' '}
+            <Link href={`/neighborhoods/${slug}/realtor`} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+              Work with Ryan, your {REALTOR_PAGES[slug].name} Realtor →
+            </Link>
+          </p>
+        </div>
+      )}
 
       {/* About {name} {area} Real Estate (2026-10-03, per Ryan) — a short,
           fact-dense summary on the listings page itself (the full detail

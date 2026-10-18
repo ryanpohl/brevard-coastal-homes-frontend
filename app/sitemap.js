@@ -14,6 +14,7 @@ import {
   NEIGHBORHOOD_LANDING_PAGES,
 } from '@/lib/constants';
 import { MARKET_REPORTS } from '@/lib/marketReports';
+import { REALTOR_PAGES } from '@/lib/realtorPages';
 
 // Native Next.js sitemap.xml (2026-09-11, SEO audit finding: brevardcoastalhomes.com/sitemap.xml
 // 404s). Same root cause as robots.js's comment: the backend DOES generate a real sitemap
@@ -310,6 +311,11 @@ export default async function sitemap() {
     const cityMatch = entry.url.slice(SITE_URL.length).match(/^\/([a-z-]+)(?:\/homes-for-sale)?$/);
     const cityPhoto = cityMatch && CITY_PAGE_SEO[cityMatch[1]]?.photo;
     if (cityPhoto) entry.images = [sitemapImage(`${SITE_URL}${cityPhoto.src}`)];
+  });
+
+  // "{Area} Realtor" pages (lib/realtorPages.js).
+  Object.keys(REALTOR_PAGES).forEach((slug) => {
+    entries.push({ url: `${SITE_URL}/neighborhoods/${slug}/realtor`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 });
   });
 
   const listingIds = await getAllListingIds();
