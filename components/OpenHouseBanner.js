@@ -8,7 +8,7 @@ import { scheduleTour } from '@/lib/listingAsk';
  * (backend upcomingOpenHouses — only ones still to come, Eastern time).
  * Buyers can find these times on the portals anyway, so the banner pairs
  * them with "Want Ryan to meet you there?", which opens the Schedule a
- * Tour popup, so they reach out before they walk in.
+ * Tour popup with "meet me at the open house at {address}" in the message.
  */
 function formatDay(iso) {
   const [y, m, d] = iso.split('-').map(Number);
@@ -23,6 +23,11 @@ function formatTime(hhmm) {
   return min ? `${hour}:${String(min).padStart(2, '0')} ${suffix}` : `${hour} ${suffix}`;
 }
 
+// "Saturday, October 31 · 10 AM – 12 PM"
+function label(oh) {
+  return [formatDay(oh.date), oh.start ? [formatTime(oh.start), formatTime(oh.end)].filter(Boolean).join(' – ') : null].filter(Boolean).join(' · ');
+}
+
 export default function OpenHouseBanner({ openHouses }) {
   if (!openHouses?.length) return null;
   return (
@@ -31,18 +36,11 @@ export default function OpenHouseBanner({ openHouses }) {
         <span className="open-house-banner__label">Open House</span>
         {openHouses.map((oh) => (
           <span key={`${oh.date}-${oh.start}`} className="open-house-banner__time">
-            {formatDay(oh.date)}
-            {oh.start && (
-              <>
-                {' · '}
-                {formatTime(oh.start)}
-                {oh.end && <> – {formatTime(oh.end)}</>}
-              </>
-            )}
+            {label(oh)}
           </span>
         ))}
       </div>
-      <button type="button" className="open-house-banner__btn" onClick={scheduleTour}>
+      <button type="button" className="open-house-banner__btn" onClick={() => scheduleTour({ openHouse: true })}>
         Want Ryan to meet you there?
       </button>
     </div>

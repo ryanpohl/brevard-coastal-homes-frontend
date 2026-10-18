@@ -53,10 +53,11 @@ export default function PropertyContactPanel({ listingId, listingAddress, status
   // "Schedule a Tour" on the photos (lib/listingAsk.js) opens the Request
   // Showing form in a popup — scrolling to the sidebar form barely moved
   // the page on computers, so the click looked like it did nothing.
+  // false, or { openHouse } (true when opened from the open house banner).
   const [tourOpen, setTourOpen] = useState(false);
   useEffect(() => {
     if (listingId == null || unavailable) return undefined;
-    const open = () => setTourOpen(true);
+    const open = (e) => setTourOpen({ openHouse: !!e.detail?.openHouse });
     window.addEventListener(SCHEDULE_TOUR_EVENT, open);
     return () => window.removeEventListener(SCHEDULE_TOUR_EVENT, open);
   }, [listingId, unavailable]);
@@ -188,7 +189,9 @@ export default function PropertyContactPanel({ listingId, listingAddress, status
       {tourOpen && (
         <ModalShell onClose={() => setTourOpen(false)} maxWidth={560}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px 0' }}>
-            <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 600, color: 'var(--color-ink)' }}>Schedule a Tour</div>
+            <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 600, color: 'var(--color-ink)' }}>
+              {tourOpen.openHouse ? 'Meet Ryan at the Open House' : 'Schedule a Tour'}
+            </div>
             <button
               type="button"
               onClick={() => setTourOpen(false)}
@@ -199,7 +202,15 @@ export default function PropertyContactPanel({ listingId, listingAddress, status
             </button>
           </div>
           {listingAddress && <div style={{ padding: '4px 24px 0', fontSize: 14, color: 'var(--color-muted-dark)' }}>{listingAddress}</div>}
-          <RequestShowingForm formId="tour-popup-showing" radioSuffix="-popup" listingId={listingId} listingAddress={listingAddress} dateOptions={dateOptions} user={user} />
+          <RequestShowingForm
+            formId="tour-popup-showing"
+            radioSuffix="-popup"
+            listingId={listingId}
+            listingAddress={listingAddress}
+            dateOptions={dateOptions}
+            user={user}
+            openHouse={tourOpen.openHouse}
+          />
         </ModalShell>
       )}
       {offerOpen && <MakeOfferModal listingId={listingId} listingAddress={listingAddress} onClose={() => setOfferOpen(false)} />}
@@ -208,7 +219,10 @@ export default function PropertyContactPanel({ listingId, listingAddress, status
   );
 }
 
-function RequestShowingForm({ listingId, listingAddress, dateOptions, user, formId = 'request-showing', radioSuffix = '' }) {
+function RequestShowingForm({ listingId, listingAddress, dateOptions, user, formId = 'request-showing', radioSuffix = '', openHouse = false }) {
+  // openHouse (2026-10-18, per Ryan): opened from the open house banner's
+  // "Want Ryan to meet you there?" — the message says it's for the open
+  // house at this address (Ryan only needs the address, not the time).
   const [selectedDate, setSelectedDate] = useState(null); // iso string
   const [tourType, setTourType] = useState(null); // 'in_person' | 'virtual'
   // "Are you currently working with an agent?" (optional Yes/No) — added
@@ -234,7 +248,7 @@ function RequestShowingForm({ listingId, listingAddress, dateOptions, user, form
   // as name/email already auto-filling from the signed-in user below.
   // Falls back to '' when there's no listing (the general-inquiry popups),
   // same as before this change.
-  const [form, setForm] = useState({ propertyAddress: listingAddress || '', name: user?.name || '', email: user?.email || '', phone: '', message: '' });
+  const [form, setForm] = useState({ propertyAddress: listingAddress || '', name: user?.name || '', email: user?.email || '', phone: '', message: openHouse ? `I'd like Ryan to meet me at the open house at ${listingAddress || 'this home'}.` : '' });
   const [status, setStatus] = useState({ submitting: false, error: '', success: '' });
 
   function update(field, value) {
