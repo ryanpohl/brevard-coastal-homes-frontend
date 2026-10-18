@@ -21,12 +21,12 @@ export default function UnsubscribeClient({ token, all = false }) {
 
   return (
     <>
-      <h1 style={{ fontSize: 28, marginBottom: 14 }}>{state.done ? 'You’re unsubscribed' : 'Unsubscribe from listing alerts'}</h1>
+      <h1 style={{ fontSize: 28, marginBottom: 14 }}>{state.done ? 'You’re unsubscribed' : 'Unsubscribe from these emails'}</h1>
       {state.done ? (
         <p style={{ fontSize: 16, lineHeight: 1.6 }}>{state.done}</p>
       ) : (
         <>
-          <p style={{ fontSize: 16, lineHeight: 1.6, marginBottom: 22 }}>{all ? 'Stop getting price and status emails for all the homes you’re watching?' : 'Stop getting these listing alert emails?'}</p>
+          <p style={{ fontSize: 16, lineHeight: 1.6, marginBottom: 22 }}>{all ? 'Stop getting price and status emails for all the homes you’re watching?' : 'Stop getting these emails?'}</p>
           {token && (
             <button type="button" className="btn btn-primary" onClick={confirm} disabled={state.busy}>
               {state.busy ? 'Unsubscribing…' : 'Yes, unsubscribe me'}

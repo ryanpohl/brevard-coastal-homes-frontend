@@ -16,6 +16,7 @@ export default async function CityRealtorPage({ params }) {
   const { citySlug } = await params;
   const page = REALTOR_PAGES[citySlug];
   if (!page || page.kind !== 'city') notFound();
-  const stats = await getRecentlySold(cityListingsQueryParams(citySlug));
-  return <RealtorPage page={page} stats={stats} />;
+  const filter = cityListingsQueryParams(citySlug);
+  const stats = await getRecentlySold(filter);
+  return <RealtorPage page={page} stats={stats} filter={filter} />;
 }

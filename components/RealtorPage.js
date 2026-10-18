@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SoldReportSignup from '@/components/SoldReportSignup';
 import { AGENT_INFO, BROKERAGE_INFO, formatPrice } from '@/lib/constants';
 import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
@@ -33,7 +34,7 @@ export function realtorMetadata(page) {
   };
 }
 
-export default function RealtorPage({ page, stats }) {
+export default function RealtorPage({ page, stats, filter }) {
   const pageUrl = `${SITE_URL}${page.path}`;
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -107,6 +108,8 @@ export default function RealtorPage({ page, stats }) {
           </p>
         </>
       )}
+      {/* Monthly sold report signup (2026-10-18, per Ryan). */}
+      {filter && <SoldReportSignup townName={page.name} filter={filter} listingsPath={page.listingsHref} />}
 
       <h2 style={sectionHeading}>Why work with Ryan Pohl</h2>
       <ul style={{ paddingLeft: 20, marginBottom: 16 }}>

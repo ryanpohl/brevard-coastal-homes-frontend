@@ -1,10 +1,11 @@
 import UnsubscribeClient from './UnsubscribeClient';
 
 // Landing page for the "Unsubscribe" link in new-listing alert emails
-// (2026-10-09) and one-home price/status alert emails (2026-10-10; `all=1`
-// stops every home that email is watching). Kept out of search results.
+// (2026-10-09), one-home price/status alert emails (2026-10-10; `all=1`
+// stops every home that email is watching) and the monthly sold report
+// (2026-10-18). Kept out of search results.
 export const metadata = {
-  title: 'Unsubscribe from listing alerts | Brevard Coastal Homes',
+  title: 'Unsubscribe | Brevard Coastal Homes',
   robots: { index: false, follow: false },
 };
 

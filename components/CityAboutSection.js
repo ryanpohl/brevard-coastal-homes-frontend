@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { formatPrice } from '@/lib/constants';
+import { formatPrice, cityListingsQueryParams } from '@/lib/constants';
+import SoldReportSignup from '@/components/SoldReportSignup';
 import { REALTOR_PAGES } from '@/lib/realtorPages';
 
 // "About {city} …" section for CITY_PAGE_SEO pages (2026-10-03) — page-
@@ -15,6 +16,7 @@ export default function CityAboutSection({ config, page, currentPath, snapshot }
     timeZone: 'America/New_York',
   });
   const links = config.relatedLinks.filter((l) => l.href !== currentPath);
+  const citySlug = currentPath.split('/')[1];
   // This city's Realtor page, if it has one (lib/realtorPages.js).
   const realtorPage = Object.values(REALTOR_PAGES).find((p) => p.kind === 'city' && p.name === config.name);
   return (
@@ -125,6 +127,8 @@ export default function CityAboutSection({ config, page, currentPath, snapshot }
         </Link>{' '}
         or call or text Ryan at <a href="tel:+13213507661" style={{ color: '#000', textDecoration: 'underline' }}>321-350-7661</a>.
       </p>
+      {/* Monthly sold report signup (2026-10-18, per Ryan). */}
+      <SoldReportSignup townName={config.name} filter={cityListingsQueryParams(citySlug)} listingsPath={`/${citySlug}`} />
       <h3 style={{ fontSize: 18, marginBottom: 8, color: 'var(--color-ink)', fontFamily: 'var(--font-inter-tight)' }}>
         More {config.name} real estate
       </h3>

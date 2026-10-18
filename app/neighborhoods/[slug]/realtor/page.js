@@ -16,6 +16,7 @@ export default async function NeighborhoodRealtorPage({ params }) {
   const { slug } = await params;
   const page = REALTOR_PAGES[slug];
   if (!page || page.kind !== 'neighborhood') notFound();
-  const stats = await getRecentlySold(neighborhoodListingsFilter(slug, {}));
-  return <RealtorPage page={page} stats={stats} />;
+  const filter = neighborhoodListingsFilter(slug, {});
+  const stats = await getRecentlySold(filter);
+  return <RealtorPage page={page} stats={stats} filter={filter} />;
 }
