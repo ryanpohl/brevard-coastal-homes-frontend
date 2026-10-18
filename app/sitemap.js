@@ -314,8 +314,8 @@ export default async function sitemap() {
   });
 
   // "{Area} Realtor" pages (lib/realtorPages.js).
-  Object.keys(REALTOR_PAGES).forEach((slug) => {
-    entries.push({ url: `${SITE_URL}/neighborhoods/${slug}/realtor`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 });
+  Object.values(REALTOR_PAGES).forEach((page) => {
+    entries.push({ url: `${SITE_URL}${page.path}`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 });
   });
 
   const listingIds = await getAllListingIds();

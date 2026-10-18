@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { formatPrice } from '@/lib/constants';
+import { REALTOR_PAGES } from '@/lib/realtorPages';
 
 // "About {city} …" section for CITY_PAGE_SEO pages (2026-10-03) — page-
 // specific copy, a live market snapshot, an agent line, and links to the
@@ -14,6 +15,8 @@ export default function CityAboutSection({ config, page, currentPath, snapshot }
     timeZone: 'America/New_York',
   });
   const links = config.relatedLinks.filter((l) => l.href !== currentPath);
+  // This city's Realtor page, if it has one (lib/realtorPages.js).
+  const realtorPage = Object.values(REALTOR_PAGES).find((p) => p.kind === 'city' && p.name === config.name);
   return (
     <section
       className="container"
@@ -25,6 +28,16 @@ export default function CityAboutSection({ config, page, currentPath, snapshot }
         color: 'var(--color-muted-dark)',
       }}
     >
+      {/* One-line link to the Realtor page, right under the listings
+          (2026-10-18, per Ryan). */}
+      {realtorPage && (
+        <p style={{ fontSize: 17, margin: '0 0 28px' }}>
+          <strong style={{ color: 'var(--color-ink)' }}>Selling or buying in {realtorPage.name}?</strong>{' '}
+          <Link href={realtorPage.path} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+            Work with Ryan, your {realtorPage.name} Realtor →
+          </Link>
+        </p>
+      )}
       <h2 style={{ fontSize: 24, marginBottom: 12, color: 'var(--color-ink)', fontFamily: 'var(--font-inter-tight)' }}>
         {page.aboutHeading}
       </h2>

@@ -2080,11 +2080,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
       {/* One-line link to this area's Realtor page (2026-10-18, per Ryan:
           links under the listings, pages kept uncluttered); see
           lib/realtorPages.js. */}
-      {REALTOR_PAGES[slug] && (
+      {REALTOR_PAGES[slug]?.kind === 'neighborhood' && (
         <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px)', margin: '8px 0 28px' }}>
           <p style={{ fontSize: 17, margin: 0 }}>
             <strong style={{ color: 'var(--color-ink)' }}>Buying or selling in {REALTOR_PAGES[slug].name}?</strong>{' '}
-            <Link href={`/neighborhoods/${slug}/realtor`} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+            <Link href={REALTOR_PAGES[slug].path} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
               Work with Ryan, your {REALTOR_PAGES[slug].name} Realtor →
             </Link>
           </p>
