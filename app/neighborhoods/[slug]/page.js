@@ -16,6 +16,7 @@ import {
   HARBOR_ISLAND_BEACH_CLUB_BATH_OPTIONS,
   VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_NEIGHBORHOOD_OPTIONS,
   VIERA_BUILDERS_SUB_COMMUNITIES,
+  VIERA_BUILDERS_HUB_SUBDIVISIONS,
   VIERA_BUILDERS_GRID_EXTRAS,
   VIERA_BUILDERS_PRICE_BANDS,
   VIERA_BUILDERS_PROPERTY_TYPE_OPTIONS,
@@ -682,7 +683,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
     : subCommunity
     ? { subdivision: subCommunity.name }
     : isVieraBuildersCommunitiesVieraWest
-      ? { subdivision: searchParams.subdivision || VIERA_BUILDERS_SUB_COMMUNITIES.map((c) => c.name).join(',') }
+      ? { subdivision: searchParams.subdivision || VIERA_BUILDERS_HUB_SUBDIVISIONS.join(',') }
       : isBeachWoods
         ? { subdivision: BEACH_WOODS_SUBDIVISION_NAMES.join(',') }
         : isAquarina
@@ -1079,7 +1080,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   let subCommunityCounts = {};
   if (isVieraBuildersCommunitiesVieraWest) {
     const entries = await Promise.all(
-      VIERA_BUILDERS_SUB_COMMUNITIES.map(async (c) => {
+      [...VIERA_BUILDERS_SUB_COMMUNITIES, ...VIERA_BUILDERS_GRID_EXTRAS].map(async (c) => {
         try {
           const data = await api.getListings({ subdivision: c.name, pageSize: 1 });
           return [c.slug, typeof data.total === 'number' ? data.total : null];
