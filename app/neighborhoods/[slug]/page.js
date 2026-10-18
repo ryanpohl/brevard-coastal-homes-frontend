@@ -184,6 +184,7 @@ async function buildNeighborhoodListingCountPrefix({ listingsFilterParams, prope
 // Adelaide: Elan Builders has no model home there, per Ryan).
 const MODEL_TOUR_WITH = {
   Aripeka: 'all 4 builders’ sales agents',
+  Adelaide: 'AR Homes’ sales agent',
   'Pangea Park': 'Viera Builders’ sales team',
   'Reeling Park': 'Viera Builders’ sales team',
   Laurasia: 'Viera Builders’ sales team',
@@ -196,6 +197,12 @@ const VIERA_BUILDERS_GRID = [
   ...VIERA_BUILDERS_SUB_COMMUNITIES.filter((c) => c.comingSoon),
 ];
 
+// Adelaide has one open model (AR Homes' Lumina) as of 2026-10-18, per Ryan.
+const SINGLE_MODEL = new Set(['Adelaide']);
+function modelTourNoun(name) {
+  return SINGLE_MODEL.has(name) ? 'model home' : 'model homes';
+}
+
 function modelTourWith(name) {
   return MODEL_TOUR_WITH[name] || 'the builders’ sales agents';
 }
@@ -205,7 +212,7 @@ function ModelTourLine({ name }) {
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, marginTop: 14 }}>
       <p style={{ fontSize: 16, lineHeight: 1.5, color: 'var(--color-ink)', margin: 0 }}>
         {/* Reworded 2026-10-17 (per Ryan: the old line was confusing). */}
-        <strong>Contact Ryan before you visit the {name} model homes.</strong> He&rsquo;ll set up private tours with{' '}
+        <strong>Contact Ryan before you visit the {name} {modelTourNoun(name)}.</strong> He&rsquo;ll set up private tours with{' '}
         {modelTourWith(name)} and go with you to answer any questions. Use Ryan at zero cost to you.
       </p>
       <ModelTourButton communityName={name} />
@@ -1777,7 +1784,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           <div style={{ marginBottom: 12 }}>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
               Explore new construction and existing homes for sale in Adelaide in Viera. With three custom home builders to
-              choose from, we can help you compare options, set up private tours of the model homes, negotiate with
+              choose from, we can help you compare options, set up a private tour of the model home, negotiate with
               builders, and navigate the entire buying process through closing.
             </p>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
@@ -2156,7 +2163,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               }}
             >
               <p style={{ marginBottom: 14, color: 'var(--color-ink)' }}>
-                <strong>Contact Ryan before you visit the {community.name} model homes.</strong> He&rsquo;ll set up
+                <strong>Contact Ryan before you visit the {community.name} {modelTourNoun(community.name)}.</strong> He&rsquo;ll set up
                 private tours with {modelTourWith(community.name)} and go with you to answer any questions. Use Ryan
                 at zero cost to you.
               </p>
