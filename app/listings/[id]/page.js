@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import * as api from '@/lib/api';
 import { formatPrice, PROPERTY_TYPE_LABEL, isPricePerSqftPlausible, soldPricePerSqft, formatSoldDate } from '@/lib/constants';
@@ -326,6 +327,16 @@ export default async function ListingDetailPage({ params }) {
                   kind={homeKind(listing.propertyType, listing.yearBuilt)}
                   hoaMonth={monthlyHoa(listing.assocFee, listing.assocFeeFrequency)}
                 />
+              )}
+              {/* Seller lead on sold homes (2026-10-18, per Ryan): people
+                  looking at a sale are often neighbors checking prices. */}
+              {listing.status === 'Sold' && !isLand && (
+                <div style={{ marginTop: 10, fontSize: 14 }}>
+                  <span style={{ color: 'var(--color-muted-dark)' }}>Own a home nearby? </span>
+                  <Link href="/looking-to-sell" style={{ fontWeight: 600, color: 'var(--color-gold-text)' }}>
+                    Get your free home value →
+                  </Link>
+                </div>
               )}
   </div>
   </div>
