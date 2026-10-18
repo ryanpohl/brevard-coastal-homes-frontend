@@ -18,8 +18,13 @@ const THUMBS_PER_PAGE = 6;
  * yet (no MLS field for it), so that tab shows a placeholder instead of
  * crashing or silently doing nothing.
  */
-export default function PropertyGallery({ photos = [], address, alt }) {
+export default function PropertyGallery({ photos = [], address, alt, tourButton = false }) {
   // `alt` (2026-10-18): photo description from lib/listingPhotoAlt.js.
+  // `tourButton` (2026-10-18, per Ryan): a "Schedule a Tour" button on the
+  // bottom left of the hero photo that scrolls to the Request Showing form
+  // (#request-showing in PropertyContactPanel.js) — another way to reach
+  // out, since there's no forced signup. Off for Pending/Sold listings,
+  // which have no showing form.
   const altBase = alt || address;
     const [activeIndex, setActiveIndex] = useState(0);
     // Index of the first thumbnail visible in the current "page" of the strip.
@@ -61,6 +66,12 @@ export default function PropertyGallery({ photos = [], address, alt }) {
 
   function pageThumbsNext() {
         setThumbStart((s) => Math.min(Math.max(0, total - THUMBS_PER_PAGE), s + THUMBS_PER_PAGE));
+  }
+
+  function scrollToShowingForm() {
+    const form = document.getElementById('request-showing');
+    if (!form) return;
+    window.scrollTo({ top: form.getBoundingClientRect().top + window.scrollY - 140, behavior: 'smooth' });
   }
 
   return (
@@ -163,6 +174,16 @@ export default function PropertyGallery({ photos = [], address, alt }) {
 {activeIndex + 1} / {total}
   </div>
   </>
+            )}
+
+{tourButton && (
+              <button type="button" onClick={scrollToShowingForm} className="gallery-tour-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <path d="M16 2v4M8 2v4M3 10h18" />
+                </svg>
+                Schedule a Tour
+              </button>
             )}
 </div>
 
