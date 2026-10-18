@@ -1254,24 +1254,6 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         >
           {h1Text}
         </h1>
-        {/* Community photo (2026-10-18, per Ryan) — floats beside the intro
-            on desktop, full width under the H1 on phones; see
-            COMMUNITY_PHOTOS. */}
-        {COMMUNITY_PHOTOS[slug] && (
-          <figure className="community-photo">
-            {/* Plain <img> so the descriptive file name stays in the URL
-                Google Images sees. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={COMMUNITY_PHOTOS[slug].src}
-              width={COMMUNITY_PHOTOS[slug].width}
-              height={COMMUNITY_PHOTOS[slug].height}
-              alt={COMMUNITY_PHOTOS[slug].alt}
-              fetchPriority="high"
-            />
-            <figcaption>{COMMUNITY_PHOTOS[slug].caption}</figcaption>
-          </figure>
-        )}
         {/* Sub-community intro (per Ryan, 2026-10-03) — the same area-guide
             intro used as this page's meta description, shown right under
             the H1. Renders nothing for a sub-community without an intro
@@ -1992,7 +1974,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {siblingLinks && (
           <NeighborhoodLinkRow cityName={`Other ${siblingLinks.cityName}`} links={siblingLinks.links} />
         )}
-        <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12, clear: 'both' }}>
+        <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
       </div>
@@ -2116,6 +2098,23 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           <h2 style={{ fontSize: 24, marginBottom: 12, color: 'var(--color-ink)', fontFamily: 'var(--font-inter-tight)' }}>
             {community.aboutHeading || `About ${community.name} ${community.area || 'Viera'} Real Estate`}
           </h2>
+          {/* Community photo (2026-10-18, per Ryan) — under the listings, at
+              the top of the About section, so the top of the page stays
+              listings-first; see COMMUNITY_PHOTOS. Plain <img> so the
+              descriptive file name stays in the URL Google Images sees. */}
+          {COMMUNITY_PHOTOS[slug] && (
+            <figure className="community-photo">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={COMMUNITY_PHOTOS[slug].src}
+                width={COMMUNITY_PHOTOS[slug].width}
+                height={COMMUNITY_PHOTOS[slug].height}
+                alt={COMMUNITY_PHOTOS[slug].alt}
+                loading="lazy"
+              />
+              <figcaption>{COMMUNITY_PHOTOS[slug].caption}</figcaption>
+            </figure>
+          )}
           {community.about.map((text) => (
             <p key={text.slice(0, 32)} style={{ marginBottom: 12 }}>
               {text}

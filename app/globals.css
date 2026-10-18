@@ -2531,10 +2531,8 @@ textarea:focus {
   .nav-phone-strip { font-size: 13px !important; letter-spacing: 0 !important; padding-left: 8px !important; padding-right: 8px !important; }
 }
 
-/* Community photo beside the neighborhood page intro (2026-10-18). */
-.community-photo { float: right; width: min(420px, 40%); margin: 4px 0 16px 28px; }
+/* Community photo at the top of a neighborhood page's About section
+   (2026-10-18). */
+.community-photo { margin: 4px 0 18px; }
 .community-photo img { display: block; width: 100%; height: auto; border-radius: 8px; }
 .community-photo figcaption { font-size: 13px; color: var(--color-muted); margin-top: 6px; }
-@media (max-width: 800px) {
-  .community-photo { float: none; width: 100%; margin: 4px 0 16px; }
-}
