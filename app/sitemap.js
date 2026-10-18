@@ -2,6 +2,7 @@ import * as api from '@/lib/api';
 import { CONDO_BUILDINGS } from '@/lib/condoBuildings';
 import {
   COMMUNITY_PHOTOS,
+  CITY_PAGE_SEO,
   PROPERTY_TYPE_TO_SLUG,
   OCEANFRONT_PROPERTY_TYPE_TO_SLUG,
   OCEANFRONT_CITY_SLUGS,
@@ -305,6 +306,10 @@ export default async function sitemap() {
   entries.forEach((entry) => {
     const slug = entry.url.startsWith(`${SITE_URL}/neighborhoods/`) && entry.url.slice(`${SITE_URL}/neighborhoods/`.length);
     if (slug && COMMUNITY_PHOTOS[slug]) entry.images = [sitemapImage(`${SITE_URL}${COMMUNITY_PHOTOS[slug].src}`)];
+    // City photos on each city's main and homes pages (CITY_PAGE_SEO photo).
+    const cityMatch = entry.url.slice(SITE_URL.length).match(/^\/([a-z-]+)(?:\/homes-for-sale)?$/);
+    const cityPhoto = cityMatch && CITY_PAGE_SEO[cityMatch[1]]?.photo;
+    if (cityPhoto) entry.images = [sitemapImage(`${SITE_URL}${cityPhoto.src}`)];
   });
 
   const listingIds = await getAllListingIds();

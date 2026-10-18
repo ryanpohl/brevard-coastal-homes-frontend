@@ -28,6 +28,21 @@ export default function CityAboutSection({ config, page, currentPath, snapshot }
       <h2 style={{ fontSize: 24, marginBottom: 12, color: 'var(--color-ink)', fontFamily: 'var(--font-inter-tight)' }}>
         {page.aboutHeading}
       </h2>
+      {/* City photo (2026-10-18, per Ryan) — same treatment as the
+          neighborhood pages' community photo (.community-photo). */}
+      {config.photo && (
+        <figure className="community-photo">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={config.photo.src}
+            width={config.photo.width}
+            height={config.photo.height}
+            alt={config.photo.alt}
+            loading="lazy"
+          />
+          <figcaption>{config.photo.caption}</figcaption>
+        </figure>
+      )}
       {page.about.map((text) => (
         <p key={text.slice(0, 32)} style={{ marginBottom: 12 }}>
           {text}
