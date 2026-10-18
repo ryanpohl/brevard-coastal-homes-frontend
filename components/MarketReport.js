@@ -73,7 +73,7 @@ export default function MarketReport({ report }) {
         </p>
       </div>
 
-      <p style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--color-muted)', marginBottom: 24 }}>{MARKET_REPORT_SOURCE}</p>
+      <p style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--color-muted)', marginBottom: 24 }}>{report.source || MARKET_REPORT_SOURCE}</p>
 
       <p style={{ fontSize: 14, color: 'var(--color-muted-dark)', marginBottom: 28 }}>
         Prepared by Ryan Pohl, {BROKERAGE_INFO.name} · Call or Text:{' '}
