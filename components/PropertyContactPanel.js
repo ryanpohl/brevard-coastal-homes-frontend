@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
 import BrokerageNote from '@/components/BrokerageNote';
 import { ASK_AVAILABLE_EVENT, SCHEDULE_TOUR_EVENT } from '@/lib/listingAsk';
+import SimilarHomesSignup from '@/components/SimilarHomesSignup';
 
 const DOW = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 const MONTH = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
@@ -37,7 +38,7 @@ const inputStyle = { border: '1px solid var(--color-border-warm)' };
 // form and invites the visitor to ask about similar homes instead (Ask a
 // Question stays, so the lead isn't lost). 'Contingent' keeps the full panel
 // (backup offers are often still accepted) with its own note.
-export default function PropertyContactPanel({ listingId, listingAddress, status }) {
+export default function PropertyContactPanel({ listingId, listingAddress, status, similarHomes }) {
   const { user } = useAuth();
   const unavailable = status === 'Pending' || status === 'Sold';
   const [offerOpen, setOfferOpen] = useState(false);
@@ -185,6 +186,8 @@ export default function PropertyContactPanel({ listingId, listingAddress, status
       <RequestShowingForm listingId={listingId} listingAddress={listingAddress} dateOptions={dateOptions} user={user} />
         </>
       )}
+      {/* "Email me similar homes" for Pending/Sold homes (2026-10-18). */}
+      {unavailable && similarHomes && <SimilarHomesSignup label={similarHomes.label} filter={similarHomes.filter} />}
 
       {tourOpen && (
         <ModalShell onClose={() => setTourOpen(false)} maxWidth={560}>
