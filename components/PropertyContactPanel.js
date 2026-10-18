@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
 import BrokerageNote from '@/components/BrokerageNote';
-import { ASK_AVAILABLE_EVENT } from '@/lib/listingAsk';
+import { ASK_AVAILABLE_EVENT, SCHEDULE_TOUR_EVENT } from '@/lib/listingAsk';
 
 const DOW = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 const MONTH = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
@@ -50,6 +50,16 @@ export default function PropertyContactPanel({ listingId, listingAddress, status
     window.addEventListener(ASK_AVAILABLE_EVENT, open);
     return () => window.removeEventListener(ASK_AVAILABLE_EVENT, open);
   }, [listingId]);
+  // "Schedule a Tour" on the photos (lib/listingAsk.js) opens the Request
+  // Showing form in a popup — scrolling to the sidebar form barely moved
+  // the page on computers, so the click looked like it did nothing.
+  const [tourOpen, setTourOpen] = useState(false);
+  useEffect(() => {
+    if (listingId == null || unavailable) return undefined;
+    const open = () => setTourOpen(true);
+    window.addEventListener(SCHEDULE_TOUR_EVENT, open);
+    return () => window.removeEventListener(SCHEDULE_TOUR_EVENT, open);
+  }, [listingId, unavailable]);
 
   const dateOptions = useMemo(() => {
     const today = new Date();
@@ -175,13 +185,30 @@ export default function PropertyContactPanel({ listingId, listingAddress, status
         </>
       )}
 
+      {tourOpen && (
+        <ModalShell onClose={() => setTourOpen(false)} maxWidth={560}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px 0' }}>
+            <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 600, color: 'var(--color-ink)' }}>Schedule a Tour</div>
+            <button
+              type="button"
+              onClick={() => setTourOpen(false)}
+              aria-label="Close"
+              style={{ cursor: 'pointer', fontSize: 20, color: 'var(--color-muted)', lineHeight: 1, background: 'none', border: 'none' }}
+            >
+              ×
+            </button>
+          </div>
+          {listingAddress && <div style={{ padding: '4px 24px 0', fontSize: 14, color: 'var(--color-muted-dark)' }}>{listingAddress}</div>}
+          <RequestShowingForm formId="tour-popup-showing" radioSuffix="-popup" listingId={listingId} listingAddress={listingAddress} dateOptions={dateOptions} user={user} />
+        </ModalShell>
+      )}
       {offerOpen && <MakeOfferModal listingId={listingId} listingAddress={listingAddress} onClose={() => setOfferOpen(false)} />}
       {askOpen && <AskQuestionModal key={String(askOpen)} listingId={listingId} listingAddress={listingAddress} user={user} availability={askOpen === 'available'} onClose={() => setAskOpen(false)} />}
     </div>
   );
 }
 
-function RequestShowingForm({ listingId, listingAddress, dateOptions, user }) {
+function RequestShowingForm({ listingId, listingAddress, dateOptions, user, formId = 'request-showing', radioSuffix = '' }) {
   const [selectedDate, setSelectedDate] = useState(null); // iso string
   const [tourType, setTourType] = useState(null); // 'in_person' | 'virtual'
   // "Are you currently working with an agent?" (optional Yes/No) — added
@@ -234,12 +261,12 @@ function RequestShowingForm({ listingId, listingAddress, dateOptions, user }) {
 
   if (status.success) {
     return (
-      <div id="request-showing" style={{ padding: '20px 24px 28px', textAlign: 'center', color: 'var(--color-success)', fontSize: 14 }}>{status.success}</div>
+      <div id={formId} style={{ padding: '20px 24px 28px', textAlign: 'center', color: 'var(--color-success)', fontSize: 14 }}>{status.success}</div>
     );
   }
 
   return (
-    <form id="request-showing" onSubmit={submit} style={{ padding: '20px 24px 28px' }}>
+    <form id={formId} onSubmit={submit} style={{ padding: '20px 24px 28px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 12, flexWrap: 'wrap', textAlign: 'center' }}>
         <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-muted-dark)' }}>Select a Preferred Date</div>
         {/* Hardcoded number (2026-10-12) — AGENT_INFO.phone is empty live. */}
@@ -290,7 +317,7 @@ function RequestShowingForm({ listingId, listingAddress, dateOptions, user }) {
             fontWeight: tourType === 'in_person' ? 700 : 400,
           }}
         >
-          <input type="radio" name="tour-type" checked={tourType === 'in_person'} onChange={() => setTourType('in_person')} style={{ width: 'auto' }} /> 🏠
+          <input type="radio" name={`tour-type${radioSuffix}`} checked={tourType === 'in_person'} onChange={() => setTourType('in_person')} style={{ width: 'auto' }} /> 🏠
           In Person
         </label>
         <label
@@ -306,7 +333,7 @@ function RequestShowingForm({ listingId, listingAddress, dateOptions, user }) {
             fontWeight: tourType === 'virtual' ? 700 : 400,
           }}
         >
-          <input type="radio" name="tour-type" checked={tourType === 'virtual'} onChange={() => setTourType('virtual')} style={{ width: 'auto' }} /> 📱
+          <input type="radio" name={`tour-type${radioSuffix}`} checked={tourType === 'virtual'} onChange={() => setTourType('virtual')} style={{ width: 'auto' }} /> 📱
           Virtual
         </label>
       </div>
@@ -318,10 +345,10 @@ function RequestShowingForm({ listingId, listingAddress, dateOptions, user }) {
           Are you currently working with an agent?
         </div>
         <div style={{ display: 'flex', gap: 24 }}>
-          <RadioLabel name="working-with-agent-schedule" checked={workingWithAgent === 'yes'} onChange={() => setWorkingWithAgent('yes')}>
+          <RadioLabel name={`working-with-agent-schedule${radioSuffix}`} checked={workingWithAgent === 'yes'} onChange={() => setWorkingWithAgent('yes')}>
             Yes
           </RadioLabel>
-          <RadioLabel name="working-with-agent-schedule" checked={workingWithAgent === 'no'} onChange={() => setWorkingWithAgent('no')}>
+          <RadioLabel name={`working-with-agent-schedule${radioSuffix}`} checked={workingWithAgent === 'no'} onChange={() => setWorkingWithAgent('no')}>
             No
           </RadioLabel>
         </div>

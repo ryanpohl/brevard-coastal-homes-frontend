@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import { askIfAvailable, scrollToShowingForm } from '@/lib/listingAsk';
+import { askIfAvailable, scheduleTour } from '@/lib/listingAsk';
 
 // Number of thumbnails shown per "page" of the strip below the hero photo.
 const THUMBS_PER_PAGE = 6;
@@ -22,8 +22,8 @@ const THUMBS_PER_PAGE = 6;
 export default function PropertyGallery({ photos = [], address, alt, tourButton = false }) {
   // `alt` (2026-10-18): photo description from lib/listingPhotoAlt.js.
   // `tourButton` (2026-10-18, per Ryan): a "Schedule a Tour" button on the
-  // bottom left of the hero photo that scrolls to the Request Showing form
-  // (#request-showing in PropertyContactPanel.js) — another way to reach
+  // bottom left of the hero photo that opens the Request Showing form in a
+  // popup (PropertyContactPanel.js) — another way to reach
   // out, since there's no forced signup. Off for Pending/Sold listings,
   // which have no showing form.
   const altBase = alt || address;
@@ -187,7 +187,7 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
                   <div className="gallery-end-card__title">Want to see it in person?</div>
                   <div className="gallery-end-card__text">Ryan can set up a private tour, or find out if it’s still available.</div>
                   <div className="gallery-end-card__actions">
-                    <button type="button" className="gallery-end-card__primary" onClick={scrollToShowingForm}>
+                    <button type="button" className="gallery-end-card__primary" onClick={scheduleTour}>
                       Schedule a Tour
                     </button>
                     <button type="button" className="gallery-end-card__secondary" onClick={askIfAvailable}>
@@ -204,7 +204,7 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
             )}
 
 {tourButton && !showEndCard && (
-              <button type="button" onClick={scrollToShowingForm} className="gallery-tour-btn">
+              <button type="button" onClick={scheduleTour} className="gallery-tour-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <rect x="3" y="4" width="18" height="18" rx="2" />
                   <path d="M16 2v4M8 2v4M3 10h18" />
