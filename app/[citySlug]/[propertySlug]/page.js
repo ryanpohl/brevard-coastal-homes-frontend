@@ -41,7 +41,8 @@ import RecentlySold from '@/components/RecentlySold';
 import { getRecentlySold } from '@/lib/recentlySold';
 
 // Cities whose Homes/Condos pages show Recently Sold (see showRecentlySold).
-const RECENTLY_SOLD_CITIES = new Set(['melbourne-beach']);
+// Satellite Beach added 2026-10-19, per Ryan.
+const RECENTLY_SOLD_CITIES = new Set(['melbourne-beach', 'satellite-beach']);
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 
 // City page intro copy (2026-09-16, per Ryan, pasting one template and
