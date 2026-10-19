@@ -11,7 +11,9 @@ function formatDate(value) {
   return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-export default function RecentlySold({ name, data }) {
+// `noun` (2026-10-19): 'home' (default) or 'condo' — the city Condos page
+// says "Recently Sold Condos in Melbourne Beach" / "86 condos sold".
+export default function RecentlySold({ name, data, noun }) {
   if (!data || !data.count) return null;
   const { count, medianPrice, medianPerSqft, recent } = data;
   const shown = recent.slice(0, RECENTLY_SOLD_VISIBLE);
@@ -53,10 +55,10 @@ export default function RecentlySold({ name, data }) {
   return (
     <section className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 40px', maxWidth: 760 }}>
       <h2 style={{ fontSize: 24, marginBottom: 8, color: 'var(--color-ink)', fontFamily: 'var(--font-inter-tight)' }}>
-        Recently Sold in {name}
+        {noun ? `Recently Sold ${noun === 'condo' ? 'Condos' : 'Homes'} in ${name}` : `Recently Sold in ${name}`}
       </h2>
       <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 16 }}>
-        {count} {count === 1 ? 'home' : 'homes'} sold in {name} in the last 12 months
+        {count} {count === 1 ? noun || 'home' : `${noun || 'home'}s`} sold in {name} in the last 12 months
         {medianPrice ? <>, with a median sold price of <strong>{formatPrice(medianPrice)}</strong></> : null}
         {medianPerSqft ? <> and a median of <strong>{formatPrice(medianPerSqft)}/sq ft</strong></> : null}.
       </p>

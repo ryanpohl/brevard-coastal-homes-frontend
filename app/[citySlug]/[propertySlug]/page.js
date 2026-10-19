@@ -21,6 +21,7 @@ import {
   CITY_PAGE_SEO,
   buildCityPlaceSchema,
   CITY_NEIGHBORHOOD_LINKS,
+  formatPrice,
 } from '@/lib/constants';
 import { getMarketSnapshot } from '@/lib/marketSnapshot';
 import { getCityMarketReport, showsMarketReport } from '@/lib/cityMarketReport';
@@ -36,6 +37,11 @@ import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import BuildingInquiryModal from '@/components/BuildingInquiryModal';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import Faq from '@/components/Faq';
+import RecentlySold from '@/components/RecentlySold';
+import { getRecentlySold } from '@/lib/recentlySold';
+
+// Cities whose Homes/Condos pages show Recently Sold (see showRecentlySold).
+const RECENTLY_SOLD_CITIES = new Set(['melbourne-beach']);
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 
 // City page intro copy (2026-09-16, per Ryan, pasting one template and
@@ -795,6 +801,32 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   const marketReport = showMarketReport
     ? await getCityMarketReport({ citySlug, cityFilter: cityListingsQueryParams(citySlug), propertyType })
     : null;
+  // Recently Sold + live FAQ answers (2026-10-19, per Ryan: push Melbourne
+  // Beach homes/condos from page 2 onto page 1 — the neighborhood pages
+  // that rank #1, like Adelaide, all have a Recently Sold section). Plain
+  // Homes and Condos pages of RECENTLY_SOLD_CITIES; more cities can be
+  // added once Melbourne Beach shows whether it helps.
+  const showRecentlySold = RECENTLY_SOLD_CITIES.has(citySlug) && !isOceanfront && (propertySlug === 'homes-for-sale' || propertySlug === 'condos-for-sale');
+  const recentlySold = showRecentlySold ? await getRecentlySold({ ...cityListingsQueryParams(citySlug), propertyType }) : null;
+  const soldNoun = propertyType === 'Condo' ? 'condo' : 'home';
+  const liveSoldFaq =
+    recentlySold && recentlySold.count > 0
+      ? [
+          recentlySold.medianPrice && {
+            q: `What is the median sold price of a ${soldNoun} in ${city.name}?`,
+            a: `Over the last 12 months, ${city.name} ${soldNoun}s sold at a median price of ${formatPrice(recentlySold.medianPrice)}${
+              recentlySold.medianPerSqft ? `, about ${formatPrice(recentlySold.medianPerSqft)} per square foot` : ''
+            }, based on closed sales in the Space Coast MLS. Prices vary a lot between oceanfront, riverfront and in-between ${soldNoun}s, so ask Ryan Pohl for a price range on a specific ${soldNoun}.`,
+          },
+          {
+            q: `How many ${soldNoun}s sold in ${city.name} in the last year?`,
+            a: `${recentlySold.count} ${soldNoun}${recentlySold.count === 1 ? '' : 's'} sold in ${city.name} in the last 12 months${
+              recentlySold.activeCount != null ? `, and ${recentlySold.activeCount} ${recentlySold.activeCount === 1 ? 'is' : 'are'} for sale now` : ''
+            }. See the most recent sales in the Recently Sold section on this page.`,
+          },
+        ].filter(Boolean)
+      : [];
+  const faqItems = listingsFaqItems || liveSoldFaq.length ? [...liveSoldFaq, ...(listingsFaqItems || [])] : null;
   const pageTitle = isOceanfrontCombined
     ? `Oceanfront Homes & Condos For Sale in ${city.name}, FL`
     : isRiverfrontCombined
@@ -1015,6 +1047,8 @@ export default async function CityListingsPage({ params, searchParams: searchPar
         <CityMarketReport cityName={city.name} typeLabel={propertyType === 'Condo' ? 'Condos' : 'Homes'} report={marketReport} />
       )}
 
+      {recentlySold && <RecentlySold name={city.name} data={recentlySold} noun={soldNoun} />}
+
       {pageSeo && (
         <CityAboutSection
           config={citySeo}
@@ -1028,9 +1062,9 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           Placed after the listing grid/pagination, same "below the
           listings" spot Ryan asked for, so it never pushes the listings
           themselves down the page. */}
-      {listingsFaqItems && (
+      {faqItems && (
         <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px', maxWidth: 760 }}>
-          <Faq items={listingsFaqItems} />
+          <Faq items={faqItems} />
         </div>
       )}
     </div>
