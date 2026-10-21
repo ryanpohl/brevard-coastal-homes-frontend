@@ -42,8 +42,8 @@ import { getRecentlySold } from '@/lib/recentlySold';
 
 // Cities whose Homes/Condos pages show Recently Sold (see showRecentlySold).
 // Satellite Beach, Indialantic and Indian Harbour Beach added 2026-10-19,
-// Cocoa Beach 2026-10-21, per Ryan.
-const RECENTLY_SOLD_CITIES = new Set(['melbourne-beach', 'satellite-beach', 'indialantic', 'indian-harbour-beach', 'cocoa-beach']);
+// Cocoa Beach, Merritt Island and Viera West 2026-10-21, per Ryan.
+const RECENTLY_SOLD_CITIES = new Set(['melbourne-beach', 'satellite-beach', 'indialantic', 'indian-harbour-beach', 'cocoa-beach', 'merritt-island', 'viera-west']);
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 
 // City page intro copy (2026-09-16, per Ryan, pasting one template and
@@ -818,7 +818,9 @@ export default async function CityListingsPage({ params, searchParams: searchPar
             q: `What is the median sold price of a ${soldNoun} in ${city.name}?`,
             a: `Over the last 12 months, ${city.name} ${soldNoun}s sold at a median price of ${formatPrice(recentlySold.medianPrice)}${
               recentlySold.medianPerSqft ? `, about ${formatPrice(recentlySold.medianPerSqft)} per square foot` : ''
-            }, based on closed sales in the Space Coast MLS. Prices vary a lot between oceanfront, riverfront and in-between ${soldNoun}s, so ask Ryan Pohl for a price range on a specific ${soldNoun}.`,
+            }, based on closed sales in the Space Coast MLS. Prices vary a lot ${
+              OCEANFRONT_CITY_SLUGS.includes(citySlug) ? `between oceanfront, riverfront and in-between ${soldNoun}s` : `by neighborhood, size and age`
+            }, so ask Ryan Pohl for a price range on a specific ${soldNoun}.`,
           },
           {
             q: `How many ${soldNoun}s sold in ${city.name} in the last year?`,
