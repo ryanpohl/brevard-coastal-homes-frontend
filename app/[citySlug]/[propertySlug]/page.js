@@ -825,7 +825,7 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           },
           {
             q: `How many ${soldNoun}s sold in ${city.name} in the last year?`,
-            a: `${recentlySold.count} ${soldNoun}${recentlySold.count === 1 ? '' : 's'} sold in ${city.name} in the last 12 months${
+            a: `${recentlySold.count.toLocaleString('en-US')} ${soldNoun}${recentlySold.count === 1 ? '' : 's'} sold in ${city.name} in the last 12 months${
               recentlySold.activeCount != null ? `, and ${recentlySold.activeCount} ${recentlySold.activeCount === 1 ? 'is' : 'are'} for sale now` : ''
             }. See the most recent sales in the Recently Sold section on this page.`,
           },

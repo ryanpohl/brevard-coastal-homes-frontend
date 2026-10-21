@@ -58,7 +58,7 @@ export default function RecentlySold({ name, data, noun }) {
         {noun ? `Recently Sold ${noun === 'condo' ? 'Condos' : 'Homes'} in ${name}` : `Recently Sold in ${name}`}
       </h2>
       <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 16 }}>
-        {count} {count === 1 ? noun || 'home' : `${noun || 'home'}s`} sold in {name} in the last 12 months
+        {count.toLocaleString('en-US')} {count === 1 ? noun || 'home' : `${noun || 'home'}s`} sold in {name} in the last 12 months
         {medianPrice ? <>, with a median sold price of <strong>{formatPrice(medianPrice)}</strong></> : null}
         {medianPerSqft ? <> and a median of <strong>{formatPrice(medianPerSqft)}/sq ft</strong></> : null}.
       </p>
