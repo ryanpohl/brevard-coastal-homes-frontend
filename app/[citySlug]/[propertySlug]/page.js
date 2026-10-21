@@ -42,8 +42,9 @@ import { getRecentlySold } from '@/lib/recentlySold';
 
 // Cities whose Homes/Condos pages show Recently Sold (see showRecentlySold).
 // Satellite Beach, Indialantic and Indian Harbour Beach added 2026-10-19,
-// Cocoa Beach, Merritt Island and Viera West 2026-10-21, per Ryan.
-const RECENTLY_SOLD_CITIES = new Set(['melbourne-beach', 'satellite-beach', 'indialantic', 'indian-harbour-beach', 'cocoa-beach', 'merritt-island', 'viera-west']);
+// Cocoa Beach, Merritt Island and Viera West 2026-10-21, then Melbourne,
+// Viera and Rockledge the same day, per Ryan.
+const RECENTLY_SOLD_CITIES = new Set(['melbourne-beach', 'satellite-beach', 'indialantic', 'indian-harbour-beach', 'cocoa-beach', 'merritt-island', 'viera-west', 'melbourne', 'viera', 'rockledge']);
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 
 // City page intro copy (2026-09-16, per Ryan, pasting one template and
