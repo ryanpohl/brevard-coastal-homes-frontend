@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { askIfAvailable, scheduleTour } from '@/lib/listingAsk';
-import { tourEmbedUrl } from '@/lib/virtualTour';
+import { tourEmbedUrl, visibleTourUrl } from '@/lib/virtualTour';
 
 // Number of thumbnails shown per "page" of the strip below the hero photo.
 const THUMBS_PER_PAGE = 6;
@@ -21,7 +21,8 @@ const THUMBS_PER_PAGE = 6;
  * listing, with no MLS field behind it). Was: that tab showed a placeholder instead of
  * crashing or silently doing nothing.
  */
-export default function PropertyGallery({ photos = [], address, alt, tourButton = false, virtualTourUrl = null }) {
+export default function PropertyGallery({ photos = [], address, alt, tourButton = false, virtualTourUrl: mlsTourUrl = null }) {
+  const virtualTourUrl = visibleTourUrl(mlsTourUrl);
   const tourEmbed = virtualTourUrl ? tourEmbedUrl(virtualTourUrl) : null;
   // `alt` (2026-10-18): photo description from lib/listingPhotoAlt.js.
   // `tourButton` (2026-10-18, per Ryan): a "Schedule a Tour" button on the
