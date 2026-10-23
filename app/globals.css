@@ -2752,3 +2752,47 @@ textarea:focus {
     flex: 1 1 100%;
   }
 }
+
+/* Virtual tour tab (PropertyGallery.js, 2026-10-23, per Ryan). */
+.tour-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-top: 12px;
+}
+
+.tour-actions a {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-gold-text);
+}
+
+.tour-linkout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  height: clamp(240px, 42vw, 460px);
+  padding: 20px;
+  border-radius: 4px;
+  background: var(--color-border-light);
+  text-align: center;
+}
+
+.tour-linkout__title {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  color: var(--color-ink);
+}
+
+.tour-linkout__secondary {
+  border: none;
+  background: none;
+  color: var(--color-muted-dark);
+  font-size: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+}

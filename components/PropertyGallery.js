@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { askIfAvailable, scheduleTour } from '@/lib/listingAsk';
+import { tourEmbedUrl } from '@/lib/virtualTour';
 
 // Number of thumbnails shown per "page" of the strip below the hero photo.
 const THUMBS_PER_PAGE = 6;
@@ -15,11 +16,13 @@ const THUMBS_PER_PAGE = 6;
  * 6) — matches design/design_files/Property Detail.dc.html, extended with
  * arrow navigation per Ryan (2026-08-10) so large photo counts (e.g. 70+)
  * are actually browsable instead of only the first 7 photos being reachable.
- * Plus a Photos / Virtual Tour tab pair. Virtual Tour has no backing data
- * yet (no MLS field for it), so that tab shows a placeholder instead of
+ * Plus a Photos / Virtual Tour tab pair, shown only when the listing has a
+ * tour (`virtualTourUrl`, 2026-10-23 — it used to be a placeholder on every
+ * listing, with no MLS field behind it). Was: that tab showed a placeholder instead of
  * crashing or silently doing nothing.
  */
-export default function PropertyGallery({ photos = [], address, alt, tourButton = false }) {
+export default function PropertyGallery({ photos = [], address, alt, tourButton = false, virtualTourUrl = null }) {
+  const tourEmbed = virtualTourUrl ? tourEmbedUrl(virtualTourUrl) : null;
   // `alt` (2026-10-18): photo description from lib/listingPhotoAlt.js.
   // `tourButton` (2026-10-18, per Ryan): a "Schedule a Tour" button on the
   // bottom left of the hero photo that opens the Request Showing form in a
@@ -295,26 +298,43 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
                   </div>
           )}
 </>
+      ) : tourEmbed ? (
+        <div>
+          <iframe
+            src={tourEmbed}
+            title={`Virtual tour of ${address}`}
+            allow="fullscreen; xr-spatial-tracking; autoplay"
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            style={{ width: '100%', height: 'clamp(260px, 46vw, 500px)', border: 0, borderRadius: 4, background: 'var(--color-border-light)' }}
+          />
+          <div className="tour-actions">
+            <a href={virtualTourUrl} target="_blank" rel="noopener noreferrer">
+              Open the tour full screen ↗
+            </a>
+            {tourButton && (
+              <button type="button" className="btn btn-gold" onClick={() => scheduleTour()}>
+                Like what you see? Schedule a Tour
+              </button>
+            )}
+          </div>
+        </div>
       ) : (
-                <div
-                  style={{
-                    width: '100%',
-                                height: 'clamp(240px, 42vw, 460px)',
-                                borderRadius: 4,
-                                background: 'var(--color-border-light)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                textAlign: 'center',
-                                color: 'var(--color-muted)',
-                                fontSize: 14,
-                                padding: 20,
-                  }}
-                >
-                  Virtual tour not available for this listing yet.
+        <div className="tour-linkout">
+          <div className="tour-linkout__title">Take the virtual tour of this home</div>
+          <a className="btn btn-primary" href={virtualTourUrl} target="_blank" rel="noopener noreferrer">
+            Open the virtual tour ↗
+          </a>
+          {tourButton && (
+            <button type="button" className="tour-linkout__secondary" onClick={() => scheduleTour()}>
+              Or schedule a private tour in person
+            </button>
+          )}
         </div>
       )}
 
+      {virtualTourUrl && (
       <div style={{ display: 'flex', gap: 28, marginTop: 20, borderBottom: '1px solid var(--color-border-light)', paddingBottom: 14 }}>
         <button
           type="button"
@@ -357,6 +377,7 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
           ▶ Virtual Tour
             </button>
             </div>
+      )}
             </div>
   );
 }

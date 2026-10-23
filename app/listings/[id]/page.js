@@ -236,7 +236,7 @@ export default async function ListingDetailPage({ params }) {
           {/* Open house times from the MLS (2026-10-18, per Ryan). */}
           {listing.status === 'Active' && <OpenHouseBanner openHouses={listing.openHouses} />}
                     <div style={{ position: 'relative' }}>
-            <PropertyGallery photos={photos} address={listing.address} alt={listingPhotoAlt(listing)} tourButton={listing.status !== 'Pending' && listing.status !== 'Sold'} />
+            <PropertyGallery photos={photos} address={listing.address} alt={listingPhotoAlt(listing)} tourButton={listing.status !== 'Pending' && listing.status !== 'Sold'} virtualTourUrl={listing.virtualTourUrl} />
             {/* Pending/Sold banner on the photo (2026-10-04, per Ryan) — sold
                 homes stay on the site for 30 days with the close date shown. */}
             {(listing.status === 'Sold' || listing.status === 'Pending' || listing.statusLabel === 'Contingent') && (
