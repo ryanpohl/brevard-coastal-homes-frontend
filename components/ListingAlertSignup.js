@@ -38,7 +38,9 @@ export function ListingAlertJumpLink({ label }) {
   );
 }
 
-export default function ListingAlertSignup({ label, filter, kind = 'home' }) {
+// `title`/`sub` (2026-10-24): own wording for the city oceanfront pages,
+// e.g. "Get Cocoa Beach oceanfront condos & price drops by email".
+export default function ListingAlertSignup({ label, filter, kind = 'home', title, sub }) {
   const pathname = usePathname();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState({ sending: false, error: '', done: '' });
@@ -63,9 +65,9 @@ export default function ListingAlertSignup({ label, filter, kind = 'home' }) {
   return (
     <section id="listing-alerts" className="listing-alert" aria-label={`Listing alerts for ${label}`}>
       <div className="listing-alert__text">
-        <div className="listing-alert__title">Get {label} listings &amp; price drops by email</div>
+        <div className="listing-alert__title">{title || <>Get {label} listings &amp; price drops by email</>}</div>
         <div className="listing-alert__sub">
-          Be the first to know when a {kind} is listed in {label} or drops its price. No account needed — unsubscribe
+          {sub || <>Be the first to know when a {kind} is listed in {label} or drops its price.</>} No account needed — unsubscribe
           anytime.
         </div>
       </div>

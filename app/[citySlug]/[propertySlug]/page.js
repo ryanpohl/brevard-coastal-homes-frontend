@@ -33,6 +33,7 @@ import CondoBuildingComparison from '@/components/CondoBuildingComparison';
 import { getCondoBuildingComparison } from '@/lib/condoBuildings';
 import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
+import ListingAlertSignup from '@/components/ListingAlertSignup';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import BuildingInquiryModal from '@/components/BuildingInquiryModal';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
@@ -831,6 +832,21 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           },
         ].filter(Boolean)
       : [];
+  // New-listing & price-drop alerts on the oceanfront pages (2026-10-24,
+  // per Ryan) — narrow enough to stay occasional, unlike citywide alerts,
+  // which Ryan turned down. Only when something is for sale there now.
+  const oceanfrontNoun = isOceanfrontCombined ? 'homes & condos' : propertyType === 'Condo' ? 'condos' : 'homes';
+  const oceanfrontAlert =
+    (isOceanfront || isOceanfrontCombined) && (snapshot ? snapshot.count > 0 : total > 0)
+      ? {
+          label: `${city.name} oceanfront ${oceanfrontNoun}`,
+          filter: {
+            ...cityListingsQueryParams(citySlug),
+            propertyType: isOceanfrontCombined ? 'Home,Condo' : propertyType,
+            waterfront: 'Oceanfront',
+          },
+        }
+      : null;
   const faqItems = listingsFaqItems || liveSoldFaq.length ? [...liveSoldFaq, ...(listingsFaqItems || [])] : null;
   const pageTitle = isOceanfrontCombined
     ? `Oceanfront Homes & Condos For Sale in ${city.name}, FL`
@@ -1020,6 +1036,14 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           page={page}
           totalPages={totalPages}
         />
+        {oceanfrontAlert && (
+          <ListingAlertSignup
+            label={oceanfrontAlert.label}
+            filter={oceanfrontAlert.filter}
+            title={isOceanfrontCombined ? `Get new ${city.name} oceanfront listings & price drops by email` : `Get ${oceanfrontAlert.label} & price drops by email`}
+            sub={`Be the first to know when an oceanfront ${isOceanfrontCombined ? 'home or condo' : propertyType === 'Condo' ? 'condo' : 'home'} is listed in ${city.name} or drops its price.`}
+          />
+        )}
         {/* Free relocation guide offer, opening with this town (2026-10-11). */}
         <RelocationGuidePromo townSlug={citySlug} />
         {/* Relocation guide as a gentle pop-up offer (2026-10-13) — PageEmailPrompt.js. */}
