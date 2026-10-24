@@ -6,7 +6,7 @@ import { OPEN_HOUSE_CITIES, openHousePath } from '@/lib/openHousePages';
 import { openHouseDayLabel } from '@/lib/openHouseLabel';
 import { REALTOR_PAGES } from '@/lib/realtorPages';
 import ListingCard from '@/components/ListingCard';
-import ListingAlertSignup from '@/components/ListingAlertSignup';
+import OpenHouseEmailSignup from '@/components/OpenHouseEmailSignup';
 import Faq from '@/components/Faq';
 
 // "{City} Open Houses" page (2026-10-24, per Ryan) — every upcoming open
@@ -148,12 +148,7 @@ export default async function CityOpenHousesPage({ params }) {
       ))}
 
       <div style={{ maxWidth: 760, fontSize: 17, lineHeight: 1.65, marginTop: 40 }}>
-        <ListingAlertSignup
-          label={`${city.name} listings`}
-          filter={cityListingsQueryParams(citySlug)}
-          title={`Get new ${city.name} listings & price drops by email`}
-          sub={`Be the first to know when a home or condo is listed in ${city.name} or drops its price.`}
-        />
+        <OpenHouseEmailSignup townName={city.name} filter={cityListingsQueryParams(citySlug)} />
         <p style={{ margin: '28px 0' }}>
           <Link href={`/${citySlug}/homes-for-sale`} style={{ color: '#000', fontWeight: 600, textDecoration: 'underline' }}>
             All {city.name} homes for sale →
