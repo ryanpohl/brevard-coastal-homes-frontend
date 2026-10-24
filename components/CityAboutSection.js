@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { formatPrice, cityListingsQueryParams } from '@/lib/constants';
 import SoldReportSignup from '@/components/SoldReportSignup';
 import { REALTOR_PAGES } from '@/lib/realtorPages';
+import { OPEN_HOUSE_CITIES, openHousePath } from '@/lib/openHousePages';
 
 // "About {city} …" section for CITY_PAGE_SEO pages (2026-10-03) — page-
 // specific copy, a live market snapshot, an agent line, and links to the
@@ -37,6 +38,15 @@ export default function CityAboutSection({ config, page, currentPath, snapshot }
           <strong style={{ color: 'var(--color-ink)' }}>Selling or buying in {realtorPage.name}?</strong>{' '}
           <Link href={realtorPage.path} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
             Work with Ryan, your {realtorPage.name} Realtor →
+          </Link>
+        </p>
+      )}
+      {/* Link to the city's Open Houses page (2026-10-24). */}
+      {OPEN_HOUSE_CITIES[citySlug] && currentPath !== openHousePath(citySlug) && (
+        <p style={{ fontSize: 17, margin: '0 0 28px' }}>
+          <strong style={{ color: 'var(--color-ink)' }}>Going to open houses?</strong>{' '}
+          <Link href={openHousePath(citySlug)} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+            See this weekend&apos;s {OPEN_HOUSE_CITIES[citySlug].name} open houses →
           </Link>
         </p>
       )}

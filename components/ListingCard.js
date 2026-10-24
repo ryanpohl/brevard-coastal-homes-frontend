@@ -13,7 +13,7 @@ import { isWatchedHome } from '@/lib/alertMemory';
 import { shortOpenHouseLabel } from '@/lib/openHouseLabel';
 import { SAVED_EVENT, requestSaveHome } from './SaveHomeHost';
 
-export default function ListingCard({ listing, onHoverChange, priority = false }) {
+export default function ListingCard({ listing, onHoverChange, priority = false, openHouse }) {
     const { signedIn, token } = useAuth();
     const [favorited, setFavorited] = useState(listing.isFavorited);
     // Signed-out visitors who saved this home by email (SaveHomeHost.js).
@@ -132,7 +132,9 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
   // Open house badge (2026-10-24, per Ryan) — takes the Days on Market
   // pill's spot when the home has an upcoming open house; the listing
   // page's OpenHouseBanner shows every time plus "Want Ryan to meet you there?".
-  const nextOpenHouse = listing.status === 'Active' && listing.openHouses?.length ? listing.openHouses[0] : null;
+  // `openHouse` overrides which one shows (the Open Houses pages' Sunday
+  // group shows Sunday's time even when the home is also open Saturday).
+  const nextOpenHouse = openHouse || (listing.status === 'Active' && listing.openHouses?.length ? listing.openHouses[0] : null);
 
   const priceReduction =
         listing.originalListPrice != null && listing.originalListPrice > listing.price
@@ -266,7 +268,7 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
                 on Market" listing (synced today) still shows the badge. */}
 {nextOpenHouse && (
               <div className="card-open-house-badge">
-                <span className="card-open-house-badge__label">Open House</span> {shortOpenHouseLabel(nextOpenHouse)}
+                <span className="card-open-house-badge__label">Open House</span> {shortOpenHouseLabel(nextOpenHouse, { timeOnly: Boolean(openHouse) })}
               </div>
           )}
 {!nextOpenHouse && listing.daysOnMarket != null && listing.status !== 'Sold' && (

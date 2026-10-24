@@ -2815,3 +2815,18 @@ textarea:focus {
   letter-spacing: 0.6px;
   text-transform: uppercase;
 }
+
+/* "{City} Open Houses" page call-out (2026-10-24). */
+.open-house-page__cta {
+  margin: 4px 0 0;
+  padding: 12px 16px;
+  border-left: 4px solid var(--color-gold);
+  background: #fff;
+  color: var(--color-ink);
+}
+
+.open-house-page__cta a {
+  color: var(--color-ink);
+  font-weight: 700;
+  text-decoration: underline;
+}

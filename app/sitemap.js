@@ -15,6 +15,7 @@ import {
 } from '@/lib/constants';
 import { MARKET_REPORTS } from '@/lib/marketReports';
 import { REALTOR_PAGES } from '@/lib/realtorPages';
+import { OPEN_HOUSE_CITIES, openHousePath } from '@/lib/openHousePages';
 
 // Native Next.js sitemap.xml (2026-09-11, SEO audit finding: brevardcoastalhomes.com/sitemap.xml
 // 404s). Same root cause as robots.js's comment: the backend DOES generate a real sitemap
@@ -316,6 +317,11 @@ export default async function sitemap() {
   // "{Area} Realtor" pages (lib/realtorPages.js).
   Object.values(REALTOR_PAGES).forEach((page) => {
     entries.push({ url: `${SITE_URL}${page.path}`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 });
+  });
+
+  // "{City} Open Houses" pages (lib/openHousePages.js) — change daily.
+  Object.keys(OPEN_HOUSE_CITIES).forEach((citySlug) => {
+    entries.push({ url: `${SITE_URL}${openHousePath(citySlug)}`, lastModified: now, changeFrequency: 'daily', priority: 0.7 });
   });
 
   const listingIds = await getAllListingIds();
