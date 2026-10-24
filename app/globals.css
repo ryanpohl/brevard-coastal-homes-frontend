@@ -2796,3 +2796,22 @@ textarea:focus {
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* Open house badge on listing cards (2026-10-24) — same dark/gold look as
+   the listing page's .open-house-banner. */
+.card-open-house-badge {
+  padding: 6px 12px;
+  border-radius: 14px;
+  background: var(--color-ink);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  line-height: 1.35;
+}
+
+.card-open-house-badge__label {
+  color: var(--color-gold);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}

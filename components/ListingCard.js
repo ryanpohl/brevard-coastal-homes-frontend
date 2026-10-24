@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
 import CardAlertButton from './CardAlertButton';
 import { isWatchedHome } from '@/lib/alertMemory';
+import { shortOpenHouseLabel } from '@/lib/openHouseLabel';
 import { SAVED_EVENT, requestSaveHome } from './SaveHomeHost';
 
 export default function ListingCard({ listing, onHoverChange, priority = false }) {
@@ -128,6 +129,11 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
   // Days on Market badge above. Ryan asked specifically for the reduction
   // amount to render in red (`--color-error`) — not Zillow's own
   // green/down-is-good convention.
+  // Open house badge (2026-10-24, per Ryan) — takes the Days on Market
+  // pill's spot when the home has an upcoming open house; the listing
+  // page's OpenHouseBanner shows every time plus "Want Ryan to meet you there?".
+  const nextOpenHouse = listing.status === 'Active' && listing.openHouses?.length ? listing.openHouses[0] : null;
+
   const priceReduction =
         listing.originalListPrice != null && listing.originalListPrice > listing.price
         ? listing.originalListPrice - listing.price
@@ -172,7 +178,7 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
               priority={priority}
             />
         )}
-        <div style={{ position: 'absolute', top: 10, left: 10, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
+        <div style={{ position: 'absolute', top: 10, left: 10, right: 92, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
 {/* Pending badge (2026-09-13, per Ryan: "Show all listings from the
                 MLS...not just current ones" — clarified as Active + Pending).
                 Cards previously only ever showed Active listings, so there was
@@ -258,7 +264,12 @@ export default function ListingCard({ listing, onHoverChange, priority = false }
                 case the badge is simply omitted rather than showing a
                 placeholder. Explicit `!= null` (not truthy) so a real "0 Days
                 on Market" listing (synced today) still shows the badge. */}
-{listing.daysOnMarket != null && listing.status !== 'Sold' && (
+{nextOpenHouse && (
+              <div className="card-open-house-badge">
+                <span className="card-open-house-badge__label">Open House</span> {shortOpenHouseLabel(nextOpenHouse)}
+              </div>
+          )}
+{!nextOpenHouse && listing.daysOnMarket != null && listing.status !== 'Sold' && (
               <div
                style={{
                                  padding: '6px 12px',
