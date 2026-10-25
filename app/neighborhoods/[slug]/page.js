@@ -197,6 +197,52 @@ const VIERA_BUILDERS_GRID = [
   ...VIERA_BUILDERS_SUB_COMMUNITIES.filter((c) => c.comingSoon),
 ];
 
+// The other Viera Builders communities as a 2-column link list — on the 6
+// sub-community pages and on Avalonia (2026-10-25, per Ryan: Avalonia
+// should match Reeling Park, Pangea Park & Laurasia).
+function VieraBuildersLinks({ currentSlug, heading }) {
+  return (
+    <>
+      <h2
+        style={{
+          fontSize: 'clamp(22px, 3vw, 30px)',
+          marginBottom: 8,
+          fontFamily: 'var(--font-inter-tight)',
+          fontWeight: 800,
+        }}
+      >
+        {heading}
+      </h2>
+      <ul
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+          maxWidth: 760,
+          columnGap: 40,
+          rowGap: 14,
+          fontSize: 'clamp(19px, 3vw, 26px)',
+          fontWeight: 600,
+          lineHeight: 1.4,
+          marginBottom: 20,
+          paddingLeft: 22,
+        }}
+      >
+        {VIERA_BUILDERS_GRID.filter((c) => c.slug !== currentSlug).map((c) => (
+          <li key={c.slug}>
+            <Link
+              href={`/neighborhoods/${c.slug}`}
+              style={{ color: '#000', textDecoration: 'underline', textUnderlineOffset: 3 }}
+            >
+              {c.name}
+            </Link>
+            {c.comingSoon ? ' (Coming Soon)' : ''}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
 function modelTourWith(name) {
   return MODEL_TOUR_WITH[name] || 'the builders’ sales agents';
 }
@@ -1427,46 +1473,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             subCommunity (truthy only for the 6 leaf pages — the hub page
             itself uses isVieraBuildersCommunitiesVieraWest above instead,
             so the two blocks never both render). */}
-        {subCommunity && (
-          <>
-            <h2
-              style={{
-                fontSize: 'clamp(22px, 3vw, 30px)',
-                marginBottom: 8,
-                fontFamily: 'var(--font-inter-tight)',
-                fontWeight: 800,
-              }}
-            >
-              {VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_H1}
-            </h2>
-            <ul
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-                maxWidth: 760,
-                columnGap: 40,
-                rowGap: 14,
-                fontSize: 'clamp(19px, 3vw, 26px)',
-                fontWeight: 600,
-                lineHeight: 1.4,
-                marginBottom: 20,
-                paddingLeft: 22,
-              }}
-            >
-              {VIERA_BUILDERS_GRID.filter((c) => c.slug !== subCommunity.slug).map((c) => (
-                <li key={c.slug}>
-                  <Link
-                    href={`/neighborhoods/${c.slug}`}
-                    style={{ color: '#000', textDecoration: 'underline', textUnderlineOffset: 3 }}
-                  >
-                    {c.name}
-                  </Link>
-                  {c.comingSoon ? ' (Coming Soon)' : ''}
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
+        {subCommunity && <VieraBuildersLinks currentSlug={subCommunity.slug} heading={VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_H1} />}
         {/* Harbor Island Beach Club subtext — replaced entirely 2026-09-16,
             per Ryan: "Can you change the text on the harbor Island Beach
             Club to the following & add a link to 'Contact Us Today' and
@@ -1958,6 +1965,10 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               to get started.
             </p>
           </div>
+        )}
+        {/* Avalonia gets the same Viera Builders link list (2026-10-25). */}
+        {VIERA_BUILDERS_GRID_EXTRAS.some((c) => c.slug === slug) && (
+          <VieraBuildersLinks currentSlug={slug} heading={VIERA_BUILDERS_COMMUNITIES_VIERA_WEST_H1} />
         )}
         {/* Area Guide link (2026-09-24, per Ryan) — same placement/styling
             as the city pages' own link (app/[citySlug]/[propertySlug]/
