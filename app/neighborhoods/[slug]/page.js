@@ -523,8 +523,10 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // lib/constants.js.
   const landingPage = NEIGHBORHOOD_LANDING_PAGES[slug];
   // Pages with their own `related` links (Adelaide, Aripeka, Summer Lakes —
-  // COMMUNITY_SEO) skip the sibling row; see `related` there.
-  const siblingLinks = COMMUNITY_SEO[slug]?.related ? null : siblingNeighborhoodLinks(slug);
+  // COMMUNITY_SEO) skip the sibling row; see `related` there. Avalonia
+  // shows it anyway (2026-10-25, per Ryan: match Reeling Park).
+  const isVieraBuildersExtra = VIERA_BUILDERS_GRID_EXTRAS.some((c) => c.slug === slug);
+  const siblingLinks = COMMUNITY_SEO[slug]?.related && !isVieraBuildersExtra ? null : siblingNeighborhoodLinks(slug);
 
   let neighborhood;
   if (landingPage) {
