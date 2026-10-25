@@ -344,6 +344,13 @@ export default async function ListingDetailPage({ params }) {
                   </span>
                 )}
               </div>
+              {/* Days on Market under the price (2026-10-25, per Ryan) — same
+                  CDOM number and wording as the listing cards' badge. */}
+              {listing.daysOnMarket != null && listing.status !== 'Sold' && (
+                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-muted-dark)', marginTop: 4 }}>
+                  {listing.daysOnMarket} Days on Market
+                </div>
+              )}
               {/* Estimated monthly payment (2026-10-11, per Ryan) — opens the
                   full calculator, pre-filled with this home. Not for land or
                   sold homes. */}
