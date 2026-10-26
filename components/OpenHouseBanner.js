@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { scheduleTour } from '@/lib/listingAsk';
 
 /**
@@ -28,7 +29,9 @@ function label(oh) {
   return [formatDay(oh.date), oh.start ? [formatTime(oh.start), formatTime(oh.end)].filter(Boolean).join(' – ') : null].filter(Boolean).join(' · ');
 }
 
-export default function OpenHouseBanner({ openHouses }) {
+// `cityPage` ({ name, href }, 2026-10-26): links to that city's Open Houses
+// page, where visitors can sign up for the Friday open house email.
+export default function OpenHouseBanner({ openHouses, cityPage }) {
   if (!openHouses?.length) return null;
   return (
     <div className="open-house-banner">
@@ -39,6 +42,11 @@ export default function OpenHouseBanner({ openHouses }) {
             {label(oh)}
           </span>
         ))}
+        {cityPage && (
+          <Link href={cityPage.href} className="open-house-banner__link">
+            See all {cityPage.name} open houses this weekend →
+          </Link>
+        )}
       </div>
       <button type="button" className="open-house-banner__btn" onClick={() => scheduleTour({ openHouse: true })}>
         Want Ryan to meet you there?

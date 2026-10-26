@@ -10,6 +10,7 @@ import { homeKind, monthlyHoa } from '@/lib/mortgage';
 import { listingPhotoAlt } from '@/lib/listingPhotoAlt';
 import PropertyGallery from '@/components/PropertyGallery';
 import OpenHouseBanner from '@/components/OpenHouseBanner';
+import { OPEN_HOUSE_CITIES, openHousePath } from '@/lib/openHousePages';
 import PropertyContactPanel from '@/components/PropertyContactPanel';
 import { ContactBarMessage } from '@/components/MobileContactBar';
 import ListingEmailPrompt from '@/components/ListingEmailPrompt';
@@ -234,7 +235,16 @@ export default async function ListingDetailPage({ params }) {
 {/* LEFT: photos, header, stats, description, map */}
         <div>
           {/* Open house times from the MLS (2026-10-18, per Ryan). */}
-          {listing.status === 'Active' && <OpenHouseBanner openHouses={listing.openHouses} />}
+          {listing.status === 'Active' && (
+            <OpenHouseBanner
+              openHouses={listing.openHouses}
+              cityPage={
+                OPEN_HOUSE_CITIES[listing.city?.slug]
+                  ? { name: OPEN_HOUSE_CITIES[listing.city.slug].name, href: openHousePath(listing.city.slug) }
+                  : null
+              }
+            />
+          )}
                     <div style={{ position: 'relative' }}>
             <PropertyGallery photos={photos} address={listing.address} alt={listingPhotoAlt(listing)} tourButton={listing.status !== 'Pending' && listing.status !== 'Sold'} virtualTourUrl={listing.virtualTourUrl} />
             {/* Pending/Sold banner on the photo (2026-10-04, per Ryan) — sold

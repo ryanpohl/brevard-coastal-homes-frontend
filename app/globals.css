@@ -2736,6 +2736,14 @@ textarea:focus {
   font-weight: 600;
 }
 
+.open-house-banner__link {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .open-house-banner__btn {
   padding: 9px 16px;
   border: none;
