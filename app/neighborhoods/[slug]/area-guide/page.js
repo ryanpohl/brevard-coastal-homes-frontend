@@ -80,6 +80,12 @@ export async function generateMetadata(props) {
   return withSocialPreview(meta, photo);
 }
 
+// Area Guides that Google shows for the neighborhood's own name, where
+// searchers want listings (2026-10-26, per Ryan: Lansing Island ranked #5
+// and Tortoise Island about #4 with no clicks) — the title says "Homes for
+// Sale" so they know listings are a click away.
+const HOMES_FOR_SALE_TITLE_SLUGS = new Set(['lansing-island', 'tortoise-island']);
+
 async function buildMetadata({ params }) {
   const { slug } = await params;
   if (!NEIGHBORHOOD_AREA_GUIDE_CONTENT[slug]) return {};
@@ -105,6 +111,13 @@ async function buildMetadata({ params }) {
   }
   try {
     const { neighborhood } = await api.getNeighborhood(slug);
+    if (HOMES_FOR_SALE_TITLE_SLUGS.has(slug)) {
+      return {
+        title: `${neighborhood.name} Homes for Sale & Area Guide | Brevard Coastal Homes`,
+        description: `${neighborhood.name} homes for sale, plus what to know before you buy: amenities, schools, HOA fees, current market stats, and FAQs.`,
+        alternates: { canonical: `/neighborhoods/${slug}/area-guide` },
+      };
+    }
     return {
       title: `${neighborhood.name} Area Guide | Brevard Coastal Homes`,
       description: `What to know before buying in ${neighborhood.name}, FL: amenities, schools, HOA fees, current market stats, and FAQs.`,
