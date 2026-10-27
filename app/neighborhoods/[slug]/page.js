@@ -261,6 +261,7 @@ const GUIDE_LINK_BELOW = new Set(['aripeka', 'adelaide', 'harbor-island-beach-cl
 const COMMUNITY_FACTS = {
   'harbor-island-beach-club': ['Gated', 'Ocean to River', 'Private Beach', '42-Slip Marina', '146 Residences'],
   aquarina: ['Gated', 'Ocean to River with Boat Ramp', '18-Hole Golf', 'Har-Tru Tennis', 'Private Beach Club', 'Fitness Center'],
+  adelaide: ['Guard-Gated', '120-Acre Lake', '25-Acre Preserve', 'DecoTurf Tennis', 'Tea Tree Park', 'Lakeside Trails'],
 };
 
 function CommunityFacts({ slug }) {
@@ -1824,6 +1825,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             Aripeka block above. */}
         {isAdelaide && (
           <div style={{ marginBottom: 12 }}>
+            <CommunityFacts slug={slug} />
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
               Explore new construction and existing homes for sale in Adelaide in Viera. With three custom home builders to
               choose from, we can help you compare options, set up private tours of the model homes, negotiate with
