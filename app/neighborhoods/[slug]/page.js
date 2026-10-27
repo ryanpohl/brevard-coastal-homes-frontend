@@ -261,7 +261,7 @@ const GUIDE_LINK_BELOW = new Set(['aripeka', 'adelaide', 'harbor-island-beach-cl
 const COMMUNITY_FACTS = {
   'harbor-island-beach-club': ['Gated', 'Ocean to River', 'Private Beach', '42-Slip Marina', '146 Residences'],
   aquarina: ['Gated', 'Ocean to River with Boat Ramp', '18-Hole Golf', 'Har-Tru Tennis', 'Private Beach Club', 'Fitness Center'],
-  adelaide: ['Guard-Gated', '120-Acre Lake', 'Basketball Court', 'DecoTurf Tennis', 'Tea Tree Park', 'Jogging & Nature Trails'],
+  adelaide: ['Guard-Gated', '120-Acre Lake', 'Basketball Court', '2 DecoTurf Tennis Courts', 'Tea Tree Park', 'Jogging & Nature Trails'],
 };
 
 function CommunityFacts({ slug }) {
