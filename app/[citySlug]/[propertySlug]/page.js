@@ -309,11 +309,11 @@ const OCEANFRONT_PAGE_EXCLUDED_MLS_NUMBERS = [
 export async function generateMetadata(props) {
   const { citySlug, propertySlug } = await props.params;
   let filter;
-  if (propertySlug === OCEANFRONT_LISTINGS_SLUG) filter = { city: citySlug, propertyType: 'Home,Condo', waterfront: 'Oceanfront' };
+  if (propertySlug === OCEANFRONT_LISTINGS_SLUG) filter = { ...cityListingsQueryParams(citySlug), propertyType: 'Home,Condo', waterfront: 'Oceanfront' };
   else if (OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug])
-    filter = { city: citySlug, propertyType: OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug], waterfront: 'Oceanfront' };
-  else if (propertySlug === RIVERFRONT_LISTINGS_SLUG) filter = { city: citySlug, waterfront: 'Riverfront' };
-  else filter = { city: citySlug, propertyType: SLUG_TO_PROPERTY_TYPE[propertySlug] };
+    filter = { ...cityListingsQueryParams(citySlug), propertyType: OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug], waterfront: 'Oceanfront' };
+  else if (propertySlug === RIVERFRONT_LISTINGS_SLUG) filter = { ...cityListingsQueryParams(citySlug), waterfront: 'Riverfront' };
+  else filter = { ...cityListingsQueryParams(citySlug), propertyType: SLUG_TO_PROPERTY_TYPE[propertySlug] };
   const [meta, photo] = await Promise.all([buildMetadata(props), listingPreviewPhoto(filter)]);
   return withSocialPreview(meta, photo);
 }

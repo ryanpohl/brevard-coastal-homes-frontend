@@ -33,7 +33,7 @@ import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 // see lib/socialPreview.js.
 export async function generateMetadata(props) {
   const { citySlug } = await props.params;
-  const [meta, photo] = await Promise.all([buildMetadata(props), listingPreviewPhoto({ city: citySlug })]);
+  const [meta, photo] = await Promise.all([buildMetadata(props), listingPreviewPhoto(cityListingsQueryParams(citySlug))]);
   return withSocialPreview(meta, photo);
 }
 
