@@ -254,7 +254,29 @@ function modelTourWith(name) {
 const MODEL_TOUR_AT_TOP = new Set(['aripeka', 'adelaide']);
 // Pages that link the Area Guide from the About section below the listings
 // instead of above them (2026-10-27, per Ryan).
-const GUIDE_LINK_BELOW = new Set(['aripeka', 'adelaide', 'harbor-island-beach-club']);
+const GUIDE_LINK_BELOW = new Set(['aripeka', 'adelaide', 'harbor-island-beach-club', 'aquarina']);
+
+// Luxury facts strip under the heading (2026-10-27, per Ryan) — gold,
+// letter-spaced facts between thin gold rules.
+const COMMUNITY_FACTS = {
+  'harbor-island-beach-club': ['Gated', 'Ocean to River', 'Private Beach', '42-Slip Marina', '146 Residences'],
+  aquarina: ['Gated', 'Ocean to River with Boat Ramp', '18-Hole Golf', 'Har-Tru Tennis', 'Private Beach Club', 'Fitness Center'],
+};
+
+function CommunityFacts({ slug }) {
+  const facts = COMMUNITY_FACTS[slug];
+  if (!facts) return null;
+  return (
+    <div className="hibc-facts">
+      {facts.map((fact, i) => (
+        <span key={fact}>
+          {i > 0 && <span className="hibc-facts__dot" aria-hidden="true">◆</span>}
+          {fact}
+        </span>
+      ))}
+    </div>
+  );
+}
 
 function ModelTourLine({ name }) {
   return (
@@ -1546,17 +1568,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             Applied identically to the Aripeka and Adelaide blocks below. */}
         {isHarborIslandBeachClub && (
           <div style={{ marginBottom: 12 }}>
-            {/* Facts strip (2026-10-27, per Ryan: a luxury feel, so the top
-                doesn't blend together) — gold, letter-spaced, between thin
-                gold rules. Facts from the About section below. */}
-            <div className="hibc-facts">
-              {['Gated', 'Ocean to River', 'Private Beach', '42-Slip Marina', '146 Residences'].map((fact, i) => (
-                <span key={fact}>
-                  {i > 0 && <span className="hibc-facts__dot" aria-hidden="true">◆</span>}
-                  {fact}
-                </span>
-              ))}
-            </div>
+            <CommunityFacts slug={slug} />
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
               Looking for a home or condo in Harbor Island Beach Club? We can help you find available properties,
               including foreclosed bank-owned condos, arrange private showings, negotiate on your behalf, and guide you through the entire purchase process
@@ -1905,6 +1917,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         )}
         {isAquarina && (
           <div style={{ marginBottom: 12 }}>
+            <CommunityFacts slug={slug} />
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
               Explore homes for sale in Aquarina. We can help you compare options, tour homes, negotiate with
               sellers, and navigate the entire buying process through closing.
@@ -2177,6 +2190,21 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               {text}
             </p>
           ))}
+          {/* Amenities list (2026-10-27, per Ryan) — COMMUNITY_SEO amenities. */}
+          {community.amenities && (
+            <>
+              <h3 style={{ fontSize: 18, margin: '20px 0 8px', color: 'var(--color-ink)', fontFamily: 'var(--font-inter-tight)' }}>
+                {community.amenities.heading}
+              </h3>
+              <ul style={{ paddingLeft: 20, marginBottom: 16 }}>
+                {community.amenities.items.map((item) => (
+                  <li key={item.slice(0, 32)} style={{ marginBottom: 8 }}>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
           {community.nearby && (
             <p style={{ marginBottom: 12 }}>
               <strong style={{ color: 'var(--color-ink)' }}>Nearby:</strong>{' '}
