@@ -2838,3 +2838,47 @@ textarea:focus {
   font-weight: 700;
   text-decoration: underline;
 }
+
+/* Model tour card at the top of Aripeka/Adelaide (2026-10-27). */
+.model-tour-card {
+  margin-top: 18px;
+  padding: 18px 22px 20px;
+  border: 1px solid var(--color-border-light);
+  border-left: 4px solid var(--color-gold);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+}
+
+.model-tour-card__label {
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-gold-dark, #8a6629);
+}
+
+.model-tour-card__text {
+  margin: 0 0 14px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--color-ink);
+}
+
+/* Aripeka builder-lots callout (2026-10-27). */
+.lots-callout {
+  margin-top: 14px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  background: #ece4d3;
+}
+
+.lots-callout__label {
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #8a6629;
+}

@@ -247,10 +247,17 @@ function modelTourWith(name) {
   return MODEL_TOUR_WITH[name] || 'the builders’ sales agents';
 }
 
+// Model tour card above the listings on Aripeka and Adelaide (2026-10-27,
+// per Ryan: the top of the page "all blends together") — a white card with a
+// gold edge and label so it reads as the page's main call to action. These
+// pages skip the About section's copy of the card (MODEL_TOUR_AT_TOP).
+const MODEL_TOUR_AT_TOP = new Set(['aripeka', 'adelaide']);
+
 function ModelTourLine({ name }) {
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, marginTop: 14 }}>
-      <p style={{ fontSize: 16, lineHeight: 1.5, color: 'var(--color-ink)', margin: 0 }}>
+    <div className="model-tour-card">
+      <div className="model-tour-card__label">Model Home Tours</div>
+      <p className="model-tour-card__text">
         {/* Reworded 2026-10-17 (per Ryan: the old line was confusing). */}
         <strong>Contact Ryan before you visit the {name} model homes.</strong> He&rsquo;ll set up private tours with{' '}
         {modelTourWith(name)} and go with you to answer any questions. Use Ryan at zero cost to you.
@@ -1672,7 +1679,10 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             </p>
             {/* Off-MLS builder lots (2026-10-12, per Ryan): the builders have
                 lots in Aripeka that aren't listed on the MLS. */}
-            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginTop: 12 }}>
+            {/* Tinted callout (2026-10-27, per Ryan: vary the top of the page). */}
+            <div className="lots-callout">
+            <div className="lots-callout__label">Builder Lots Not on the MLS</div>
+            <p style={{ fontSize: 17, lineHeight: 1.6, color: 'var(--color-ink)', margin: 0 }}>
               Planning to build in Aripeka? Aripeka&rsquo;s builders don&rsquo;t list all of their available lots on
               the MLS. They have more lots available in their own inventory that you won&rsquo;t find here or on
               Zillow, Realtor.com or other home search sites. We work directly with the builders and can share every
@@ -1682,6 +1692,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
               </strong>{' '}
               for a full list of lots not currently on the MLS.
             </p>
+            </div>
             <ModelTourLine name="Aripeka" />
           </div>
         )}
@@ -1976,7 +1987,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             as the city pages' own link (app/[citySlug]/[propertySlug]/
             page.js's showAreaGuideLink), right under the intro text and
             above the results count. */}
-        {showAreaGuideLink && (
+        {/* Aripeka/Adelaide link the guide from the About section below the
+            listings instead (2026-10-27, per Ryan). */}
+        {showAreaGuideLink && !MODEL_TOUR_AT_TOP.has(slug) && (
           <p style={{ fontSize: 15, marginBottom: 12 }}>
             <Link href={`/neighborhoods/${slug}/area-guide`} style={{ color: '#000', textDecoration: 'underline' }}>
               {neighborhood.name} Area Guide →
@@ -2159,7 +2172,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           )}
           {/* Model tour CTA (2026-10-04, per Ryan) — new-construction
               communities with model homes (COMMUNITY_SEO modelTour). */}
-          {community.modelTour && (
+          {community.modelTour && !MODEL_TOUR_AT_TOP.has(slug) && (
             <div
               style={{
                 margin: '20px 0 24px',
