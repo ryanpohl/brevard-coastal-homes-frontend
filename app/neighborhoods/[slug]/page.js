@@ -252,6 +252,9 @@ function modelTourWith(name) {
 // gold edge and label so it reads as the page's main call to action. These
 // pages skip the About section's copy of the card (MODEL_TOUR_AT_TOP).
 const MODEL_TOUR_AT_TOP = new Set(['aripeka', 'adelaide']);
+// Pages that link the Area Guide from the About section below the listings
+// instead of above them (2026-10-27, per Ryan).
+const GUIDE_LINK_BELOW = new Set(['aripeka', 'adelaide', 'harbor-island-beach-club']);
 
 function ModelTourLine({ name }) {
   return (
@@ -1543,13 +1546,20 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             Applied identically to the Aripeka and Adelaide blocks below. */}
         {isHarborIslandBeachClub && (
           <div style={{ marginBottom: 12 }}>
+            {/* Facts strip (2026-10-27, per Ryan: a luxury feel, so the top
+                doesn't blend together) — gold, letter-spaced, between thin
+                gold rules. Facts from the About section below. */}
+            <div className="hibc-facts">
+              {['Gated', 'Ocean to River', 'Private Beach', '42-Slip Marina', '146 Residences'].map((fact, i) => (
+                <span key={fact}>
+                  {i > 0 && <span className="hibc-facts__dot" aria-hidden="true">◆</span>}
+                  {fact}
+                </span>
+              ))}
+            </div>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
               Looking for a home or condo in Harbor Island Beach Club? We can help you find available properties,
-              including{' '}
-              <strong>
-                <HarborIslandForeclosuresTrigger>Foreclosed bank-owned condos</HarborIslandForeclosuresTrigger>
-              </strong>
-              , arrange private showings, negotiate on your behalf, and guide you through the entire purchase process
+              including foreclosed bank-owned condos, arrange private showings, negotiate on your behalf, and guide you through the entire purchase process
               from start to closing.
             </p>
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
@@ -1581,12 +1591,18 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                 and sized/weighted to match its new paragraph neighbors
                 (18px, bold) rather than the smaller 14px understated
                 treatment it needed down in the button row. */}
-            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
-              <strong>
-                <HarborIslandForeclosuresTrigger>Ask us about foreclosures in Harbor Island</HarborIslandForeclosuresTrigger>
-              </strong>
-              .
-            </p>
+            {/* Foreclosures callout (2026-10-27, per Ryan) — same tinted box as
+                Aripeka's builder lots, so the offer reads as its own thing. */}
+            <div className="lots-callout">
+              <div className="lots-callout__label">Bank-Owned Condos</div>
+              <p style={{ fontSize: 17, lineHeight: 1.6, color: 'var(--color-ink)', margin: 0 }}>
+                Harbor Island has had foreclosed, bank-owned condos come up for sale. We keep track of them and can
+                tell you what&rsquo;s available.{' '}
+                <strong>
+                  <HarborIslandForeclosuresTrigger>Ask us about foreclosures in Harbor Island →</HarborIslandForeclosuresTrigger>
+                </strong>
+              </p>
+            </div>
             {/* Reciprocal Homes<->Condos cross-link (per Ryan, 2026-09-20):
                 the Condo-filtered variant of this page links to the
                 Home-filtered variant, and vice versa, so a visitor on one
@@ -1987,9 +2003,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             as the city pages' own link (app/[citySlug]/[propertySlug]/
             page.js's showAreaGuideLink), right under the intro text and
             above the results count. */}
-        {/* Aripeka/Adelaide link the guide from the About section below the
-            listings instead (2026-10-27, per Ryan). */}
-        {showAreaGuideLink && !MODEL_TOUR_AT_TOP.has(slug) && (
+        {/* GUIDE_LINK_BELOW pages link the guide from the About section
+            below the listings instead (2026-10-27, per Ryan). */}
+        {showAreaGuideLink && !GUIDE_LINK_BELOW.has(slug) && (
           <p style={{ fontSize: 15, marginBottom: 12 }}>
             <Link href={`/neighborhoods/${slug}/area-guide`} style={{ color: '#000', textDecoration: 'underline' }}>
               {neighborhood.name} Area Guide →
