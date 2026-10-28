@@ -259,7 +259,7 @@ const GUIDE_LINK_BELOW = new Set(['aripeka', 'adelaide', 'harbor-island-beach-cl
 // Luxury facts strip under the heading (2026-10-27, per Ryan) — gold,
 // letter-spaced facts between thin gold rules.
 const COMMUNITY_FACTS = {
-  'harbor-island-beach-club': ['Gated', 'Ocean to River', 'Private Beach', '42-Slip Marina', '54 Homes · 88 Condos · 4 Villas'],
+  'harbor-island-beach-club': ['Gated', 'Ocean to River', 'Private Beach', '42-Slip Marina', 'Resort-Style Pool & Spa', 'Gym', '54 Homes · 88 Condos · 4 Villas'],
   aquarina: ['Gated', 'Ocean to River with Boat Ramp', '18-Hole Golf', 'Tennis Club with 6 Courts', 'Private Beach Club', 'Fitness Center'],
   adelaide: ['Guard-Gated', '120-Acre Lake', 'Park & Community Pavilion', '2 Tennis Courts', 'Basketball Court', 'Jogging & Nature Trails'],
 };
