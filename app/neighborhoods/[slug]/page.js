@@ -1571,12 +1571,10 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {isHarborIslandBeachClub && (
           <div style={{ marginBottom: 12 }}>
             <CommunityFacts slug={slug} />
-            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
-              Looking for a home or condo in Harbor Island Beach Club? We can help you find available properties,
-              including foreclosed bank-owned condos, arrange private showings, negotiate on your behalf, and guide you through the entire purchase process
-              from start to closing.
-            </p>
+            {/* Trimmed 2026-10-28 (per Ryan: less text above the listings). */}
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
+              Looking for a home or condo in Harbor Island Beach Club? We&rsquo;ll find available properties, set up
+              private showings and negotiate on your behalf.{' '}
               <strong>
                 <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
               </strong>{' '}
@@ -1610,8 +1608,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             <div className="lots-callout">
               <div className="lots-callout__label">Bank-Owned Condos</div>
               <p style={{ fontSize: 17, lineHeight: 1.6, color: 'var(--color-ink)', margin: 0 }}>
-                Harbor Island has had foreclosed, bank-owned condos come up for sale. We keep track of them and can
-                tell you what&rsquo;s available.{' '}
+                Bank-owned condos come up for sale at Harbor Island from time to time.{' '}
                 <strong>
                   <HarborIslandForeclosuresTrigger>Ask us about foreclosures in Harbor Island →</HarborIslandForeclosuresTrigger>
                 </strong>
@@ -1914,12 +1911,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {isAquarina && (
           <div style={{ marginBottom: 12 }}>
             <CommunityFacts slug={slug} />
-            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
-              Explore homes for sale in Aquarina. We can help you compare options, tour homes, negotiate with
-              sellers, and navigate the entire buying process through closing.
-            </p>
+            {/* Trimmed 2026-10-28 (per Ryan: less text above the listings). */}
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
-              Looking for an Aquarina home?{' '}
+              Explore homes and condos for sale in Aquarina, from oceanfront condos to riverfront homes.{' '}
               <strong>
                 <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
               </strong>{' '}
