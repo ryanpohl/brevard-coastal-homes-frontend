@@ -255,6 +255,9 @@ const MODEL_TOUR_AT_TOP = new Set(['aripeka', 'adelaide']);
 // Pages that link the Area Guide from the About section below the listings
 // instead of above them (2026-10-27, per Ryan).
 const GUIDE_LINK_BELOW = new Set(['aripeka', 'adelaide', 'harbor-island-beach-club', 'aquarina']);
+// Pages that show the "Other {city} neighborhoods" row in the About section
+// below the listings instead of above them (2026-10-28, per Ryan).
+const SIBLING_LINKS_BELOW = new Set(['harbor-island-beach-club', 'aquarina']);
 
 // Luxury facts strip under the heading (2026-10-27, per Ryan) — gold,
 // letter-spaced facts between thin gold rules.
@@ -2021,7 +2024,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {/* Sibling neighborhood links (2026-10-05, per Ryan) — e.g. "Other
             Melbourne Beach neighborhoods: ..." on each Melbourne Beach
             neighborhood page; see siblingNeighborhoodLinks. */}
-        {siblingLinks && (
+        {siblingLinks && !SIBLING_LINKS_BELOW.has(slug) && (
           <NeighborhoodLinkRow cityName={`Other ${siblingLinks.cityName}`} links={siblingLinks.links} />
         )}
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
@@ -2271,6 +2274,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                 </span>
               ))}
             </p>
+          )}
+          {siblingLinks && SIBLING_LINKS_BELOW.has(slug) && (
+            <div style={{ marginTop: 12 }}>
+              <NeighborhoodLinkRow cityName={`Other ${siblingLinks.cityName}`} links={siblingLinks.links} />
+            </div>
           )}
         </section>
       )}
