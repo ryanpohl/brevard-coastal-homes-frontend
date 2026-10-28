@@ -1608,10 +1608,10 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             <div className="lots-callout">
               <div className="lots-callout__label">Bank-Owned Condos</div>
               <p style={{ fontSize: 17, lineHeight: 1.6, color: 'var(--color-ink)', margin: 0 }}>
-                {/* Per Ryan (2026-10-28): about 17 foreclosures available now that
-                    aren't on the MLS — no number here since it changes. */}
-                Foreclosed, bank-owned condos are available in Harbor Island right now, and they aren&rsquo;t listed
-                on the MLS.{' '}
+                {/* Per Ryan (2026-10-28): about 17 foreclosures available now, only
+                    2 or 3 of them on the MLS — no number here since it changes. */}
+                Foreclosed, bank-owned condos are available in Harbor Island right now, and most of them aren&rsquo;t
+                listed on the MLS.{' '}
                 <strong>
                   <HarborIslandForeclosuresTrigger>Ask us about foreclosures in Harbor Island →</HarborIslandForeclosuresTrigger>
                 </strong>
