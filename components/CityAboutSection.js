@@ -46,7 +46,7 @@ export default function CityAboutSection({ config, page, currentPath, snapshot }
         <p style={{ fontSize: 17, margin: '0 0 28px' }}>
           <strong style={{ color: 'var(--color-ink)' }}>Going to open houses?</strong>{' '}
           <Link href={openHousePath(citySlug)} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
-            See this weekend&apos;s {OPEN_HOUSE_CITIES[citySlug].name} open houses →
+            View a list of all {OPEN_HOUSE_CITIES[citySlug].name} open houses →
           </Link>
         </p>
       )}
