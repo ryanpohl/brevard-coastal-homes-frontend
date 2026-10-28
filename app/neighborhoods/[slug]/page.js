@@ -285,8 +285,9 @@ function ModelTourLine({ name }) {
       <div className="model-tour-card__label">Model Home Tours</div>
       <p className="model-tour-card__text">
         {/* Reworded 2026-10-17 (per Ryan: the old line was confusing). */}
+        {/* Shortened 2026-10-28 (per Ryan: less text above the listings). */}
         <strong>Contact Ryan before you visit the {name} model homes.</strong> He&rsquo;ll set up private tours with{' '}
-        {modelTourWith(name)} and go with you to answer any questions. Use Ryan at zero cost to you.
+        {modelTourWith(name)} and go with you, at no cost to you.
       </p>
       <ModelTourButton communityName={name} />
     </div>
@@ -1694,13 +1695,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             "Lots" link) now gets its own "land and lots" copy instead. */}
         {isAripeka && primaryType !== 'Land' && (
           <div style={{ marginBottom: 12 }}>
-            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
-              Explore new construction and existing homes for sale in Aripeka. With four custom home builders to
-              choose from, we can help you compare options, set up private tours of the model homes, negotiate with
-              builders, and navigate the entire buying process through closing.
-            </p>
+            {/* Trimmed 2026-10-28 (per Ryan: too much text above the listings);
+                the longer builder copy is in the About section below. */}
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
-              Looking for an Aripeka home?{' '}
+              Explore new construction and existing homes for sale in Aripeka, with four custom home builders to
+              choose from.{' '}
               <strong>
                 <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
               </strong>{' '}
@@ -1712,14 +1711,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             <div className="lots-callout">
             <div className="lots-callout__label">Builder Lots Not on the MLS</div>
             <p style={{ fontSize: 17, lineHeight: 1.6, color: 'var(--color-ink)', margin: 0 }}>
-              Planning to build in Aripeka? Aripeka&rsquo;s builders don&rsquo;t list all of their available lots on
-              the MLS. They have more lots available in their own inventory that you won&rsquo;t find here or on
-              Zillow, Realtor.com or other home search sites. We work directly with the builders and can share every
-              available lot, including its size, location and price.{' '}
+              Aripeka&rsquo;s builders have more lots than what&rsquo;s listed here, on Zillow or on Realtor.com.{' '}
               <strong>
                 <ContactUsTrigger initialMessage={ARIPEKA_LOTS_MESSAGE}>Contact Us</ContactUsTrigger>
               </strong>{' '}
-              for a full list of lots not currently on the MLS.
+              for the full list with size, location and price.
             </p>
             </div>
             <ModelTourLine name="Aripeka" />
@@ -1826,13 +1822,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {isAdelaide && (
           <div style={{ marginBottom: 12 }}>
             <CommunityFacts slug={slug} />
-            <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
-              Explore new construction and existing homes for sale in Adelaide in Viera. With three custom home builders to
-              choose from, we can help you compare options, set up private tours of the model homes, negotiate with
-              builders, and navigate the entire buying process through closing.
-            </p>
+            {/* Trimmed 2026-10-28 (per Ryan: too much text above the listings);
+                the longer builder copy is in the About section below. */}
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
-              Looking for an Adelaide home?{' '}
+              Explore new construction and existing homes for sale in Adelaide in Viera, with three custom home builders to
+              choose from.{' '}
               <strong>
                 <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
               </strong>{' '}
