@@ -44,7 +44,7 @@ export default function OpenHouseBanner({ openHouses, cityPage }) {
         ))}
         {cityPage && (
           <Link href={cityPage.href} className="open-house-banner__link">
-            See all {cityPage.name} open houses this weekend →
+            View a list of all {cityPage.name} open houses →
           </Link>
         )}
       </div>
