@@ -501,7 +501,7 @@ function PhotoViewer({ photo, alt, index, total, onPrev, onNext, onClose, onTour
         </svg>
       </button>
       <div className="photo-viewer__stage" onClick={(e) => e.stopPropagation()} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-        <Image src={photo} alt={alt} fill sizes="(max-width: 1024px) 100vw, 1024px" quality={90} style={{ objectFit: 'contain' }} />
+        <Image src={photo} alt={alt} fill sizes="(max-width: 1024px) 100vw, 1024px" style={{ objectFit: 'contain' }} />
       </div>
       <div className="photo-viewer__bar" onClick={(e) => e.stopPropagation()}>
         {onTour ? (
