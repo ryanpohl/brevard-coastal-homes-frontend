@@ -2679,6 +2679,84 @@ textarea:focus {
   background: rgba(255, 255, 255, 0.12);
 }
 
+/* Listing page breadcrumb (ListingBreadcrumbs.js, 2026-10-29, per Ryan).
+   One small line; long trails trim the street with an ellipsis. */
+.listing-breadcrumbs ol {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  font-size: 13px;
+  color: var(--color-muted);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.listing-breadcrumbs li {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.listing-breadcrumbs li + li::before {
+  content: '›';
+  margin: 0 8px;
+  color: var(--color-muted-light);
+}
+
+.listing-breadcrumbs a {
+  color: var(--color-muted-dark);
+  text-decoration: none;
+}
+
+.listing-breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+.listing-breadcrumbs span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* "More Homes in …" under a listing (MoreHomesNearby.js, 2026-10-29). Spans
+   both columns of .listing-detail-grid. */
+.more-homes {
+  grid-column: 1 / -1;
+  margin-top: 24px;
+  padding-top: 28px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.more-homes__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 16px;
+  margin-bottom: 16px;
+}
+
+.more-homes__head h2 {
+  margin: 0;
+  font-size: 22px;
+  color: var(--color-ink);
+  font-family: var(--font-inter-tight);
+}
+
+.more-homes__link {
+  color: #000;
+  font-weight: 600;
+  text-decoration: underline;
+  font-size: 15px;
+}
+
+.more-homes__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
 /* Ready-made question buttons under the address (ListingQuestionButtons.js,
    2026-10-18, per Ryan). */
 .listing-questions {

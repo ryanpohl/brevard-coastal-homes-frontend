@@ -17,6 +17,11 @@ import PropertyContactPanel from '@/components/PropertyContactPanel';
 import { ContactBarMessage } from '@/components/MobileContactBar';
 import ListingEmailPrompt from '@/components/ListingEmailPrompt';
 import ListingMap from '@/components/ListingMap';
+import ListingBreadcrumbs, { breadcrumbJsonLd } from '@/components/ListingBreadcrumbs';
+import MoreHomesNearby, { pickMoreHomes } from '@/components/MoreHomesNearby';
+import { listingCommunity, listingCityArea } from '@/lib/listingCommunity';
+
+const SITE_URL = 'https://brevardcoastalhomes.com';
 
 // Status badge color — matches design/design_files/Property Detail.dc.html's
 // olive-green "ACTIVE" for the common case; the other statuses aren't shown
@@ -138,6 +143,39 @@ export default async function ListingDetailPage({ params }) {
           notFound();
     }
 
+  // Community page + breadcrumb trail + "More Homes in …" (2026-10-29,
+  // per Ryan). Lookups that fail just leave those parts out.
+  let neighborhoods = [];
+  let cities = [];
+  try {
+    [{ neighborhoods = [] }, { cities = [] }] = await Promise.all([api.getNeighborhoods(), api.getCities()]);
+  } catch {}
+  const community = listingCommunity(listing, neighborhoods);
+  const cityArea = listingCityArea(listing);
+  const crumbCitySlug = community?.citySlug || cityArea?.slug;
+  const crumbCity = cities.find((c) => c.slug === crumbCitySlug);
+  const breadcrumbs = [
+    { name: 'Home', href: '/' },
+    ...(crumbCity ? [{ name: crumbCity.name, href: `/${crumbCity.slug}` }] : []),
+    ...(community ? [{ name: community.name, href: community.path }] : []),
+    { name: listing.address.split(',')[0] },
+  ];
+  let moreArea = null;
+  let moreHomes = [];
+  for (const area of [community, cityArea]) {
+    if (!area || !cities.some((c) => c.slug === area.citySlug)) continue;
+    try {
+      const data = await api.getListings({ ...area.filter, pageSize: 40 });
+      moreHomes = pickMoreHomes(listing, data.results || []);
+    } catch {
+      moreHomes = [];
+    }
+    if (moreHomes.length) {
+      moreArea = area;
+      break;
+    }
+  }
+
   const photos = listing.photos && listing.photos.length ? listing.photos : [];
     const isLand = listing.propertyType === 'Land';
     // Per Ryan (2026-08-14): on condo/townhome listings, the Assoc Fee /
@@ -233,9 +271,11 @@ export default async function ListingDetailPage({ params }) {
                                                                                                                                                       `}</style>
       <div className="listing-detail-grid">
 {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
+<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd(breadcrumbs, SITE_URL)) }} />
 
 {/* LEFT: photos, header, stats, description, map */}
         <div>
+          <ListingBreadcrumbs items={breadcrumbs} />
           {/* Open house times from the MLS (2026-10-18, per Ryan). */}
           {listing.status === 'Active' && (
             <OpenHouseBanner
@@ -512,6 +552,7 @@ export default async function ListingDetailPage({ params }) {
           status={listing.statusLabel === 'Contingent' ? 'Contingent' : listing.status}
           similarHomes={similarHomesAlert(listing)}
         />
+        <MoreHomesNearby area={moreArea} homes={moreHomes} />
           </div>
           </>
   );
