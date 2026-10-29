@@ -20,6 +20,7 @@ import ListingMap from '@/components/ListingMap';
 import ListingBreadcrumbs, { breadcrumbJsonLd } from '@/components/ListingBreadcrumbs';
 import MoreHomesNearby, { pickMoreHomes } from '@/components/MoreHomesNearby';
 import { listingCommunity, listingCityArea } from '@/lib/listingCommunity';
+import { keyFeatureLabels } from '@/lib/keyFeatures';
 
 const SITE_URL = 'https://brevardcoastalhomes.com';
 
@@ -176,6 +177,7 @@ export default async function ListingDetailPage({ params }) {
     }
   }
 
+  const keyFeatures = keyFeatureLabels(listing);
   const photos = listing.photos && listing.photos.length ? listing.photos : [];
     const isLand = listing.propertyType === 'Land';
     // Per Ryan (2026-08-14): on condo/townhome listings, the Assoc Fee /
@@ -509,7 +511,21 @@ export default async function ListingDetailPage({ params }) {
             )}
 </div>
 
-{listing.waterfront && listing.waterfront !== 'None' && (
+{/* Key Features row (2026-10-29, per Ryan) — lib/keyFeatures.js. It
+    names the water frontage itself, so the plain waterfront line below
+    only shows when the row doesn't. */}
+{keyFeatures.length > 0 && (
+            <div className="key-features">
+              <div className="key-features__label">Key Features</div>
+              <ul>
+                {keyFeatures.map((f) => (
+                  <li key={f}>{f}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+{listing.waterfront && listing.waterfront !== 'None' && !keyFeatures.some((f) => /front$/i.test(f)) && (
               <p style={{ fontSize: 13, color: 'var(--color-success)', fontWeight: 600, marginTop: 16 }}>{listing.waterfront}</p>
           )}
 

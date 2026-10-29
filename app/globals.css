@@ -2912,6 +2912,39 @@ textarea:focus {
   margin-top: 28px;
 }
 
+/* Key Features row on listing pages (2026-10-29, lib/keyFeatures.js). */
+.key-features {
+  margin-top: 22px;
+}
+
+.key-features__label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-gold-text);
+  margin-bottom: 8px;
+}
+
+.key-features ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.key-features li {
+  padding: 5px 10px;
+  border: 1px solid var(--color-border-light);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
 /* Ready-made question buttons under the address (ListingQuestionButtons.js,
    2026-10-18, per Ryan). */
 .listing-questions {
