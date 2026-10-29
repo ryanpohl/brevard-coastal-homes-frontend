@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import * as api from '@/lib/api';
 import { formatPrice, PROPERTY_TYPE_LABEL, isPricePerSqftPlausible, soldPricePerSqft, formatSoldDate } from '@/lib/constants';
 import FavoriteButton from '@/components/FavoriteButton';
+import ShareHomeButton from '@/components/ShareHomeButton';
 import { HomeAlertSignup, InfoSheetRequest } from '@/components/ListingAlertSignup';
 import ListingQuestionButtons from '@/components/ListingQuestionButtons';
 import MortgageCalculator from '@/components/MortgageCalculator';
@@ -280,7 +281,9 @@ export default async function ListingDetailPage({ params }) {
                 )}
               </div>
             )}
-            <div style={{ position: 'absolute', top: 14, right: 14 }}>
+            {/* Share icon left of the heart (2026-10-29, per Ryan). */}
+            <div style={{ position: 'absolute', top: 14, right: 14, display: 'flex', gap: 8 }}>
+              <ShareHomeButton listingId={listing.id} address={listing.address} size={44} />
               <FavoriteButton
                 listingId={listing.id}
                 initialFavorited={listing.isFavorited}
