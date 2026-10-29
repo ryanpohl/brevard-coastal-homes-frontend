@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { askIfAvailable, scheduleTour } from '@/lib/listingAsk';
 import { tourEmbedUrl, visibleTourUrl } from '@/lib/virtualTour';
 
@@ -50,6 +51,10 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
   // Swipe on the hero photo (2026-10-29, per Ryan): on phones it replaces the
   // ‹ › arrows, which globals.css hides there (.gallery-arrow).
   const touchStart = useRef(null);
+  // Full-screen photo viewer (2026-10-29, per Ryan, like corcoran.com):
+  // click/tap the hero photo to see the whole, uncropped photo on black.
+  // It shares activeIndex with the hero, so closing lands on the same photo.
+  const [viewerOpen, setViewerOpen] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia(PHONE_QUERY);
@@ -114,6 +119,17 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
     else showPrevPhoto();
   }
 
+  // Clicks on the hero's own buttons (arrows, Schedule a Tour, end card)
+  // keep doing their job; anywhere else on the photo opens the viewer.
+  function onHeroClick(e) {
+    if (!heroPhoto || e.target.closest('button')) return;
+    setViewerOpen(true);
+  }
+
+  function closeViewer() {
+    setViewerOpen(false);
+  }
+
   function pageThumbsPrev() {
         setThumbStart((s) => Math.max(0, s - perPage));
   }
@@ -129,8 +145,10 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
              <div
                onTouchStart={onTouchStart}
                onTouchEnd={onTouchEnd}
+               onClick={onHeroClick}
                style={{
                  position: 'relative',
+                               cursor: heroPhoto ? 'zoom-in' : 'default',
                                touchAction: 'pan-y',
                                width: '100%',
                                height: 'clamp(240px, 42vw, 460px)',
@@ -381,6 +399,28 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
         </div>
       )}
 
+      {viewerOpen && heroPhoto && (
+        <PhotoViewer
+          photo={heroPhoto}
+          alt={`${altBase}, photo ${activeIndex + 1}`}
+          index={activeIndex}
+          total={total}
+          onPrev={showPrevPhoto}
+          onNext={showNextPhoto}
+          onClose={closeViewer}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+          onTour={
+            tourButton
+              ? () => {
+                  closeViewer();
+                  scheduleTour();
+                }
+              : null
+          }
+        />
+      )}
+
       {virtualTourUrl && (
       <div style={{ display: 'flex', gap: 28, marginTop: 20, borderBottom: '1px solid var(--color-border-light)', paddingBottom: 14 }}>
         <button
@@ -426,5 +466,66 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
             </div>
       )}
             </div>
+  );
+}
+
+/**
+ * Full-screen photo viewer (2026-10-29, per Ryan). The whole photo, never
+ * cropped, on black. MLS photos are 1024x768, so the photo is never drawn
+ * wider than 1024px (Ryan: "we don't have to make the pictures too large if
+ * it makes them look soft"). Arrows/counter/Schedule a Tour along the
+ * bottom; swipe, ← → and Esc work too.
+ */
+function PhotoViewer({ photo, alt, index, total, onPrev, onNext, onClose, onTour, onTouchStart, onTouchEnd }) {
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key === 'Escape') onClose();
+      else if (e.key === 'ArrowLeft') onPrev();
+      else if (e.key === 'ArrowRight') onNext();
+    }
+    document.addEventListener('keydown', onKey);
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = overflow;
+    };
+  }, [onClose, onPrev, onNext]);
+
+  // Portal to <body> so no parent's overflow/transform can clip it.
+  return createPortal(
+    <div className="photo-viewer" role="dialog" aria-modal="true" aria-label="Photo viewer" onClick={onClose}>
+      <button type="button" className="photo-viewer__close" onClick={onClose} aria-label="Close photo viewer">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+          <path d="M5 5l14 14M19 5L5 19" />
+        </svg>
+      </button>
+      <div className="photo-viewer__stage" onClick={(e) => e.stopPropagation()} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+        <Image src={photo} alt={alt} fill sizes="(max-width: 1024px) 100vw, 1024px" quality={90} style={{ objectFit: 'contain' }} />
+      </div>
+      <div className="photo-viewer__bar" onClick={(e) => e.stopPropagation()}>
+        {onTour ? (
+          <button type="button" className="photo-viewer__tour" onClick={onTour}>
+            Schedule a Tour
+          </button>
+        ) : (
+          <span />
+        )}
+        {total > 1 && (
+          <div className="photo-viewer__nav">
+            <button type="button" onClick={onPrev} aria-label="Previous photo">
+              ‹
+            </button>
+            <span>
+              {index + 1} / {total}
+            </span>
+            <button type="button" onClick={onNext} aria-label="Next photo">
+              ›
+            </button>
+          </div>
+        )}
+      </div>
+    </div>,
+    document.body
   );
 }
