@@ -25,7 +25,9 @@ function shortAddress(address) {
   return String(address || '').split(',')[0];
 }
 
-export default function CardAlertButton({ listing }) {
+// `large` (2026-10-29, per Ryan): the bigger round bell on a listing
+// page's photo, next to the share icon and heart — same signup.
+export default function CardAlertButton({ listing, large = false }) {
   const { user } = useAuth();
   const [watching, setWatching] = useState(false);
   const [popup, setPopup] = useState(false);
@@ -61,7 +63,7 @@ export default function CardAlertButton({ listing }) {
   async function subscribe(address) {
     setState({ sending: true, error: '' });
     try {
-      await api.watchHome(listing.id, address, 'card_bell');
+      await api.watchHome(listing.id, address, large ? 'photo_bell' : 'card_bell');
       rememberAlertEmail(address);
       rememberWatchedHome(listing.id);
       setWatching(true);
@@ -99,13 +101,13 @@ export default function CardAlertButton({ listing }) {
     <>
       <button
         type="button"
-        className={`card-alert-btn${watching ? ' card-alert-btn--on' : ''}`}
+        className={`card-alert-btn${large ? ' card-alert-btn--large' : ''}${watching ? ' card-alert-btn--on' : ''}`}
         onClick={onBellClick}
         aria-label={watching ? 'Watching this home for price drops' : 'Get price-drop alerts for this home'}
         title={watching ? 'Watching for price drops' : 'Get price-drop alerts'}
         disabled={state.sending}
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width={large ? 20 : 16} height={large ? 20 : 16} viewBox="0 0 24 24" aria-hidden="true" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
           <path d="M13.7 21a2 2 0 0 1-3.4 0" fill="none" />
         </svg>

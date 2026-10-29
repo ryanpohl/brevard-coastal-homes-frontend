@@ -4,6 +4,7 @@ import * as api from '@/lib/api';
 import { formatPrice, PROPERTY_TYPE_LABEL, isPricePerSqftPlausible, soldPricePerSqft, formatSoldDate } from '@/lib/constants';
 import FavoriteButton from '@/components/FavoriteButton';
 import ShareHomeButton from '@/components/ShareHomeButton';
+import CardAlertButton from '@/components/CardAlertButton';
 import { HomeAlertSignup, InfoSheetRequest } from '@/components/ListingAlertSignup';
 import ListingQuestionButtons from '@/components/ListingQuestionButtons';
 import MortgageCalculator from '@/components/MortgageCalculator';
@@ -281,9 +282,11 @@ export default async function ListingDetailPage({ params }) {
                 )}
               </div>
             )}
-            {/* Share icon left of the heart (2026-10-29, per Ryan). */}
+            {/* Share icon and bell left of the heart (2026-10-29, per Ryan). */}
             <div style={{ position: 'absolute', top: 14, right: 14, display: 'flex', gap: 8 }}>
               <ShareHomeButton listingId={listing.id} address={listing.address} size={44} />
+              {/* Price-drop bell, same as the listing cards (2026-10-29, per Ryan) — not on sold or off-market homes. */}
+              {(listing.status === 'Active' || listing.status === 'Pending') && <CardAlertButton listing={listing} large />}
               <FavoriteButton
                 listingId={listing.id}
                 initialFavorited={listing.isFavorited}
