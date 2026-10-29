@@ -2579,6 +2579,15 @@ textarea:focus {
   }
 }
 
+/* Phones swipe the listing hero photo (PropertyGallery.js, 2026-10-29, per
+   Ryan), so its ‹ › arrows go away there. !important beats the inline
+   display:flex. Mouse users on a narrow window keep them. */
+@media (max-width: 640px) and (hover: none) {
+  .gallery-arrow {
+    display: none !important;
+  }
+}
+
 /* Ready-made question buttons under the address (ListingQuestionButtons.js,
    2026-10-18, per Ryan). */
 .listing-questions {

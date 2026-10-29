@@ -1,12 +1,18 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { askIfAvailable, scheduleTour } from '@/lib/listingAsk';
 import { tourEmbedUrl, visibleTourUrl } from '@/lib/virtualTour';
 
-// Number of thumbnails shown per "page" of the strip below the hero photo.
+// Number of thumbnails shown per "page" of the strip below the hero photo:
+// 6 on wider screens, 4 in a single row on phones (2026-10-29, per Ryan —
+// 6 wrapped to two rows on a phone).
 const THUMBS_PER_PAGE = 6;
+const PHONE_THUMBS_PER_PAGE = 4;
+const PHONE_QUERY = '(max-width: 640px)';
+// Horizontal finger travel (px) that counts as a swipe on the hero photo.
+const SWIPE_MIN = 40;
 
 /**
  * Property Detail page's photo gallery: one large hero photo with left/right
@@ -40,21 +46,39 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
   // available?" question. Shown with tourButton (active listings); "View
   // last photo" hides it until they leave and come back to the end.
   const [endCardHidden, setEndCardHidden] = useState(false);
+  const [perPage, setPerPage] = useState(THUMBS_PER_PAGE);
+  // Swipe on the hero photo (2026-10-29, per Ryan): on phones it replaces the
+  // ‹ › arrows, which globals.css hides there (.gallery-arrow).
+  const touchStart = useRef(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia(PHONE_QUERY);
+    const update = () => setPerPage(mq.matches ? PHONE_THUMBS_PER_PAGE : THUMBS_PER_PAGE);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  // Keep the active photo's thumbnail in view when the page size changes.
+  useEffect(() => {
+    setThumbStart(Math.floor(activeIndex / perPage) * perPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [perPage]);
 
   const hasPhotos = photos.length > 0;
     const total = photos.length;
     const heroPhoto = hasPhotos ? photos[Math.min(activeIndex, total - 1)] : null;
   const showEndCard = tourButton && total > 1 && activeIndex === total - 1 && !endCardHidden;
 
-  // Thumbnail strip shows a THUMBS_PER_PAGE-wide window starting at
+  // Thumbnail strip shows a perPage-wide window starting at
   // thumbStart; the page-arrows below shift that window without touching
   // which photo is active in the hero. Clicking a thumbnail sets the hero.
-  const thumbnails = photos.slice(thumbStart, thumbStart + THUMBS_PER_PAGE);
+  const thumbnails = photos.slice(thumbStart, thumbStart + perPage);
     const canPageThumbsPrev = thumbStart > 0;
-    const canPageThumbsNext = thumbStart + THUMBS_PER_PAGE < total;
+    const canPageThumbsNext = thumbStart + perPage < total;
 
   function syncThumbWindow(index) {
-        setThumbStart(Math.floor(index / THUMBS_PER_PAGE) * THUMBS_PER_PAGE);
+        setThumbStart(Math.floor(index / perPage) * perPage);
   }
 
   function showPrevPhoto() {
@@ -73,12 +97,29 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
         syncThumbWindow(next);
   }
 
+  function onTouchStart(e) {
+    const t = e.touches[0];
+    touchStart.current = { x: t.clientX, y: t.clientY };
+  }
+
+  function onTouchEnd(e) {
+    const start = touchStart.current;
+    touchStart.current = null;
+    if (!start) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    if (Math.abs(dx) < SWIPE_MIN || Math.abs(dx) < Math.abs(dy)) return;
+    if (dx < 0) showNextPhoto();
+    else showPrevPhoto();
+  }
+
   function pageThumbsPrev() {
-        setThumbStart((s) => Math.max(0, s - THUMBS_PER_PAGE));
+        setThumbStart((s) => Math.max(0, s - perPage));
   }
 
   function pageThumbsNext() {
-        setThumbStart((s) => Math.min(Math.max(0, total - THUMBS_PER_PAGE), s + THUMBS_PER_PAGE));
+        setThumbStart((s) => Math.min(Math.max(0, total - perPage), s + perPage));
   }
 
   return (
@@ -86,8 +127,11 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
   {tab === 'photos' ? (
             <>
              <div
+               onTouchStart={onTouchStart}
+               onTouchEnd={onTouchEnd}
                style={{
                  position: 'relative',
+                               touchAction: 'pan-y',
                                width: '100%',
                                height: 'clamp(240px, 42vw, 460px)',
                                borderRadius: 4,
@@ -119,6 +163,7 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
                       type="button"
                       onClick={showPrevPhoto}
                       aria-label="Previous photo"
+                      className="gallery-arrow"
                       style={{
                       zIndex: 2,
                                             position: 'absolute',
@@ -145,6 +190,7 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
                      type="button"
                      onClick={showNextPhoto}
                      aria-label="Next photo"
+                     className="gallery-arrow"
                      style={{
                       zIndex: 2,
                        position: 'absolute',
@@ -245,7 +291,7 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
                 ‹
                   </button>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(70px, 1fr))', gap: 8, flex: 1 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${perPage}, minmax(0, 1fr))`, gap: 8, flex: 1 }}>
 {thumbnails.map((photo, i) => {
                     const photoIndex = thumbStart + i;
                     const isActive = activeIndex === photoIndex;
@@ -257,7 +303,7 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
                         aria-label={`Show photo ${photoIndex + 1}`}
                                       style={{
                           position: 'relative',
-                          height: 78,
+                          height: perPage === PHONE_THUMBS_PER_PAGE ? 56 : 78,
                           borderRadius: 3,
                           overflow: 'hidden',
                           border: isActive ? '2px solid var(--color-ink)' : '2px solid transparent',
