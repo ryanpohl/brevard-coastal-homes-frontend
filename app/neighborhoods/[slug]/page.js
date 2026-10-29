@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { COMPARISON_LINKS, comparisonPath } from '@/lib/comparisons';
 import Link from 'next/link';
 import * as api from '@/lib/api';
 import { neighborhoodViewPath } from '@/lib/neighborhoodViews';
@@ -2273,6 +2274,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                   </Link>
                 </span>
               ))}
+            </p>
+          )}
+          {/* Comparison guide link (2026-10-29), lib/comparisons.js. */}
+          {COMPARISON_LINKS[slug] && (
+            <p style={{ marginTop: 12 }}>
+              <strong style={{ color: 'var(--color-ink)' }}>Deciding where to buy?</strong>{' '}
+              <Link href={comparisonPath(COMPARISON_LINKS[slug].slug)} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+                {COMPARISON_LINKS[slug].label}: compare them →
+              </Link>
             </p>
           )}
           {siblingLinks && SIBLING_LINKS_BELOW.has(slug) && (

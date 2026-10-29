@@ -16,6 +16,7 @@ import {
 import { MARKET_REPORTS } from '@/lib/marketReports';
 import { REALTOR_PAGES } from '@/lib/realtorPages';
 import { OPEN_HOUSE_CITIES, openHousePath } from '@/lib/openHousePages';
+import { COMPARISONS, comparisonPath } from '@/lib/comparisons';
 
 // Native Next.js sitemap.xml (2026-09-11, SEO audit finding: brevardcoastalhomes.com/sitemap.xml
 // 404s). Same root cause as robots.js's comment: the backend DOES generate a real sitemap
@@ -335,5 +336,9 @@ export default async function sitemap() {
     });
   });
 
+  // "X vs. Y" comparison guides (2026-10-29) — lib/comparisons.js.
+  Object.keys(COMPARISONS).forEach((slug) => {
+    entries.push({ url: `${SITE_URL}${comparisonPath(slug)}`, lastModified: now, changeFrequency: 'weekly', priority: 0.6 });
+  });
   return entries;
 }

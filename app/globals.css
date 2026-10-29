@@ -2757,6 +2757,161 @@ textarea:focus {
   gap: 20px;
 }
 
+/* "X vs. Y" comparison guides (app/compare/[slug]/page.js, 2026-10-29). */
+.compare-page {
+  max-width: 860px;
+  padding: 28px clamp(16px, 4vw, 56px) 64px;
+  color: var(--color-muted-dark);
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.compare-page h1 {
+  font-size: clamp(30px, 4.5vw, 42px);
+  margin: 0 0 8px;
+  color: var(--color-ink);
+  font-family: var(--font-inter-tight);
+}
+
+.compare-page h2 {
+  font-size: 24px;
+  margin: 36px 0 10px;
+  color: var(--color-ink);
+  font-family: var(--font-inter-tight);
+}
+
+.compare-page section p {
+  margin: 0 0 12px;
+}
+
+.compare-page__subtitle {
+  margin: 0 0 22px;
+  font-size: 18px;
+}
+
+.compare-page__answer {
+  padding: 18px 22px;
+  border: 1px solid var(--color-border-light);
+  border-left: 4px solid var(--color-gold);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--color-ink);
+}
+
+.compare-page__answer p {
+  margin: 0;
+}
+
+.compare-page__answer-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-gold-text);
+  margin-bottom: 6px;
+}
+
+.compare-table {
+  margin-top: 28px;
+  overflow-x: auto;
+}
+
+.compare-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: 15px;
+}
+
+.compare-table caption {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-gold-text);
+  padding-bottom: 8px;
+}
+
+.compare-table th,
+.compare-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border-light);
+  text-align: left;
+  vertical-align: top;
+}
+
+.compare-table thead th {
+  font-size: 15px;
+  color: var(--color-ink);
+  border-bottom: 2px solid var(--color-gold);
+  width: 36%;
+}
+
+.compare-table thead th:first-child {
+  width: 28%;
+}
+
+.compare-table tbody th {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+@media (max-width: 640px) {
+  .compare-table table {
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .compare-table th,
+  .compare-table td {
+    padding: 8px 6px;
+  }
+}
+
+.compare-page__choose {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.compare-page__choose-card {
+  padding: 18px 20px;
+  border: 1px solid var(--color-border-light);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.compare-page__choose-card h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  color: var(--color-ink);
+}
+
+.compare-page__choose-card ul {
+  margin: 0 0 12px;
+  padding-left: 20px;
+  font-size: 16px;
+}
+
+.compare-page__choose-card a,
+.compare-page__links a {
+  color: #000;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.compare-page__cta {
+  margin: 28px 0 36px;
+}
+
+.compare-page__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-top: 28px;
+}
+
 /* Ready-made question buttons under the address (ListingQuestionButtons.js,
    2026-10-18, per Ryan). */
 .listing-questions {

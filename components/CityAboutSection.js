@@ -3,6 +3,7 @@ import { formatPrice, cityListingsQueryParams } from '@/lib/constants';
 import SoldReportSignup from '@/components/SoldReportSignup';
 import { REALTOR_PAGES } from '@/lib/realtorPages';
 import { OPEN_HOUSE_CITIES, openHousePath } from '@/lib/openHousePages';
+import { COMPARISON_LINKS, comparisonPath } from '@/lib/comparisons';
 
 // "About {city} …" section for CITY_PAGE_SEO pages (2026-10-03) — page-
 // specific copy, a live market snapshot, an agent line, and links to the
@@ -47,6 +48,15 @@ export default function CityAboutSection({ config, page, currentPath, snapshot }
           <strong style={{ color: 'var(--color-ink)' }}>Going to open houses?</strong>{' '}
           <Link href={openHousePath(citySlug)} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
             View a list of all {OPEN_HOUSE_CITIES[citySlug].name} open houses →
+          </Link>
+        </p>
+      )}
+      {/* Comparison guide link (2026-10-29), lib/comparisons.js. */}
+      {COMPARISON_LINKS[citySlug] && (
+        <p style={{ fontSize: 17, margin: '0 0 28px' }}>
+          <strong style={{ color: 'var(--color-ink)' }}>Deciding where to buy?</strong>{' '}
+          <Link href={comparisonPath(COMPARISON_LINKS[citySlug].slug)} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+            {COMPARISON_LINKS[citySlug].label}: compare them →
           </Link>
         </p>
       )}
