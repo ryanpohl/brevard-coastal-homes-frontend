@@ -9,16 +9,19 @@
           "lint": "next lint"
     },
     "dependencies": {
-          "next": "^15.5.21",
+          "next": "^15.5.27",
           "react": "^18.3.1",
           "react-dom": "^18.3.1",
-          "sharp": "^0.34.5"
+          "sharp": "^0.35.5"
+    },
+    "overrides": {
+          "postcss": "^8.5.32"
     },
     "devDependencies": {
           "eslint": "^8.57.0",
           "eslint-config-next": "^15.5.21"
     },
     "engines": {
-          "node": "^18.18.0 || ^19.8.0 || >=20.0.0"
+          "node": ">=20.9.0"
     }
 }
