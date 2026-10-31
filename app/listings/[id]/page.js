@@ -21,6 +21,7 @@ import ListingBreadcrumbs, { breadcrumbJsonLd } from '@/components/ListingBreadc
 import MoreHomesNearby, { pickMoreHomes } from '@/components/MoreHomesNearby';
 import { listingCommunity, listingCityArea } from '@/lib/listingCommunity';
 import { keyFeatureLabels } from '@/lib/keyFeatures';
+import { similarHomesBand, shortPrice } from '@/lib/similarHomes';
 
 const SITE_URL = 'https://brevardcoastalhomes.com';
 
@@ -110,26 +111,12 @@ export async function generateMetadata({ params }) {
 
 // "Email me similar homes" on Pending/Sold listings (2026-10-18, per Ryan):
 // a listing alert for the same town and property type, about 20% either
-// side of the price, with at least as many bedrooms. Not for land.
-function roundPrice(n, up) {
-  const step = n >= 1000000 ? 50000 : 10000;
-  return (up ? Math.ceil(n / step) : Math.floor(n / step)) * step;
-}
-
-function shortPrice(n) {
-  return n >= 1000000 ? `$${parseFloat((n / 1000000).toFixed(2))}M` : `$${Math.round(n / 1000)}K`;
-}
-
+// side of the price, with at least as many bedrooms (lib/similarHomes.js).
 function similarHomesAlert(listing) {
-  const price = listing.status === 'Sold' && listing.closePrice ? listing.closePrice : listing.price;
-  if (!price || !listing.city?.slug || !['Home', 'Condo'].includes(listing.propertyType)) return null;
-  const priceMin = roundPrice(price * 0.8, false);
-  const priceMax = roundPrice(price * 1.2, true);
-  const filter = { city: listing.city.slug, propertyType: listing.propertyType, priceMin: String(priceMin), priceMax: String(priceMax) };
-  if (listing.beds > 0) filter.beds = String(listing.beds);
-  const noun = listing.propertyType === 'Condo' ? 'condos' : 'homes';
-  const beds = listing.beds > 0 ? `${listing.beds}+ bed ` : '';
-  return { filter, label: `${beds}${listing.city.name} ${noun}, ${shortPrice(priceMin)}–${shortPrice(priceMax)}` };
+  const band = similarHomesBand(listing);
+  if (!band || !listing.city?.slug) return null;
+  const filter = { city: listing.city.slug, ...band.filter };
+  return { filter, label: `${band.bedsLabel}${listing.city.name} ${band.noun}, ${shortPrice(band.priceMin)}–${shortPrice(band.priceMax)}` };
 }
 
 export default async function ListingDetailPage({ params }) {
