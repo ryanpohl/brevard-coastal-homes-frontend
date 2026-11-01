@@ -19,7 +19,10 @@ import Pagination from './Pagination';
  */
 // `labelExtra` (optional) sits on the results-count line, e.g. the
 // "Get alerts" jump link (ListingAlertSignup.js, 2026-10-09).
-export default function ListingResultsLayout({ mapCenter, results, mapZoom, resultsLabel, labelExtra, page, totalPages }) {
+// `emptyMessage` (optional, 2026-11-01) replaces the "adjust your filters"
+// line when nothing is listed — neighborhood pages pass one when the
+// visitor hasn't filtered, so an empty community doesn't read as broken.
+export default function ListingResultsLayout({ mapCenter, results, mapZoom, resultsLabel, labelExtra, emptyMessage, page, totalPages }) {
     const [hoveredId, setHoveredId] = useState(null);
 
   return (
@@ -59,7 +62,7 @@ export default function ListingResultsLayout({ mapCenter, results, mapZoom, resu
                           ))}
               {results.length === 0 && (
                             <p style={{ gridColumn: '1 / -1', color: 'var(--color-muted)' }}>
-              No listings match your search yet. Try adjusting your filters.
+              {emptyMessage || 'No listings match your search yet. Try adjusting your filters.'}
                 </p>
           )}
 </div>

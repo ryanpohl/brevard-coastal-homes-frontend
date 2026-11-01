@@ -53,7 +53,7 @@ export default function RecentlySold({ name, data, noun }) {
     );
   };
   return (
-    <section className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 40px', maxWidth: 760 }}>
+    <section id="recently-sold" className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 40px', maxWidth: 760 }}>
       <h2 style={{ fontSize: 24, marginBottom: 8, color: 'var(--color-ink)', fontFamily: 'var(--font-inter-tight)' }}>
         {noun ? `Recently Sold ${noun === 'condo' ? 'Condos' : 'Homes'} in ${name}` : `Recently Sold in ${name}`}
       </h2>

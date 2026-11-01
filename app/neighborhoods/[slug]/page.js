@@ -1284,6 +1284,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // Recently Sold section + live FAQ answers (2026-10-07, per Ryan) — see
   // lib/recentlySold.js. On a single-type view (e.g. /condos-for-sale) the
   // sales are limited to that type too.
+  // Nothing listed and no filters picked (2026-11-01, per Ryan): say so
+  // plainly, with how often homes here sell, instead of "adjust your
+  // filters".
+  const visitorFiltered = ['priceMin', 'priceMax', 'beds', 'baths', 'waterfront'].some((k) => searchParams[k]);
+  let emptyMessage = null;
   const recentlySold = showsRecentlySold(slug)
     ? await getRecentlySold({ ...listingsFilterParams, propertyType: searchParams.propertyType })
     : null;
@@ -1294,6 +1299,29 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
     : null;
   const nbName = neighborhood.name;
   const liveFaqItems = [];
+  if (!visitorFiltered) {
+    const sold = recentlySold?.count;
+    emptyMessage = (
+      <>
+        <strong style={{ color: 'var(--color-ink)' }}>No {neighborhood.name} homes are for sale right now</strong>
+        {sold ? ` — ${sold} sold in the last 12 months.` : '.'}{' '}
+        <a href="#listing-alerts" style={{ color: '#000', fontWeight: 600, textDecoration: 'underline' }}>
+          Get an email the moment one lists
+        </a>
+        {sold ? (
+          <>
+            , or{' '}
+            <a href="#recently-sold" style={{ color: '#000', fontWeight: 600, textDecoration: 'underline' }}>
+              see recent sales below
+            </a>
+            .
+          </>
+        ) : (
+          '.'
+        )}
+      </>
+    );
+  }
   if (recentlySold) {
     if (recentlySold.activeCount != null) {
       liveFaqItems.push({
@@ -2111,6 +2139,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           mapZoom={neighborhood.mapZoom || 15}
           resultsLabel={total === 0 ? '0 results' : `${rangeStart}-${rangeEnd} of ${total} Homes`}
           labelExtra={<ListingAlertJumpLink label={neighborhood.name} />}
+          emptyMessage={emptyMessage}
           page={page}
           totalPages={totalPages}
         />
