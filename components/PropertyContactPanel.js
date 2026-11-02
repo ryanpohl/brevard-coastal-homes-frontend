@@ -38,7 +38,7 @@ const inputStyle = { border: '1px solid var(--color-border-warm)' };
 // form and invites the visitor to ask about similar homes instead (Ask a
 // Question stays, so the lead isn't lost). 'Contingent' keeps the full panel
 // (backup offers are often still accepted) with its own note.
-export default function PropertyContactPanel({ listingId, listingAddress, status, similarHomes }) {
+export default function PropertyContactPanel({ listingId, listingAddress, status, similarHomes, initialTourType }) {
   const { user } = useAuth();
   const unavailable = status === 'Pending' || status === 'Sold';
   const [offerOpen, setOfferOpen] = useState(false);
@@ -183,7 +183,7 @@ export default function PropertyContactPanel({ listingId, listingAddress, status
         </div>
       </div>
 
-      <RequestShowingForm listingId={listingId} listingAddress={listingAddress} dateOptions={dateOptions} user={user} />
+      <RequestShowingForm listingId={listingId} listingAddress={listingAddress} dateOptions={dateOptions} user={user} initialTourType={initialTourType} />
         </>
       )}
       {/* "Email me similar homes" for Pending/Sold homes (2026-10-18). */}
@@ -222,12 +222,14 @@ export default function PropertyContactPanel({ listingId, listingAddress, status
   );
 }
 
-function RequestShowingForm({ listingId, listingAddress, dateOptions, user, formId = 'request-showing', radioSuffix = '', openHouse = false }) {
+function RequestShowingForm({ listingId, listingAddress, dateOptions, user, formId = 'request-showing', radioSuffix = '', openHouse = false, initialTourType = null }) {
   // openHouse (2026-10-18, per Ryan): opened from the open house banner's
   // "Want Ryan to meet you there?" — the message says it's for the open
   // house at this address (Ryan only needs the address, not the time).
   const [selectedDate, setSelectedDate] = useState(null); // iso string
-  const [tourType, setTourType] = useState(null); // 'in_person' | 'virtual'
+  // initialTourType: 'virtual' when opened from the out-of-state box's
+  // "Schedule a Video Tour" (OutOfStateBuyers.js, 2026-11-02).
+  const [tourType, setTourType] = useState(initialTourType); // 'in_person' | 'virtual'
   // "Are you currently working with an agent?" (optional Yes/No) — added
   // 2026-09-27, per Ryan: he wants to spend less time on buyer leads who
   // already have an agent, and this is the site's actual, most-used

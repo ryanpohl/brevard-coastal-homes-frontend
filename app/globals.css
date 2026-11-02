@@ -3387,3 +3387,17 @@ textarea:focus {
   font-weight: 600;
   color: var(--color-success);
 }
+
+/* "Buying from out of state?" box (2026-11-02), components/OutOfStateBuyers.js. */
+.oos-box__guide {
+  color: var(--color-ink-dark);
+  font-weight: 600;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .oos-box .guide-promo__cover {
+    display: none;
+  }
+}

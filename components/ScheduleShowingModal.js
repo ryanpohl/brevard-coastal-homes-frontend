@@ -24,7 +24,7 @@ import PropertyContactPanel from './PropertyContactPanel';
  * <main> in app/layout.js and lives in a *different* stacking context.
  * Portaling straight to document.body escapes that nesting entirely.
  */
-export default function ScheduleShowingModal({ onClose }) {
+export default function ScheduleShowingModal({ onClose, initialTourType }) {
   const modal = (
     <div className="modal-overlay" onClick={onClose}>
       <div
@@ -57,7 +57,7 @@ export default function ScheduleShowingModal({ onClose }) {
         >
           ×
         </button>
-        <PropertyContactPanel />
+        <PropertyContactPanel initialTourType={initialTourType} />
       </div>
     </div>
   );

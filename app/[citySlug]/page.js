@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import RelocationGuidePromo from '@/components/RelocationGuidePromo';
+import OutOfStateBuyers from '@/components/OutOfStateBuyers';
 import * as api from '@/lib/api';
 import {
   cityListingsQueryParams,
@@ -308,8 +308,8 @@ export default async function CityAllListingsPage({ params, searchParams: search
           page={page}
           totalPages={totalPages}
         />
-        {/* Free relocation guide offer, opening with this town (2026-10-11). */}
-        <RelocationGuidePromo townSlug={citySlug} />
+        {/* Out-of-state buyers: video tour + free relocation guide (2026-11-02). */}
+        <OutOfStateBuyers townSlug={citySlug} />
       </div>
 
       {listingsSeo && (

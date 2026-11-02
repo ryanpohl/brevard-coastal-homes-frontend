@@ -49,6 +49,7 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
 
 import ModelTourButton from '@/components/ModelTourButton';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
+import OutOfStateBuyers from '@/components/OutOfStateBuyers';
 import ListingAlertSignup, { ListingAlertJumpLink } from '@/components/ListingAlertSignup';
 import PageEmailPrompt from '@/components/PageEmailPrompt';
 import Faq from '@/components/Faq';
@@ -2149,6 +2150,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         <ListingAlertSignup label={neighborhood.name} kind={alertKind} filter={alertFilter} />
         {/* Same alerts as a gentle pop-up offer (2026-10-13) — PageEmailPrompt.js. */}
         <PageEmailPrompt label={neighborhood.name} kind={alertKind} filter={alertFilter} />
+        {/* Out-of-state buyers: video tour + free relocation guide (2026-11-02). */}
+        <OutOfStateBuyers townSlug={neighborhood.city?.slug} />
       </div>
 
       {/* Market stats bar (2026-10-08) — below the listings, per Ryan, so
