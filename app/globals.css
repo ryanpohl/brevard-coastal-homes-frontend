@@ -1618,6 +1618,19 @@ textarea:focus {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
+/* "Stop alerts" on a gold bell's toast (CardAlertButton.js, 2026-11-02). */
+.card-alert-toast__action {
+  margin-left: 12px;
+  padding: 4px 10px;
+  border: 1px solid var(--color-gold);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-gold);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 @media (max-width: 720px) {
   .card-alert-toast {
     bottom: calc(80px + env(safe-area-inset-bottom));

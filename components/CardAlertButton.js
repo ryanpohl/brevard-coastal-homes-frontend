@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
-import { isWatchedHome, rememberAlertEmail, rememberWatchedHome, rememberedAlertEmail } from '@/lib/alertMemory';
+import { forgetWatchedHome, isWatchedHome, rememberAlertEmail, rememberWatchedHome, rememberedAlertEmail } from '@/lib/alertMemory';
 
 /**
  * 🔔 button on each listing card, next to the heart (2026-10-10, per Ryan):
@@ -18,6 +18,9 @@ import { isWatchedHome, rememberAlertEmail, rememberWatchedHome, rememberedAlert
  * another home is one tap, confirmed by a short toast. Homes watched from
  * this device show a gold bell. See lib/alertMemory.js — the listing-page
  * link and the building/neighborhood box save the email there too.
+ *
+ * Tapping a gold bell (2026-11-02, per Ryan) shows "You're watching … Stop
+ * alerts"; only that second tap stops them, so a stray tap can't.
  */
 const TOAST_EVENT = 'bch-card-alert-toast';
 
@@ -34,6 +37,8 @@ export default function CardAlertButton({ listing, large = false }) {
   const [email, setEmail] = useState('');
   const [state, setState] = useState({ sending: false, error: '' });
   const [toast, setToast] = useState('');
+  // { email } while the "Stop alerts" toast is showing for a gold bell.
+  const [stopOffer, setStopOffer] = useState(null);
 
   useEffect(() => {
     setWatching(isWatchedHome(listing.id));
@@ -41,23 +46,53 @@ export default function CardAlertButton({ listing, large = false }) {
 
   useEffect(() => {
     if (!toast) return undefined;
-    const t = setTimeout(() => setToast(''), 3500);
+    // Longer when there's a button to tap.
+    const t = setTimeout(() => {
+      setToast('');
+      setStopOffer(null);
+    }, stopOffer ? 8000 : 3500);
     return () => clearTimeout(t);
-  }, [toast]);
+  }, [toast, stopOffer]);
 
   // One confirmation on screen at a time: a newer one from another card
   // replaces this card's.
   useEffect(() => {
     const onOther = (e) => {
-      if (e.detail !== listing.id) setToast('');
+      if (e.detail !== listing.id) {
+        setToast('');
+        setStopOffer(null);
+      }
     };
     window.addEventListener(TOAST_EVENT, onOther);
     return () => window.removeEventListener(TOAST_EVENT, onOther);
   }, [listing.id]);
 
-  function showToast(message) {
+  function showToast(message, offer = null) {
     window.dispatchEvent(new CustomEvent(TOAST_EVENT, { detail: listing.id }));
+    setStopOffer(offer);
     setToast(message);
+  }
+
+  async function stopAlerts(e) {
+    // The toast renders inside the card's link (React portals bubble).
+    e.preventDefault();
+    e.stopPropagation();
+    const address = stopOffer?.email;
+    setStopOffer(null);
+    try {
+      await api.stopWatchingHome(listing.id, address);
+      forgetWatchedHome(listing.id);
+      setWatching(false);
+      showToast(`Alerts stopped for ${shortAddress(listing.address)}.`);
+    } catch (err) {
+      // Not found under this email (e.g. signed up with another one):
+      // the email's own "Stop alerts" link still works.
+      showToast(
+        err?.status === 404 || /no alerts found/i.test(err?.message || '')
+          ? `We couldn't find alerts for this home under ${address}. Use "Stop alerts" in your alert emails.`
+          : 'Something went wrong. Please try again.'
+      );
+    }
   }
 
   async function subscribe(address) {
@@ -82,7 +117,8 @@ export default function CardAlertButton({ listing, large = false }) {
     e.stopPropagation();
     if (state.sending) return;
     if (watching) {
-      showToast(`🔔 You're already watching ${shortAddress(listing.address)}`);
+      const known = user?.email || rememberedAlertEmail();
+      showToast(`🔔 You're watching ${shortAddress(listing.address)}.`, known ? { email: known } : null);
       return;
     }
     const known = user?.email || rememberedAlertEmail();
@@ -164,8 +200,13 @@ export default function CardAlertButton({ listing, large = false }) {
 
       {toast &&
         createPortal(
-          <div className="card-alert-toast" role="status">
+          <div className="card-alert-toast" role="status" onClick={(e) => e.stopPropagation()}>
             {toast}
+            {stopOffer && (
+              <button type="button" className="card-alert-toast__action" onClick={stopAlerts}>
+                Stop alerts
+              </button>
+            )}
           </div>,
           document.body
         )}
