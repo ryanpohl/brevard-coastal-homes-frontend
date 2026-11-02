@@ -82,7 +82,9 @@ export default async function CondoBuildingPage({ params }) {
       ].filter(Boolean)
     : [];
 
-  const intro = [
+  // A building with its own neighborhood page (e.g. Montecito) gets its own
+  // intro line and a link there (see lib/condoBuildings.js).
+  const intro = building.intro || [
     `${name} is ${building.oceanfront ? 'an oceanfront' : 'a'} condominium${building.address ? ` at ${building.address}` : ''} in ${cityName}, Florida${building.near ? `, ${building.near}` : ''}.`,
     building.newConstruction ? ' It is new construction.' : building.built ? ` It was built in ${building.built}.` : '',
   ].join('');
@@ -144,6 +146,13 @@ export default async function CondoBuildingPage({ params }) {
         </p>
         {condoBuildingDetail(building) && (
           <p style={{ fontSize: 14, color: 'var(--color-muted)', marginBottom: 20 }}>{condoBuildingDetail(building)}</p>
+        )}
+        {building.neighborhoodPage && (
+          <p className="open-house-page__cta" style={{ maxWidth: 760, margin: '14px 0 20px' }}>
+            <strong>Looking at all of {name}?</strong> See every {name} home and townhome for sale, recent sales and
+            amenities on the{' '}
+            <Link href={building.neighborhoodPage}>{name} neighborhood page →</Link>
+          </p>
         )}
       </div>
 
