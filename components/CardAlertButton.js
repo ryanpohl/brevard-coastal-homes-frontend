@@ -90,7 +90,9 @@ export default function CardAlertButton({ listing, large = false }) {
       showToast(
         err?.status === 404 || /no alerts found/i.test(err?.message || '')
           ? `We couldn't find alerts for this home under ${address}. Use "Stop alerts" in your alert emails.`
-          : 'Something went wrong. Please try again.'
+          : err?.status === 429
+            ? 'Too many tries in a short time. Please try again in a little while, or use "Stop alerts" in your alert emails.'
+            : 'Something went wrong. Please try again.'
       );
     }
   }
