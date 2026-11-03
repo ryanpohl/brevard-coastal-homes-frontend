@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { markFavorite, useFavoriteIds } from '@/lib/favoriteIds';
 import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
 import { isWatchedHome } from '@/lib/alertMemory';
@@ -15,6 +16,12 @@ import { SAVED_EVENT, requestSaveHome } from './SaveHomeHost';
 export default function FavoriteButton({ listingId, initialFavorited, size = 40, address, status }) {
   const { signedIn, token } = useAuth();
   const [favorited, setFavorited] = useState(!!initialFavorited);
+  // Listing pages render without the account: show the heart filled once
+  // the visitor's favorites load (2026-11-03).
+  const favoriteIds = useFavoriteIds();
+  useEffect(() => {
+    if (favoriteIds) setFavorited(favoriteIds.has(listingId));
+  }, [favoriteIds, listingId]);
   const [busy, setBusy] = useState(false);
   const [savedByEmail, setSavedByEmail] = useState(false);
 
@@ -47,6 +54,7 @@ export default function FavoriteButton({ listingId, initialFavorited, size = 40,
         await api.addFavorite(token, listingId);
       }
       setFavorited(!favorited);
+      markFavorite(listingId, !favorited);
     } catch {
       // leave state unchanged on failure
     } finally {

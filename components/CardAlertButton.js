@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
+import { useFavoriteIds } from '@/lib/favoriteIds';
 import { forgetWatchedHome, isWatchedHome, rememberAlertEmail, rememberWatchedHome, rememberedAlertEmail } from '@/lib/alertMemory';
 
 /**
@@ -32,6 +33,7 @@ function shortAddress(address) {
 // page's photo, next to the share icon and heart — same signup.
 export default function CardAlertButton({ listing, large = false }) {
   const { user } = useAuth();
+  const favoriteIds = useFavoriteIds();
   const [watching, setWatching] = useState(false);
   const [popup, setPopup] = useState(false);
   const [email, setEmail] = useState('');
@@ -153,6 +155,10 @@ export default function CardAlertButton({ listing, large = false }) {
   }
 
   const underContract = listing.status === 'Pending' || listing.statusLabel === 'Contingent';
+
+  // No bell on a signed-in visitor's favorites (2026-11-03, per Ryan): the
+  // heart already turns that home's alerts on and off.
+  if (user && favoriteIds?.has(listing.id)) return null;
 
   return (
     <>

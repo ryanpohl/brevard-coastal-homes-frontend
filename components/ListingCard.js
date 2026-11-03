@@ -9,6 +9,7 @@ import { formatPrice, formatAssocFee, isPricePerSqftPlausible, soldPricePerSqft,
 import { useAuth } from '@/lib/auth-context';
 import * as api from '@/lib/api';
 import CardAlertButton from './CardAlertButton';
+import { markFavorite, useFavoriteIds } from '@/lib/favoriteIds';
 import { isWatchedHome } from '@/lib/alertMemory';
 import { shortOpenHouseLabel } from '@/lib/openHouseLabel';
 import { SAVED_EVENT, requestSaveHome } from './SaveHomeHost';
@@ -16,6 +17,11 @@ import { SAVED_EVENT, requestSaveHome } from './SaveHomeHost';
 export default function ListingCard({ listing, onHoverChange, priority = false, openHouse }) {
     const { signedIn, token } = useAuth();
     const [favorited, setFavorited] = useState(listing.isFavorited);
+    // Hearts on pages rendered without the account show filled (2026-11-03).
+    const favoriteIds = useFavoriteIds();
+    useEffect(() => {
+        if (favoriteIds) setFavorited(favoriteIds.has(listing.id));
+    }, [favoriteIds, listing.id]);
     // Signed-out visitors who saved this home by email (SaveHomeHost.js).
     const [savedByEmail, setSavedByEmail] = useState(false);
     useEffect(() => {
@@ -91,6 +97,7 @@ export default function ListingCard({ listing, onHoverChange, priority = false, 
                           await api.addFavorite(token, listing.id);
                 }
                 setFavorited(!favorited);
+                markFavorite(listing.id, !favorited);
         } catch {
                 // leave state unchanged on failure
         } finally {
