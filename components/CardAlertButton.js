@@ -37,7 +37,7 @@ export default function CardAlertButton({ listing, large = false }) {
   const [email, setEmail] = useState('');
   const [state, setState] = useState({ sending: false, error: '' });
   const [toast, setToast] = useState('');
-  // { email } while the "Stop alerts" toast is showing for a gold bell.
+  // { emails } while the "Stop alerts" toast is showing for a gold bell.
   const [stopOffer, setStopOffer] = useState(null);
 
   useEffect(() => {
@@ -77,23 +77,38 @@ export default function CardAlertButton({ listing, large = false }) {
     // The toast renders inside the card's link (React portals bubble).
     e.preventDefault();
     e.stopPropagation();
-    const address = stopOffer?.email;
+    // Every email this device knows (2026-11-03, per Ryan: a home watched
+    // before signing in is under the remembered email, not the account's).
+    const emails = stopOffer?.emails || [];
     setStopOffer(null);
-    try {
-      await api.stopWatchingHome(listing.id, address);
+    let lastErr = null;
+    for (const address of emails) {
+      try {
+        await api.stopWatchingHome(listing.id, address);
+        forgetWatchedHome(listing.id);
+        setWatching(false);
+        showToast(`Alerts stopped for ${shortAddress(listing.address)}.`);
+        return;
+      } catch (err) {
+        lastErr = err;
+        if (err?.status !== 404) break;
+      }
+    }
+    if (lastErr?.status === 409) {
+      // Alerts from a saved favorite: the heart controls them.
+      showToast(lastErr.message);
+    } else if (lastErr?.status === 404) {
+      // Nothing active under these emails, so the gold bell was out of
+      // date (stopped from an email link, or another device): clear it.
       forgetWatchedHome(listing.id);
       setWatching(false);
-      showToast(`Alerts stopped for ${shortAddress(listing.address)}.`);
-    } catch (err) {
-      // Not found under this email (e.g. signed up with another one):
-      // the email's own "Stop alerts" link still works.
       showToast(
-        err?.status === 404 || /no alerts found/i.test(err?.message || '')
-          ? `We couldn't find alerts for this home under ${address}. Use "Stop alerts" in your alert emails.`
-          : err?.status === 429
-            ? 'Too many tries in a short time. Please try again in a little while, or use "Stop alerts" in your alert emails.'
-            : 'Something went wrong. Please try again.'
+        `No bell alerts are on for this home under ${emails.join(' or ')}. If you still get emails about it, use "Stop alerts" in the email.`
       );
+    } else if (lastErr?.status === 429) {
+      showToast('Too many tries in a short time. Please try again in a little while, or use "Stop alerts" in your alert emails.');
+    } else {
+      showToast('Something went wrong. Please try again.');
     }
   }
 
@@ -119,8 +134,8 @@ export default function CardAlertButton({ listing, large = false }) {
     e.stopPropagation();
     if (state.sending) return;
     if (watching) {
-      const known = user?.email || rememberedAlertEmail();
-      showToast(`🔔 You're watching ${shortAddress(listing.address)}.`, known ? { email: known } : null);
+      const emails = [...new Set([user?.email, rememberedAlertEmail()].filter(Boolean).map((x) => x.toLowerCase()))];
+      showToast(`🔔 You're watching ${shortAddress(listing.address)}.`, emails.length ? { emails } : null);
       return;
     }
     const known = user?.email || rememberedAlertEmail();
