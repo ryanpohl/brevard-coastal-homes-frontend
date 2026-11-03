@@ -95,7 +95,11 @@ export default function CardAlertButton({ listing, large = false }) {
       }
     }
     if (lastErr?.status === 409) {
-      // Alerts from a saved favorite: the heart controls them.
+      // Alerts from a saved favorite: the heart controls them, and the bell
+      // has none of its own (a bell tap on a favorite reuses the favorite's
+      // alerts), so the bell goes white (2026-11-03, per Ryan).
+      forgetWatchedHome(listing.id);
+      setWatching(false);
       showToast(lastErr.message);
     } else if (lastErr?.status === 404) {
       // Nothing active under these emails, so the gold bell was out of
