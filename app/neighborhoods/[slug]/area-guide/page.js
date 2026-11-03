@@ -206,6 +206,7 @@ export default async function NeighborhoodAreaGuidePage({ params }) {
 
       <GuideSection title="Community & Amenities" text={content.amenities} />
       <GuideSection title={content.homesitesTitle || 'Homesites & Builders'} text={content.homesites} />
+      <GuideSection title="Nightly Rentals" text={content.rentals} />
       <GuideSection title="Schools" text={content.schools} />
       <GuideSection title="HOA & Community Fees" text={content.hoa} />
 

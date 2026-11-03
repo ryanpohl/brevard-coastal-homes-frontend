@@ -1607,7 +1607,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             {/* Trimmed 2026-10-28 (per Ryan: less text above the listings). */}
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
               Looking for a home or condo in Harbor Island Beach Club? We&rsquo;ll find available properties, set up
-              private showings and negotiate on your behalf.{' '}
+              private showings and negotiate on your behalf. Nightly rentals are allowed here, which is uncommon in
+              the Melbourne Beach area and a draw for investors and second-home buyers.{' '}
               <strong>
                 <ContactUsTrigger>Contact Us Today</ContactUsTrigger>
               </strong>{' '}
