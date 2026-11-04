@@ -747,6 +747,12 @@ textarea:focus {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.32);
 }
 
+/* The address suggestion list hangs over the filter pills (2026-11-04), so
+   it's solid: see-through, the pill labels showed behind the addresses. */
+.hero-search-panel--suggestions {
+  background: rgb(16, 28, 33);
+}
+
 .hero-search-item {
   color: #d8dee0;
   border-radius: 4px;

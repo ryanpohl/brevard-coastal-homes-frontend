@@ -101,6 +101,16 @@ export default function SearchBar({ cities, neighborhoods }) {
                                   // address suggestion list left open from the text field.
                                   setSuggestionsOpen(false);
   }, []);
+  // Hover opens a filter's menu, except while the address suggestion list
+  // is open (2026-11-04): passing over a filter on the way to an address
+  // shouldn't close the list. A click still opens it.
+  const hoverOpen = useCallback(
+    (key) => {
+      if (suggestionsOpen && suggestions.length > 0) return;
+      openNow(key);
+    },
+    [suggestionsOpen, suggestions.length, openNow]
+  );
     const scheduleClose = useCallback(() => {
           closeTimer.current = setTimeout(() => setOpenMenu(null), 250);
     }, []);
@@ -334,7 +344,11 @@ export default function SearchBar({ cities, neighborhoods }) {
             field). Pure reorder — no logic changes; nothing in globals.css
             keyed .hero-search-item(-secondary)/.hero-search-panel to row
             order, so this is safe. */}
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+      {/* Above the filter row (2026-11-04, per Ryan): the address suggestion
+          list hangs down over the filter pills, and was drawn under them, so
+          moving the mouse to an address hovered City/Neighborhood instead,
+          which opened that menu and closed the list. */}
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', position: 'relative', zIndex: 30 }}>
         <div
           style={{
                         flex: 1,
@@ -385,7 +399,7 @@ export default function SearchBar({ cities, neighborhoods }) {
                 pill's dropdown for visual consistency. */}
 {suggestionsOpen && suggestions.length > 0 && (
               <div
-               className="hero-search-panel"
+               className="hero-search-panel hero-search-panel--suggestions"
                style={{
                                  position: 'absolute',
                                  top: '100%',
@@ -467,7 +481,7 @@ export default function SearchBar({ cities, neighborhoods }) {
             </div>
 
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-        <PillField style={{ flex: 1 }} onMouseEnter={() => openNow('location')} onMouseLeave={scheduleClose}>
+        <PillField style={{ flex: 1 }} onMouseEnter={() => hoverOpen('location')} onMouseLeave={scheduleClose}>
                       <PillTrigger label={locationLabel} onClick={() => openNow('location')} />
 {openMenu === 'location' && (
               <div
@@ -543,7 +557,7 @@ export default function SearchBar({ cities, neighborhoods }) {
           )}
 </PillField>
 
-        <PillField style={{ flex: 1 }} onMouseEnter={() => openNow('propertyType')} onMouseLeave={scheduleClose}>
+        <PillField style={{ flex: 1 }} onMouseEnter={() => hoverOpen('propertyType')} onMouseLeave={scheduleClose}>
                       <PillTrigger label="Property Type" onClick={() => openNow('propertyType')} />
 {openMenu === 'propertyType' && (
               <div
@@ -577,7 +591,7 @@ export default function SearchBar({ cities, neighborhoods }) {
 
         <PillField
           style={{ flex: 1 }}
-          onMouseEnter={() => openNow('price')}
+          onMouseEnter={() => hoverOpen('price')}
           onMouseLeave={() => {
             if (!draggingRef.current) scheduleClose();
           }}
@@ -734,7 +748,7 @@ export default function SearchBar({ cities, neighborhoods }) {
           )}
 </PillField>
 
-        <PillField style={{ flex: 0.7 }} onMouseEnter={() => openNow('beds')} onMouseLeave={scheduleClose}>
+        <PillField style={{ flex: 0.7 }} onMouseEnter={() => hoverOpen('beds')} onMouseLeave={scheduleClose}>
                       <PillTrigger label={bedsLabel} onClick={() => openNow('beds')} narrow />
           {openMenu === 'beds' && (
                         <div className="hero-search-panel" style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, borderRadius: 4, padding: '8px 0', zIndex: 10 }}>
