@@ -50,6 +50,8 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
 import ModelTourButton from '@/components/ModelTourButton';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import OutOfStateBuyers from '@/components/OutOfStateBuyers';
+import AripekaBuilderPrices from '@/components/AripekaBuilderPrices';
+import { ARIPEKA_BUILDERS, ARIPEKA_BUILDERS_AS_OF } from '@/lib/aripekaBuilders';
 import ListingAlertSignup, { ListingAlertJumpLink } from '@/components/ListingAlertSignup';
 import PageEmailPrompt from '@/components/PageEmailPrompt';
 import Faq from '@/components/Faq';
@@ -1320,7 +1322,10 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // guidance on where prices start.
   const PRICE_GUIDE = {
     adelaide: 'Completed homes in Adelaide usually start around $1.8 million.',
-    aripeka: 'A finished custom home in Aripeka, lot included, starts around $1.25 million, depending on the builder.',
+    aripeka:
+      `A finished custom home in Aripeka, lot included, starts around $1.25 million, depending on the builder: ` +
+      ARIPEKA_BUILDERS.map((b) => `${b.name} ${b.from} (${b.plan} plan)`).join(', ') +
+      ` (builders' prices, ${ARIPEKA_BUILDERS_AS_OF}).`,
   };
   if (communitySnapshot && communitySnapshot.count > 0 && communitySnapshot.low != null) {
     const { count, low, high, median, byType = {}, complete } = communitySnapshot;
@@ -2207,6 +2212,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {/* New-listing email alerts (2026-10-09, per Ryan) — matches this
             page's own listings (and its Homes/Condos view, if any), not the
             visitor's price/bed filters. See ListingAlertSignup.js. */}
+        {/* Builder starting prices (2026-11-05, per Ryan), below the listings. */}
+        {slug === 'aripeka' && <AripekaBuilderPrices />}
         <ListingAlertSignup label={neighborhood.name} kind={alertKind} filter={alertFilter} />
         {/* Same alerts as a gentle pop-up offer (2026-10-13) — PageEmailPrompt.js. */}
         <PageEmailPrompt label={neighborhood.name} kind={alertKind} filter={alertFilter} />
