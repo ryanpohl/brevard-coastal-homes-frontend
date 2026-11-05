@@ -1324,13 +1324,17 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   };
   if (communitySnapshot && communitySnapshot.count > 0 && communitySnapshot.low != null) {
     const { count, low, high, median, byType = {}, complete } = communitySnapshot;
-    const TYPE_WORDS = { Home: 'single-family homes', Condo: 'villas, townhomes and condos', Land: 'homesites' };
+    const TYPE_WORDS = {
+      Home: ['single-family home', 'single-family homes'],
+      Condo: ['villa, townhome or condo', 'villas, townhomes and condos'],
+      Land: ['homesite', 'homesites'],
+    };
     const types = ['Home', 'Condo', 'Land'].filter((t) => byType[t]);
     const span = (lo, hi) => (hi != null && hi !== lo ? `from ${formatPrice(lo)} to ${formatPrice(hi)}` : `at ${formatPrice(lo)}`);
     let detail;
     if (types.length > 1 && complete) {
       // Mixed types: a range for each, no overall median.
-      detail = `: ${types.map((t) => `${byType[t].count} ${TYPE_WORDS[t]} ${span(byType[t].low, byType[t].high)}`).join(', ')}.`;
+      detail = `: ${types.map((t) => `${byType[t].count} ${TYPE_WORDS[t][byType[t].count === 1 ? 0 : 1]} ${span(byType[t].low, byType[t].high)}`).join(', ')}.`;
     } else {
       detail = `, listed ${span(low, high)}${median != null && count > 2 ? `, with a median asking price of ${formatPrice(median)}` : ''}.`;
     }
