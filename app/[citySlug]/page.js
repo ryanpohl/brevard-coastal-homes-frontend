@@ -18,6 +18,7 @@ import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import BuildingInquiryModal from '@/components/BuildingInquiryModal';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import Faq from '@/components/Faq';
+import { formatPrice } from '@/lib/siteConstants';
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 
 // Matches the reference design's "1-30 of 34 Homes" pagination — the
@@ -230,7 +231,46 @@ export default async function CityAllListingsPage({ params, searchParams: search
   // page already show — no new Q&A content to write. Only populated for
   // the cities CITY_LISTINGS_FAQ has content for today; Faq.js renders
   // nothing when items is undefined, so this is a no-op elsewhere.
-  const listingsFaqItems = CITY_LISTINGS_FAQ[citySlug];
+  // Live price and pace answers (2026-11-05, per Ryan: Google's AI answer
+  // for Melbourne Beach quoted Zillow's averages and days on market). Asking
+  // prices from today's listings, sold numbers from the last 12 months of
+  // Space Coast MLS sales; both update on their own.
+  const cityParams = cityListingsQueryParams(citySlug);
+  const [homeAsk, condoAsk, homeSold] = await Promise.all([
+    getMarketSnapshot({ ...cityParams, propertyType: 'Home' }),
+    getMarketSnapshot({ ...cityParams, propertyType: 'Condo' }),
+    api.getSoldStats({ ...cityParams, propertyType: 'Home' }).catch(() => null),
+  ]);
+  const asOf = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/New_York' });
+  const liveFaqItems = [];
+  const plural = (n, one, many) => `${n.toLocaleString('en-US')} ${n === 1 ? one : many}`;
+  if (homeAsk?.count > 0 && homeAsk.median != null) {
+    const parts = [
+      `As of ${asOf}, ${plural(homeAsk.count, 'single-family home is', 'single-family homes are')} for sale in ${city.name}, with a median asking price of ${formatPrice(homeAsk.median)}` +
+        (homeAsk.low != null && homeAsk.high != null && homeAsk.low !== homeAsk.high ? ` (from ${formatPrice(homeAsk.low)} to ${formatPrice(homeAsk.high)}).` : '.'),
+    ];
+    if (condoAsk?.count > 0 && condoAsk.median != null) {
+      parts.push(`${plural(condoAsk.count, 'condo is', 'condos are')} listed, with a median asking price of ${formatPrice(condoAsk.median)}.`);
+    }
+    if (homeSold?.count >= 5 && homeSold.medianPrice) {
+      parts.push(`Over the last 12 months, single-family homes in ${city.name} sold for a median of ${formatPrice(homeSold.medianPrice)}.`);
+    }
+    parts.push('Prices update hourly from the Space Coast MLS.');
+    liveFaqItems.push({ q: `How much do homes cost in ${city.name}?`, a: parts.join(' ') });
+  }
+  if (homeSold?.count >= 5 && homeSold.medianDaysOnMarket != null) {
+    liveFaqItems.push({
+      q: `How fast are homes selling in ${city.name}?`,
+      a:
+        `Over the last 12 months, ${plural(homeSold.count, 'single-family home', 'single-family homes')} sold in ${city.name}, ` +
+        `with a median of ${homeSold.medianDaysOnMarket} days on market` +
+        (homeSold.medianSaleToListPct ? `, selling for a median of ${homeSold.medianSaleToListPct}% of their asking price` : '') +
+        '. Based on Space Coast MLS sales.',
+    });
+  }
+  const listingsFaqItems = CITY_LISTINGS_FAQ[citySlug] || liveFaqItems.length
+    ? [...liveFaqItems, ...(CITY_LISTINGS_FAQ[citySlug] || [])]
+    : undefined;
   const pageJsonLd = [
     ...(itemListSchema ? [itemListSchema] : []),
     ...(listingsSeo ? buildCityPlaceSchema(citySlug, { latitude: city.latitude, longitude: city.longitude }) : []),
