@@ -1146,11 +1146,24 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         .map((l) => l.price)
         .filter((p) => typeof p === 'number' && p > 0)
         .sort((a, b) => a - b);
+      // Price range by property type, for the "How much do homes cost?"
+      // answer (2026-11-05): buyers compare villas with houses, homesites
+      // with finished homes.
+      const byType = {};
+      for (const l of data.results || []) {
+        if (typeof l.price !== 'number' || l.price <= 0 || !l.propertyType) continue;
+        const t = (byType[l.propertyType] ||= { count: 0, low: l.price, high: l.price });
+        t.count += 1;
+        t.low = Math.min(t.low, l.price);
+        t.high = Math.max(t.high, l.price);
+      }
       communitySnapshot = {
         count: typeof data.total === 'number' ? data.total : prices.length,
         median: prices.length ? prices[Math.floor(prices.length / 2)] : null,
         low: prices[0] ?? null,
         high: prices[prices.length - 1] ?? null,
+        byType,
+        complete: (data.results || []).length >= (data.total || 0),
       };
     } catch {
       // Leave the snapshot out rather than show wrong numbers.
@@ -1307,43 +1320,26 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // guidance on where prices start.
   const PRICE_GUIDE = {
     adelaide: 'Completed homes in Adelaide usually start around $1.8 million.',
-    aripeka:
-      'Vacant homesites cost less and are listed too; a finished custom home in Aripeka, lot included, starts around $1.25 million, depending on the builder.',
+    aripeka: 'A finished custom home in Aripeka, lot included, starts around $1.25 million, depending on the builder.',
   };
   if (communitySnapshot && communitySnapshot.count > 0 && communitySnapshot.low != null) {
-    const { count, low, high, median } = communitySnapshot;
-    const range = high != null && high !== low ? `from ${formatPrice(low)} to ${formatPrice(high)}` : `at ${formatPrice(low)}`;
+    const { count, low, high, median, byType = {}, complete } = communitySnapshot;
+    const TYPE_WORDS = { Home: 'single-family homes', Condo: 'villas, townhomes and condos', Land: 'homesites' };
+    const types = ['Home', 'Condo', 'Land'].filter((t) => byType[t]);
+    const span = (lo, hi) => (hi != null && hi !== lo ? `from ${formatPrice(lo)} to ${formatPrice(hi)}` : `at ${formatPrice(lo)}`);
+    let detail;
+    if (types.length > 1 && complete) {
+      // Mixed types: a range for each, no overall median.
+      detail = `: ${types.map((t) => `${byType[t].count} ${TYPE_WORDS[t]} ${span(byType[t].low, byType[t].high)}`).join(', ')}.`;
+    } else {
+      detail = `, listed ${span(low, high)}${median != null && count > 2 ? `, with a median asking price of ${formatPrice(median)}` : ''}.`;
+    }
     liveFaqItems.push({
       q: `How much do homes in ${nbName} cost?`,
       a:
-        `As of ${snapshotUpdated}, ${count} ${count === 1 ? 'property is' : 'properties are'} for sale in ${nbName}, listed ${range}` +
-        // No median where lots are listed with homes: it reads as a home price.
-        `${median != null && count > 2 && slug !== 'aripeka' ? `, with a median asking price of ${formatPrice(median)}` : ''}.` +
+        `As of ${snapshotUpdated}, ${count} ${count === 1 ? 'property is' : 'properties are'} for sale in ${nbName}${detail}` +
         `${PRICE_GUIDE[slug] ? ` ${PRICE_GUIDE[slug]}` : ''} Prices update hourly from the Space Coast MLS.`,
     });
-  }
-  if (!visitorFiltered) {
-    const sold = recentlySold?.count;
-    emptyMessage = (
-      <>
-        <strong style={{ color: 'var(--color-ink)' }}>No {neighborhood.name} homes are for sale right now</strong>
-        {sold ? ` — ${sold} sold in the last 12 months.` : '.'}{' '}
-        <a href="#listing-alerts" style={{ color: '#000', fontWeight: 600, textDecoration: 'underline' }}>
-          Get an email the moment one lists
-        </a>
-        {sold ? (
-          <>
-            , or{' '}
-            <a href="#recently-sold" style={{ color: '#000', fontWeight: 600, textDecoration: 'underline' }}>
-              see recent sales below
-            </a>
-            .
-          </>
-        ) : (
-          '.'
-        )}
-      </>
-    );
   }
   if (recentlySold) {
     if (recentlySold.activeCount != null) {

@@ -847,7 +847,51 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           },
         }
       : null;
-  const faqItems = listingsFaqItems || liveSoldFaq.length ? [...liveSoldFaq, ...(listingsFaqItems || [])] : null;
+  // Asking prices, condo communities and pace (2026-11-05, per Ryan:
+  // Google's AI answer for Melbourne Beach condos quoted Zillow and
+  // Realtor.com for price ranges and named the condo communities). Plain
+  // Homes and Condos pages; all numbers live.
+  const plainTypePage = !isOceanfront && (propertySlug === 'homes-for-sale' || propertySlug === 'condos-for-sale');
+  const typePlural = propertyType === 'Condo' ? 'condos' : 'homes';
+  const askSnap = plainTypePage
+    ? snapshot || (await getMarketSnapshot({ ...cityListingsQueryParams(citySlug), propertyType: [propertyType] }))
+    : null;
+  const asOf = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/New_York' });
+  const liveTypeFaq = [];
+  if (askSnap?.count > 0 && askSnap.median != null) {
+    liveTypeFaq.push({
+      q: `How much do ${typePlural} cost in ${city.name}?`,
+      a:
+        `As of ${asOf}, ${askSnap.count.toLocaleString('en-US')} ${askSnap.count === 1 ? soldNoun : typePlural} ${askSnap.count === 1 ? 'is' : 'are'} for sale in ${city.name}, ` +
+        `with a median asking price of ${formatPrice(askSnap.median)}` +
+        (askSnap.low != null && askSnap.high != null && askSnap.low !== askSnap.high ? ` (from ${formatPrice(askSnap.low)} to ${formatPrice(askSnap.high)})` : '') +
+        '. Prices update hourly from the Space Coast MLS.',
+    });
+  }
+  const buildingsForSale = (condoComparison || []).filter((r) => r.forSale > 0 && r.low != null).slice(0, 8);
+  if (propertySlug === 'condos-for-sale' && buildingsForSale.length >= 2) {
+    liveTypeFaq.push({
+      q: `Which condo communities in ${city.name} have units for sale?`,
+      a:
+        `As of ${asOf}: ` +
+        buildingsForSale
+          .map((r) => `${r.building.name}, ${r.forSale} for sale${r.high != null && r.high !== r.low ? ` from ${formatPrice(r.low)} to ${formatPrice(r.high)}` : ` at ${formatPrice(r.low)}`}`)
+          .join('; ') +
+        '. See the condo community comparison on this page for sold prices, HOA fees and rental rules.',
+    });
+  }
+  const pace = marketReport?.city;
+  if (plainTypePage && pace?.count >= 5 && pace.medianDaysOnMarket != null) {
+    liveTypeFaq.push({
+      q: `How fast are ${typePlural} selling in ${city.name}?`,
+      a:
+        `Over the last 12 months, ${typePlural} in ${city.name} sold after a median of ${pace.medianDaysOnMarket} days on market` +
+        (pace.medianSaleToListPct ? `, for a median of ${pace.medianSaleToListPct}% of their asking price` : '') +
+        '. Based on Space Coast MLS sales.',
+    });
+  }
+  const faqItems =
+    listingsFaqItems || liveSoldFaq.length || liveTypeFaq.length ? [...liveTypeFaq, ...liveSoldFaq, ...(listingsFaqItems || [])] : null;
   const pageTitle = isOceanfrontCombined
     ? `Oceanfront Homes & Condos For Sale in ${city.name}, FL`
     : isRiverfrontCombined

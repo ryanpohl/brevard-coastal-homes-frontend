@@ -10,6 +10,7 @@ import {
   CITY_NEIGHBORHOOD_LINKS,
 } from '@/lib/constants';
 import { getMarketSnapshot } from '@/lib/marketSnapshot';
+import { getCityMarketReport } from '@/lib/cityMarketReport';
 import CityAboutSection from '@/components/CityAboutSection';
 import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
 import FilterBar from '@/components/FilterBar';
@@ -236,10 +237,12 @@ export default async function CityAllListingsPage({ params, searchParams: search
   // prices from today's listings, sold numbers from the last 12 months of
   // Space Coast MLS sales; both update on their own.
   const cityParams = cityListingsQueryParams(citySlug);
-  const [homeAsk, condoAsk, homeSold] = await Promise.all([
+  const [homeAsk, condoAsk, homeSold, homeReport] = await Promise.all([
     getMarketSnapshot({ ...cityParams, propertyType: 'Home' }),
     getMarketSnapshot({ ...cityParams, propertyType: 'Condo' }),
     api.getSoldStats({ ...cityParams, propertyType: 'Home' }).catch(() => null),
+    // Per-neighborhood 12-month sold prices, for "What are the neighborhoods?".
+    getCityMarketReport({ citySlug, cityFilter: cityParams, propertyType: 'Home' }),
   ]);
   const asOf = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/New_York' });
   const liveFaqItems = [];
@@ -266,6 +269,16 @@ export default async function CityAllListingsPage({ params, searchParams: search
         `with a median of ${homeSold.medianDaysOnMarket} days on market` +
         (homeSold.medianSaleToListPct ? `, selling for a median of ${homeSold.medianSaleToListPct}% of their asking price` : '') +
         '. Based on Space Coast MLS sales.',
+    });
+  }
+  const hoods = (homeReport?.neighborhoods || []).filter((n) => n.stats?.count >= 3 && n.stats.medianPrice).slice(0, 10);
+  if (hoods.length >= 3) {
+    liveFaqItems.push({
+      q: `What are the neighborhoods in ${city.name}?`,
+      a:
+        `${city.name} neighborhoods with their median single-family sold price over the last 12 months: ` +
+        hoods.map((n) => `${n.label} (${formatPrice(n.stats.medianPrice)})`).join(', ') +
+        `. Each has its own page on this site with homes for sale and recent sales.`,
     });
   }
   const listingsFaqItems = CITY_LISTINGS_FAQ[citySlug] || liveFaqItems.length
