@@ -854,26 +854,45 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   // Homes and Condos pages; all numbers live.
   const plainTypePage = !isOceanfront && (propertySlug === 'homes-for-sale' || propertySlug === 'condos-for-sale');
   const typePlural = propertyType === 'Condo' ? 'condos' : 'homes';
+  // Oceanfront and riverfront pages too (2026-11-05, per Ryan: Google's
+  // answer for Melbourne Beach oceanfront homes quoted Zillow's range).
+  const waterPage = isOceanfront || isOceanfrontCombined || isRiverfrontCombined;
   const askSnap = plainTypePage
     ? snapshot || (await getMarketSnapshot({ ...cityListingsQueryParams(citySlug), propertyType: [propertyType] }))
-    : null;
+    : waterPage
+      ? snapshot ||
+        (await getMarketSnapshot({
+          ...cityListingsQueryParams(citySlug),
+          propertyType: isOceanfrontCombined ? ['Home', 'Condo'] : isRiverfrontCombined ? ['Home', 'Condo', 'Land'] : [propertyType],
+          waterfront: isRiverfrontCombined ? 'Riverfront' : 'Oceanfront',
+        }))
+      : null;
+  const askNoun = isOceanfrontCombined
+    ? ['oceanfront home or condo', 'oceanfront homes and condos']
+    : isRiverfrontCombined
+      ? ['riverfront property', 'riverfront properties']
+      : isOceanfront
+        ? [`oceanfront ${soldNoun}`, `oceanfront ${typePlural}`]
+        : [soldNoun, typePlural];
   const asOf = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/New_York' });
   const liveTypeFaq = [];
-  const typeWaterLine = askSnap?.count > 0 ? await waterfrontPriceLine({ citySlug, cityName: city.name, propertyType }).catch(() => '') : '';
+  const typeWaterLine = askSnap?.count > 0 && !waterPage ? await waterfrontPriceLine({ citySlug, cityName: city.name, propertyType }).catch(() => '') : '';
   if (askSnap?.count > 0 && askSnap.median != null) {
     liveTypeFaq.push({
-      q: `How much do ${typePlural} cost in ${city.name}?`,
+      q: `How much do ${askNoun[1]} cost in ${city.name}?`,
       a:
-        `As of ${asOf}, ${askSnap.count.toLocaleString('en-US')} ${askSnap.count === 1 ? soldNoun : typePlural} ${askSnap.count === 1 ? 'is' : 'are'} for sale in ${city.name}, ` +
+        `As of ${asOf}, ${askSnap.count.toLocaleString('en-US')} ${askSnap.count === 1 ? askNoun[0] : askNoun[1]} ${askSnap.count === 1 ? 'is' : 'are'} for sale in ${city.name}, ` +
         `with a median asking price of ${formatPrice(askSnap.median)}` +
         (askSnap.low != null && askSnap.high != null && askSnap.low !== askSnap.high ? ` (from ${formatPrice(askSnap.low)} to ${formatPrice(askSnap.high)})` : '') +
         `.${typeWaterLine ? ` ${typeWaterLine}` : ''} Prices update hourly from the Space Coast MLS.`,
     });
   }
   const buildingsForSale = (condoComparison || []).filter((r) => r.forSale > 0 && r.low != null).slice(0, 8);
-  if (propertySlug === 'condos-for-sale' && buildingsForSale.length >= 2) {
+  if ((propertySlug === 'condos-for-sale' || comparisonOceanfront) && buildingsForSale.length >= 2) {
     liveTypeFaq.push({
-      q: `Which condo communities in ${city.name} have units for sale?`,
+      q: comparisonOceanfront
+        ? `Which oceanfront condo buildings in ${city.name} have units for sale?`
+        : `Which condo communities in ${city.name} have units for sale?`,
       a:
         `As of ${asOf}: ` +
         buildingsForSale
