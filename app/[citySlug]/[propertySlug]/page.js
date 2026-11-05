@@ -24,6 +24,7 @@ import {
   formatPrice,
 } from '@/lib/constants';
 import { getMarketSnapshot } from '@/lib/marketSnapshot';
+import { waterfrontPriceLine } from '@/lib/waterfrontFaq';
 import { getCityMarketReport, showsMarketReport } from '@/lib/cityMarketReport';
 import CityMarketReport from '@/components/CityMarketReport';
 import CityAboutSection from '@/components/CityAboutSection';
@@ -858,6 +859,7 @@ export default async function CityListingsPage({ params, searchParams: searchPar
     : null;
   const asOf = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/New_York' });
   const liveTypeFaq = [];
+  const typeWaterLine = askSnap?.count > 0 ? await waterfrontPriceLine({ citySlug, cityName: city.name, propertyType }).catch(() => '') : '';
   if (askSnap?.count > 0 && askSnap.median != null) {
     liveTypeFaq.push({
       q: `How much do ${typePlural} cost in ${city.name}?`,
@@ -865,7 +867,7 @@ export default async function CityListingsPage({ params, searchParams: searchPar
         `As of ${asOf}, ${askSnap.count.toLocaleString('en-US')} ${askSnap.count === 1 ? soldNoun : typePlural} ${askSnap.count === 1 ? 'is' : 'are'} for sale in ${city.name}, ` +
         `with a median asking price of ${formatPrice(askSnap.median)}` +
         (askSnap.low != null && askSnap.high != null && askSnap.low !== askSnap.high ? ` (from ${formatPrice(askSnap.low)} to ${formatPrice(askSnap.high)})` : '') +
-        '. Prices update hourly from the Space Coast MLS.',
+        `.${typeWaterLine ? ` ${typeWaterLine}` : ''} Prices update hourly from the Space Coast MLS.`,
     });
   }
   const buildingsForSale = (condoComparison || []).filter((r) => r.forSale > 0 && r.low != null).slice(0, 8);

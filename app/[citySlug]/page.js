@@ -11,6 +11,7 @@ import {
 } from '@/lib/constants';
 import { getMarketSnapshot } from '@/lib/marketSnapshot';
 import { getCityMarketReport } from '@/lib/cityMarketReport';
+import { waterfrontPriceLine } from '@/lib/waterfrontFaq';
 import CityAboutSection from '@/components/CityAboutSection';
 import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
 import FilterBar from '@/components/FilterBar';
@@ -237,12 +238,13 @@ export default async function CityAllListingsPage({ params, searchParams: search
   // prices from today's listings, sold numbers from the last 12 months of
   // Space Coast MLS sales; both update on their own.
   const cityParams = cityListingsQueryParams(citySlug);
-  const [homeAsk, condoAsk, homeSold, homeReport] = await Promise.all([
+  const [homeAsk, condoAsk, homeSold, homeReport, waterLine] = await Promise.all([
     getMarketSnapshot({ ...cityParams, propertyType: 'Home' }),
     getMarketSnapshot({ ...cityParams, propertyType: 'Condo' }),
     api.getSoldStats({ ...cityParams, propertyType: 'Home' }).catch(() => null),
     // Per-neighborhood 12-month sold prices, for "What are the neighborhoods?".
     getCityMarketReport({ citySlug, cityFilter: cityParams, propertyType: 'Home' }),
+    waterfrontPriceLine({ citySlug, cityName: city.name }).catch(() => ''),
   ]);
   const asOf = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/New_York' });
   const liveFaqItems = [];
@@ -258,6 +260,7 @@ export default async function CityAllListingsPage({ params, searchParams: search
     if (homeSold?.count >= 5 && homeSold.medianPrice) {
       parts.push(`Over the last 12 months, single-family homes in ${city.name} sold for a median of ${formatPrice(homeSold.medianPrice)}.`);
     }
+    if (waterLine) parts.push(waterLine);
     parts.push('Prices update hourly from the Space Coast MLS.');
     liveFaqItems.push({ q: `How much do homes cost in ${city.name}?`, a: parts.join(' ') });
   }
