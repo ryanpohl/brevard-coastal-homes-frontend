@@ -1359,6 +1359,43 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
       });
     }
   }
+  // HOA fee from recent MLS sales (2026-11-05, per Ryan: Google's AI answer
+  // quoted an unsourced "$500 per month" for Lansing Island, whose MLS
+  // records show $544-$657). Only where the written FAQ has no HOA answer.
+  const writtenHoa = (NEIGHBORHOOD_LISTINGS_FAQ[slug] || []).some((f) => /\bHOA\b|association fee/i.test(f.q));
+  if (!writtenHoa) {
+    try {
+      const sold = await api.getListings({ ...listingsFilterParams, status: 'Sold', closedWithinDays: 730, pageSize: 100 });
+      const PER_MONTH = { monthly: 1, quarterly: 1 / 3, 'semi-annually': 1 / 6, semiannually: 1 / 6, annually: 1 / 12, yearly: 1 / 12 };
+      const fees = (sold.results || [])
+        .map((l) => {
+          const k = PER_MONTH[String(l.assocFeeFrequency || '').toLowerCase()];
+          return l.assocFee > 0 && k ? Math.round(l.assocFee * k) : null;
+        })
+        .filter(Boolean)
+        .sort((a, b) => a - b);
+      // MLS fee entries have outliers (a yearly civic-association due typed
+      // as monthly, a typo): the middle 80% when there are 20+ sales, and
+      // no answer where the typical fee is under $25 a month (voluntary or
+      // yearly dues, not a real HOA fee).
+      const mid = fees.length ? fees[Math.floor(fees.length / 2)] : 0;
+      const trim = fees.length >= 20 ? Math.floor(fees.length * 0.1) : 0;
+      const kept = fees.slice(trim, fees.length - trim);
+      if (fees.length >= 3 && mid >= 25) {
+        const lo = kept[0];
+        const hi = kept[kept.length - 1];
+        liveFaqItems.push({
+          q: `What is the HOA fee in ${nbName}?`,
+          a:
+            `Based on Space Coast MLS records for ${fees.length} homes sold in ${nbName} in the last two years, HOA fees ${trim ? 'mostly ' : ''}run about ` +
+            `${lo === hi ? formatPrice(lo) : `${formatPrice(lo)} to ${formatPrice(hi)}`} a month${lo === hi ? '' : ` (median ${formatPrice(mid)})`}. ` +
+            'Fees change over time, so confirm the current fee on any listing.',
+        });
+      }
+    } catch {
+      // No HOA answer rather than a wrong one.
+    }
+  }
   // Neighborhoods without written FAQ content still get the live answers.
   const listingsFaqItems = NEIGHBORHOOD_LISTINGS_FAQ[slug]
     ? [...NEIGHBORHOOD_LISTINGS_FAQ[slug], ...liveFaqItems]
