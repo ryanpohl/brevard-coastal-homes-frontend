@@ -1300,6 +1300,28 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
     : null;
   const nbName = neighborhood.name;
   const liveFaqItems = [];
+  // "How much do homes cost?" with today's prices (2026-11-05, per Ryan:
+  // Google's AI answer for "adelaide viera for sale" opened with the
+  // developer site's old "starting around $1.2 million"). A plain question
+  // with live numbers is what AI answers quote. PRICE_GUIDE is Ryan's own
+  // guidance on where prices start.
+  const PRICE_GUIDE = {
+    adelaide: 'Completed homes in Adelaide usually start around $1.8 million.',
+    aripeka:
+      'Vacant homesites cost less and are listed too; a finished custom home in Aripeka, lot included, usually starts around $1.2 million.',
+  };
+  if (communitySnapshot && communitySnapshot.count > 0 && communitySnapshot.low != null) {
+    const { count, low, high, median } = communitySnapshot;
+    const range = high != null && high !== low ? `from ${formatPrice(low)} to ${formatPrice(high)}` : `at ${formatPrice(low)}`;
+    liveFaqItems.push({
+      q: `How much do homes in ${nbName} cost?`,
+      a:
+        `As of ${snapshotUpdated}, ${count} ${count === 1 ? 'property is' : 'properties are'} for sale in ${nbName}, listed ${range}` +
+        // No median where lots are listed with homes: it reads as a home price.
+        `${median != null && count > 2 && slug !== 'aripeka' ? `, with a median asking price of ${formatPrice(median)}` : ''}.` +
+        `${PRICE_GUIDE[slug] ? ` ${PRICE_GUIDE[slug]}` : ''} Prices update hourly from the Space Coast MLS.`,
+    });
+  }
   if (!visitorFiltered) {
     const sold = recentlySold?.count;
     emptyMessage = (
