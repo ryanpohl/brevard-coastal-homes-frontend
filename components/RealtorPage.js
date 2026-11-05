@@ -2,6 +2,7 @@ import Link from 'next/link';
 import SoldReportSignup from '@/components/SoldReportSignup';
 import { AGENT_INFO, BROKERAGE_INFO, formatPrice } from '@/lib/constants';
 import Faq from '@/components/Faq';
+import { medianChangeText } from '@/lib/marketSnapshot';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import ModelTourButton from '@/components/ModelTourButton';
 
@@ -34,7 +35,48 @@ export function realtorMetadata(page) {
   };
 }
 
-export default function RealtorPage({ page, stats, filter }) {
+// Seller answers on every Realtor page (2026-11-05, per Ryan: Google's AI
+// answer for "sell my house melbourne beach" is built on how long homes
+// take to sell, agent vs. cash buyer, and Florida seller documents, and
+// cited cash buyers and Opendoor, not this site). Live numbers first.
+function sellerFaq(page, pace) {
+  const items = [];
+  const homes = page.kind === 'city' ? 'single-family homes' : 'homes';
+  if (pace?.count >= 5 && pace.medianDaysOnMarket != null) {
+    items.push({
+      q: `How long does it take to sell a house in ${page.name}?`,
+      a:
+        `Over the last 12 months, ${pace.count.toLocaleString('en-US')} ${homes} sold in ${page.name} after a median of ${pace.medianDaysOnMarket} days on market` +
+        (pace.medianSaleToListPct ? `, for a median of ${pace.medianSaleToListPct}% of their asking price` : '') +
+        '. Homes priced right from the start, against recent sales that truly match them, tend to sell faster and closer to asking. Based on Space Coast MLS sales.',
+    });
+  }
+  if (pace?.count >= 5 && pace.medianPrice) {
+    items.push({
+      q: `What are homes selling for in ${page.name}?`,
+      a:
+        `Over the last 12 months, ${homes} in ${page.name} sold for a median of ${formatPrice(pace.medianPrice)}${medianChangeText(pace)}` +
+        (pace.medianPerSqft ? `, about ${formatPrice(pace.medianPerSqft)} per square foot` : '') +
+        '. Your home’s value depends on its location, water exposure, size and condition, so ask Ryan for a free market analysis based on sales like yours.',
+    });
+  }
+  items.push(
+    {
+      q: 'Should I sell to a cash buyer or list with an agent?',
+      a:
+        'Cash buyers and instant-offer companies offer speed and an as-is sale, usually below market value, since they need room to profit when they resell. Listing on the MLS puts your home in front of every buyer, including out-of-state buyers, and is usually how sellers get the highest price. ' +
+        `If you already have a cash offer, Ryan can compare it with what recent ${page.name} sales suggest your home would sell for, free and with no obligation.`,
+    },
+    {
+      q: 'What documents do I need to sell a house in Florida?',
+      a:
+        'Typically a seller’s property disclosure (Florida sellers must disclose known defects that aren’t readily visible), Florida’s flood disclosure for residential sales, your deed and mortgage payoff details, and for an HOA or condo property, the association documents and an estoppel certificate. A title company handles the title search, title insurance and closing. Ryan walks you through each one.',
+    }
+  );
+  return items;
+}
+
+export default function RealtorPage({ page, stats, filter, pace }) {
   const pageUrl = `${SITE_URL}${page.path}`;
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -135,7 +177,7 @@ export default function RealtorPage({ page, stats, filter }) {
       </p>
 
       <div style={{ marginTop: 28 }}>
-        <Faq items={page.faq} heading={`${page.name} Realtor FAQ`} />
+        <Faq items={[...page.faq, ...sellerFaq(page, pace)]} heading={`${page.name} Realtor FAQ`} />
       </div>
 
       <p style={{ fontSize: 13, color: 'var(--color-muted)', marginTop: 24 }}>
