@@ -1308,7 +1308,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   const PRICE_GUIDE = {
     adelaide: 'Completed homes in Adelaide usually start around $1.8 million.',
     aripeka:
-      'Vacant homesites cost less and are listed too; a finished custom home in Aripeka, lot included, usually starts around $1.2 million.',
+      'Vacant homesites cost less and are listed too; a finished custom home in Aripeka, lot included, starts around $1.25 million, depending on the builder.',
   };
   if (communitySnapshot && communitySnapshot.count > 0 && communitySnapshot.low != null) {
     const { count, low, high, median } = communitySnapshot;
