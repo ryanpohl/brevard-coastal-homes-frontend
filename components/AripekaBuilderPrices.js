@@ -28,6 +28,7 @@ export default function AripekaBuilderPrices() {
                 <td data-label="Starting plan">
                   <strong>{b.plan}</strong>
                   <div className="aripeka-builders__specs">{b.specs}</div>
+                  {b.model && <div className="aripeka-builders__specs">Model home: {b.model}</div>}
                 </td>
                 <td data-label="Build time">{b.build}</td>
               </tr>

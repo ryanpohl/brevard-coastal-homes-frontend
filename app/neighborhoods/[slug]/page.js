@@ -51,7 +51,7 @@ import ModelTourButton from '@/components/ModelTourButton';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import OutOfStateBuyers from '@/components/OutOfStateBuyers';
 import AripekaBuilderPrices from '@/components/AripekaBuilderPrices';
-import { ARIPEKA_BUILDERS, ARIPEKA_BUILDERS_AS_OF } from '@/lib/aripekaBuilders';
+import { ARIPEKA_BUILDERS, ARIPEKA_BUILDERS_AS_OF, aripekaBuilderFaq } from '@/lib/aripekaBuilders';
 import ListingAlertSignup, { ListingAlertJumpLink } from '@/components/ListingAlertSignup';
 import PageEmailPrompt from '@/components/PageEmailPrompt';
 import Faq from '@/components/Faq';
@@ -1315,6 +1315,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
     : null;
   const nbName = neighborhood.name;
   const liveFaqItems = [];
+  if (slug === 'aripeka') liveFaqItems.push(...aripekaBuilderFaq());
   // "How much do homes cost?" with today's prices (2026-11-05, per Ryan:
   // Google's AI answer for "adelaide viera for sale" opened with the
   // developer site's old "starting around $1.2 million"). A plain question
