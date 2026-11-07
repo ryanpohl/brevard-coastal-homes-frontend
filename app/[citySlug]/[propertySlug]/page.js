@@ -25,6 +25,7 @@ import {
 } from '@/lib/constants';
 import { getMarketSnapshot } from '@/lib/marketSnapshot';
 import { waterfrontPriceLine } from '@/lib/waterfrontFaq';
+import { buildingsFromListings, exampleText, priceSpreadExamples } from '@/lib/listingExamples';
 import { getCityMarketReport, showsMarketReport } from '@/lib/cityMarketReport';
 import CityMarketReport from '@/components/CityMarketReport';
 import CityAboutSection from '@/components/CityAboutSection';
@@ -867,6 +868,22 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           waterfront: isRiverfrontCombined ? 'Riverfront' : 'Oceanfront',
         }))
       : null;
+  // Current listings on the water pages (2026-11-06, per Ryan: Google's AI
+  // answer for Melbourne Beach oceanfront listed specific homes and condo
+  // buildings): a few examples across the price range, and on oceanfront
+  // condo pages the buildings with units for sale.
+  const waterListings = waterPage
+    ? await api
+        .getListings({
+          ...cityListingsQueryParams(citySlug),
+          propertyType: isOceanfrontCombined ? 'Home,Condo' : isRiverfrontCombined ? 'Home,Condo,Land' : propertyType,
+          waterfront: isRiverfrontCombined ? 'Riverfront' : 'Oceanfront',
+          sort: 'price_desc',
+          pageSize: 100,
+        })
+        .then((d) => d.results || [])
+        .catch(() => [])
+    : [];
   const askNoun = isOceanfrontCombined
     ? ['oceanfront home or condo', 'oceanfront homes and condos']
     : isRiverfrontCombined
@@ -884,7 +901,13 @@ export default async function CityListingsPage({ params, searchParams: searchPar
         `As of ${asOf}, ${askSnap.count.toLocaleString('en-US')} ${askSnap.count === 1 ? askNoun[0] : askNoun[1]} ${askSnap.count === 1 ? 'is' : 'are'} for sale in ${city.name}, ` +
         `with a median asking price of ${formatPrice(askSnap.median)}` +
         (askSnap.low != null && askSnap.high != null && askSnap.low !== askSnap.high ? ` (from ${formatPrice(askSnap.low)} to ${formatPrice(askSnap.high)})` : '') +
-        `.${typeWaterLine ? ` ${typeWaterLine}` : ''} Prices update hourly from the Space Coast MLS.`,
+        `.${typeWaterLine ? ` ${typeWaterLine}` : ''}` +
+        (waterListings.length >= 3
+          ? ` Current examples: ${priceSpreadExamples(waterListings)
+              .map((l) => exampleText(l, isOceanfrontCombined || isRiverfrontCombined))
+              .join('; ')}.`
+          : '') +
+        ' Prices update hourly from the Space Coast MLS.',
     });
   }
   const buildingsForSale = (condoComparison || []).filter((r) => r.forSale > 0 && r.low != null).slice(0, 8);
@@ -900,6 +923,22 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           .join('; ') +
         '. See the condo community comparison on this page for sold prices, HOA fees and rental rules.',
     });
+  }
+  // Oceanfront condo buildings from the MLS names where the building list
+  // (lib/condoBuildings.js) doesn't cover the town.
+  if (comparisonOceanfront && buildingsForSale.length < 2) {
+    const mlsBuildings = buildingsFromListings(waterListings).slice(0, 8);
+    if (mlsBuildings.length >= 2) {
+      liveTypeFaq.push({
+        q: `Which oceanfront condo buildings in ${city.name} have units for sale?`,
+        a:
+          `As of ${asOf}: ` +
+          mlsBuildings
+            .map((b) => `${b.name}, ${b.count} for sale${b.high !== b.low ? ` from ${formatPrice(b.low)} to ${formatPrice(b.high)}` : ` at ${formatPrice(b.low)}`}`)
+            .join('; ') +
+          '. Building names are from the MLS; ask Ryan about HOA fees and rental rules for any building.',
+      });
+    }
   }
   const pace = marketReport?.city;
   if (plainTypePage && pace?.count >= 5 && pace.medianDaysOnMarket != null) {
