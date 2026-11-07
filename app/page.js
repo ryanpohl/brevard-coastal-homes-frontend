@@ -356,7 +356,8 @@ export default async function HomePage() {
             Search By City
           </h2>
           <div className="city-grid">
-            {sortByDisplayOrder(cities, HOMEPAGE_CITY_ORDER).map((city) => (
+            {/* Cities without a photo (Cape Canaveral, added 2026-11-07) stay off the grid until one is added. */}
+            {sortByDisplayOrder(cities, HOMEPAGE_CITY_ORDER).filter((city) => CITY_THUMBNAIL_OVERRIDE[city.slug] || city.thumbnail).map((city) => (
               <PlaceCard
                 key={city.slug}
                 name={city.name}

@@ -11,8 +11,7 @@ import {
   RIVERFRONT_LISTINGS_SLUG,
   VIERA_BUILDERS_SUB_COMMUNITIES,
   NEIGHBORHOOD_AREA_GUIDE_CONTENT,
-  NEIGHBORHOOD_LANDING_PAGES,
-} from '@/lib/constants';
+  NEIGHBORHOOD_LANDING_PAGES, CITY_AREA_GUIDE_SLUGS } from '@/lib/constants';
 import { MARKET_REPORTS } from '@/lib/marketReports';
 import { REALTOR_PAGES } from '@/lib/realtorPages';
 import { OPEN_HOUSE_CITIES, openHousePath } from '@/lib/openHousePages';
@@ -164,12 +163,15 @@ export default async function sitemap() {
       changeFrequency: 'daily',
       priority: 0.75,
     });
-    entries.push({
-      url: `${SITE_URL}/${city.slug}/area-guide`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    });
+    // Only cities with an area guide (Cape Canaveral has none yet, 2026-11-07).
+    if (CITY_AREA_GUIDE_SLUGS.includes(city.slug)) {
+      entries.push({
+        url: `${SITE_URL}/${city.slug}/area-guide`,
+        lastModified: now,
+        changeFrequency: 'weekly',
+        priority: 0.7,
+      });
+    }
     // Oceanfront homes/condos + the combined "Listings" view only exist for
     // the 5 barrier-island cities — see OCEANFRONT_CITY_SLUGS's own comment
     // in lib/constants.js.

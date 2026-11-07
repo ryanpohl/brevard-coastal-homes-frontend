@@ -47,7 +47,7 @@ import { getRecentlySold } from '@/lib/recentlySold';
 // Satellite Beach, Indialantic and Indian Harbour Beach added 2026-10-19,
 // Cocoa Beach, Merritt Island and Viera West 2026-10-21, then Melbourne,
 // Viera and Rockledge the same day, per Ryan.
-const RECENTLY_SOLD_CITIES = new Set(['melbourne-beach', 'satellite-beach', 'indialantic', 'indian-harbour-beach', 'cocoa-beach', 'merritt-island', 'viera-west', 'melbourne', 'viera', 'rockledge']);
+const RECENTLY_SOLD_CITIES = new Set(['cape-canaveral', 'melbourne-beach', 'satellite-beach', 'indialantic', 'indian-harbour-beach', 'cocoa-beach', 'merritt-island', 'viera-west', 'melbourne', 'viera', 'rockledge']);
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 
 // City page intro copy (2026-09-16, per Ryan, pasting one template and
@@ -872,6 +872,16 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   // answer for Melbourne Beach oceanfront listed specific homes and condo
   // buildings): a few examples across the price range, and on oceanfront
   // condo pages the buildings with units for sale.
+  // Towns without a curated building list (lib/condoBuildings.js) get the
+  // building answer from MLS names on the plain Condos page too (2026-11-07,
+  // Cape Canaveral).
+  const condoListings =
+    propertySlug === 'condos-for-sale' && !(condoComparison || []).length
+      ? await api
+          .getListings({ ...cityListingsQueryParams(citySlug), propertyType: 'Condo', sort: 'price_desc', pageSize: 100 })
+          .then((d) => d.results || [])
+          .catch(() => [])
+      : [];
   const waterListings = waterPage
     ? await api
         .getListings({
@@ -929,11 +939,13 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   }
   // Oceanfront condo buildings from the MLS names where the building list
   // (lib/condoBuildings.js) doesn't cover the town.
-  if (comparisonOceanfront && buildingsForSale.length < 2) {
-    const mlsBuildings = buildingsFromListings(waterListings).slice(0, 8);
+  if ((comparisonOceanfront || propertySlug === 'condos-for-sale') && buildingsForSale.length < 2) {
+    const mlsBuildings = buildingsFromListings(comparisonOceanfront ? waterListings : condoListings).slice(0, 8);
     if (mlsBuildings.length >= 2) {
       liveTypeFaq.push({
-        q: `Which oceanfront condo buildings in ${city.name} have units for sale?`,
+        q: comparisonOceanfront
+          ? `Which oceanfront condo buildings in ${city.name} have units for sale?`
+          : `Which condo communities in ${city.name} have units for sale?`,
         a:
           `As of ${asOf}: ` +
           mlsBuildings
