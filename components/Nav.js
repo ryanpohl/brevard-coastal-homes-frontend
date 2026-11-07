@@ -394,7 +394,8 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           onToggle={() => toggleOnClick('city')}
           panel={
             openMenu === 'city' && (
-              <DropdownPanel grid={5}>
+              // Six across so Cape Canaveral fits on the Beachside row (2026-11-07, per Ryan).
+              <DropdownPanel grid={6}>
                 {groupCitiesForNav(cities).map((group) => (
                   <Fragment key={group.label}>
                     <div className="nav-group-label">{group.label}</div>
@@ -616,7 +617,7 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
           onToggle={() => toggleOnClick('oceanfront')}
           panel={
             openMenu === 'oceanfront' && (
-              <DropdownPanel grid={5}>
+              <DropdownPanel grid={6}>
                 {oceanfrontCities.map((city) => (
                   <div key={city.slug}>
                     {/* "<City> Listings" header made a live link (2026-09-01,
@@ -941,6 +942,8 @@ function DropdownPanel({ children, grid }) {
         padding: 18,
         maxWidth: 'calc(100vw - 32px)',
         '--nav-grid-cols': grid,
+        // Six across only on wider screens (2026-11-07, Cape Canaveral).
+        '--nav-grid-cols-md': Math.min(grid, 5),
         boxShadow: 'var(--shadow-nav-menu)',
         zIndex: 40,
       }}

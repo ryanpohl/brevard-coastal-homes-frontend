@@ -581,6 +581,13 @@ h4 {
 
 @media (min-width: 900px) {
   .nav-grid {
+    grid-template-columns: repeat(var(--nav-grid-cols-md, var(--nav-grid-cols, 3)), minmax(140px, 1fr));
+  }
+}
+
+/* Six-across menus (Search by City, Search Oceanfront) only where they fit. */
+@media (min-width: 1150px) {
+  .nav-grid {
     grid-template-columns: repeat(var(--nav-grid-cols, 3), minmax(140px, 1fr));
   }
 }
