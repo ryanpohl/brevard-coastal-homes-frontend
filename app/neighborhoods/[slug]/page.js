@@ -1368,7 +1368,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // HOA fee from recent MLS sales (2026-11-05, per Ryan: Google's AI answer
   // quoted an unsourced "$500 per month" for Lansing Island, whose MLS
   // records show $544-$657). Only where the written FAQ has no HOA answer.
-  const writtenHoa = (NEIGHBORHOOD_LISTINGS_FAQ[slug] || []).some((f) => /\bHOA\b|association fee/i.test(f.q));
+  // A written question or answer that already gives the HOA fee wins (2026-11-07: Modern Duran had both).
+  const writtenHoa = (NEIGHBORHOOD_LISTINGS_FAQ[slug] || []).some((f) => /\bHOA\b|association fee/i.test(f.q) || /\bHOA fees?\b[^.]*\$\d/i.test(f.a));
   if (!writtenHoa) {
     try {
       const sold = await api.getListings({ ...listingsFilterParams, status: 'Sold', closedWithinDays: 730, pageSize: 100 });
