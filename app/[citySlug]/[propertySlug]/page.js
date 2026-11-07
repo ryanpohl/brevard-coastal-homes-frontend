@@ -25,7 +25,7 @@ import {
 } from '@/lib/constants';
 import { getMarketSnapshot } from '@/lib/marketSnapshot';
 import { waterfrontPriceLine } from '@/lib/waterfrontFaq';
-import { buildingsFromListings, exampleText, priceSpreadExamples } from '@/lib/listingExamples';
+import { buildingsFromListings, exampleText, priceSpreadExamples, rentalPhrase } from '@/lib/listingExamples';
 import { getCityMarketReport, showsMarketReport } from '@/lib/cityMarketReport';
 import CityMarketReport from '@/components/CityMarketReport';
 import CityAboutSection from '@/components/CityAboutSection';
@@ -919,9 +919,12 @@ export default async function CityListingsPage({ params, searchParams: searchPar
       a:
         `As of ${asOf}: ` +
         buildingsForSale
-          .map((r) => `${r.building.name}, ${r.forSale} for sale${r.high != null && r.high !== r.low ? ` from ${formatPrice(r.low)} to ${formatPrice(r.high)}` : ` at ${formatPrice(r.low)}`}`)
+          .map((r) => {
+            const rent = rentalPhrase(r.rentalMinimum);
+            return `${r.building.name}, ${r.forSale} for sale${r.high != null && r.high !== r.low ? ` from ${formatPrice(r.low)} to ${formatPrice(r.high)}` : ` at ${formatPrice(r.low)}`}${rent ? `, ${rent}` : ''}`;
+          })
           .join('; ') +
-        '. See the condo community comparison on this page for sold prices, HOA fees and rental rules.',
+        '. Each rental minimum is the one most often shown in that building’s MLS listings; confirm the current rules with the association. See the condo community comparison on this page for sold prices, HOA fees and rental rules.',
     });
   }
   // Oceanfront condo buildings from the MLS names where the building list
@@ -934,9 +937,12 @@ export default async function CityListingsPage({ params, searchParams: searchPar
         a:
           `As of ${asOf}: ` +
           mlsBuildings
-            .map((b) => `${b.name}, ${b.count} for sale${b.high !== b.low ? ` from ${formatPrice(b.low)} to ${formatPrice(b.high)}` : ` at ${formatPrice(b.low)}`}`)
+            .map((b) => {
+              const rent = rentalPhrase(b.rentalMinimum);
+              return `${b.name}, ${b.count} for sale${b.high !== b.low ? ` from ${formatPrice(b.low)} to ${formatPrice(b.high)}` : ` at ${formatPrice(b.low)}`}${rent ? `, ${rent}` : ''}`;
+            })
             .join('; ') +
-          '. Building names are from the MLS; ask Ryan about HOA fees and rental rules for any building.',
+          '. Building names and rental minimums are from MLS listings; confirm the current rules with the association, and ask Ryan about HOA fees for any building.',
       });
     }
   }
