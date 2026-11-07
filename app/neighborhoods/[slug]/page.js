@@ -52,6 +52,8 @@ import ListingResultsLayout from '@/components/ListingResultsLayout';
 import OutOfStateBuyers from '@/components/OutOfStateBuyers';
 import AripekaBuilderPrices from '@/components/AripekaBuilderPrices';
 import { ARIPEKA_BUILDERS, ARIPEKA_BUILDERS_AS_OF, aripekaBuilderFaq } from '@/lib/aripekaBuilders';
+import VieraBuilderPrices from '@/components/VieraBuilderPrices';
+import { showsVieraBuilderPrices, vieraBuilderFaq, vieraBuilderPriceGuide } from '@/lib/vieraBuilders';
 import ListingAlertSignup, { ListingAlertJumpLink } from '@/components/ListingAlertSignup';
 import PageEmailPrompt from '@/components/PageEmailPrompt';
 import Faq from '@/components/Faq';
@@ -1316,6 +1318,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   const nbName = neighborhood.name;
   const liveFaqItems = [];
   if (slug === 'aripeka') liveFaqItems.push(...aripekaBuilderFaq());
+  // Viera Builders' current base prices (2026-11-07, per Ryan) — lib/vieraBuilders.js.
+  liveFaqItems.push(...vieraBuilderFaq(slug));
   // "How much do homes cost?" with today's prices (2026-11-05, per Ryan:
   // Google's AI answer for "adelaide viera for sale" opened with the
   // developer site's old "starting around $1.2 million"). A plain question
@@ -1328,6 +1332,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
       ARIPEKA_BUILDERS.map((b) => `${b.name} ${b.from} (${b.plan} plan)`).join(', ') +
       ` (builders' prices, ${ARIPEKA_BUILDERS_AS_OF}).`,
   };
+  if (vieraBuilderPriceGuide(slug)) PRICE_GUIDE[slug] = vieraBuilderPriceGuide(slug);
   if (communitySnapshot && communitySnapshot.count > 0 && communitySnapshot.low != null) {
     const { count, low, high, median, byType = {}, complete } = communitySnapshot;
     const TYPE_WORDS = {
@@ -2216,6 +2221,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             visitor's price/bed filters. See ListingAlertSignup.js. */}
         {/* Builder starting prices (2026-11-05, per Ryan), below the listings. */}
         {slug === 'aripeka' && <AripekaBuilderPrices />}
+        {showsVieraBuilderPrices(slug) && <VieraBuilderPrices slug={slug} />}
         <ListingAlertSignup label={neighborhood.name} kind={alertKind} filter={alertFilter} />
         {/* Same alerts as a gentle pop-up offer (2026-10-13) — PageEmailPrompt.js. */}
         <PageEmailPrompt label={neighborhood.name} kind={alertKind} filter={alertFilter} />
