@@ -68,8 +68,13 @@ const CITY_LOTS_NAV_SLUGS = new Set(['merritt-island', 'cocoa-beach', 'melbourne
 // Search by City groups (2026-10-04, per Ryan): beach towns first, then
 // mainland cities, instead of the backend's mixed order. A city not listed
 // here (e.g. one added later) falls into the last group so it never disappears.
+// Cities shown with Condos only in Search by City and Search Oceanfront
+// (2026-11-07, per Ryan: Cape Canaveral).
+const CONDOS_ONLY_NAV = ['cape-canaveral'];
+const OCEANFRONT_CONDOS_ONLY = CONDOS_ONLY_NAV;
+
 const CITY_NAV_GROUPS = [
-  { label: 'Beachside', slugs: ['cape-canaveral', 'cocoa-beach', 'satellite-beach', 'indian-harbour-beach', 'indialantic', 'melbourne-beach'] },
+  { label: 'Beachside', slugs: ['cocoa-beach', 'satellite-beach', 'indian-harbour-beach', 'indialantic', 'melbourne-beach', 'cape-canaveral'] },
   // Merritt Island is its own island (between the Indian and Banana Rivers),
   // not mainland — named in the label per Ryan (2026-10-05).
   { label: 'Mainland & Merritt Island', slugs: ['melbourne', 'rockledge', 'merritt-island', 'viera', 'viera-west'] },
@@ -101,7 +106,8 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
   // both excluded from Search Oceanfront (see CITIES_EXCLUDING_OCEANFRONT
   // in app/[citySlug]/[propertySlug]/page.js) since they're mainland
   // cities with no ocean frontage, but they do front the Indian River.
-  const riverfrontCities = cities.filter((city) => RIVERFRONT_CITY_SLUGS.includes(city.slug));
+  // Cape Canaveral's riverfront page exists but isn't in this menu (2026-11-07, per Ryan).
+  const riverfrontCities = cities.filter((city) => RIVERFRONT_CITY_SLUGS.includes(city.slug) && city.slug !== 'cape-canaveral');
   // 'signin'/'join' merged into a single 'auth' key (2026-08-16) — see the
   // "Sign In/Register" NavLink below and AuthPanel.js's own top comment.
   const [openMenu, setOpenMenu] = useState(null); // 'city' | 'neighborhood' | 'oceanfront' | 'riverfront' | 'account' | 'auth' | null
@@ -410,14 +416,17 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                         >
                           {city.name}
                         </Link>
-                        <Link
-                          href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
-                          className="hero-search-item nav-dropdown-link"
-                          style={cityHomeLinkStyle}
-                          onClick={closeNow}
-                        >
-                          Homes
-                        </Link>
+                        {/* Cape Canaveral: Condos only (2026-11-07, per Ryan). */}
+                        {!CONDOS_ONLY_NAV.includes(city.slug) && (
+                          <Link
+                            href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`}
+                            className="hero-search-item nav-dropdown-link"
+                            style={cityHomeLinkStyle}
+                            onClick={closeNow}
+                          >
+                            Homes
+                          </Link>
+                        )}
                         {city.showCondosInNav !== false && (
                           <Link
                             href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Condo}`}
@@ -629,14 +638,17 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                     >
                       {city.name}
                     </Link>
-                    <Link
-                      href={`/${city.slug}/${OCEANFRONT_PROPERTY_TYPE_TO_SLUG.Home}`}
-                      className="hero-search-item nav-dropdown-link"
-                      style={cityHomeLinkStyle}
-                      onClick={closeNow}
-                    >
-                      Homes
-                    </Link>
+                    {/* Cape Canaveral: oceanfront condos only (2026-11-07, per Ryan). */}
+                    {!OCEANFRONT_CONDOS_ONLY.includes(city.slug) && (
+                      <Link
+                        href={`/${city.slug}/${OCEANFRONT_PROPERTY_TYPE_TO_SLUG.Home}`}
+                        className="hero-search-item nav-dropdown-link"
+                        style={cityHomeLinkStyle}
+                        onClick={closeNow}
+                      >
+                        Homes
+                      </Link>
+                    )}
                     <Link
                       href={`/${city.slug}/${OCEANFRONT_PROPERTY_TYPE_TO_SLUG.Condo}`}
                       className="hero-search-item-secondary nav-dropdown-link"

@@ -140,7 +140,8 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
               condo/oceanfront views. */}
           {cities.map((city) => (
             <div key={city.slug} style={{ marginBottom: 8 }}>
-              <Link href={`/${city.slug}/${PROPERTY_TYPE_TO_SLUG.Home}`} className="footer-link" style={footerLinkStyle}>
+              {/* Cape Canaveral links to its condos (2026-11-07, per Ryan). */}
+              <Link href={`/${city.slug}/${city.slug === 'cape-canaveral' ? PROPERTY_TYPE_TO_SLUG.Condo : PROPERTY_TYPE_TO_SLUG.Home}`} className="footer-link" style={footerLinkStyle}>
                 {city.name}
               </Link>
             </div>
