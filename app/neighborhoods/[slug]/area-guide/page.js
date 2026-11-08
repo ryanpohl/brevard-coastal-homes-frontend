@@ -14,6 +14,7 @@ import {
   formatPrice,
 } from '@/lib/constants';
 import Faq from '@/components/Faq';
+import ListingCard from '@/components/ListingCard';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 import AripekaBuilderPrices from '@/components/AripekaBuilderPrices';
@@ -88,7 +89,18 @@ export async function generateMetadata(props) {
 // searchers want listings (2026-10-26, per Ryan: Lansing Island ranked #5
 // and Tortoise Island about #4 with no clicks) — the title says "Homes for
 // Sale" so they know listings are a click away.
-const HOMES_FOR_SALE_TITLE_SLUGS = new Set(['lansing-island', 'tortoise-island']);
+// 2026-11-08 (per Ryan's ranking report: these four area guides are the
+// page Google shows for the community's own name, with views but no
+// clicks): Aquarina and Harbor Island Beach Club added, the description
+// leads with how many are for sale now and the price range, and the page
+// shows the listings right under the intro.
+const FOR_SALE_GUIDES = {
+  'lansing-island': 'Homes for Sale',
+  'tortoise-island': 'Homes for Sale',
+  aquarina: 'Homes & Condos for Sale',
+  'harbor-island-beach-club': 'Condos for Sale',
+};
+const HOMES_FOR_SALE_TITLE_SLUGS = new Set(Object.keys(FOR_SALE_GUIDES));
 
 async function buildMetadata({ params }) {
   const { slug } = await params;
@@ -116,9 +128,15 @@ async function buildMetadata({ params }) {
   try {
     const { neighborhood } = await api.getNeighborhood(slug);
     if (HOMES_FOR_SALE_TITLE_SLUGS.has(slug)) {
+      const what = FOR_SALE_GUIDES[slug];
+      const snap = await getMarketSnapshot(getListingsFilterParams(slug));
+      const live =
+        snap.count > 0 && snap.low != null
+          ? `${snap.count} ${what.replace(/ for Sale$/, '').toLowerCase()} for sale in ${neighborhood.name} now${snap.high !== snap.low ? `, ${formatPrice(snap.low)} to ${formatPrice(snap.high)}` : `, ${formatPrice(snap.low)}`}. `
+          : `${neighborhood.name} ${what.toLowerCase()}. `;
       return {
-        title: `${neighborhood.name} Homes for Sale & Area Guide | Brevard Coastal Homes`,
-        description: `${neighborhood.name} homes for sale, plus what to know before you buy: amenities, schools, HOA fees, current market stats, and FAQs.`,
+        title: `${neighborhood.name} ${what}${what.includes('&') ? ',' : ' &'} Area Guide | Brevard Coastal Homes`,
+        description: `${live}Plus what to know before you buy: amenities, HOA fees, schools and FAQs. Updated hourly from the MLS.`,
         alternates: { canonical: `/neighborhoods/${slug}/area-guide` },
       };
     }
@@ -136,11 +154,17 @@ async function getMarketSnapshot(listingsFilterParams) {
   try {
     const data = await api.getListings({ ...listingsFilterParams, pageSize: 100 });
     const results = data.results || [];
-    const prices = results.map((l) => l.price).filter((p) => typeof p === 'number').sort((a, b) => a - b);
+    const prices = results.map((l) => l.price).filter((p) => typeof p === 'number' && p > 0).sort((a, b) => a - b);
     const median = prices.length ? prices[Math.floor(prices.length / 2)] : null;
-    return { count: typeof data.total === 'number' ? data.total : results.length, median };
+    return {
+      count: typeof data.total === 'number' ? data.total : results.length,
+      median,
+      low: prices.length ? prices[0] : null,
+      high: prices.length ? prices[prices.length - 1] : null,
+      results: results.filter((l) => l.price > 0),
+    };
   } catch {
-    return { count: 0, median: null };
+    return { count: 0, median: null, low: null, high: null, results: [] };
   }
 }
 
@@ -207,6 +231,27 @@ export default async function NeighborhoodAreaGuidePage({ params }) {
       <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)', marginBottom: 36 }}>
         {content.intro}
       </p>
+
+      {HOMES_FOR_SALE_TITLE_SLUGS.has(slug) && snapshot.results.length > 0 && (
+        <section style={{ marginBottom: 36 }}>
+          <h2 style={{ fontSize: 22, marginBottom: 12, fontFamily: 'var(--font-inter-tight)' }}>
+            {neighborhood.name} {FOR_SALE_GUIDES[slug]} Now
+          </h2>
+          <div className="condo-listing-grid">
+            {[...snapshot.results]
+              .sort((a, b) => b.price - a.price)
+              .slice(0, 4)
+              .map((l) => (
+                <ListingCard key={l.id} listing={l} />
+              ))}
+          </div>
+          <p style={{ marginTop: 14 }}>
+            <Link href={`/neighborhoods/${slug}`} style={{ fontWeight: 700, textDecoration: 'underline' }}>
+              See all {snapshot.count} {neighborhood.name} listings &rarr;
+            </Link>
+          </p>
+        </section>
+      )}
 
       <GuideSection title="Community & Amenities" text={content.amenities} />
       <GuideSection title={content.homesitesTitle || 'Homesites & Builders'} text={content.homesites} />

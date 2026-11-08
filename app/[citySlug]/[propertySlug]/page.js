@@ -25,7 +25,7 @@ import {
 } from '@/lib/constants';
 import { getMarketSnapshot } from '@/lib/marketSnapshot';
 import { waterfrontPriceLine } from '@/lib/waterfrontFaq';
-import { buildingsFromListings, exampleText, priceSpreadExamples, rentalPhrase } from '@/lib/listingExamples';
+import { buildingsFromListings, exampleText, neighborhoodsFromListings, priceSpreadExamples, rentalPhrase } from '@/lib/listingExamples';
 import { getCityMarketReport, showsMarketReport } from '@/lib/cityMarketReport';
 import CityMarketReport from '@/components/CityMarketReport';
 import CityAboutSection from '@/components/CityAboutSection';
@@ -882,6 +882,16 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           .then((d) => d.results || [])
           .catch(() => [])
       : [];
+  // Homes for sale on the plain Homes page (2026-11-08, per Ryan's ranking
+  // report: beach-town homes searches rank on page 3+): examples across the
+  // price range and the neighborhoods with homes for sale, by MLS name.
+  const homeListings =
+    propertySlug === 'homes-for-sale'
+      ? await api
+          .getListings({ ...cityListingsQueryParams(citySlug), propertyType: 'Home', sort: 'price_desc', pageSize: 100 })
+          .then((d) => d.results || [])
+          .catch(() => [])
+      : [];
   const waterListings = waterPage
     ? await api
         .getListings({
@@ -916,7 +926,9 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           ? ` Current examples: ${priceSpreadExamples(waterListings)
               .map((l) => exampleText(l, isOceanfrontCombined || isRiverfrontCombined))
               .join('; ')}.`
-          : '') +
+          : homeListings.length >= 3
+            ? ` Current examples: ${priceSpreadExamples(homeListings).map((l) => exampleText(l)).join('; ')}.`
+            : '') +
         ' Prices update hourly from the Space Coast MLS.',
     });
   }
@@ -957,6 +969,21 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           '. Building names and rental minimums are from MLS listings; confirm the current rules with the association, and ask Ryan about HOA fees for any building.',
       });
     }
+  }
+  // The town's own name ("Indian Harbour Beach Sec 3") isn't a neighborhood.
+  const homeNeighborhoods = neighborhoodsFromListings(homeListings)
+    .filter((n) => n.name.toLowerCase() !== city.name.toLowerCase())
+    .slice(0, 8);
+  if (homeNeighborhoods.length >= 3) {
+    liveTypeFaq.push({
+      q: `Which neighborhoods in ${city.name} have homes for sale?`,
+      a:
+        `As of ${asOf}: ` +
+        homeNeighborhoods
+          .map((n) => `${n.name}, ${n.count} for sale${n.high !== n.low ? ` from ${formatPrice(n.low)} to ${formatPrice(n.high)}` : ` at ${formatPrice(n.low)}`}`)
+          .join('; ') +
+        `. Neighborhood names are from MLS listings and update hourly; ask Ryan about any ${city.name} neighborhood.`,
+    });
   }
   const pace = marketReport?.city;
   if (plainTypePage && pace?.count >= 5 && pace.medianDaysOnMarket != null) {
