@@ -18,6 +18,7 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 import AripekaBuilderPrices from '@/components/AripekaBuilderPrices';
 import VieraBuilderPrices from '@/components/VieraBuilderPrices';
+import DelWebbVieraPrices from '@/components/DelWebbVieraPrices';
 import { showsVieraBuilderPrices } from '@/lib/vieraBuilders';
 
 // Mirrors app/neighborhoods/[slug]/page.js's own listingsFilterParams
@@ -211,6 +212,7 @@ export default async function NeighborhoodAreaGuidePage({ params }) {
       <GuideSection title={content.homesitesTitle || 'Homesites & Builders'} text={content.homesites} />
       {slug === 'aripeka' && <AripekaBuilderPrices />}
       {showsVieraBuilderPrices(slug) && <VieraBuilderPrices slug={slug} />}
+      {slug === 'del-webb-viera' && <DelWebbVieraPrices />}
       <GuideSection title="Nightly Rentals" text={content.rentals} />
       <GuideSection title="Schools" text={content.schools} />
       <GuideSection title="HOA & Community Fees" text={content.hoa} />
