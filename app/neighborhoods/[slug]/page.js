@@ -579,8 +579,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
       slug,
       name: landingPage.name,
       city: { slug: landingPage.citySlug },
-      latitude: null,
-      longitude: null,
+      latitude: landingPage.latitude ?? null,
+      longitude: landingPage.longitude ?? null,
       mapZoom: null,
     };
   } else if (subCommunity) {
@@ -646,6 +646,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
       ({ city: parentCity } = await api.getCity(neighborhood.city.slug));
       waterfrontFlags = parentCity.filters || {};
     } catch {
+      // Hidden cities (Cocoa) have no city record; the page sets its own.
+      if (landingPage?.filters) waterfrontFlags = landingPage.filters;
       // No parent city data available — FilterBar simply won't show a Waterfront option.
     }
   }
@@ -1233,7 +1235,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             '@type': 'BreadcrumbList',
             itemListElement: [
               { name: 'Home', path: '' },
-              { name: landingPage.cityName, path: `/${landingPage.citySlug}` },
+              ...(landingPage.noCityPage ? [] : [{ name: landingPage.cityName, path: `/${landingPage.citySlug}` }]),
               { name: landingPage.name, path: `/neighborhoods/${slug}` },
             ].map((crumb, i) => ({
               '@type': 'ListItem',

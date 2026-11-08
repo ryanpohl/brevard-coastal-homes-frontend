@@ -151,7 +151,8 @@ export default async function ListingDetailPage({ params }) {
   let moreArea = null;
   let moreHomes = [];
   for (const area of [community, cityArea]) {
-    if (!area || !cities.some((c) => c.slug === area.citySlug)) continue;
+    // A community on a hidden city (Cocoa Village) still gets its own homes.
+    if (!area || (area !== community && !cities.some((c) => c.slug === area.citySlug))) continue;
     try {
       const data = await api.getListings({ ...area.filter, pageSize: 40 });
       moreHomes = pickMoreHomes(listing, data.results || []);
