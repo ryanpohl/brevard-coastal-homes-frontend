@@ -27,17 +27,19 @@ export default function VieraBuilderPrices({ slug }) {
             {rows.map((c) => (
               <tr key={c.slug}>
                 <th scope="row">
-                  {c.slug === slug ? c.name : <Link href={`/neighborhoods/${c.slug}`}>{c.name}</Link>}
+                  {c.slug === slug ? c.name : <Link href={c.href || `/neighborhoods/${c.slug}`}>{c.name}</Link>}
                 </th>
-                <td data-label="Starts at">{c.from}</td>
+                <td data-label="Starts at">
+                  {c.remainingOnly ? <Link href={c.href} style={{ textDecoration: 'underline' }}>{c.from}</Link> : c.from}
+                </td>
                 <td data-label="Starting plan">
                   <strong>{c.plan}</strong>
                   <div className="aripeka-builders__specs">{c.specs}</div>
                   <div className="aripeka-builders__specs">{c.note}</div>
                 </td>
                 <td data-label="Plans up to">
-                  {c.top}
-                  <div className="aripeka-builders__specs">{c.topPlan}</div>
+                  {c.remainingOnly ? '—' : c.top}
+                  {!c.remainingOnly && <div className="aripeka-builders__specs">{c.topPlan}</div>}
                 </td>
               </tr>
             ))}
