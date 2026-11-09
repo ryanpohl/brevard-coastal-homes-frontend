@@ -11,7 +11,7 @@ import {
   RIVERFRONT_LISTINGS_SLUG,
   VIERA_BUILDERS_SUB_COMMUNITIES,
   NEIGHBORHOOD_AREA_GUIDE_CONTENT,
-  NEIGHBORHOOD_LANDING_PAGES, CITY_AREA_GUIDE_SLUGS } from '@/lib/constants';
+  NEIGHBORHOOD_LANDING_PAGES, CITY_AREA_GUIDE_SLUGS, WATER_LAND_PAGES } from '@/lib/constants';
 import { MARKET_REPORTS } from '@/lib/marketReports';
 import { REALTOR_PAGES } from '@/lib/realtorPages';
 import { OPEN_HOUSE_CITIES, openHousePath } from '@/lib/openHousePages';
@@ -206,6 +206,12 @@ export default async function sitemap() {
         priority: 0.6,
       });
     }
+    // Waterfront lot pages (2026-11-08) — see WATER_LAND_PAGES.
+    Object.entries(WATER_LAND_PAGES).forEach(([slug, page]) => {
+      if (page.cities.includes(city.slug)) {
+        entries.push({ url: `${SITE_URL}/${city.slug}/${slug}`, lastModified: now, changeFrequency: 'daily', priority: 0.6 });
+      }
+    });
   });
 
   neighborhoods.forEach((n) => {

@@ -9,6 +9,7 @@ import {
   PROPERTY_TYPE_LABEL,
   CONDO_PRICE_BANDS,
   OCEANFRONT_SLUG_TO_PROPERTY_TYPE,
+  waterLandPage,
   OCEANFRONT_CITY_SLUGS,
   OCEANFRONT_LISTINGS_SLUG,
   OCEANFRONT_PROPERTY_TYPE_TO_SLUG,
@@ -314,6 +315,8 @@ export async function generateMetadata(props) {
   if (propertySlug === OCEANFRONT_LISTINGS_SLUG) filter = { ...cityListingsQueryParams(citySlug), propertyType: 'Home,Condo', waterfront: 'Oceanfront' };
   else if (OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug])
     filter = { ...cityListingsQueryParams(citySlug), propertyType: OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug], waterfront: 'Oceanfront' };
+  else if (waterLandPage(citySlug, propertySlug))
+    filter = { ...cityListingsQueryParams(citySlug), propertyType: 'Land', waterfront: waterLandPage(citySlug, propertySlug).waterfront };
   else if (propertySlug === RIVERFRONT_LISTINGS_SLUG) filter = { ...cityListingsQueryParams(citySlug), waterfront: 'Riverfront' };
   else filter = { ...cityListingsQueryParams(citySlug), propertyType: SLUG_TO_PROPERTY_TYPE[propertySlug] };
   const [meta, photo] = await Promise.all([buildMetadata(props), listingPreviewPhoto(filter)]);
@@ -341,7 +344,9 @@ async function buildMetadata({ params }) {
   // type-by-type breakdown, so there's nothing analogous to isOceanfront
   // to check here).
   const isRiverfrontCombined = propertySlug === RIVERFRONT_LISTINGS_SLUG;
-  const propertyType = isOceanfront ? OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug] : SLUG_TO_PROPERTY_TYPE[propertySlug];
+  // Waterfront lot pages (2026-11-08) — see WATER_LAND_PAGES in lib/constants.js.
+  const waterLand = waterLandPage(citySlug, propertySlug);
+  const propertyType = waterLand ? 'Land' : isOceanfront ? OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug] : SLUG_TO_PROPERTY_TYPE[propertySlug];
   if (!propertyType && !isOceanfrontCombined && !isRiverfrontCombined) return {};
   if ((isOceanfront || isOceanfrontCombined) && !OCEANFRONT_CITY_SLUGS.includes(citySlug)) return {};
   if (isRiverfrontCombined && !RIVERFRONT_CITY_SLUGS.includes(citySlug)) return {};
@@ -361,7 +366,7 @@ async function buildMetadata({ params }) {
           citySlug,
           cityName: CITY_PAGE_SEO[citySlug].name,
           propertyType: isCombined ? ['Home', 'Condo', 'Land'] : propertyType,
-          waterfront: isOceanfront || isOceanfrontCombined ? 'Oceanfront' : isRiverfrontCombined ? 'Riverfront' : undefined,
+          waterfront: waterLand ? waterLand.waterfront : isOceanfront || isOceanfrontCombined ? 'Oceanfront' : isRiverfrontCombined ? 'Riverfront' : undefined,
           noun: isCombined ? { singular: 'property', plural: 'properties' } : undefined,
         })
       : '';
@@ -539,7 +544,9 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   // RIVERFRONT_SLUG_TO_PROPERTY_TYPE lookup exists), same as
   // isOceanfrontCombined leaves it undefined.
   const isRiverfrontCombined = propertySlug === RIVERFRONT_LISTINGS_SLUG;
-  const propertyType = isOceanfront ? OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug] : SLUG_TO_PROPERTY_TYPE[propertySlug];
+  // Waterfront lot pages (2026-11-08) — see WATER_LAND_PAGES in lib/constants.js.
+  const waterLand = waterLandPage(citySlug, propertySlug);
+  const propertyType = waterLand ? 'Land' : isOceanfront ? OCEANFRONT_SLUG_TO_PROPERTY_TYPE[propertySlug] : SLUG_TO_PROPERTY_TYPE[propertySlug];
   if (!propertyType && !isOceanfrontCombined && !isRiverfrontCombined) notFound();
   // Oceanfront cross-link (2026-09-26, per Ryan — he asked whether it'd be
   // worth adding oceanfront links across all 5 barrier-island city pages;
@@ -642,7 +649,7 @@ export default async function CityListingsPage({ params, searchParams: searchPar
       // ignoring any ?waterfront= a visitor's URL might otherwise carry —
       // there's no Waterfront dropdown on these pages to set it from
       // anyway (see hideWaterfront on FilterBar below).
-      waterfront: isOceanfront || isOceanfrontCombined ? 'Oceanfront' : isRiverfrontCombined ? 'Riverfront' : searchParams.waterfront,
+      waterfront: waterLand ? waterLand.waterfront : isOceanfront || isOceanfrontCombined ? 'Oceanfront' : isRiverfrontCombined ? 'Riverfront' : searchParams.waterfront,
       // "55+ Communities" (2026-08-14) — the control only ever renders on
       // Viera West's Homes/Condos pages (see show55Filter below), so this
       // param will only be set there in practice. Forwarded unconditionally
@@ -786,7 +793,7 @@ export default async function CityListingsPage({ params, searchParams: searchPar
     snapshot = await getMarketSnapshot({
       ...cityListingsQueryParams(citySlug),
       propertyType: isOceanfrontCombined ? ['Home', 'Condo'] : isRiverfrontCombined ? ['Home', 'Condo', 'Land'] : [propertyType],
-      waterfront: isOceanfront || isOceanfrontCombined ? 'Oceanfront' : isRiverfrontCombined ? 'Riverfront' : undefined,
+      waterfront: waterLand ? waterLand.waterfront : isOceanfront || isOceanfrontCombined ? 'Oceanfront' : isRiverfrontCombined ? 'Riverfront' : undefined,
     });
   }
   // City market snapshot + neighborhood comparison (2026-10-07, per Ryan) on
@@ -1155,7 +1162,7 @@ export default async function CityListingsPage({ params, searchParams: searchPar
         // above) — showing a Waterfront dropdown that could uncheck the
         // very filter defining the page wouldn't make sense, so it's
         // hidden entirely rather than just pre-checked.
-        hideWaterfront={isOceanfront || isOceanfrontCombined || isRiverfrontCombined}
+        hideWaterfront={Boolean(waterLand) || isOceanfront || isOceanfrontCombined || isRiverfrontCombined}
         // Property Type stays visible (so a visitor can still narrow to
         // just Homes or just Condos, or view both together) but Land is
         // excluded from its options — Ryan's request was specifically

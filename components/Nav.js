@@ -32,6 +32,11 @@ import ContactModal from './ContactModal';
 // though") extended the header + Homes treatment to every neighborhood, so
 // this set is now just the allowlist for the extra Condos link, not a gate
 // on the header/Homes treatment itself.
+// Waterfront lot pages (2026-11-08, per Ryan) — see WATER_LAND_PAGES in
+// lib/constants.js (kept as plain lists here so the browser bundle doesn't
+// pull in lib/constants.js).
+const OCEANFRONT_LOTS_NAV = ['melbourne-beach'];
+const RIVERFRONT_LOTS_NAV = ['merritt-island'];
 const NEIGHBORHOOD_CONDO_PAGE_SLUGS = new Set(['harbor-island-beach-club', 'aquarina', 'beach-woods', 'heritage-isle', 'pangea-park', 'cocoa-village']);
 
 // Neighborhoods whose "Search by Neighborhood" dropdown entry also gets a
@@ -658,6 +663,16 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
                     >
                       Condos
                     </Link>
+                    {OCEANFRONT_LOTS_NAV.includes(city.slug) && (
+                      <Link
+                        href={`/${city.slug}/oceanfront-land-for-sale`}
+                        className="hero-search-item-secondary nav-dropdown-link"
+                        style={lotsLinkStyle}
+                        onClick={closeNow}
+                      >
+                        Lots
+                      </Link>
+                    )}
                   </div>
                 ))}
               </DropdownPanel>
@@ -694,15 +709,26 @@ export default function Nav({ cities = [], neighborhoods = [] }) {
             openMenu === 'riverfront' && (
               <DropdownPanel grid={4}>
                 {riverfrontCities.map((city) => (
-                  <Link
-                    key={city.slug}
-                    href={`/${city.slug}/${RIVERFRONT_LISTINGS_SLUG}`}
-                    className="hero-search-item nav-dropdown-label nav-dropdown-link"
-                    style={cityListingsOnlyLinkStyle}
-                    onClick={closeNow}
-                  >
-                    {city.name}
-                  </Link>
+                  <div key={city.slug}>
+                    <Link
+                      href={`/${city.slug}/${RIVERFRONT_LISTINGS_SLUG}`}
+                      className="hero-search-item nav-dropdown-label nav-dropdown-link"
+                      style={cityListingsOnlyLinkStyle}
+                      onClick={closeNow}
+                    >
+                      {city.name}
+                    </Link>
+                    {RIVERFRONT_LOTS_NAV.includes(city.slug) && (
+                      <Link
+                        href={`/${city.slug}/riverfront-land-for-sale`}
+                        className="hero-search-item-secondary nav-dropdown-link"
+                        style={lotsLinkStyle}
+                        onClick={closeNow}
+                      >
+                        Lots
+                      </Link>
+                    )}
+                  </div>
                 ))}
               </DropdownPanel>
             )
@@ -1007,6 +1033,7 @@ const cityListingsLabelStyle = {
   borderRadius: 4,
 };
 const cityHomeLinkStyle = { ...gridLinkStyle, padding: '2px 10px 0' };
+// "Lots" right under Condos (or the city name), no gap above it (2026-11-08).
 
 // Search Riverfront's dropdown items (2026-09-29) — unlike
 // cityListingsLabelStyle above, this is the ONLY link in its cell (no
@@ -1020,6 +1047,7 @@ const gridCondoLinkStyle = {
   padding: '2px 10px 8px',
   borderRadius: 4,
 };
+const lotsLinkStyle = { ...gridCondoLinkStyle, marginTop: -8 };
 
 const accountRowStyle = {
   display: 'block',
