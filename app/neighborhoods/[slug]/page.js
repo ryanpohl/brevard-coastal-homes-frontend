@@ -51,6 +51,8 @@ import ModelTourButton from '@/components/ModelTourButton';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import OutOfStateBuyers from '@/components/OutOfStateBuyers';
 import AripekaBuilderPrices from '@/components/AripekaBuilderPrices';
+import AdelaideBuilderPrices from '@/components/AdelaideBuilderPrices';
+import { adelaideBuilderFaq } from '@/lib/adelaideBuilders';
 import { ARIPEKA_BUILDERS, ARIPEKA_BUILDERS_AS_OF, aripekaBuilderFaq } from '@/lib/aripekaBuilders';
 import VieraBuilderPrices from '@/components/VieraBuilderPrices';
 import DelWebbVieraPrices from '@/components/DelWebbVieraPrices';
@@ -1322,6 +1324,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   const nbName = neighborhood.name;
   const liveFaqItems = [];
   if (slug === 'aripeka') liveFaqItems.push(...aripekaBuilderFaq());
+  if (slug === 'adelaide') liveFaqItems.push(...adelaideBuilderFaq());
   // Viera Builders' current base prices (2026-11-07, per Ryan) — lib/vieraBuilders.js.
   liveFaqItems.push(...vieraBuilderFaq(slug));
   // Del Webb at Viera's own starting prices (2026-11-08, per Ryan) — lib/delWebbViera.js.
@@ -1332,7 +1335,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // with live numbers is what AI answers quote. PRICE_GUIDE is Ryan's own
   // guidance on where prices start.
   const PRICE_GUIDE = {
-    adelaide: 'Completed homes in Adelaide usually start around $1.8 million.',
+    adelaide:
+      'Completed homes in Adelaide usually start around $1.8 million; new custom builds start around $1.3 million with AR Homes (lot included) and from $1.4 million with Élan (builders’ prices, November 2026).',
     aripeka:
       `A finished custom home in Aripeka, lot included, starts around $1.25 million, depending on the builder: ` +
       ARIPEKA_BUILDERS.map((b) => `${b.name} ${b.from} (${b.plan} plan)`).join(', ') +
@@ -2228,6 +2232,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             visitor's price/bed filters. See ListingAlertSignup.js. */}
         {/* Builder starting prices (2026-11-05, per Ryan), below the listings. */}
         {slug === 'aripeka' && <AripekaBuilderPrices />}
+        {slug === 'adelaide' && <AdelaideBuilderPrices />}
         {showsVieraBuilderPrices(slug) && <VieraBuilderPrices slug={slug} />}
         {slug === DEL_WEBB_VIERA_SLUG && <DelWebbVieraPrices />}
         <ListingAlertSignup label={neighborhood.name} kind={alertKind} filter={alertFilter} />

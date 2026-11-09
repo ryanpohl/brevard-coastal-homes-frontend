@@ -18,6 +18,7 @@ import ListingCard from '@/components/ListingCard';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 import AripekaBuilderPrices from '@/components/AripekaBuilderPrices';
+import AdelaideBuilderPrices from '@/components/AdelaideBuilderPrices';
 import VieraBuilderPrices from '@/components/VieraBuilderPrices';
 import DelWebbVieraPrices from '@/components/DelWebbVieraPrices';
 import { showsVieraBuilderPrices } from '@/lib/vieraBuilders';
@@ -256,6 +257,7 @@ export default async function NeighborhoodAreaGuidePage({ params }) {
       <GuideSection title="Community & Amenities" text={content.amenities} />
       <GuideSection title={content.homesitesTitle || 'Homesites & Builders'} text={content.homesites} />
       {slug === 'aripeka' && <AripekaBuilderPrices />}
+      {slug === 'adelaide' && <AdelaideBuilderPrices />}
       {showsVieraBuilderPrices(slug) && <VieraBuilderPrices slug={slug} />}
       {slug === 'del-webb-viera' && <DelWebbVieraPrices />}
       <GuideSection title="Nightly Rentals" text={content.rentals} />
