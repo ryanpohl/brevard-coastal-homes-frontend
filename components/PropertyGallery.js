@@ -1,5 +1,6 @@
 'use client';
 
+import { isMlsPhoto, mlsPhoto } from '@/lib/mlsPhoto';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -158,7 +159,7 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
                }}
               >
    {heroPhoto ? (
-                   <Image src={heroPhoto} alt={altBase} fill priority sizes="(max-width: 900px) 100vw, 60vw" style={{ objectFit: 'cover' }} />
+                   <Image src={heroPhoto} unoptimized={isMlsPhoto(heroPhoto)} alt={altBase} fill priority sizes="(max-width: 900px) 100vw, 60vw" style={{ objectFit: 'cover' }} />
                  ) : (
                    <div
                      style={{
@@ -330,7 +331,7 @@ export default function PropertyGallery({ photos = [], address, alt, tourButton 
                           background: 'var(--color-border-light)',
 }}
                     >
-                      <Image src={photo} alt={`${altBase}, photo ${photoIndex + 1}`} fill sizes="120px" style={{ objectFit: 'cover' }} />
+                      <Image src={isMlsPhoto(photo) ? mlsPhoto(photo, '320x240') : photo} unoptimized={isMlsPhoto(photo)} alt={`${altBase}, photo ${photoIndex + 1}`} fill sizes="120px" style={{ objectFit: 'cover' }} />
                       </button>
                   );
 })}
@@ -501,7 +502,7 @@ function PhotoViewer({ photo, alt, index, total, onPrev, onNext, onClose, onTour
         </svg>
       </button>
       <div className="photo-viewer__stage" onClick={(e) => e.stopPropagation()} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-        <Image src={photo} alt={alt} fill sizes="(max-width: 1024px) 100vw, 1024px" style={{ objectFit: 'contain' }} />
+        <Image src={photo} unoptimized={isMlsPhoto(photo)} alt={alt} fill sizes="(max-width: 1024px) 100vw, 1024px" style={{ objectFit: 'contain' }} />
       </div>
       <div className="photo-viewer__bar" onClick={(e) => e.stopPropagation()}>
         {onTour ? (

@@ -1,5 +1,6 @@
 'use client';
 
+import { isMlsPhoto, mlsPhoto } from '@/lib/mlsPhoto';
 import { listingPhotoAlt } from '@/lib/listingPhotoAlt';
 
 import Image from 'next/image';
@@ -179,7 +180,8 @@ export default function ListingCard({ listing, onHoverChange, priority = false, 
             // fetchPriority="high" + an actual <link rel="preload"> in
             // <head> — everything below the fold stays lazy as before.
             <Image
-              src={photo}
+              src={isMlsPhoto(photo) ? mlsPhoto(photo, '640x480') : photo}
+              unoptimized={isMlsPhoto(photo)}
               alt={listingPhotoAlt(listing)}
               fill
               sizes="(max-width: 768px) 100vw, 25vw"
