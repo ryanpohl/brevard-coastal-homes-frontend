@@ -1,3 +1,4 @@
+import { buildingsFromListings, rentalPhrase } from '@/lib/listingExamples';
 import { notFound } from 'next/navigation';
 import { COMPARISON_LINKS, comparisonPath } from '@/lib/comparisons';
 import Link from 'next/link';
@@ -1168,6 +1169,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         t.high = Math.max(t.high, l.price);
       }
       communitySnapshot = {
+        // Condo buildings with units for sale (2026-11-09, per Ryan's Cocoa
+        // Village AI screenshot, which named the buildings from other sites).
+        condoBuildings: buildingsFromListings((data.results || []).filter((l) => l.propertyType === 'Condo' && l.status !== 'Sold')),
         count: typeof data.total === 'number' ? data.total : prices.length,
         median: prices.length ? prices[Math.floor(prices.length / 2)] : null,
         low: prices[0] ?? null,
@@ -1325,6 +1329,21 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   const liveFaqItems = [];
   if (slug === 'aripeka') liveFaqItems.push(...aripekaBuilderFaq());
   if (slug === 'adelaide') liveFaqItems.push(...adelaideBuilderFaq());
+  const nbBuildings = (communitySnapshot?.condoBuildings || []).slice(0, 8);
+  if (slug === 'cocoa-village' && nbBuildings.length >= 2) {
+    liveFaqItems.push({
+      q: 'Which condo buildings in Cocoa Village have units for sale?',
+      a:
+        'Right now: ' +
+        nbBuildings
+          .map((b) => {
+            const rent = rentalPhrase(b.rentalMinimum);
+            return `${b.name}, ${b.count} for sale${b.high !== b.low ? ` from ${formatPrice(b.low)} to ${formatPrice(b.high)}` : ` at ${formatPrice(b.low)}`}${rent ? `, ${rent}` : ''}`;
+          })
+          .join('; ') +
+        '. Building names and rental minimums are from MLS listings and update hourly; confirm rental rules and HOA fees with each association, and ask Ryan about any building.',
+    });
+  }
   // Viera Builders' current base prices (2026-11-07, per Ryan) — lib/vieraBuilders.js.
   liveFaqItems.push(...vieraBuilderFaq(slug));
   // Del Webb at Viera's own starting prices (2026-11-08, per Ryan) — lib/delWebbViera.js.
