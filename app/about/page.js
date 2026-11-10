@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { AGENT_INFO, BROKERAGE_INFO, agentSchemaFields } from '@/lib/constants';
+import { AGENT_INFO, BROKERAGE_INFO, agentSchemaFields, areasServedSchema } from '@/lib/constants';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import { withSocialPreview } from '@/lib/socialPreview';
 
@@ -57,7 +57,7 @@ const ABOUT_JSON_LD = (() => {
   const { employee, ...agent } = agentSchemaFields(siteUrl);
   return [
     { '@context': 'https://schema.org', '@type': 'ProfilePage', url: `${siteUrl}/about`, mainEntity: employee },
-    { '@context': 'https://schema.org', '@type': 'RealEstateAgent', name: AGENT_INFO.businessName, url: siteUrl, ...agent, employee: { '@id': employee['@id'] } },
+    { '@context': 'https://schema.org', '@type': 'RealEstateAgent', name: AGENT_INFO.businessName, url: siteUrl, ...agent, areaServed: areasServedSchema(), employee: { '@id': employee['@id'] } },
   ];
 })();
 
