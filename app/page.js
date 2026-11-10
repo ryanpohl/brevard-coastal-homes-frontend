@@ -3,7 +3,7 @@ import RelocationGuidePromo from '@/components/RelocationGuidePromo';
 import Link from 'next/link';
 import { preload } from 'react-dom';
 import * as api from '@/lib/api';
-import { PROPERTY_TYPE_TO_SLUG, placePhotoUrl } from '@/lib/constants';
+import { PROPERTY_TYPE_TO_SLUG, agentSchemaFields, placePhotoUrl } from '@/lib/constants';
 import SearchBar from '@/components/SearchBar';
 import { withSocialPreview } from '@/lib/socialPreview';
 
@@ -194,6 +194,10 @@ export default async function HomePage() {
   let jsonLd = null;
   try {
     ({ jsonLd } = await api.getHomeSeo());
+    // Same agent identity as every other page (lib/siteConstants.js).
+    if (Array.isArray(jsonLd)) {
+      jsonLd = jsonLd.map((n) => (n && n['@type'] === 'RealEstateAgent' ? { ...n, ...agentSchemaFields('https://brevardcoastalhomes.com') } : n));
+    }
   } catch {
     // No SEO data available — render the page without JSON-LD rather than crashing.
   }

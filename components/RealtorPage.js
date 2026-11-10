@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import SoldReportSignup from '@/components/SoldReportSignup';
-import { AGENT_INFO, BROKERAGE_INFO, formatPrice } from '@/lib/constants';
+import { AGENT_INFO, BROKERAGE_INFO, agentSchemaFields, formatPrice } from '@/lib/constants';
 import Faq from '@/components/Faq';
 import { medianChangeText } from '@/lib/marketSnapshot';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
@@ -84,7 +84,7 @@ export default function RealtorPage({ page, stats, filter, pace }) {
     name: 'Ryan Pohl, Brevard Coastal Homes',
     url: pageUrl,
     telephone: '+1-321-350-7661',
-    employee: { '@type': 'Person', name: 'Ryan Pohl', url: `${SITE_URL}/about` },
+    ...agentSchemaFields(SITE_URL),
     areaServed: [
       { '@type': 'Place', name: page.place },
       { '@type': 'AdministrativeArea', name: 'Brevard County, FL' },

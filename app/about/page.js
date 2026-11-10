@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { AGENT_INFO, BROKERAGE_INFO } from '@/lib/constants';
+import { AGENT_INFO, BROKERAGE_INFO, agentSchemaFields } from '@/lib/constants';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import { withSocialPreview } from '@/lib/socialPreview';
 
@@ -50,9 +50,21 @@ export const metadata = withSocialPreview({
   alternates: { canonical: '/about' },
 });
 
+// About page structured data (2026-11-10): the same agent identity as every
+// other page, with this page as Ryan's profile.
+const ABOUT_JSON_LD = (() => {
+  const siteUrl = 'https://brevardcoastalhomes.com';
+  const { employee, ...agent } = agentSchemaFields(siteUrl);
+  return [
+    { '@context': 'https://schema.org', '@type': 'ProfilePage', url: `${siteUrl}/about`, mainEntity: employee },
+    { '@context': 'https://schema.org', '@type': 'RealEstateAgent', name: AGENT_INFO.businessName, url: siteUrl, ...agent, employee: { '@id': employee['@id'] } },
+  ];
+})();
+
 export default function AboutPage() {
   return (
     <div className="container" style={{ padding: '32px clamp(16px, 4vw, 56px) 64px', maxWidth: 860 }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ABOUT_JSON_LD) }} />
       <h1 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', marginBottom: 28, fontFamily: 'var(--font-inter-tight)' }}>
         About Ryan Pohl
       </h1>
