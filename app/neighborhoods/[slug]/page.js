@@ -611,8 +611,12 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   } else {
     try {
       ({ neighborhood } = await api.getNeighborhood(slug));
-    } catch {
-      notFound();
+    } catch (err) {
+      // Only a real "not found" from the API is a 404; a timeout or server
+      // hiccup throws so the page errors (and Google retries) instead of
+      // being recorded as a missing page.
+      if ([403, 404, 410].includes(err?.status)) notFound();
+      throw err;
     }
   }
 
@@ -1405,9 +1409,51 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
   // records show $544-$657). Only where the written FAQ has no HOA answer.
   // A written question or answer that already gives the HOA fee wins (2026-11-07: Modern Duran had both).
   const writtenHoa = (NEIGHBORHOOD_LISTINGS_FAQ[slug] || []).some((f) => /\bHOA\b|association fee/i.test(f.q) || /\bHOA fees?\b[^.]*\$\d/i.test(f.a));
+  let soldTwoYears = null;
+  try {
+    soldTwoYears = await api.getListings({ ...listingsFilterParams, status: 'Sold', closedWithinDays: 730, pageSize: 100 });
+  } catch {
+    soldTwoYears = null;
+  }
+  // Two-year sold price range (2026-11-10, per Ryan: Google's AI keeps quoting
+  // Jeffcoat's and Carpenter Kessel's plain "homes range from $X to $Y on
+  // three-quarter-acre lots" sentences). Single-family homes only, and only
+  // when every sale fits in one page so the range is complete.
+  try {
+    const all = soldTwoYears?.results || [];
+    const homes = all.filter((l) => l.propertyType === 'Home' && (l.closePrice ?? l.price) > 0);
+    if (homes.length >= 3 && all.length === (soldTwoYears.total ?? all.length)) {
+      const prices = homes.map((l) => l.closePrice ?? l.price).sort((a, b) => a - b);
+      const lots = homes
+        .map((l) => l.lotSizeAcres ?? l.acreage)
+        .filter((a) => typeof a === 'number' && a > 0.03 && a < 25)
+        .sort((a, b) => a - b);
+      const acres = (a) => (a >= 1 ? `${Math.round(a * 10) / 10} acres` : `${Math.round(a * 100) / 100} of an acre`);
+      const since = homes
+        .map((l) => l.closeDate)
+        .filter(Boolean)
+        .sort()[0];
+      const sinceText = since
+        ? new Date(`${since.slice(0, 10)}T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })
+        : null;
+      liveFaqItems.push({
+        q: `What price range do homes in ${nbName} sell for?`,
+        a:
+          `${homes.length} single-family homes sold in ${nbName} in the last two years${sinceText ? ` (since ${sinceText})` : ''}, ` +
+          `from ${formatPrice(prices[0])} to ${formatPrice(prices[prices.length - 1])}` +
+          `${prices.length > 2 ? `, with a median of ${formatPrice(prices[Math.floor(prices.length / 2)])}` : ''}. ` +
+          (lots.length >= 3 && lots[lots.length - 1] > lots[0]
+            ? `Their lots ran from about ${acres(lots[0])} to ${acres(lots[lots.length - 1])}. `
+            : '') +
+          'Based on Space Coast MLS records of closed sales.',
+      });
+    }
+  } catch {
+    // No range answer rather than a wrong one.
+  }
   if (!writtenHoa) {
     try {
-      const sold = await api.getListings({ ...listingsFilterParams, status: 'Sold', closedWithinDays: 730, pageSize: 100 });
+      const sold = soldTwoYears || { results: [] };
       const PER_MONTH = { monthly: 1, quarterly: 1 / 3, 'semi-annually': 1 / 6, semiannually: 1 / 6, annually: 1 / 12, yearly: 1 / 12 };
       const fees = (sold.results || [])
         .map((l) => {

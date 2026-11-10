@@ -186,8 +186,12 @@ export default async function NeighborhoodAreaGuidePage({ params }) {
   } else {
     try {
       ({ neighborhood } = await api.getNeighborhood(slug));
-    } catch {
-      notFound();
+    } catch (err) {
+      // Only a real "not found" from the API is a 404; a timeout or server
+      // hiccup throws so the page errors (and Google retries) instead of
+      // being recorded as a missing page.
+      if ([403, 404, 410].includes(err?.status)) notFound();
+      throw err;
     }
   }
 
