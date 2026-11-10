@@ -38,23 +38,40 @@ async function sideStats(stats) {
 
 const money = (n) => (typeof n === 'number' && n > 0 ? formatPrice(n) : '—');
 
-function numberRows(c, a, b) {
-  const rows = [
-    ['Homes for sale now', a.homes?.count ?? '—', b.homes?.count ?? '—'],
-    ['Median list price, homes', money(a.homes?.median), money(b.homes?.median)],
-    ['Median sold price, past 12 months', money(a.sold?.medianPrice), money(b.sold?.medianPrice)],
-    ['Homes sold, past 12 months', a.sold?.count ?? '—', b.sold?.count ?? '—'],
-    ['Median sold price per sq ft', a.sold?.medianPerSqft ? `$${a.sold.medianPerSqft}` : '—', b.sold?.medianPerSqft ? `$${b.sold.medianPerSqft}` : '—'],
-    ['Median days on market', a.sold?.medianDaysOnMarket ?? '—', b.sold?.medianDaysOnMarket ?? '—'],
+// Places compared: `places` (any number, 2026-11-10: the four beach towns)
+// or the original two-sided `a`/`b` with `chooseA`/`chooseB`.
+function placesOf(c) {
+  return c.places || [
+    { ...c.a, choose: c.chooseA },
+    { ...c.b, choose: c.chooseB },
   ];
-  if (c.a.stats.condos || c.b.stats.condos) {
-    rows.push(['Condos for sale now', a.condos?.count ?? '—', b.condos?.count ?? '—']);
-    rows.push(['Median list price, condos', money(a.condos?.median), money(b.condos?.median)]);
+}
+
+function joinNames(names) {
+  return names.length <= 2 ? names.join(' and ') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
+
+function numberRows(places, stats) {
+  const col = (fn) => stats.map(fn);
+  const rows = [
+    ['Homes for sale now', ...col((x) => x.homes?.count ?? '—')],
+    ['Median list price, homes', ...col((x) => money(x.homes?.median))],
+    ['Median sold price, past 12 months', ...col((x) => money(x.sold?.medianPrice))],
+    ['Homes sold, past 12 months', ...col((x) => x.sold?.count ?? '—')],
+    ['Median sold price per sq ft', ...col((x) => (x.sold?.medianPerSqft ? `$${x.sold.medianPerSqft}` : '—'))],
+    ['Median days on market', ...col((x) => x.sold?.medianDaysOnMarket ?? '—')],
+  ];
+  if (places.some((pl) => pl.stats.condos)) {
+    rows.push(['Condos for sale now', ...col((x) => x.condos?.count ?? '—')]);
+    rows.push(['Median list price, condos', ...col((x) => money(x.condos?.median))]);
   }
-  if (c.a.stats.lots || c.b.stats.lots) {
-    const lotCell = (side, s) =>
-      s.stats.lots ? (side.lots?.count ? `${side.lots.count} from ${money(side.lots.low)}` : 'None right now') : 'Through the builders';
-    rows.push(['Vacant lots on the MLS', lotCell(a, c.a), lotCell(b, c.b)]);
+  if (places.some((pl) => pl.stats.lots)) {
+    rows.push([
+      'Vacant lots on the MLS',
+      ...places.map((pl, i) =>
+        pl.stats.lots ? (stats[i].lots?.count ? `${stats[i].lots.count} from ${money(stats[i].lots.low)}` : 'None right now') : 'Through the builders'
+      ),
+    ]);
   }
   return rows;
 }
@@ -94,8 +111,9 @@ export default async function ComparePage({ params }) {
   const c = COMPARISONS[slug];
   if (!c) notFound();
 
-  const [a, b] = await Promise.all([sideStats(c.a.stats), sideStats(c.b.stats)]);
-  const head = [c.a.name, c.b.name];
+  const places = placesOf(c);
+  const stats = await Promise.all(places.map((pl) => sideStats(pl.stats)));
+  const head = places.map((pl) => pl.name);
   const crumbs = [{ name: 'Home', href: '/' }, { name: c.h1 }];
   const updated = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/New_York' });
   const articleLd = {
@@ -121,7 +139,7 @@ export default async function ComparePage({ params }) {
         <p>{c.shortAnswer}</p>
       </div>
 
-      <CompareTable caption={`By the numbers · live from the MLS, updated ${updated}`} head={head} rows={numberRows(c, a, b)} />
+      <CompareTable caption={`By the numbers · live from the MLS, updated ${updated}`} head={head} rows={numberRows(places, stats)} />
       <CompareTable caption="At a glance" head={head} rows={c.facts} />
 
       {c.sections.map((s) => (
@@ -135,10 +153,7 @@ export default async function ComparePage({ params }) {
 
       <h2>Which one fits you?</h2>
       <div className="compare-page__choose">
-        {[
-          [c.a, c.chooseA],
-          [c.b, c.chooseB],
-        ].map(([side, reasons]) => (
+        {places.map((side) => [side, side.choose]).map(([side, reasons]) => (
           <div key={side.name} className="compare-page__choose-card">
             <h3>Choose {side.name} if…</h3>
             <ul>
@@ -152,15 +167,18 @@ export default async function ComparePage({ params }) {
       </div>
 
       <div className="open-house-page__cta compare-page__cta">
-        <strong>Still deciding between {c.a.name} and {c.b.name}?</strong> Ryan can show you homes in both on the same day. Call or text{' '}
+        <strong>Still deciding between {joinNames(head)}?</strong> Ryan can show you homes in {places.length > 2 ? 'all of them' : 'both'} on the same day. Call or text{' '}
         <a href="tel:+13213507661">321-350-7661</a>.
       </div>
 
       <Faq items={c.faq} />
 
       <p className="compare-page__links">
-        <Link href={c.a.href}>{c.a.name} homes for sale →</Link>
-        <Link href={c.b.href}>{c.b.name} homes for sale →</Link>
+        {places.map((pl) => (
+          <Link key={pl.name} href={pl.href}>
+            {pl.name} homes for sale →
+          </Link>
+        ))}
       </p>
     </div>
   );
