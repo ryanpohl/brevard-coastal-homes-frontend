@@ -936,6 +936,10 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           : homeListings.length >= 3
             ? ` Current examples: ${priceSpreadExamples(homeListings).map((l) => exampleText(l)).join('; ')}.`
             : '') +
+        // Mobile and manufactured homes aren't listed on the site (2026-11-09,
+        // per Ryan: Google's AI quoted Melbourne Beach homes "from $40,000"
+        // from sites that include 55+ mobile home parks).
+        (propertyType === 'Home' && plainTypePage ? ' These figures leave out mobile and manufactured homes.' : '') +
         ' Prices update hourly from the Space Coast MLS.',
     });
   }
