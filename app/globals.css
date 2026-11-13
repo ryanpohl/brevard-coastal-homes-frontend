@@ -3564,3 +3564,6 @@ button.guide-strip {
 .guide-strip--open .btn {
   flex: none;
 }
+.guide-strip--open .guide-strip__text {
+  flex: 1 1 100%;
+}
