@@ -36,7 +36,8 @@ import CondoBuildingComparison from '@/components/CondoBuildingComparison';
 import { getCondoBuildingComparison } from '@/lib/condoBuildings';
 import FilterBar from '@/components/FilterBar';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
-import ListingAlertSignup from '@/components/ListingAlertSignup';
+import ListingAlertSignup, { ListingAlertJumpLink } from '@/components/ListingAlertSignup';
+import GuideStrip from '@/components/GuideStrip';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import BuildingInquiryModal from '@/components/BuildingInquiryModal';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
@@ -860,6 +861,18 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           },
         }
       : null;
+  // Town-wide alerts on the plain homes/condos pages (2026-11-13, per Ryan:
+  // Melbourne Beach homes for sale, the busiest page, had no "new listings
+  // in Melbourne Beach" offer except at the very bottom). Oceanfront pages
+  // keep their own oceanfront alert above.
+  const townAlert =
+    !oceanfrontAlert && !waterLand && !isRiverfrontCombined && (propertyType === 'Home' || propertyType === 'Condo') && total > 0
+      ? {
+          kind: propertyType === 'Condo' ? 'condo' : 'home',
+          label: `${city.name} ${propertyType === 'Condo' ? 'condos' : 'homes'}`,
+          filter: { ...cityListingsQueryParams(citySlug), propertyType },
+        }
+      : null;
   // Asking prices, condo communities and pace (2026-11-05, per Ryan:
   // Google's AI answer for Melbourne Beach condos quoted Zillow and
   // Realtor.com for price ranges and named the condo communities). Plain
@@ -1156,6 +1169,8 @@ export default async function CityListingsPage({ params, searchParams: searchPar
             Beach Club, Aquarina, Beach Woods) moved into the Melbourne Beach
             Condo Communities & Buildings directory below the listings
             (2026-10-08, per Ryan) — see lib/condoBuildings.js. */}
+        {/* Relocation guide near the top (2026-11-13) — GuideStrip.js. */}
+        {GUIDE_TOWNS[citySlug] && <GuideStrip townSlug={citySlug} />}
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
@@ -1197,6 +1212,7 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           mapCenter={mapCenter}
           results={results}
           resultsLabel={total === 0 ? '0 results' : `${rangeStart}-${rangeEnd} of ${total} ${typeLabel}`}
+          labelExtra={oceanfrontAlert || townAlert ? <ListingAlertJumpLink label={city.name} /> : undefined}
           page={page}
           totalPages={totalPages}
         />
@@ -1206,6 +1222,14 @@ export default async function CityListingsPage({ params, searchParams: searchPar
             filter={oceanfrontAlert.filter}
             title={isOceanfrontCombined ? `Get new ${city.name} oceanfront listings & price drops by email` : `Get ${oceanfrontAlert.label} & price drops by email`}
             sub={`Be the first to know when an oceanfront ${isOceanfrontCombined ? 'home or condo' : propertyType === 'Condo' ? 'condo' : 'home'} is listed in ${city.name} or drops its price.`}
+          />
+        )}
+        {townAlert && (
+          <ListingAlertSignup
+            label={city.name}
+            kind={townAlert.kind}
+            filter={townAlert.filter}
+            title={`Get new ${townAlert.label} & price drops by email`}
           />
         )}
         {/* Free relocation guide offer, opening with this town (2026-10-11). */}

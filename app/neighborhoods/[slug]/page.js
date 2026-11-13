@@ -51,6 +51,12 @@ import ContactUsTrigger from '@/components/ContactUsTrigger';
 import ModelTourButton from '@/components/ModelTourButton';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import OutOfStateBuyers from '@/components/OutOfStateBuyers';
+import GuideStrip from '@/components/GuideStrip';
+
+// Relocation guide town for neighborhoods filed under the wrong city in the
+// listings database (2026-11-13): Harbor Island Beach Club is south of
+// Melbourne Beach on A1A, not in Indian Harbour Beach.
+const GUIDE_TOWN_FOR_NEIGHBORHOOD = { 'harbor-island-beach-club': 'melbourne-beach' };
 import AripekaBuilderPrices from '@/components/AripekaBuilderPrices';
 import AdelaideBuilderPrices from '@/components/AdelaideBuilderPrices';
 import { adelaideBuilderFaq } from '@/lib/adelaideBuilders';
@@ -2205,6 +2211,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {siblingLinks && !SIBLING_LINKS_BELOW.has(slug) && (
           <NeighborhoodLinkRow cityName={`Other ${siblingLinks.cityName}`} links={siblingLinks.links} />
         )}
+        {/* Relocation guide near the top (2026-11-13) — GuideStrip.js. */}
+        <GuideStrip townSlug={GUIDE_TOWN_FOR_NEIGHBORHOOD[slug] || neighborhood.city?.slug} />
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
@@ -2304,7 +2312,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {/* Same alerts as a gentle pop-up offer (2026-10-13) — PageEmailPrompt.js. */}
         <PageEmailPrompt label={neighborhood.name} kind={alertKind} filter={alertFilter} />
         {/* Out-of-state buyers: video tour + free relocation guide (2026-11-02). */}
-        <OutOfStateBuyers townSlug={neighborhood.city?.slug} />
+        <OutOfStateBuyers townSlug={GUIDE_TOWN_FOR_NEIGHBORHOOD[slug] || neighborhood.city?.slug} />
       </div>
 
       {/* Market stats bar (2026-10-08) — below the listings, per Ryan, so
