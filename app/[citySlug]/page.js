@@ -1,5 +1,7 @@
 import { notFound } from 'next/navigation';
 import OutOfStateBuyers from '@/components/OutOfStateBuyers';
+import NeighborhoodGuideStrip from '@/components/NeighborhoodGuideStrip';
+import { NEIGHBORHOOD_GUIDES } from '@/lib/neighborhoodGuides';
 import * as api from '@/lib/api';
 import {
   cityListingsQueryParams,
@@ -342,6 +344,8 @@ export default async function CityAllListingsPage({ params, searchParams: search
           </p>
         </div>
         <NeighborhoodLinkRow cityName={city.name} links={CITY_NEIGHBORHOOD_LINKS[citySlug]} />
+        {/* Town guide near the top (2026-11-13), for towns that have one. */}
+        {NEIGHBORHOOD_GUIDES[citySlug] && <NeighborhoodGuideStrip slug={citySlug} />}
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>
