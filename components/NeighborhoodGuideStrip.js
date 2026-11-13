@@ -53,7 +53,7 @@ export default function NeighborhoodGuideStrip({ slug }) {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="guide-strip__cover" src={guide.cover} alt="" width="28" height="36" loading="lazy" />
         <span className="guide-strip__text">
-          <strong>Free {name} Guide:</strong> builders, prices, HOA, schools and model homes, sent to your inbox
+          <strong>Free {name} Guide:</strong> {guide.blurb}, sent to your inbox
         </span>
         <span className="guide-strip__arrow" aria-hidden="true">
           &rarr;
