@@ -357,22 +357,6 @@ function RequestShowingForm({ listingId, listingAddress, dateOptions, user, form
         </label>
       </div>
 
-      {/* "Are you currently working with an agent?" — optional. See its
-          state declaration above for the why. */}
-      <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-muted-dark)', marginBottom: 8 }}>
-          Are you currently working with an agent?
-        </div>
-        <div style={{ display: 'flex', gap: 24 }}>
-          <RadioLabel name={`working-with-agent-schedule${radioSuffix}`} checked={workingWithAgent === 'yes'} onChange={() => setWorkingWithAgent('yes')}>
-            Yes
-          </RadioLabel>
-          <RadioLabel name={`working-with-agent-schedule${radioSuffix}`} checked={workingWithAgent === 'no'} onChange={() => setWorkingWithAgent('no')}>
-            No
-          </RadioLabel>
-        </div>
-      </div>
-
       {/* Hidden on a listing's own page, where the address is already known
           and still sent with the request (2026-10-09, per Ryan: one less
           field to look at). The general Schedule a Showing popup, which has
@@ -404,13 +388,8 @@ function RequestShowingForm({ listingId, listingAddress, dateOptions, user, form
         onChange={(e) => update('phone', e.target.value)}
         style={{ ...inputStyle, marginBottom: 10 }}
       />
-      <textarea
-        placeholder="Add a message or question here ..."
-        rows={3}
-        value={form.message}
-        onChange={(e) => update('message', e.target.value)}
-        style={{ ...inputStyle, marginBottom: 16, resize: 'vertical' }}
-      />
+      {/* Message box removed (2026-11-13, per Ryan: shorter forms). An open
+          house request still sends its preset message. */}
 
       {status.error && <p className="error-text" style={{ marginBottom: 10 }}>{status.error}</p>}
 
@@ -716,48 +695,14 @@ function AskQuestionModal({ listingId, listingAddress, user, preset = null, onCl
             <div style={{ fontSize: 16, color: 'var(--color-muted-dark)', marginBottom: 10 }}>
               Enter your contact information below &amp; we will reach out to you shortly with an answer.
             </div>
-            <div
-              style={{
-                fontSize: 14,
-                fontWeight: 600,
-                color: 'var(--color-ink)',
-                marginBottom: 8,
-                textDecoration: 'underline',
-              }}
-            >
-              How would you like us to respond?
-            </div>
-            <div style={{ display: 'flex', gap: 20, marginBottom: 16 }}>
-              {['Call', 'Text', 'Email'].map((method) => (
-                <label key={method} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, color: 'var(--color-muted-dark)', cursor: 'pointer' }}>
-                  <input type="checkbox" checked={contactMethods.includes(method)} onChange={() => toggleMethod(method)} style={{ width: 'auto' }} />
-                  {method}
-                </label>
-              ))}
-            </div>
-
-            {/* "Are you currently working with an agent?" — optional. See
-                its state declaration above for the why. */}
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-ink)', marginBottom: 8 }}>
-                Are you currently working with an agent?
-              </div>
-              <div style={{ display: 'flex', gap: 20 }}>
-                <RadioLabel name="working-with-agent-question" checked={workingWithAgent === 'yes'} onChange={() => setWorkingWithAgent('yes')}>
-                  Yes
-                </RadioLabel>
-                <RadioLabel name="working-with-agent-question" checked={workingWithAgent === 'no'} onChange={() => setWorkingWithAgent('no')}>
-                  No
-                </RadioLabel>
-              </div>
-            </div>
-
-            <input
-              placeholder="Address of Property"
-              value={form.propertyAddress}
-              onChange={(e) => update('propertyAddress', e.target.value)}
-              style={{ ...inputStyle, marginBottom: 10 }}
-            />
+            {!listingAddress && (
+              <input
+                placeholder="Address of Property"
+                value={form.propertyAddress}
+                onChange={(e) => update('propertyAddress', e.target.value)}
+                style={{ ...inputStyle, marginBottom: 10 }}
+              />
+            )}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10, marginBottom: 10 }}>
               <input placeholder="Name" required value={form.name} onChange={(e) => update('name', e.target.value)} style={inputStyle} />
               <input type="tel" placeholder="Phone (optional)" value={form.phone} onChange={(e) => update('phone', e.target.value)} style={inputStyle} />

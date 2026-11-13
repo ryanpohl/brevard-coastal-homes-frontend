@@ -60,6 +60,11 @@ import BrokerageNote from '@/components/BrokerageNote';
  * Property Management modal already use. Still fully optional/non-blocking,
  * matching Make an Offer's treatment of the same underlying question.
  */
+// Shorter forms (2026-11-13, per Ryan: about half the people who started a
+// form finished it). Ask a Question is now name, email, optional phone and
+// the question; Schedule a Showing is name, email, mobile phone and an
+// optional date. The agent question, property address, contact-method
+// checkboxes, time and message fields were removed (notes above are history).
 export default function InquiryModals({
   listingId,
   containerStyle,
@@ -75,8 +80,6 @@ export default function InquiryModals({
 }) {
   const { user } = useAuth();
   const [open, setOpen] = useState(null); // 'schedule' | 'question' | null
-  const [contactMethods, setContactMethods] = useState([]); // ['Call', 'Text', 'Email'] — 'question' mode only
-  const [workingWithAgent, setWorkingWithAgent] = useState(null); // 'yes' | 'no' | null — both modes, see top-of-file comment
   // propertyAddress: added 2026-08-17 per Ryan ("Can you add 'Address of
   // Property' to all the ask a question pop up boxes in all the city &
   // neighborhood pages so I know what property they potentially are asking
@@ -107,8 +110,6 @@ export default function InquiryModals({
       preferredTime: '',
       propertyAddress: '',
     });
-    setContactMethods([]);
-    setWorkingWithAgent(null);
     setStatus({ submitting: false, error: '', success: '' });
     setOpen(kind);
   }
@@ -121,10 +122,6 @@ export default function InquiryModals({
     setForm((f) => ({ ...f, [field]: value }));
   }
 
-  function toggleContactMethod(method) {
-    setContactMethods((methods) => (methods.includes(method) ? methods.filter((m) => m !== method) : [...methods, method]));
-  }
-
   async function submit(e) {
     e.preventDefault();
     setStatus({ submitting: true, error: '', success: '' });
@@ -132,15 +129,11 @@ export default function InquiryModals({
       // Folded into the free-text `message` field rather than sent as its
       // own param — see top-of-file comment on why (no backend column/
       // notification-forwarding for this field on these inquiry types).
-      const agentNote = workingWithAgent ? `[Working with an agent: ${workingWithAgent === 'yes' ? 'Yes' : 'No'}] ` : '';
-      const payload = { ...form, listingId, message: `${agentNote}${form.message}`.trim() };
+      const payload = { ...form, listingId, message: form.message.trim() };
       const result =
         open === 'schedule'
           ? await api.submitScheduleShowing(payload)
-          : await api.submitAskQuestion({
-              ...payload,
-              preferredContactMethod: contactMethods.length ? contactMethods : undefined,
-            });
+          : await api.submitAskQuestion(payload);
       setStatus({ submitting: false, error: '', success: result.message || "Thanks — we'll be in touch shortly." });
     } catch (err) {
       setStatus({ submitting: false, error: err.message || 'Something went wrong. Please try again.', success: '' });
@@ -194,60 +187,6 @@ export default function InquiryModals({
               <p style={{ color: 'var(--color-success)' }}>{status.success}</p>
             ) : (
               <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {/* "Are you currently working with an agent?" — optional,
-                    shown for both modes. See top-of-file comment. */}
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8 }}>
-                    Are you currently working with an agent?
-                  </div>
-                  <div style={{ display: 'flex', gap: 24 }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, cursor: 'pointer' }}>
-                      <input
-                        type="radio"
-                        name="working-with-agent"
-                        checked={workingWithAgent === 'yes'}
-                        onChange={() => setWorkingWithAgent('yes')}
-                        style={{ width: 'auto' }}
-                      />
-                      Yes
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, cursor: 'pointer' }}>
-                      <input
-                        type="radio"
-                        name="working-with-agent"
-                        checked={workingWithAgent === 'no'}
-                        onChange={() => setWorkingWithAgent('no')}
-                        style={{ width: 'auto' }}
-                      />
-                      No
-                    </label>
-                  </div>
-                </div>
-                {open === 'question' && (
-                  <>
-                    <input
-                      placeholder="Address of Property"
-                      value={form.propertyAddress}
-                      onChange={(e) => update('propertyAddress', e.target.value)}
-                    />
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8 }}>How would you like us to respond?</div>
-                      <div style={{ display: 'flex', gap: 20 }}>
-                        {['Call', 'Text', 'Email'].map((method) => (
-                          <label key={method} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, cursor: 'pointer' }}>
-                            <input
-                              type="checkbox"
-                              checked={contactMethods.includes(method)}
-                              onChange={() => toggleContactMethod(method)}
-                              style={{ width: 'auto' }}
-                            />
-                            {method}
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
                 <input placeholder="Full name" required value={form.name} onChange={(e) => update('name', e.target.value)} />
                 <input
                   type="email"
@@ -264,28 +203,20 @@ export default function InquiryModals({
                   onChange={(e) => update('phone', e.target.value)}
                 />
                 {open === 'schedule' && (
-                  <div style={{ display: 'flex', gap: 10 }}>
-                    <input
-                      type="date"
-                      value={form.preferredDate}
-                      onChange={(e) => update('preferredDate', e.target.value)}
-                      style={{ flex: 1 }}
-                    />
-                    <input
-                      type="time"
-                      value={form.preferredTime}
-                      onChange={(e) => update('preferredTime', e.target.value)}
-                      style={{ flex: 1 }}
-                    />
-                  </div>
+                  <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 13, color: 'var(--color-muted)' }}>
+                    Preferred date (optional)
+                    <input type="date" value={form.preferredDate} onChange={(e) => update('preferredDate', e.target.value)} />
+                  </label>
                 )}
-                <textarea
-                  rows={4}
-                  placeholder={open === 'schedule' ? 'Anything else we should know? (optional)' : 'Your question'}
-                  value={form.message}
-                  onChange={(e) => update('message', e.target.value)}
-                  required={open === 'question'}
-                />
+                {open === 'question' && (
+                  <textarea
+                    rows={4}
+                    placeholder="Your question"
+                    value={form.message}
+                    onChange={(e) => update('message', e.target.value)}
+                    required
+                  />
+                )}
                 {status.error && <p className="error-text">{status.error}</p>}
                 <button type="submit" className="btn btn-primary" disabled={status.submitting}>
                   {status.submitting ? 'Sending…' : 'Send'}

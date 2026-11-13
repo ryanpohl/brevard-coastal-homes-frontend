@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import * as api from '@/lib/api';
-import { GUIDE_TIMEFRAMES } from '@/lib/relocationGuide';
 import { rememberedAlertEmail } from '@/lib/alertMemory';
 
 // Signup form for the free relocation guide (2026-10-11) — the backend
@@ -50,18 +49,9 @@ export default function GuideForm({ town }) {
     <form className="guide-form" onSubmit={submit}>
       <div className="guide-form__title">Get the free guide</div>
       <p className="guide-form__small">We&rsquo;ll email it to you as a PDF.</p>
-      <input placeholder="First name" aria-label="First name" value={form.name} onChange={(e) => update('name', e.target.value)} autoComplete="given-name" />
+      <input placeholder="First name (optional)" aria-label="First name" value={form.name} onChange={(e) => update('name', e.target.value)} autoComplete="given-name" />
       <input type="email" required placeholder="Email *" aria-label="Email" value={form.email} onChange={(e) => update('email', e.target.value)} autoComplete="email" />
-      <input type="tel" placeholder="Phone (optional)" aria-label="Phone" value={form.phone} onChange={(e) => update('phone', e.target.value)} autoComplete="tel" />
-      <input placeholder="Where are you moving from? (optional)" aria-label="Where are you moving from?" value={form.movingFrom} onChange={(e) => update('movingFrom', e.target.value)} />
-      <select aria-label="When are you planning to move?" value={form.timeframe} onChange={(e) => update('timeframe', e.target.value)}>
-        <option value="">When are you moving? (optional)</option>
-        {GUIDE_TIMEFRAMES.map((t) => (
-          <option key={t} value={t}>
-            {t}
-          </option>
-        ))}
-      </select>
+      {/* Phone, moving-from and timeframe removed (2026-11-13, per Ryan: shorter forms). */}
       <button type="submit" className="btn btn-gold" disabled={state.sending}>
         {state.sending ? 'Sending…' : 'Email Me the Guide'}
       </button>
