@@ -52,6 +52,8 @@ import ModelTourButton from '@/components/ModelTourButton';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import OutOfStateBuyers from '@/components/OutOfStateBuyers';
 import GuideStrip from '@/components/GuideStrip';
+import NeighborhoodGuideStrip from '@/components/NeighborhoodGuideStrip';
+import { NEIGHBORHOOD_GUIDES } from '@/lib/neighborhoodGuides';
 
 // Relocation guide town for neighborhoods filed under the wrong city in the
 // listings database (2026-11-13): Harbor Island Beach Club is south of
@@ -2212,7 +2214,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           <NeighborhoodLinkRow cityName={`Other ${siblingLinks.cityName}`} links={siblingLinks.links} />
         )}
         {/* Relocation guide near the top (2026-11-13) — GuideStrip.js. */}
-        <GuideStrip townSlug={GUIDE_TOWN_FOR_NEIGHBORHOOD[slug] || neighborhood.city?.slug} />
+        {NEIGHBORHOOD_GUIDES[slug] ? (
+          <NeighborhoodGuideStrip slug={slug} />
+        ) : (
+          <GuideStrip townSlug={GUIDE_TOWN_FOR_NEIGHBORHOOD[slug] || neighborhood.city?.slug} />
+        )}
         <p style={{ fontSize: 13, color: 'var(--color-muted)', marginBottom: 12 }}>
           {total} result{total === 1 ? '' : 's'}
         </p>

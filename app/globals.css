@@ -3541,3 +3541,26 @@ textarea:focus {
   font-weight: 700;
   color: var(--color-gold-text, #8a6629);
 }
+
+/* Neighborhood guide strip (2026-11-13) — components/NeighborhoodGuideStrip.js:
+   a button that opens one email box in place. */
+button.guide-strip {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.guide-strip--open {
+  flex-wrap: wrap;
+}
+.guide-strip--open input {
+  flex: 1 1 180px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #d6cdb8;
+  border-radius: 8px;
+  font-size: 16px;
+}
+.guide-strip--open .btn {
+  flex: none;
+}
