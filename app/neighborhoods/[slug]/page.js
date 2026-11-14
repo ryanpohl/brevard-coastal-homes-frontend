@@ -53,7 +53,7 @@ import ListingResultsLayout from '@/components/ListingResultsLayout';
 import OutOfStateBuyers from '@/components/OutOfStateBuyers';
 import GuideStrip from '@/components/GuideStrip';
 import NeighborhoodGuideStrip from '@/components/NeighborhoodGuideStrip';
-import { NEIGHBORHOOD_GUIDES } from '@/lib/neighborhoodGuides';
+import { guideSlugForPage } from '@/lib/neighborhoodGuides';
 
 // Relocation guide town for neighborhoods filed under the wrong city in the
 // listings database (2026-11-13): Harbor Island Beach Club is south of
@@ -2214,8 +2214,8 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           <NeighborhoodLinkRow cityName={`Other ${siblingLinks.cityName}`} links={siblingLinks.links} />
         )}
         {/* Relocation guide near the top (2026-11-13) — GuideStrip.js. */}
-        {NEIGHBORHOOD_GUIDES[slug] ? (
-          <NeighborhoodGuideStrip slug={slug} />
+        {guideSlugForPage(slug) ? (
+          <NeighborhoodGuideStrip slug={guideSlugForPage(slug)} />
         ) : (
           <GuideStrip townSlug={GUIDE_TOWN_FOR_NEIGHBORHOOD[slug] || neighborhood.city?.slug} />
         )}
