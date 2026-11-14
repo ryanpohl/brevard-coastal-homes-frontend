@@ -39,7 +39,7 @@ import ListingResultsLayout from '@/components/ListingResultsLayout';
 import ListingAlertSignup, { ListingAlertJumpLink } from '@/components/ListingAlertSignup';
 import GuideStrip from '@/components/GuideStrip';
 import NeighborhoodGuideStrip from '@/components/NeighborhoodGuideStrip';
-import { NEIGHBORHOOD_GUIDES } from '@/lib/neighborhoodGuides';
+import { NEIGHBORHOOD_GUIDES, condoGuideForTown } from '@/lib/neighborhoodGuides';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import BuildingInquiryModal from '@/components/BuildingInquiryModal';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
@@ -1172,7 +1172,10 @@ export default async function CityListingsPage({ params, searchParams: searchPar
             Condo Communities & Buildings directory below the listings
             (2026-10-08, per Ryan) — see lib/condoBuildings.js. */}
         {/* Relocation guide near the top (2026-11-13) — GuideStrip.js. */}
-        {NEIGHBORHOOD_GUIDES[citySlug] ? (
+        {/* Condo pages offer the town's condo guide (2026-11-14). */}
+        {propertyType === 'Condo' && condoGuideForTown(citySlug) ? (
+          <NeighborhoodGuideStrip slug={condoGuideForTown(citySlug)} />
+        ) : NEIGHBORHOOD_GUIDES[citySlug] ? (
           <NeighborhoodGuideStrip slug={citySlug} />
         ) : (
           GUIDE_TOWNS[citySlug] && <GuideStrip townSlug={citySlug} />

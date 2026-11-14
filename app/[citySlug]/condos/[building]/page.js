@@ -17,6 +17,8 @@ import Faq from '@/components/Faq';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
 import CondoBuildingDirectory from '@/components/CondoBuildingDirectory';
 import BrokerageNote from '@/components/BrokerageNote';
+import NeighborhoodGuideStrip from '@/components/NeighborhoodGuideStrip';
+import { condoGuideForTown } from '@/lib/neighborhoodGuides';
 import { formatMiles, nearbyFor } from '@/lib/nearby';
 
 // Condo building page (2026-10-08, per Ryan): /{city}/condos/{building} —
@@ -147,6 +149,8 @@ export default async function CondoBuildingPage({ params }) {
         {condoBuildingDetail(building) && (
           <p style={{ fontSize: 14, color: 'var(--color-muted)', marginBottom: 20 }}>{condoBuildingDetail(building)}</p>
         )}
+        {/* The town's condo guide (2026-11-14). */}
+        {condoGuideForTown(citySlug) && <NeighborhoodGuideStrip slug={condoGuideForTown(citySlug)} />}
         {building.neighborhoodPage && (
           <p className="open-house-page__cta" style={{ maxWidth: 760, margin: '14px 0 20px' }}>
             <strong>Looking at all of {name}?</strong> See every {name} home and townhome for sale, recent sales and
