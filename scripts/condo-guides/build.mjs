@@ -17,13 +17,13 @@ const { cityListingsQueryParams } = await import('../../lib/constants.js');
 const OUT = path.resolve(process.cwd(), '../brevard-coastal-homes-backend/assets/guides/neighborhoods');
 const FRONT = process.cwd();
 
-// Town name, page and cover photo (from public/place-photos; none for Cape Canaveral yet).
+// Town name, page and cover photo (from public/place-photos; Cape Canaveral's from Ryan, 2026-11-14).
 const TOWNS = {
   'cocoa-beach': { name: 'Cocoa Beach', photo: 'cocoa-beach-pier.jpg', alt: 'The Cocoa Beach Pier' },
   'satellite-beach': { name: 'Satellite Beach', photo: 'satellite-beach.jpg', alt: 'Satellite Beach' },
   'indian-harbour-beach': { name: 'Indian Harbour Beach', photo: 'indian-harbour-beach.jpg', alt: 'Indian Harbour Beach' },
   indialantic: { name: 'Indialantic', photo: 'indialantic.jpg', alt: 'Indialantic' },
-  'cape-canaveral': { name: 'Cape Canaveral', photo: null, alt: '' },
+  'cape-canaveral': { name: 'Cape Canaveral', photo: 'cape-canaveral.jpg', alt: 'The beach and oceanfront condos in Cape Canaveral' },
   'melbourne-beach': { name: 'Melbourne Beach', photo: 'melbourne-beach.jpg', alt: 'Melbourne Beach' },
 };
 
