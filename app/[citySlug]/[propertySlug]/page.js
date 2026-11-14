@@ -1174,9 +1174,17 @@ export default async function CityListingsPage({ params, searchParams: searchPar
         {/* Relocation guide near the top (2026-11-13) — GuideStrip.js. */}
         {/* Condo pages offer the town's condo guide (2026-11-14). */}
         {propertyType === 'Condo' && condoGuideForTown(citySlug) ? (
-          <NeighborhoodGuideStrip slug={condoGuideForTown(citySlug)} />
+          <NeighborhoodGuideStrip
+            slug={condoGuideForTown(citySlug)}
+            label={(oceanfrontAlert || townAlert)?.label || `${city.name} condos`}
+            filter={(oceanfrontAlert || townAlert)?.filter || { ...cityListingsQueryParams(citySlug), propertyType }}
+          />
         ) : NEIGHBORHOOD_GUIDES[citySlug] ? (
-          <NeighborhoodGuideStrip slug={citySlug} />
+          <NeighborhoodGuideStrip
+            slug={citySlug}
+            label={(oceanfrontAlert || townAlert)?.label || `${city.name} ${propertyType === 'Land' ? 'land' : 'homes'}`}
+            filter={(oceanfrontAlert || townAlert)?.filter || { ...cityListingsQueryParams(citySlug), propertyType }}
+          />
         ) : (
           GUIDE_TOWNS[citySlug] && <GuideStrip townSlug={citySlug} />
         )}

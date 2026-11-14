@@ -2215,7 +2215,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         )}
         {/* Relocation guide near the top (2026-11-13) — GuideStrip.js. */}
         {guideSlugForPage(slug) ? (
-          <NeighborhoodGuideStrip slug={guideSlugForPage(slug)} />
+          <NeighborhoodGuideStrip slug={guideSlugForPage(slug)} label={neighborhood.name} filter={alertFilter} />
         ) : (
           <GuideStrip townSlug={GUIDE_TOWN_FOR_NEIGHBORHOOD[slug] || neighborhood.city?.slug} />
         )}

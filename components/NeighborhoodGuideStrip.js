@@ -13,7 +13,9 @@ import { NEIGHBORHOOD_GUIDES } from '@/lib/neighborhoodGuides';
  * email box in place (no name or phone, to keep it short). The guide PDF is
  * emailed right away and the request goes to Ryan's Website Leads sheet.
  */
-export default function NeighborhoodGuideStrip({ slug }) {
+// `filter`/`label` are the page's listings (same shape as ListingAlertSignup);
+// the follow-up emails send new listings that match them (2026-11-14).
+export default function NeighborhoodGuideStrip({ slug, filter, label }) {
   const guide = NEIGHBORHOOD_GUIDES[slug];
   const name = guide?.name;
   const pathname = usePathname();
@@ -31,7 +33,7 @@ export default function NeighborhoodGuideStrip({ slug }) {
     e.preventDefault();
     setState({ sending: true, error: '', done: '' });
     try {
-      const res = await api.requestNeighborhoodGuide({ email: email.trim(), slug, pagePath: pathname });
+      const res = await api.requestNeighborhoodGuide({ email: email.trim(), slug, pagePath: pathname, filter, label });
       rememberAlertEmail(email);
       setState({ sending: false, error: '', done: res?.message || `Check your inbox — your ${name} Guide is on its way.` });
     } catch (err) {
