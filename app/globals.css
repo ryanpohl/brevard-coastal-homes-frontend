@@ -2374,6 +2374,23 @@ textarea:focus {
   animation: email-prompt-exit-in 0.25s ease-out;
 }
 
+/* Soft signup box (2026-11-15) — ListingEmailPrompt.js. */
+.signup-box .email-prompt__title {
+  font-size: 22px;
+}
+
+.signup-box__continue {
+  display: block;
+  margin: 10px auto 0;
+  padding: 8px 12px;
+  background: none;
+  border: 0;
+  color: var(--color-muted-dark);
+  font-size: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .email-prompt-backdrop {
   position: fixed;
   inset: 0;
@@ -2499,6 +2516,26 @@ textarea:focus {
   .email-prompt__note {
     margin-top: 6px;
   }
+  /* Centered cards on phones (2026-11-15: the soft signup box is the first
+     centered card shown on phones). */
+  .email-prompt--exit {
+    left: 12px;
+    right: 12px;
+    top: 50%;
+    bottom: auto;
+    width: auto;
+    padding: 22px 18px 12px;
+    transform: translateY(-50%);
+    animation: email-prompt-phone-in 0.25s ease-out;
+  }
+  .signup-box .email-prompt__title {
+    font-size: 20px;
+  }
+}
+
+@keyframes email-prompt-phone-in {
+  from { transform: translateY(-46%); opacity: 0; }
+  to { transform: translateY(-50%); opacity: 1; }
 }
 
 /* Condo building comparison table (components/CondoBuildingComparison.js,

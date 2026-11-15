@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import * as api from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { isWatchedHome, rememberAlertEmail, rememberWatchedHome } from '@/lib/alertMemory';
+import { isWatchedHome, rememberAlertEmail, rememberedAlertEmail, rememberWatchedHome } from '@/lib/alertMemory';
 import { promptAllowed, promptForced, snoozePrompts, watchExitIntent } from '@/lib/emailPrompt';
 
 /**
@@ -20,10 +20,46 @@ import { promptAllowed, promptForced, snoozePrompts, watchExitIntent } from '@/l
  * you go" card when the visitor heads for the top of the window to leave
  * (watchExitIntent), if it hasn't shown yet.
  */
+// Soft signup box (2026-11-15, per Ryan: "build the soft version"). A bigger,
+// centered version of this card on a visitor's 3rd different listing, again
+// on the 6th, then every 5th (11, 16, ...). "Continue browsing" closes it
+// and quiets the small cards for 7 days (like "No thanks"), but the box
+// itself still comes back at the next step. Never on the first page of a visit (the page someone lands on from
+// Google or an ad), never for signed-in visitors or anyone who has given an
+// email on this device. Google always loads a page fresh, as a first
+// visit, so it never sees the box. ?signupbox=1 forces it (testing).
+const GATE_KEY = 'bch-signup-box-step';
+const SESSION_KEY = 'bch-session-listings';
+
+function nextGateStep(shown) {
+  if (shown < 3) return 3;
+  if (shown < 6) return 6;
+  return shown + 5;
+}
+
+function sessionListingCount() {
+  try {
+    const n = Number(sessionStorage.getItem(SESSION_KEY) || 0) + 1;
+    sessionStorage.setItem(SESSION_KEY, String(n));
+    return n;
+  } catch {
+    return 1;
+  }
+}
+
+function gateForced() {
+  try {
+    return new URLSearchParams(window.location.search).get('signupbox') === '1';
+  } catch {
+    return false;
+  }
+}
+
 const VIEWS_KEY = 'bch-listing-views';
 const MIN_VIEWS = 2;
 const WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 const DELAY_MS = 6000;
+const GATE_DELAY_MS = 2500;
 
 function readJson(key, fallback) {
   try {
@@ -55,6 +91,7 @@ export default function ListingEmailPrompt({ listingId, address, status }) {
   const { user } = useAuth();
   const [show, setShow] = useState(false);
   const [exit, setExit] = useState(false);
+  const [gate, setGate] = useState(false);
   const [email, setEmail] = useState('');
   const [state, setState] = useState({ sending: false, error: '', done: false });
   const underContract = status === 'Pending' || status === 'Contingent';
@@ -62,7 +99,21 @@ export default function ListingEmailPrompt({ listingId, address, status }) {
   useEffect(() => {
     const forced = promptForced();
     const viewed = countView(listingId);
+    const inSession = sessionListingCount();
     if (!['Active', 'Pending', 'Contingent'].includes(status)) return undefined;
+    // Soft signup box: ignores the 7-day "No thanks" snooze, nothing else.
+    const signedUp = !!user || !!rememberedAlertEmail();
+    // Views older than two weeks drop off the count; start the steps over then.
+    const shown = Number(readJson(GATE_KEY, 0)) || 0;
+    const step = nextGateStep(viewed < shown ? 0 : shown);
+    if (gateForced() || (!signedUp && !isWatchedHome(listingId) && inSession >= 2 && viewed >= step)) {
+      if (!gateForced()) writeJson(GATE_KEY, viewed);
+      const t = setTimeout(() => {
+        setGate(true);
+        setShow(true);
+      }, gateForced() ? 800 : GATE_DELAY_MS);
+      return () => clearTimeout(t);
+    }
     if (!forced && (!promptAllowed(user) || isWatchedHome(listingId))) return undefined;
     let done = false;
     const open = (onExit = false) => {
@@ -81,6 +132,7 @@ export default function ListingEmailPrompt({ listingId, address, status }) {
   }, [listingId, user, status]);
 
   function dismiss() {
+    // Either close quiets the small cards for 7 days; the signup box ignores that.
     if (!state.done) snoozePrompts();
     setShow(false);
   }
@@ -89,7 +141,7 @@ export default function ListingEmailPrompt({ listingId, address, status }) {
     e.preventDefault();
     setState({ sending: true, error: '', done: false });
     try {
-      await api.watchHome(listingId, email.trim(), 'email_prompt');
+      await api.watchHome(listingId, email.trim(), gate ? 'signup_box' : 'email_prompt');
       rememberAlertEmail(email);
       rememberWatchedHome(listingId);
       setState({ sending: false, error: '', done: true });
@@ -100,6 +152,53 @@ export default function ListingEmailPrompt({ listingId, address, status }) {
   }
 
   if (!show) return null;
+
+  if (gate) {
+    return (
+      <>
+        <div className="email-prompt-backdrop" onClick={dismiss} aria-hidden="true" />
+        <div className="email-prompt email-prompt--exit signup-box" role="dialog" aria-modal="true" aria-label="Sign up free">
+          <button type="button" className="email-prompt__close" onClick={dismiss} aria-label="Close">
+            ×
+          </button>
+          {state.done ? (
+            <div className="email-prompt__done" role="status">
+              <div className="email-prompt__title">✓ You&rsquo;re signed up</div>
+              <p>Check your inbox for the full report on {address}. We&rsquo;ll email you if anything changes.</p>
+            </div>
+          ) : (
+            <form onSubmit={submit}>
+              <div className="email-prompt__kicker">Free signup</div>
+              <div className="email-prompt__title">Don&rsquo;t miss the right home</div>
+              <p className="email-prompt__text">
+                Sign up with just your email. We&rsquo;ll send you the full report on {address} (taxes, HOA, lot size,
+                schools) and let you know {underContract ? 'if it comes back on the market' : 'the moment its price drops or it goes under contract'}.
+              </p>
+              <div className="email-prompt__row">
+                <input
+                  type="email"
+                  required
+                  autoFocus
+                  placeholder="Your email"
+                  aria-label="Your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <button type="submit" className="btn btn-gold" disabled={state.sending}>
+                  {state.sending ? 'Signing up…' : 'Sign Up Free'}
+                </button>
+              </div>
+              {state.error && <p className="error-text email-prompt__note">{state.error}</p>}
+              <p className="email-prompt__note">No password. Unsubscribe anytime.</p>
+              <button type="button" className="signup-box__continue" onClick={dismiss}>
+                Continue browsing
+              </button>
+            </form>
+          )}
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
