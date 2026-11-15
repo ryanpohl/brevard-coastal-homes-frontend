@@ -78,8 +78,8 @@ export default async function LookingToSellPage() {
           Start With a Free Home Value Report
         </h2>
         <p style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 24px', fontSize: 14, color: 'var(--color-muted-dark)' }}>
-          Enter your property details below and we&apos;ll pull real comparable sales for your neighborhood — not an
-          instant algorithm guess.
+          Enter your property details to see an instant estimate from recent sales near you, then get a free
+          personal valuation from Ryan if you&apos;d like a closer number.
         </p>
 
         <div style={{ marginBottom: 12 }}>

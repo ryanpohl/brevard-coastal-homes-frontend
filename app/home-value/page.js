@@ -5,7 +5,7 @@ import { withSocialPreview } from '@/lib/socialPreview';
 export const metadata = withSocialPreview({
   title: "What's My Home Worth? Free Brevard County Home Value Report | Brevard Coastal Homes",
   description:
-    'Get a free, no-obligation home value report for your Brevard County, FL property — based on real comparable sales and current market conditions, not a generic algorithm.',
+    'See what your Brevard County, FL home is worth: an instant estimate from recent sales near you, plus a free personal valuation from a local Realtor if you want one.',
   alternates: { canonical: '/home-value' },
 });
 
@@ -38,9 +38,8 @@ export default async function HomeValuePage() {
             What&apos;s Your Brevard County Home Worth?
           </h1>
           <p style={{ maxWidth: 620, color: 'rgba(255,255,255,0.85)', fontSize: 16, lineHeight: 1.6 }}>
-            Get a free, no-obligation home value report based on recent comparable sales and current market
-            conditions in your neighborhood — not a generic automated number. We&apos;ll have it in your inbox
-            within one business day.
+            See an instant estimate from recent sales of similar homes in your ZIP code, then get a free personal
+            valuation from Ryan if you&apos;d like a closer number. No obligation.
           </p>
         </div>
       </div>
@@ -51,19 +50,19 @@ export default async function HomeValuePage() {
 
           <div>
             <div className="card" style={{ padding: 24, marginBottom: 20 }}>
-              <h2 style={{ fontSize: 18, marginBottom: 12 }}>Why a Real Report Beats an Instant Estimate</h2>
+              <h2 style={{ fontSize: 18, marginBottom: 12 }}>How the Estimate Works</h2>
               <p style={{ fontSize: 14, color: 'var(--color-muted-dark)', lineHeight: 1.7 }}>
-                Automated home value tools rely on public records and broad algorithms, which often miss what
-                actually drives price on your street — recent upgrades, true condition, and which comparable
-                sales really apply. We pull real, current comps from the local MLS and review them personally
-                before sending your report.
+                We compare your home with recent MLS sales in your ZIP code: the same kind of property, a similar
+                size, and the same waterfront type. You&apos;ll see the range and the sales it came from. Sales
+                can&apos;t show your home&apos;s condition, updates or view, so for a closer number Ryan will
+                prepare a personal valuation at no cost.
               </p>
             </div>
             <div className="card" style={{ padding: 24 }}>
               <h2 style={{ fontSize: 18, marginBottom: 12 }}>Currently Serving Brevard County, FL</h2>
               <p style={{ fontSize: 14, color: 'var(--color-muted-dark)', lineHeight: 1.7 }}>
-                From Cocoa Beach to Melbourne Beach, we know the coastal Brevard market. Home value reports are
-                currently available for properties within Brevard County only.
+                From Cocoa Beach to Melbourne Beach, we know the coastal Brevard market. Home values are available
+                for Brevard County homes only.
               </p>
             </div>
           </div>
