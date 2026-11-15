@@ -3604,3 +3604,42 @@ button.guide-strip {
 .guide-strip--open .guide-strip__text {
   flex: 1 1 100%;
 }
+
+/* "Email me new homes that match this search" (2026-11-15) — components/SearchMatchAlert.js.
+   One quiet line under the filter bar; only after the visitor filters. */
+.search-match {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--color-muted-dark);
+}
+.search-match__link {
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  color: var(--color-gold-text);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.search-match--open {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.search-match--open input {
+  flex: 1 1 200px;
+  max-width: 280px;
+  min-height: 38px;
+  padding: 6px 12px;
+  border: 1px solid var(--color-border-light);
+  border-radius: 6px;
+  font-size: 16px;
+}
+.search-match--open .btn {
+  min-height: 38px;
+  padding: 0 16px;
+  font-size: 13px;
+}

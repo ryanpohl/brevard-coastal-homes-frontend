@@ -17,6 +17,7 @@ import { waterfrontPriceLine } from '@/lib/waterfrontFaq';
 import CityAboutSection from '@/components/CityAboutSection';
 import NeighborhoodLinkRow from '@/components/NeighborhoodLinkRow';
 import FilterBar from '@/components/FilterBar';
+import SearchMatchAlert from '@/components/SearchMatchAlert';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import BuildingInquiryModal from '@/components/BuildingInquiryModal';
@@ -369,6 +370,22 @@ export default async function CityAllListingsPage({ params, searchParams: search
       />
 
       <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
+        {/* "Email me new homes that match this search" (2026-11-15) — only once the visitor filters. */}
+        {['priceMin', 'priceMax', 'beds', 'baths', 'waterfront'].some((k) => searchParams[k]) && (
+          <SearchMatchAlert
+            place={city.name}
+            filter={{
+              ...cityListingsQueryParams(citySlug),
+              propertyType: effectivePropertyTypes,
+              priceMin: searchParams.priceMin,
+              priceMax: searchParams.priceMax,
+              beds: searchParams.beds,
+              baths: searchParams.baths,
+              waterfront: searchParams.waterfront,
+              seniorCommunity: searchParams.seniorCommunity,
+            }}
+          />
+        )}
         <ListingResultsLayout
           mapCenter={mapCenter}
           results={results}

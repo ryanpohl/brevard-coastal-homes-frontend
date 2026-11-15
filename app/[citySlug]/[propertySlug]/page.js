@@ -35,6 +35,7 @@ import CondoBuildingDirectory from '@/components/CondoBuildingDirectory';
 import CondoBuildingComparison from '@/components/CondoBuildingComparison';
 import { getCondoBuildingComparison } from '@/lib/condoBuildings';
 import FilterBar from '@/components/FilterBar';
+import SearchMatchAlert from '@/components/SearchMatchAlert';
 import ListingResultsLayout from '@/components/ListingResultsLayout';
 import ListingAlertSignup, { ListingAlertJumpLink } from '@/components/ListingAlertSignup';
 import GuideStrip from '@/components/GuideStrip';
@@ -637,6 +638,7 @@ export default async function CityListingsPage({ params, searchParams: searchPar
         ? ['Home', 'Condo', 'Land']
         : [propertyType];
 
+  const pageWaterfront = waterLand ? waterLand.waterfront : isOceanfront || isOceanfrontCombined ? 'Oceanfront' : isRiverfrontCombined ? 'Riverfront' : searchParams.waterfront;
   const page = Number(searchParams.page) || 1;
 
   let results = [];
@@ -656,7 +658,7 @@ export default async function CityListingsPage({ params, searchParams: searchPar
       // ignoring any ?waterfront= a visitor's URL might otherwise carry —
       // there's no Waterfront dropdown on these pages to set it from
       // anyway (see hideWaterfront on FilterBar below).
-      waterfront: waterLand ? waterLand.waterfront : isOceanfront || isOceanfrontCombined ? 'Oceanfront' : isRiverfrontCombined ? 'Riverfront' : searchParams.waterfront,
+      waterfront: pageWaterfront,
       // "55+ Communities" (2026-08-14) — the control only ever renders on
       // Viera West's Homes/Condos pages (see show55Filter below), so this
       // param will only be set there in practice. Forwarded unconditionally
@@ -1225,11 +1227,28 @@ export default async function CityListingsPage({ params, searchParams: searchPar
       />
 
       <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
+        {/* "Email me new homes that match this search" (2026-11-15) — only once the visitor filters. */}
+        {['priceMin', 'priceMax', 'beds', 'baths'].some((k) => searchParams[k]) && (
+          <SearchMatchAlert
+            place={city.name}
+            filter={{
+              ...cityListingsQueryParams(citySlug),
+              propertyType: effectivePropertyTypes,
+              priceMin: searchParams.priceMin,
+              priceMax: searchParams.priceMax,
+              beds: searchParams.beds,
+              baths: searchParams.baths,
+              waterfront: pageWaterfront,
+              seniorCommunity: searchParams.seniorCommunity,
+            }}
+          />
+        )}
         <ListingResultsLayout
           mapCenter={mapCenter}
           results={results}
           resultsLabel={total === 0 ? '0 results' : `${rangeStart}-${rangeEnd} of ${total} ${typeLabel}`}
-          labelExtra={oceanfrontAlert || townAlert ? <ListingAlertJumpLink label={city.name} /> : undefined}
+          // Hidden while the visitor filters: SearchMatchAlert offers the closer match (2026-11-15).
+          labelExtra={(oceanfrontAlert || townAlert) && !['priceMin', 'priceMax', 'beds', 'baths'].some((k) => searchParams[k]) ? <ListingAlertJumpLink label={city.name} /> : undefined}
           page={page}
           totalPages={totalPages}
         />

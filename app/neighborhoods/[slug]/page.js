@@ -44,6 +44,7 @@ import {
   formatPrice,
 } from '@/lib/constants';
 import FilterBar from '@/components/FilterBar';
+import SearchMatchAlert from '@/components/SearchMatchAlert';
 import HarborIslandInquiryModals from '@/components/HarborIslandInquiryModals';
 import HarborIslandForeclosuresTrigger from '@/components/HarborIslandForeclosuresTrigger';
 import ContactUsTrigger from '@/components/ContactUsTrigger';
@@ -2296,12 +2297,28 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
       />
 
       <div className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 64px' }}>
+        {/* "Email me new homes that match this search" (2026-11-15) — only once the visitor filters. */}
+        {['priceMin', 'priceMax', 'beds', 'baths', 'waterfront'].some((k) => searchParams[k]) && (
+          <SearchMatchAlert
+            place={neighborhood.name}
+            filter={{
+              ...listingsFilterParams,
+              propertyType: searchParams.propertyType || searchParams.__viewPropertyType,
+              priceMin: searchParams.priceMin,
+              priceMax: searchParams.priceMax,
+              beds: searchParams.beds,
+              baths: searchParams.baths,
+              waterfront: searchParams.waterfront,
+            }}
+          />
+        )}
         <ListingResultsLayout
           mapCenter={mapCenter}
           results={results}
           mapZoom={neighborhood.mapZoom || 15}
           resultsLabel={total === 0 ? '0 results' : `${rangeStart}-${rangeEnd} of ${total} Homes`}
-          labelExtra={<ListingAlertJumpLink label={neighborhood.name} />}
+          // Hidden while the visitor filters: SearchMatchAlert offers the closer match (2026-11-15).
+          labelExtra={['priceMin', 'priceMax', 'beds', 'baths', 'waterfront'].some((k) => searchParams[k]) ? undefined : <ListingAlertJumpLink label={neighborhood.name} />}
           emptyMessage={emptyMessage}
           page={page}
           totalPages={totalPages}
