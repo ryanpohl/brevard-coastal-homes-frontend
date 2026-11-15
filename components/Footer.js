@@ -336,6 +336,11 @@ export default function Footer({ cities = [], neighborhoods = [] }) {
 
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', padding: '16px clamp(16px, 4vw, 56px)', fontSize: 12 }}>
         © {new Date().getFullYear()} Brevard Coastal Homes. All rights reserved.
+        {/* Privacy policy (2026-11-15) — app/privacy/page.js. */}
+        {' · '}
+        <Link href="/privacy" className="footer-link" style={{ fontSize: 12 }}>
+          Privacy Policy
+        </Link>
       </div>
 
       {contactModalOpen && <ContactModal onClose={() => setContactModalOpen(false)} />}

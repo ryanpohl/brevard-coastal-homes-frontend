@@ -88,6 +88,7 @@ export default async function sitemap() {
     // app/home-value/page.js. Same priority tier as /looking-to-sell — both
     // are static lead-capture pages, not listing pages.
     { url: `${SITE_URL}/home-value`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${SITE_URL}/privacy`, lastModified: now, changeFrequency: 'yearly', priority: 0.1 },
     // About / agent bio page (2026-09-25, per Ryan) — see app/about/page.js.
     // Same priority tier as Looking to Sell — both are informational,
     // non-listing static pages that link from every page's nav/footer.
