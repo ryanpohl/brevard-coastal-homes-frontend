@@ -3686,3 +3686,27 @@ button.guide-strip {
   text-align: right;
   white-space: nowrap;
 }
+
+/* Required signup box from the 6th listing (2026-11-23) — ListingEmailPrompt.js. */
+.signup-box-backdrop--required {
+  background: rgba(16, 36, 44, 0.72);
+  backdrop-filter: blur(3px);
+}
+.signup-box__alt {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-muted-dark);
+}
+.signup-box__link {
+  background: none;
+  border: 0;
+  padding: 4px 2px;
+  font-size: 14px;
+  color: var(--color-muted-dark);
+  text-decoration: underline;
+  cursor: pointer;
+}
+body.signup-required .mobile-contact-bar {
+  z-index: 96;
+}
