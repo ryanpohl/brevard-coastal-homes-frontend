@@ -189,6 +189,15 @@ export default function ListingEmailPrompt({ listingId, address, status }) {
       setState({ sending: false, error: '', done: true });
       setTimeout(() => setShow(false), required ? 2500 : 6000);
     } catch (err) {
+      // A returning subscriber can hit the per-email home limit or the hourly
+      // signup limit. They're already on Ryan's list, so the required box
+      // lets them through instead of leaving them stuck.
+      if (required && /maximum|too many/i.test(String(err.message || '')) && /\S+@\S+\.\S+/.test(email)) {
+        rememberAlertEmail(email);
+        setState({ sending: false, error: '', done: true });
+        setTimeout(() => setShow(false), 1500);
+        return;
+      }
       setState({ sending: false, error: err.message || 'Something went wrong. Please try again.', done: false });
     }
   }
@@ -236,7 +245,9 @@ export default function ListingEmailPrompt({ listingId, address, status }) {
                 </button>
               </div>
               {state.error && <p className="error-text email-prompt__note">{state.error}</p>}
-              <p className="email-prompt__note">No password. Unsubscribe anytime.</p>
+              <p className="email-prompt__note">
+                No password. Unsubscribe anytime.{required ? ' Signed up before? Just enter the same email.' : ''}
+              </p>
               {required ? (
                 <p className="signup-box__alt">
                   Prefer to talk? Call or text{' '}
