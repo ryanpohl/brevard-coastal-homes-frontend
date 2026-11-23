@@ -68,12 +68,16 @@ export async function generateMetadata({ params }) {
     try {
           const { listing } = await api.getListing(id);
           const typeLabel = PROPERTY_TYPE_LABEL[listing.propertyType] || listing.propertyType;
+          // Lots with no street number yet ("Riverfront Lot, Melbourne Beach",
+          // 2026-11-23) add the MLS# so two such lots never share a title.
+          const titleAddress =
+            /^\d/.test(listing.address) || !listing.mlsNumber ? listing.address : `${listing.address} (MLS# ${listing.mlsNumber})`;
           const title =
                     listing.status === 'Sold'
-                      ? `Sold: ${listing.address} | ${formatPrice(listing.closePrice ?? listing.price)} — Brevard Coastal Homes`
+                      ? `Sold: ${titleAddress} | ${formatPrice(listing.closePrice ?? listing.price)} — Brevard Coastal Homes`
                       : listing.status === 'Pending' || listing.statusLabel === 'Contingent'
-                        ? `${listing.statusLabel === 'Contingent' ? 'Contingent' : 'Pending'}: ${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`
-                        : `${listing.address} | ${formatPrice(listing.price)} — Brevard Coastal Homes`;
+                        ? `${listing.statusLabel === 'Contingent' ? 'Contingent' : 'Pending'}: ${titleAddress} | ${formatPrice(listing.price)} — Brevard Coastal Homes`
+                        : `${titleAddress} | ${formatPrice(listing.price)} — Brevard Coastal Homes`;
           const description = buildListingMetaDescription(listing, typeLabel);
           // Link previews (2026-10-04, per Ryan): a listing link texted or
           // emailed to a buyer showed the site-wide hero photo from
