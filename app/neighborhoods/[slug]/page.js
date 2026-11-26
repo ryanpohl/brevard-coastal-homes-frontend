@@ -302,6 +302,58 @@ function CommunityFacts({ slug }) {
   );
 }
 
+// Harbor Island Beach Club "Prices & HOA Fees" box near the top (2026-11-26,
+// per Ryan: "do these now") — price ranges and monthly HOA fees by type from
+// the current listings, plus the amenities, so Google and AI answers find
+// the key numbers without reading down to the FAQ. Rows without data are
+// left out; the whole box is left out if there's no snapshot.
+function HibcPricesHoa({ snapshot, asOf }) {
+  if (!snapshot || !snapshot.byType) return null;
+  const k = (n) => (n >= 1e6 ? `$${parseFloat((n / 1e6).toFixed(2))}M` : `$${Math.round(n / 1000)}K`);
+  const price = (t) => (t.low === t.high ? k(t.low) : `${k(t.low)}–${k(t.high)}`);
+  const money = (n) => `$${n.toLocaleString('en-US')}`;
+  const hoa = (h) => (h.low === h.high ? money(h.low) : `${money(h.low)}–${money(h.high)}`);
+  const rows = [
+    ['Homes', snapshot.byType.Home, snapshot.hoaByType?.Home],
+    ['Condos', snapshot.byType.Condo, snapshot.hoaByType?.Condo],
+  ].filter(([, t]) => t && t.count > 0);
+  if (!rows.length) return null;
+  return (
+    <section className="hibc-prices" aria-labelledby="hibc-prices-heading">
+      <h2 id="hibc-prices-heading" className="hibc-prices__title">
+        Harbor Island Beach Club Prices &amp; HOA Fees
+      </h2>
+      <table className="hibc-prices__table">
+        <thead>
+          <tr>
+            <th scope="col">
+              <span className="visually-hidden">Type</span>
+            </th>
+            <th scope="col">For sale now</th>
+            <th scope="col">Price range</th>
+            <th scope="col">HOA fee</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(([label, t, h]) => (
+            <tr key={label}>
+              <th scope="row">{label}</th>
+              <td>{t.count}</td>
+              <td>{price(t)}</td>
+              <td>{h ? `${hoa(h)}/mo` : '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="hibc-prices__note">
+        Community amenities: gated entry, private Atlantic beach access, a 42-slip marina on the Indian River,
+        resort-style pool and spa, and a fitness center. Nightly rentals are allowed. From current MLS listings as of{' '}
+        {asOf}; confirm the exact HOA fee and what it includes on each listing.
+      </p>
+    </section>
+  );
+}
+
 function ModelTourLine({ name }) {
   return (
     <div className="model-tour-card">
@@ -1181,7 +1233,20 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         t.low = Math.min(t.low, l.price);
         t.high = Math.max(t.high, l.price);
       }
+      // Monthly HOA range by type (2026-11-26, for Harbor Island's "Prices &
+      // HOA Fees" box): MLS fees come monthly, quarterly or yearly.
+      const PER_MONTH = { Monthly: 1, Quarterly: 1 / 3, Annually: 1 / 12, Yearly: 1 / 12, 'Semi-Annually': 1 / 6 };
+      const hoaByType = {};
+      for (const l of data.results || []) {
+        const per = PER_MONTH[l.assocFeeFrequency];
+        if (!per || typeof l.assocFee !== 'number' || l.assocFee <= 0 || !l.propertyType) continue;
+        const fee = Math.round(l.assocFee * per);
+        const h = (hoaByType[l.propertyType] ||= { low: fee, high: fee });
+        h.low = Math.min(h.low, fee);
+        h.high = Math.max(h.high, fee);
+      }
       communitySnapshot = {
+        hoaByType,
         // Condo buildings with units for sale (2026-11-09, per Ryan's Cocoa
         // Village AI screenshot, which named the buildings from other sites).
         condoBuildings: buildingsFromListings((data.results || []).filter((l) => l.propertyType === 'Condo' && l.status !== 'Sold')),
@@ -1760,6 +1825,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {isHarborIslandBeachClub && (
           <div style={{ marginBottom: 12 }}>
             <CommunityFacts slug={slug} />
+            <HibcPricesHoa snapshot={communitySnapshot} asOf={snapshotUpdated} />
             {/* Trimmed 2026-10-28 (per Ryan: less text above the listings). */}
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
               Looking for a home or condo in Harbor Island Beach Club? We&rsquo;ll find available properties, set up

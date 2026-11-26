@@ -3710,3 +3710,47 @@ button.guide-strip {
 body.signup-required .mobile-contact-bar {
   z-index: 96;
 }
+
+/* Harbor Island Beach Club "Prices & HOA Fees" box (2026-11-26). */
+.hibc-prices {
+  margin: 14px 0 16px;
+  padding: 14px 18px;
+  border: 1px solid #e6e0d4;
+  border-left: 3px solid #c9a15a;
+  border-radius: 8px;
+  background: #fff;
+  max-width: 760px;
+}
+.hibc-prices__title {
+  font-family: var(--font-inter-tight);
+  font-size: 19px;
+  margin: 0 0 8px;
+  color: var(--color-ink);
+}
+.hibc-prices__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.hibc-prices__table th,
+.hibc-prices__table td {
+  text-align: left;
+  padding: 6px 8px 6px 0;
+  border-bottom: 1px solid #eee;
+}
+.hibc-prices__table thead th {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-muted-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.hibc-prices__table tbody th {
+  font-weight: 700;
+}
+.hibc-prices__note {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--color-muted-dark);
+  margin: 10px 0 0;
+}
