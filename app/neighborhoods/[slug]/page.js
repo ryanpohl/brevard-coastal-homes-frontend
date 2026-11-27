@@ -376,7 +376,6 @@ function AdelaideAtAGlance({ snapshot, asOf }) {
   const hoa = snapshot.hoaByType?.Home;
   const list = snapshot.homesForSale || [];
   const median = list.length ? [...list].sort((a, b) => a.price - b.price)[Math.floor((list.length - 1) / 2)].price : null;
-  const street = (a) => String(a || '').split(',')[0];
   return (
     <section className="hibc-prices" aria-labelledby="adelaide-glance-heading">
       <h2 id="adelaide-glance-heading" className="hibc-prices__title">
@@ -421,13 +420,27 @@ function AdelaideAtAGlance({ snapshot, asOf }) {
           <strong>Model homes</strong>, open Monday–Saturday 10 AM–5 PM and Sunday 12–5 PM:{' '}
           <strong>AR Homes</strong> (built locally by Rosewood Homes), the Lumina at 3639 Lake Adelaide Place, a
           one-story 4,485 sq ft home with 4 bedrooms and a 4-car garage; and <strong>Christopher Burton Luxury
-          Homes</strong> at 3717 Upper Floridian Way. Contact Ryan before
+          Homes</strong> at 3717 Upper Floridian Way. <strong>Elan Builders</strong> also builds custom homes here, without a model home. Contact Ryan before
           you visit and he&rsquo;ll go with you.
         </li>
       </ul>
+      <p className="hibc-prices__note">Prices and HOA fees from current MLS listings as of {asOf}.</p>
+    </section>
+  );
+}
+
+// The "Adelaide homes for sale now" table, below the listings (2026-11-27,
+// per Ryan: option B, so phones reach the listings sooner).
+function AdelaideForSaleTable({ snapshot, asOf }) {
+  const list = snapshot?.homesForSale || [];
+  if (!list.length) return null;
+  const money = (n) => `$${n.toLocaleString('en-US')}`;
+  const street = (a) => String(a || '').split(',')[0];
+  return (
+    <section className="hibc-prices" aria-labelledby="adelaide-forsale-heading">
       {list.length > 0 && (
         <>
-          <h3 className="glance-subtitle">Adelaide homes for sale now</h3>
+          <h2 id="adelaide-forsale-heading" className="hibc-prices__title">Adelaide Homes for Sale Now</h2>
           <div className="glance-table-wrap">
             <table className="hibc-prices__table glance-table">
               <thead>
@@ -458,7 +471,7 @@ function AdelaideAtAGlance({ snapshot, asOf }) {
           </div>
         </>
       )}
-      <p className="hibc-prices__note">Prices and HOA fees from current MLS listings as of {asOf}.</p>
+      <p className="hibc-prices__note">From current MLS listings as of {asOf}.</p>
     </section>
   );
 }
@@ -2522,6 +2535,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             visitor's price/bed filters. See ListingAlertSignup.js. */}
         {/* Builder starting prices (2026-11-05, per Ryan), below the listings. */}
         {slug === 'aripeka' && <AripekaBuilderPrices />}
+        {slug === 'adelaide' && <AdelaideForSaleTable snapshot={communitySnapshot} asOf={snapshotUpdated} />}
         {slug === 'adelaide' && <AdelaideBuilderPrices />}
         {showsVieraBuilderPrices(slug) && <VieraBuilderPrices slug={slug} />}
         {slug === DEL_WEBB_VIERA_SLUG && <DelWebbVieraPrices />}
