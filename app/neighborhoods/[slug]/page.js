@@ -2284,7 +2284,9 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {/* Relocation guide near the top (2026-11-13) — GuideStrip.js. */}
         {/* Adelaide: builder incentives signup in place of the guide strip
             (2026-11-26, per Ryan) — see BuilderIncentivesSignup.js. */}
-        {slug === 'adelaide' ? (
+        {/* Aripeka too (2026-11-26, per Ryan: "can you do this for aripeka
+            too"), except its Lots view, which keeps the guide strip. */}
+        {slug === 'adelaide' || (slug === 'aripeka' && primaryType !== 'Land') ? (
           <BuilderIncentivesSignup label={neighborhood.name} filter={alertFilter} />
         ) : guideSlugForPage(slug) ? (
           <NeighborhoodGuideStrip slug={guideSlugForPage(slug)} label={neighborhood.name} filter={alertFilter} />
