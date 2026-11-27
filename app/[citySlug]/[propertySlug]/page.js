@@ -1147,6 +1147,14 @@ export default async function CityListingsPage({ params, searchParams: searchPar
                   <Link href="/neighborhoods/heritage-isle">Heritage Isle</Link> and{' '}
                   <Link href="/neighborhoods/bridgewater-at-viera">Bridgewater at Viera</Link>.
                 </>
+              ) : citySlug === 'indian-harbour-beach' ? (
+                <>
+                  <strong>Location:</strong> Indian Harbour Beach sits on the barrier island between the Atlantic Ocean and
+                  the Banana River, south of Satellite Beach and north of the Eau Gallie Causeway, with quick access to A1A
+                  and mainland Melbourne. Many homes are on residential canals with boat access to the river; others are a
+                  short walk to the beach, Bicentennial Beach Park and Gleason Park. Most homes are zoned for Ocean
+                  Breeze Elementary, Hoover Middle and Satellite High.
+                </>
               ) : null
             }
           />

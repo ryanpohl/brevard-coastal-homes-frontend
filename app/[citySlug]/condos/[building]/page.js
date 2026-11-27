@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import * as api from '@/lib/api';
 import { formatPrice } from '@/lib/siteConstants';
 import {
@@ -7,6 +7,7 @@ import {
   condoBuildingFilter,
   findCondoBuilding,
   getCondoBuildingData,
+  REMOVED_CONDO_BUILDINGS,
 } from '@/lib/condoBuildings';
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
 import ListingCard from '@/components/ListingCard';
@@ -32,6 +33,8 @@ const SITE_URL = 'https://brevardcoastalhomes.com';
 
 async function load(params) {
   const { citySlug, building: slug } = await params;
+  const moved = REMOVED_CONDO_BUILDINGS[`${citySlug}/${slug}`];
+  if (moved) permanentRedirect(moved);
   const building = findCondoBuilding(citySlug, slug);
   if (!building) return null;
   let city = null;
@@ -51,7 +54,7 @@ export async function generateMetadata({ params }) {
   const where = building.oceanfront ? 'oceanfront condos' : 'condos';
   const meta = {
     title: { absolute: `${building.name} Condos for Sale | ${cityName}, FL` },
-    description: `${building.name} ${where} for sale in ${cityName}, FL${building.address ? ` at ${building.address}` : ''}: current listings, recent sales, HOA fees and rental rules, updated from the MLS.`,
+    description: `${building.name} ${where} for sale in ${cityName}, FL${building.address ? ` at ${building.address}` : ''}${building.aka ? ` (also spelled ${building.aka})` : ''}: current listings, recent sales, HOA fees and rental rules, updated from the MLS.`,
     alternates: { canonical: `/${citySlug}/condos/${building.slug}` },
   };
   const photo = await listingPreviewPhoto(condoBuildingFilter(citySlug, building));
@@ -79,6 +82,15 @@ export default async function CondoBuildingPage({ params }) {
         data.medianListPrice ? { label: 'Median list price', value: formatPrice(data.medianListPrice) } : null,
         sold ? { label: 'Sold in the last 12 months', value: sold.count.toLocaleString('en-US') } : null,
         sold?.medianPrice ? { label: 'Median sold price', value: formatPrice(sold.medianPrice) } : null,
+        data.soldTwoYears && data.soldTwoYears.count > (sold?.count || 0)
+          ? {
+              label: `Sold in the last 2 years (${data.soldTwoYears.count})`,
+              value:
+                data.soldTwoYears.low === data.soldTwoYears.high
+                  ? formatPrice(data.soldTwoYears.low)
+                  : `${formatPrice(data.soldTwoYears.low)}–${formatPrice(data.soldTwoYears.high)}`,
+            }
+          : null,
         fee ? { label: 'HOA fees (recent listings)', value: fee } : null,
         rental ? { label: 'Minimum rental (MLS)', value: rental } : null,
       ].filter(Boolean)
@@ -145,6 +157,7 @@ export default async function CondoBuildingPage({ params }) {
         <p style={{ fontSize: 17, lineHeight: 1.6, color: 'var(--color-muted-dark)', maxWidth: 760, marginBottom: 6 }}>
           {intro}
           {building.note ? ` ${building.note}` : ''}
+          {building.facts?.length ? ` ${building.facts[0]}` : ''}
         </p>
         {condoBuildingDetail(building) && (
           <p style={{ fontSize: 14, color: 'var(--color-muted)', marginBottom: 20 }}>{condoBuildingDetail(building)}</p>
@@ -194,13 +207,14 @@ export default async function CondoBuildingPage({ params }) {
         <PageEmailPrompt label={name} filter={condoBuildingFilter(citySlug, building)} kind="condo" />
       </div>
 
-      {tiles.length > 1 && (
+      {(tiles.length > 1 || building.facts?.length > 1) && (
         <div className="container" style={{ padding: '8px clamp(16px, 4vw, 56px) 8px', maxWidth: 760 }}>
           <section className="market-report neighborhood-market-stats" style={{ margin: '4px 0 20px' }}>
             <h2 className="market-report-title" style={{ fontSize: 20 }}>
               {name} at a Glance
             </h2>
             <p className="market-report-sub">Space Coast MLS · listings updated hourly, sales daily</p>
+            {tiles.length > 1 && (
             <div className="market-tiles">
               {tiles.map((t) => (
                 <div key={t.label} className="market-tile">
@@ -209,6 +223,17 @@ export default async function CondoBuildingPage({ params }) {
                 </div>
               ))}
             </div>
+            )}
+            {building.facts?.length > 1 && (
+              <>
+                <h3 style={{ fontSize: 17, margin: '16px 0 6px', color: 'var(--color-ink)' }}>About {name}: Key Facts</h3>
+                <ul className="glance-facts">
+                  {building.facts.slice(1).map((f) => (
+                    <li key={f}>{f}</li>
+                  ))}
+                </ul>
+              </>
+            )}
             {(fee || rental) && (
               <p className="market-report-note" style={{ fontSize: 13, marginTop: 10 }}>
                 HOA fees and rental rules are from recent MLS listings at {name} and can change; confirm them with the
