@@ -2632,6 +2632,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {slug === 'summer-lakes' && (
           <CommunityAtAGlance
             name="Summer Lakes"
+            hideHoaRange
             filter={listingsFilterParams}
             asOf={snapshotUpdated}
             types={[{ type: 'Home', one: 'estate home', many: 'estate homes' }]}
@@ -2646,6 +2647,10 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
                 pools and summer kitchens, on some of the largest lots in any gated Viera community (about 0.7–0.9
                 acres); most have lake views and many have private docks. The lake supports kayaking, paddle boating
                 and sailing.
+              </>,
+              <>
+                <strong>HOA:</strong> $1,125 every six months ($2,250 a year) to the Summer Lakes association, plus a second
+                fee of about $280 a year, so about $2,530 a year in total (about $211 a month), per recent MLS listings.
               </>,
               <>
                 <strong>Location:</strong> minutes from The Avenue Viera, Duran Golf Club and Viera Hospital; zoned for Viera
