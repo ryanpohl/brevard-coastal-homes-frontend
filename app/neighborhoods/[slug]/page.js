@@ -2500,6 +2500,41 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           <NeighborhoodLinkRow cityName={`Other ${siblingLinks.cityName}`} links={siblingLinks.links} />
         )}
         {/* Relocation guide near the top (2026-11-13) — GuideStrip.js. */}
+        {/* Aquarina at a Glance (2026-11-27, AI-visibility push): Google
+            quoted Zillow and Compass for Aquarina prices and this site for the
+            HOA structure and amenities. Facts match the About section. */}
+        {slug === 'aquarina' && (
+          <CommunityAtAGlance
+            name="Aquarina"
+            hideHoaRange
+            filter={listingsFilterParams}
+            asOf={snapshotUpdated}
+            types={[
+              { type: 'Home', one: 'single-family home', many: 'single-family homes' },
+              { type: 'Condo', one: 'condo or villa', many: 'condos and villas' },
+              { type: 'Land', one: 'lot', many: 'lots' },
+            ]}
+            facts={[
+              <>
+                <strong>Gated, ocean-to-river community</strong> in Melbourne Beach, FL 32951, on both sides of A1A
+                inside the Archie Carr National Wildlife Refuge, north of Sebastian Inlet, with 18 neighborhoods of
+                oceanfront condos, riverfront single-family homes, villas and townhomes.
+              </>,
+              <>
+                <strong>Amenities:</strong> an 18-hole, par-62 Audubon-certified golf course (open to the public), six
+                Har-Tru clay tennis courts, a private oceanfront Beach Club, a boat ramp and fishing dock on the Indian
+                River, a fitness center, a library and the Aqua Bar &amp; Grill.
+              </>,
+              <>
+                <strong>HOA:</strong> the Aquarina master association fee is about $1,535 a quarter for 2026 (about $512
+                a month), and since January 2026 it includes golf and tennis play, according to Aquarina Country Club.
+                Each of the 18 sections also has its own enclave or condo dues (condo associations include Ocean Dunes,
+                The Marlin, Egret Trace, Tidewater and The Hammock), so totals vary; there is no equity or enrollment
+                fee. Schools: Gemini Elementary, Hoover Middle and Melbourne High (confirm by address).
+              </>,
+            ]}
+          />
+        )}
         {/* Avalonia at a Glance (2026-11-27, AI-visibility push) — live MLS
             numbers plus the facts already in its About text. */}
         {slug === 'avalonia' && (

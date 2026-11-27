@@ -12,7 +12,9 @@ const PER_MONTH = { Monthly: 1, Quarterly: 1 / 3, Annually: 1 / 12, Yearly: 1 / 
 const short = (n) => (n >= 1e6 ? `$${parseFloat((n / 1e6).toFixed(2))}M` : `$${Math.round(n / 1000)}K`);
 const money = (n) => `$${Math.round(n).toLocaleString('en-US')}`;
 
-export default async function CommunityAtAGlance({ name, filter, asOf, types, facts = [] }) {
+// `hideHoaRange`: leave out the listings' HOA range where listings mix
+// association-only dues with totals (Aquarina's master fee + enclave dues).
+export default async function CommunityAtAGlance({ name, filter, asOf, types, facts = [], hideHoaRange = false }) {
   const [data, sold] = await Promise.all([
     api.getListings({ ...filter, pageSize: 100 }).catch(() => null),
     api.getSoldStats(filter).catch(() => null),
@@ -23,7 +25,8 @@ export default async function CommunityAtAGlance({ name, filter, asOf, types, fa
       const ls = listings.filter((l) => l.propertyType === t.type);
       if (!ls.length) return null;
       const prices = ls.map((l) => l.price);
-      return { ...t, count: ls.length, low: Math.min(...prices), high: Math.max(...prices) };
+      const sorted = [...prices].sort((a, b) => a - b);
+      return { ...t, count: ls.length, low: sorted[0], high: sorted[sorted.length - 1], median: sorted[Math.floor((sorted.length - 1) / 2)] };
     })
     .filter(Boolean);
   const fees = listings
@@ -43,12 +46,13 @@ export default async function CommunityAtAGlance({ name, filter, asOf, types, fa
             <li key={r.type}>
               <strong>{r.count}</strong> {r.count === 1 ? r.one : r.many} for sale,{' '}
               {r.low === r.high ? short(r.low) : `${short(r.low)}–${short(r.high)}`}
+              {r.count >= 3 ? `, median ${short(r.median)}` : ''}
             </li>
           ))
         ) : (
           <li>Nothing listed for sale right now</li>
         )}
-        {hoaLow != null && (
+        {!hideHoaRange && hoaLow != null && (
           <li>HOA about {hoaLow === hoaHigh ? money(hoaLow) : `${money(hoaLow)}–${money(hoaHigh)}`} a month</li>
         )}
         {sold?.count >= 3 && sold.medianPrice ? (
