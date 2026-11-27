@@ -485,6 +485,69 @@ function AdelaideForSaleTable({ snapshot, asOf }) {
   );
 }
 
+// Aripeka "At a Glance" (2026-11-27, per Ryan's AI-visibility push). Google
+// already quotes this site for Aripeka's builder prices; the gaps were the
+// Gulf Coast town of Aripeka mixed into "aripeka homes for sale", and the
+// community facts and schools, which it took from viera.com. Facts from
+// viera.com/aripeka (2026-11-27): starting in the $1.2M's, four builders,
+// gated, trails, pocket parks, lakes, central park with clubhouse; model
+// homes and hours; zoned schools. Live counts and prices from the MLS.
+function AripekaAtAGlance({ snapshot, sold, asOf }) {
+  if (!snapshot) return null;
+  const short = (n) => (n >= 1e6 ? `$${parseFloat((n / 1e6).toFixed(2))}M` : `$${Math.round(n / 1000)}K`);
+  const range = (t) => (t.low === t.high ? short(t.low) : `${short(t.low)}–${short(t.high)}`);
+  const homes = snapshot.byType?.Home;
+  const lots = snapshot.byType?.Land;
+  return (
+    <section className="hibc-prices" aria-labelledby="aripeka-glance-heading">
+      <h2 id="aripeka-glance-heading" className="hibc-prices__title">
+        Aripeka at Viera at a Glance
+      </h2>
+      <ul className="glance-stats">
+        {homes && homes.count > 0 && (
+          <li>
+            <strong>{homes.count}</strong> {homes.count === 1 ? 'home' : 'homes'} for sale, {range(homes)}
+          </li>
+        )}
+        {lots && lots.count > 0 && (
+          <li>
+            <strong>{lots.count}</strong> {lots.count === 1 ? 'lot' : 'lots'} for sale, {range(lots)}
+          </li>
+        )}
+        {sold?.count >= 3 && sold.medianPrice ? (
+          <li>
+            {sold.count} homes sold in the past 12 months, median {short(sold.medianPrice)}
+          </li>
+        ) : null}
+      </ul>
+      <ul className="glance-facts">
+        <li>
+          <strong>New custom homes start in the $1.2 millions</strong>, home and homesite, from four builders.
+          Aripeka at Viera is a gated, roughly 400-acre community in Viera, in Brevard County on Florida&rsquo;s
+          Space Coast (homes have Melbourne, FL 32940 addresses). It is not the Gulf Coast town of Aripeka in Pasco
+          County.
+        </li>
+        <li>
+          <strong>About 250 wooded homesites</strong> laid out around the community&rsquo;s mature oak, palm and pine
+          trees, with nature trails, pocket parks and lakes, and a private central park with a clubhouse that has a
+          catering kitchen and indoor and outdoor gathering spaces.
+        </li>
+        <li>
+          <strong>Model homes:</strong> CDS Builders, the Live Oak at 1726 Gracewood Drive (Mon–Sat 10–6, Sun 12–6);
+          LifeStyle Homes, the Key Largo at 1746 Gracewood Drive (Mon–Sat 10–5, Sun 12–5); Joyal Homes, the Sandhill
+          Key at 1756 Gracewood Drive (Mon–Sat 10–5, Sun 12–5); and Stanley Homes, the Emerald at 8350 Waxwing Circle
+          (Mon–Sat 10:30–5, Sun 12–4). Contact Ryan before your first model visit and he&rsquo;ll go with you.
+        </li>
+        <li>
+          <strong>Schools:</strong> Viera Elementary (K–6), Viera Middle (7–8) and Viera High (9–12), with Viera
+          Charter School (K–8) nearby.
+        </li>
+      </ul>
+      <p className="hibc-prices__note">Prices from current MLS listings as of {asOf}.</p>
+    </section>
+  );
+}
+
 function ModelTourLine({ name }) {
   return (
     <div className="model-tour-card">
@@ -2102,6 +2165,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             "Lots" link) now gets its own "land and lots" copy instead. */}
         {isAripeka && primaryType !== 'Land' && (
           <div style={{ marginBottom: 12 }}>
+            <AripekaAtAGlance snapshot={communitySnapshot} sold={marketStats?.sold} asOf={snapshotUpdated} />
             {/* Trimmed 2026-10-28 (per Ryan: too much text above the listings);
                 the longer builder copy is in the About section below. */}
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
