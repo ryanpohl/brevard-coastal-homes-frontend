@@ -340,8 +340,9 @@ function HibcPricesHoa({ snapshot, sold = {}, asOf }) {
         Harbor Island Beach Club at a Glance: Prices &amp; HOA Fees
       </h2>
       <p className="glance-lead">
-        <strong>Harbor Island Beach Club</strong> is a gated, 146-residence ocean-to-river community on South A1A in
-        Melbourne Beach, FL 32951: 54 single-family homes, 4 oceanfront villas and 88 riverfront and ocean-view condos.
+        <strong>Harbor Island Beach Club</strong> is a gated, 146-residence ocean-to-river community at 3034 S Highway
+        A1A in Melbourne Beach, FL 32951, on Strand Drive and Hafen Lane: 54 single-family homes, 4 oceanfront villas and 88
+        riverfront and ocean-view condos.
         {forSale > 0 ? ` ${forSale} are for sale right now, from ${k(allLow)} to ${k(allHigh)}` : ''}
         {forSale > 0 && soldCount > 0 ? `, and ${soldCount} sold in the past 12 months.` : forSale > 0 ? '.' : ''}
       </p>
@@ -376,6 +377,24 @@ function HibcPricesHoa({ snapshot, sold = {}, asOf }) {
         </table>
       </div>
       <ul className="glance-facts" style={{ marginTop: 10 }}>
+        {rows
+          .filter(([, t]) => t?.count > 0)
+          .map(([label, t]) => {
+            const span = (xs, f = (x) => x) =>
+              xs?.length ? (Math.min(...xs) === Math.max(...xs) ? f(Math.min(...xs)) : `${f(Math.min(...xs))}–${f(Math.max(...xs))}`) : null;
+            const beds = span(t.beds);
+            const sqft = span(t.sqft, (x) => x.toLocaleString('en-US'));
+            const built = span(t.built);
+            const avg = t.sum && t.count ? k(Math.round(t.sum / t.count)) : null;
+            return (
+              <li key={label}>
+                <strong>{label} for sale:</strong> average asking price {avg}
+                {beds ? `, ${beds} bedrooms` : ''}
+                {sqft ? `, ${sqft} sq ft` : ''}
+                {built ? `, built ${built}` : ''}.
+              </li>
+            );
+          })}
         <li>
           <strong>Amenities:</strong> private Atlantic beach access, a private 42-slip marina with direct Intracoastal
           Waterway access, a resort-style pool and spa with shaded cabanas, and a fitness center. Golf-cart and pet
@@ -1460,10 +1479,16 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
       const byType = {};
       for (const l of data.results || []) {
         if (typeof l.price !== 'number' || l.price <= 0 || !l.propertyType) continue;
-        const t = (byType[l.propertyType] ||= { count: 0, low: l.price, high: l.price });
+        const t = (byType[l.propertyType] ||= { count: 0, low: l.price, high: l.price, sum: 0, beds: [], sqft: [], built: [] });
         t.count += 1;
         t.low = Math.min(t.low, l.price);
         t.high = Math.max(t.high, l.price);
+        // Sizes and years built (2026-11-27, for Harbor Island's box: Google
+        // quoted other sites for sizes, bedrooms and years built).
+        t.sum += l.price;
+        if (l.beds > 0) t.beds.push(l.beds);
+        if (l.sqft > 0) t.sqft.push(l.sqft);
+        if (l.yearBuilt > 1800) t.built.push(l.yearBuilt);
       }
       // Monthly HOA range by type (2026-11-26, for Harbor Island's "Prices &
       // HOA Fees" box): MLS fees come monthly, quarterly or yearly.
