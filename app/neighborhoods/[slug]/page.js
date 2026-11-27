@@ -2286,8 +2286,12 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             (2026-11-26, per Ryan) — see BuilderIncentivesSignup.js. */}
         {/* Aripeka too (2026-11-26, per Ryan: "can you do this for aripeka
             too"), except its Lots view, which keeps the guide strip. */}
+        {/* Viera Builders' community pages too (2026-11-26, per Ryan: "can you
+            do this for viera builders too"), except their Lots views. */}
         {slug === 'adelaide' || (slug === 'aripeka' && primaryType !== 'Land') ? (
           <BuilderIncentivesSignup label={neighborhood.name} filter={alertFilter} />
+        ) : guideSlugForPage(slug) === 'viera-builders' && primaryType !== 'Land' ? (
+          <BuilderIncentivesSignup label={neighborhood.name} filter={alertFilter} builder="Viera Builders" />
         ) : guideSlugForPage(slug) ? (
           <NeighborhoodGuideStrip slug={guideSlugForPage(slug)} label={neighborhood.name} filter={alertFilter} />
         ) : (

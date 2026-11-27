@@ -13,7 +13,9 @@ import { rememberAlertEmail, rememberedAlertEmail } from '@/lib/alertMemory';
  * homes) and the monthly incentives email; the lead sheet shows
  * "{label} Builder Incentives Signup".
  */
-export default function BuilderIncentivesSignup({ label, filter }) {
+// `builder` (optional) names the builder in the box, e.g. "Viera Builders"
+// on Viera Builders' community pages; otherwise the community name is used.
+export default function BuilderIncentivesSignup({ label, filter, builder }) {
   const pathname = usePathname();
   const [email, setEmail] = useState('');
   const [state, setState] = useState({ sending: false, error: '', done: '' });
@@ -50,7 +52,7 @@ export default function BuilderIncentivesSignup({ label, filter }) {
       ) : (
         <>
           <p className="incentives-card__text">
-            <strong>Get this month&rsquo;s {label} builder incentives</strong> and move-in-ready homes, emailed to you.
+            <strong>Get this month&rsquo;s {builder ? `${builder} incentives` : `${label} builder incentives`}</strong> and move-in-ready homes, emailed to you.
           </p>
           <form className="incentives-card__form" onSubmit={submit}>
             <label className="visually-hidden" htmlFor="incentives-email">
