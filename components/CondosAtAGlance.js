@@ -16,7 +16,9 @@ import { cityListingsQueryParams } from '@/lib/constants';
  * Homes box: Homes page of cities in HOME_GLANCE_CITIES.
  */
 export const CONDO_GLANCE_CITIES = new Set(['melbourne-beach', 'satellite-beach', 'cocoa-beach', 'cape-canaveral', 'indian-harbour-beach']);
-export const HOME_GLANCE_CITIES = new Set(['melbourne-beach']);
+// Cocoa Beach added 2026-11-27 (Google's answer for "cocoa beach homes for sale"
+// was all Zillow).
+export const HOME_GLANCE_CITIES = new Set(['melbourne-beach', 'cocoa-beach']);
 
 const PER_MONTH = { Monthly: 1, Quarterly: 1 / 3, Annually: 1 / 12, Yearly: 1 / 12, 'Semi-Annually': 1 / 6 };
 const short = (n) => (n >= 1e6 ? `$${parseFloat((n / 1e6).toFixed(2))}M` : `$${Math.round(n / 1000)}K`);
@@ -106,6 +108,34 @@ export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType
     return t.label(n);
   });
 
+  // Bedrooms, square feet and years built across what's for sale (2026-11-27:
+  // Google quoted Trulia/Zillow for these ranges on "cocoa beach condos").
+  const nums = (key, min) => listings.map((l) => l[key]).filter((x) => typeof x === 'number' && x > min);
+  // Typical range: the middle 80% once there are 10+ listings, so one
+  // multi-unit building or pre-construction listing doesn't skew it.
+  const typical = (xs) => {
+    const s2 = [...xs].sort((a, b) => a - b);
+    if (s2.length < 10) return [s2[0], s2[s2.length - 1]];
+    return [s2[Math.floor(s2.length * 0.1)], s2[Math.ceil(s2.length * 0.9) - 1]];
+  };
+  const span = (xs, f = (x) => x) => {
+    if (!xs.length) return null;
+    const [lo, hi] = typical(xs);
+    return lo === hi ? f(lo) : `${f(lo)}–${f(hi)}`;
+  };
+  const thisYear = new Date().getFullYear();
+  const builtYears = nums('yearBuilt', 1800);
+  const newBuilds = builtYears.filter((y) => y > thisYear).length;
+  const builtSpan = span(builtYears.filter((y) => y <= thisYear));
+  const bedsSpan = span(nums('beds', 0));
+  const sqftSpan = span(nums('sqft', 0), (x) => x.toLocaleString('en-US'));
+  const sizeLine = [
+    bedsSpan && `mostly ${bedsSpan} bedrooms`,
+    sqftSpan && `${sqftSpan} sq ft`,
+    builtSpan && `built ${builtSpan}${newBuilds ? `, plus ${newBuilds} new-construction ${v(newBuilds, 'listings', 'listing')}` : ''}`,
+  ]
+    .filter(Boolean)
+    .join(', ');
   const buckets = {};
   if (isCondo) {
     for (const l of listings) {
@@ -171,6 +201,11 @@ export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType
           </tbody>
         </table>
       </div>
+      {sizeLine && (
+        <p className="glance-lead" style={{ marginTop: 10 }}>
+          <strong>Sizes:</strong> {sizeLine}.
+        </p>
+      )}
       <p className="glance-lead" style={{ marginTop: 10 }}>
         <strong>By price:</strong> {list(tierParts)}.
         {showBuildingsLink ? (
