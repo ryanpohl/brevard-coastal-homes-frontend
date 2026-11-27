@@ -315,48 +315,83 @@ function CommunityFacts({ slug }) {
 // the current listings, plus the amenities, so Google and AI answers find
 // the key numbers without reading down to the FAQ. Rows without data are
 // left out; the whole box is left out if there's no snapshot.
-function HibcPricesHoa({ snapshot, asOf }) {
+function HibcPricesHoa({ snapshot, sold = {}, asOf }) {
+  // Upgraded 2026-11-27 (per Ryan: "upgrade the harbor island box") to the
+  // newer "at a Glance" format: what sold in the past 12 months, days on
+  // market and sold vs. asking for homes and condos, plus the community facts
+  // from its area guide, so AI answers can quote one complete source.
   if (!snapshot || !snapshot.byType) return null;
   const k = (n) => (n >= 1e6 ? `$${parseFloat((n / 1e6).toFixed(2))}M` : `$${Math.round(n / 1000)}K`);
   const price = (t) => (t.low === t.high ? k(t.low) : `${k(t.low)}–${k(t.high)}`);
   const money = (n) => `$${n.toLocaleString('en-US')}`;
   const hoa = (h) => (h.low === h.high ? money(h.low) : `${money(h.low)}–${money(h.high)}`);
   const rows = [
-    ['Homes', snapshot.byType.Home, snapshot.hoaByType?.Home],
-    ['Condos', snapshot.byType.Condo, snapshot.hoaByType?.Condo],
-  ].filter(([, t]) => t && t.count > 0);
+    ['Homes', snapshot.byType.Home, snapshot.hoaByType?.Home, sold.Home],
+    ['Condos', snapshot.byType.Condo, snapshot.hoaByType?.Condo, sold.Condo],
+  ].filter(([, t, , sd]) => (t && t.count > 0) || (sd && sd.count > 0));
   if (!rows.length) return null;
+  const forSale = rows.reduce((n, [, t]) => n + (t?.count || 0), 0);
+  const allLow = Math.min(...rows.filter(([, t]) => t?.count).map(([, t]) => t.low));
+  const allHigh = Math.max(...rows.filter(([, t]) => t?.count).map(([, t]) => t.high));
+  const soldCount = rows.reduce((n, [, , , sd]) => n + (sd?.count || 0), 0);
   return (
     <section className="hibc-prices" aria-labelledby="hibc-prices-heading">
       <h2 id="hibc-prices-heading" className="hibc-prices__title">
-        Harbor Island Beach Club Prices &amp; HOA Fees
+        Harbor Island Beach Club at a Glance: Prices &amp; HOA Fees
       </h2>
-      <table className="hibc-prices__table">
-        <thead>
-          <tr>
-            <th scope="col">
-              <span className="visually-hidden">Type</span>
-            </th>
-            <th scope="col">For sale now</th>
-            <th scope="col">Price range</th>
-            <th scope="col">HOA fee</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map(([label, t, h]) => (
-            <tr key={label}>
-              <th scope="row">{label}</th>
-              <td>{t.count}</td>
-              <td>{price(t)}</td>
-              <td>{h ? `${hoa(h)}/mo` : '—'}</td>
+      <p className="glance-lead">
+        <strong>Harbor Island Beach Club</strong> is a gated, 146-residence ocean-to-river community on South A1A in
+        Melbourne Beach, FL 32951: 54 single-family homes, 4 oceanfront villas and 88 riverfront and ocean-view condos.
+        {forSale > 0 ? ` ${forSale} are for sale right now, from ${k(allLow)} to ${k(allHigh)}` : ''}
+        {forSale > 0 && soldCount > 0 ? `, and ${soldCount} sold in the past 12 months.` : forSale > 0 ? '.' : ''}
+      </p>
+      <div className="glance-table-wrap">
+        <table className="hibc-prices__table glance-table">
+          <thead>
+            <tr>
+              <th scope="col">
+                <span className="visually-hidden">Type</span>
+              </th>
+              <th scope="col">For sale now</th>
+              <th scope="col">Price range</th>
+              <th scope="col">Median sold, past 12 months</th>
+              <th scope="col">Days on market</th>
+              <th scope="col">Sold vs. asking</th>
+              <th scope="col">HOA a month</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map(([label, t, h, sd]) => (
+              <tr key={label}>
+                <th scope="row">{label}</th>
+                <td>{t?.count || 0}</td>
+                <td>{t?.count ? price(t) : '—'}</td>
+                <td>{sd?.count > 0 && sd.medianPrice ? `${k(sd.medianPrice)} (${sd.count} sold)` : '—'}</td>
+                <td>{sd?.count >= 3 && sd.medianDaysOnMarket != null ? `${sd.medianDaysOnMarket} days` : '—'}</td>
+                <td>{sd?.count >= 3 && sd.medianSaleToListPct != null ? `${sd.medianSaleToListPct}%` : '—'}</td>
+                <td>{h ? hoa(h) : '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <ul className="glance-facts" style={{ marginTop: 10 }}>
+        <li>
+          <strong>Amenities:</strong> private Atlantic beach access, a private 42-slip marina with direct Intracoastal
+          Waterway access, a resort-style pool and spa with shaded cabanas, and a fitness center. Golf-cart and pet
+          friendly.
+        </li>
+        <li>
+          <strong>Nightly rentals are allowed</strong>, which is uncommon in the Melbourne Beach area and a draw for
+          investors and second-home buyers.
+        </li>
+        <li>
+          <strong>Schools:</strong> Gemini Elementary, Hoover Middle and Melbourne High.
+        </li>
+      </ul>
       <p className="hibc-prices__note">
-        Community amenities: gated entry, private Atlantic beach access, a 42-slip marina on the Indian River,
-        resort-style pool and spa, and a fitness center. Nightly rentals are allowed. From current MLS listings as of{' '}
-        {asOf}; confirm the exact HOA fee and what it includes on each listing.
+        From the Space Coast MLS as of {asOf}. HOA is per month from current listings; confirm the exact fee and what it
+        includes on each listing.
       </p>
     </section>
   );
@@ -1478,6 +1513,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
       // Leave the snapshot out rather than show wrong numbers.
     }
   }
+  // Harbor Island sales by type for its box (2026-11-27).
+  let hibcSold = {};
+  if (slug === 'harbor-island-beach-club') {
+    const [soldHome, soldCondo] = await Promise.all([
+      api.getSoldStats({ ...listingsFilterParams, propertyType: 'Home' }).catch(() => null),
+      api.getSoldStats({ ...listingsFilterParams, propertyType: 'Condo' }).catch(() => null),
+    ]);
+    hibcSold = { Home: soldHome, Condo: soldCondo };
+  }
   const snapshotUpdated = new Date().toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',
@@ -2042,7 +2086,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {isHarborIslandBeachClub && (
           <div style={{ marginBottom: 12 }}>
             <CommunityFacts slug={slug} />
-            <HibcPricesHoa snapshot={communitySnapshot} asOf={snapshotUpdated} />
+            <HibcPricesHoa snapshot={communitySnapshot} sold={hibcSold} asOf={snapshotUpdated} />
             {/* Trimmed 2026-10-28 (per Ryan: less text above the listings). */}
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>
               Looking for a home or condo in Harbor Island Beach Club? We&rsquo;ll find available properties, set up
