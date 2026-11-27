@@ -402,26 +402,35 @@ function AdelaideAtAGlance({ snapshot, asOf }) {
         {hoa && (
           <li>
             HOA about {hoa.low === hoa.high ? money(hoa.low) : `${money(hoa.low)}–${money(hoa.high)}`} a month
+            {hoa.common ? ` (most are ${money(hoa.common.fee)} ${hoa.common.per})` : ''}
           </li>
         )}
       </ul>
       <ul className="glance-facts">
         <li>
-          <strong>Guard-gated</strong>, with the gate staffed 24/7. About 460 acres in Viera West (Rockledge, FL 32955),
-          roughly a third of it water and preserve, around the 120-acre Lake Adelaide.
+          <strong>Custom homes start from about $1.5 million.</strong> Adelaide is a 460-acre guard-gated community
+          (the gate is staffed 24/7) in Viera West, Rockledge, FL 32955, around the 120-acre Lake Adelaide. Over a
+          third of it is water or preserve.
         </li>
         <li>
-          <strong>Over 120 homesites in four sections:</strong> The Reserve (18 homesites behind its own private gate),
-          The Lakes (larger homesites on or next to Lake Adelaide), The Preserve (homesites along a 25-acre wetlands
-          preserve) and The Park (24 smaller homesites near the front, about a quarter to a third of an acre).
-          Homesites run from about a quarter acre to over 1.5 acres.
+          <strong>Over 120 homesites in five sections:</strong> The Reserve (18 homesites behind its own private gate),
+          The Lakes (oversized homesites on or next to Lake Adelaide), The Preserve (homesites around a private 25-acre
+          water-to-wetlands preserve), The Park (24 homesites near the front, about a quarter to a third of an acre)
+          and The Ranch, the final phase, now selling. Most homesites are half an acre to over an acre, many with
+          water views.
         </li>
         <li>
-          <strong>Model homes</strong>, open Monday–Saturday 10 AM–5 PM and Sunday 12–5 PM:{' '}
-          <strong>AR Homes</strong> (built locally by Rosewood Homes), the Lumina at 3639 Lake Adelaide Place, a
-          one-story 4,485 sq ft home with 4 bedrooms and a 4-car garage; and <strong>Christopher Burton Luxury
-          Homes</strong> at 3717 Upper Floridian Way. <strong>Elan Builders</strong> also builds custom homes here, without a model home. Contact Ryan before
-          you visit and he&rsquo;ll go with you.
+          <strong>Builders and model homes</strong> (models open Monday–Saturday 10 AM–5 PM, Sunday 12–5 PM):{' '}
+          <strong>AR Homes</strong> (built locally by Rosewood Homes, Inc.), the Lumina model at 3639 Lake Adelaide
+          Place, a one-story 4,485 sq ft home with 4 bedrooms and a 4-car garage; <strong>Christopher Burton Luxury
+          Homes</strong>, model at 3717 Upper Floridian Way; and <strong>Elan Builders</strong>, modern homes led by
+          Christopher Burton and designed by architect Phil Kean, with no model home in Adelaide now. Contact Ryan
+          before you visit and he&rsquo;ll go with you.
+        </li>
+        <li>
+          <strong>Amenities:</strong> a community dock and boardwalk on Lake Adelaide for paddling and sailing, a
+          5-acre park, tennis courts, a basketball half-court, jogging trails, and a pavilion and playground. About 15
+          minutes to the beaches, 30 minutes to Orlando International Airport and 45 minutes to Orlando.
         </li>
       </ul>
       <p className="hibc-prices__note">Prices and HOA fees from current MLS listings as of {asOf}.</p>
@@ -1363,9 +1372,21 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         const per = PER_MONTH[l.assocFeeFrequency];
         if (!per || typeof l.assocFee !== 'number' || l.assocFee <= 0 || !l.propertyType) continue;
         const fee = Math.round(l.assocFee * per);
-        const h = (hoaByType[l.propertyType] ||= { low: fee, high: fee });
+        const h = (hoaByType[l.propertyType] ||= { low: fee, high: fee, raw: {} });
         h.low = Math.min(h.low, fee);
         h.high = Math.max(h.high, fee);
+        const key = `${Math.round(l.assocFee)}|${l.assocFeeFrequency}`;
+        h.raw[key] = (h.raw[key] || 0) + 1;
+      }
+      // The fee most listings show, as listed (e.g. "$1,225 a quarter"),
+      // when at least 3 listings share it (2026-11-27: Google quoted Zillow's
+      // "$1,225 per quarter" for Adelaide).
+      const PER_LABEL = { Monthly: 'a month', Quarterly: 'a quarter', Annually: 'a year', Yearly: 'a year', 'Semi-Annually': 'every six months' };
+      for (const h of Object.values(hoaByType)) {
+        const [key, n] = Object.entries(h.raw).sort((a, b) => b[1] - a[1])[0] || [];
+        const [fee, freq] = key ? key.split('|') : [];
+        if (n >= 3 && PER_LABEL[freq]) h.common = { fee: Number(fee), per: PER_LABEL[freq] };
+        delete h.raw;
       }
       // Homes for sale now, highest price first (2026-11-27, for Adelaide's
       // "At a Glance" table, which AI answers quote).
