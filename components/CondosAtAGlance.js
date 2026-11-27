@@ -136,6 +136,20 @@ export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType
   ]
     .filter(Boolean)
     .join(', ');
+  // Median list price by bedrooms (2026-11-27: Google quoted Homes.com's
+  // 1-, 2- and 3-bed medians for "cape canaveral condos for sale").
+  const byBeds = {};
+  for (const l of listings) {
+    if (!(l.beds > 0)) continue;
+    const key = l.beds >= 4 ? 4 : l.beds;
+    (byBeds[key] ||= []).push(l.price);
+  }
+  const bedLine = Object.keys(byBeds)
+    .map(Number)
+    .sort((a, b) => a - b)
+    .filter((b) => byBeds[b].length >= 2)
+    .map((b) => `${b === 4 ? '4+' : b}-bedroom median ${short(median(byBeds[b]))} (${byBeds[b].length})`)
+    .join(', ');
   const buckets = {};
   if (isCondo) {
     for (const l of listings) {
@@ -201,6 +215,11 @@ export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType
           </tbody>
         </table>
       </div>
+      {bedLine && (
+        <p className="glance-lead" style={{ marginTop: 10 }}>
+          <strong>By bedrooms:</strong> {bedLine}.
+        </p>
+      )}
       {sizeLine && (
         <p className="glance-lead" style={{ marginTop: 10 }}>
           <strong>Sizes:</strong> {sizeLine}.
