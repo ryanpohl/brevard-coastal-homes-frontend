@@ -12,7 +12,7 @@ export default function CondoBuildingComparison({ rows, citySlug, cityName, ocea
   if (!rows || !rows.length) return null;
   const what = oceanfrontOnly ? 'oceanfront condo buildings' : 'condo buildings';
   return (
-    <section className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 40px', maxWidth: 1100 }}>
+    <section id="condo-buildings" className="container" style={{ padding: '0 clamp(16px, 4vw, 56px) 40px', maxWidth: 1100 }}>
       <h2 className="market-report-title">
         {cityName} {oceanfrontOnly ? 'Oceanfront Condo Buildings' : 'Condo Buildings'} Compared
       </h2>
