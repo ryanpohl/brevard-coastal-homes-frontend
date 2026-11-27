@@ -54,6 +54,7 @@ import { getRecentlySold } from '@/lib/recentlySold';
 // Viera and Rockledge the same day, per Ryan.
 const RECENTLY_SOLD_CITIES = new Set(['cape-canaveral', 'melbourne-beach', 'satellite-beach', 'indialantic', 'indian-harbour-beach', 'cocoa-beach', 'merritt-island', 'viera-west', 'melbourne', 'viera', 'rockledge']);
 import { listingPreviewPhoto, withSocialPreview } from '@/lib/socialPreview';
+import OceanfrontAtAGlance, { OCEANFRONT_GLANCE_CITIES } from '@/components/OceanfrontAtAGlance';
 
 // City page intro copy (2026-09-16, per Ryan, pasting one template and
 // asking for it on every city page, with the city name and property type
@@ -1116,6 +1117,12 @@ export default async function CityListingsPage({ params, searchParams: searchPar
             to get started.
           </p>
         </div>
+        {/* Oceanfront "at a Glance" (2026-11-27) — live MLS numbers by type,
+            see components/OceanfrontAtAGlance.js. */}
+        {OCEANFRONT_GLANCE_CITIES.has(citySlug) &&
+          (isOceanfront || isOceanfrontCombined || waterLand?.waterfront === 'Oceanfront') && (
+            <OceanfrontAtAGlance citySlug={citySlug} cityName={city.name} asOf={asOf} />
+          )}
         {/* Area Guide link (2026-09-24, per Ryan: "Add a link to the top of
             the page... right under the intro text" — a single small text
             link, not a third button, per his "very easy to navigate

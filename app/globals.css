@@ -3834,3 +3834,10 @@ body.signup-required .mobile-contact-bar {
   color: inherit;
   text-decoration: underline;
 }
+
+.glance-lead {
+  margin: 0 0 8px;
+  font-size: 15.5px;
+  line-height: 1.5;
+  color: var(--color-ink);
+}
