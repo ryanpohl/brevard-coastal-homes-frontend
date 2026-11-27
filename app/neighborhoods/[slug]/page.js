@@ -55,6 +55,7 @@ import OutOfStateBuyers from '@/components/OutOfStateBuyers';
 import GuideStrip from '@/components/GuideStrip';
 import NeighborhoodGuideStrip from '@/components/NeighborhoodGuideStrip';
 import BuilderIncentivesSignup from '@/components/BuilderIncentivesSignup';
+import CommunityAtAGlance from '@/components/CommunityAtAGlance';
 import { guideSlugForPage } from '@/lib/neighborhoodGuides';
 
 // Relocation guide town for neighborhoods filed under the wrong city in the
@@ -64,7 +65,9 @@ const GUIDE_TOWN_FOR_NEIGHBORHOOD = { 'harbor-island-beach-club': 'melbourne-bea
 // Viera Builders communities with no build lots left (no new-construction
 // incentives to offer), per Ryan 2026-11-26: "arrivas village doesn't have
 // any more build lots available". These keep the Viera Builders Guide strip.
-const INCENTIVES_SOLD_OUT = new Set(['arrivas-village']);
+// Avalonia added 2026-11-27: Viera Builders has sold it out (its About text
+// says so; Jack Jeffcoat's page, quoted by Google, says the same).
+const INCENTIVES_SOLD_OUT = new Set(['arrivas-village', 'avalonia']);
 import AripekaBuilderPrices from '@/components/AripekaBuilderPrices';
 import AdelaideBuilderPrices from '@/components/AdelaideBuilderPrices';
 import { adelaideBuilderFaq } from '@/lib/adelaideBuilders';
@@ -2497,6 +2500,38 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           <NeighborhoodLinkRow cityName={`Other ${siblingLinks.cityName}`} links={siblingLinks.links} />
         )}
         {/* Relocation guide near the top (2026-11-13) — GuideStrip.js. */}
+        {/* Avalonia at a Glance (2026-11-27, AI-visibility push) — live MLS
+            numbers plus the facts already in its About text. */}
+        {slug === 'avalonia' && (
+          <CommunityAtAGlance
+            name="Avalonia"
+            filter={listingsFilterParams}
+            asOf={snapshotUpdated}
+            types={[
+              { type: 'Home', one: 'single-family home', many: 'single-family homes' },
+              { type: 'Condo', one: 'villa', many: 'villas' },
+            ]}
+            facts={[
+              <>
+                <strong>Avalonia is sold out by Viera Builders</strong>, so homes here are resales. It is in Addison
+                Village in Viera West (Melbourne, FL 32940 addresses), near The Avenue Viera.
+              </>,
+              <>
+                <strong>Single-family homes and single-story paired and 4-plex villas</strong> (the MLS lists the villas
+                as condos), mostly 3 bedrooms and 2 baths, about 1,450–2,550 sq ft. The villas come in four floor plans of
+                about 1,481–1,809 sq ft with 2-car garages. Viera Builders features include foam-filled concrete block
+                construction, impact-resistant front windows, gas ranges and tankless gas water heaters.
+              </>,
+              <>
+                <strong>Villa HOA</strong>, through the Central Viera Community Association (CVCA), covers roof
+                maintenance, exterior paint and pressure washing, lawn care, landscaping, irrigation and pest control,
+                according to Viera Builders and recent listings. Residents can join the Addison Village Club, with a
+                clubhouse, zero-entry and lap pools, fitness and sports courts (membership fees apply). Most homes also
+                carry a Viera West CDD fee; confirm dues and what they cover on each listing.
+              </>,
+            ]}
+          />
+        )}
         {/* Adelaide: builder incentives signup in place of the guide strip
             (2026-11-26, per Ryan) — see BuilderIncentivesSignup.js. */}
         {/* Aripeka too (2026-11-26, per Ryan: "can you do this for aripeka
