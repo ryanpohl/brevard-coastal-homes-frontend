@@ -1649,7 +1649,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
     adelaide:
       'Completed homes in Adelaide usually start around $1.8 million; new custom builds start around $1.3 million with AR Homes (lot included) and from $1.4 million with Élan (builders’ prices, November 2026).',
     aripeka:
-      `A finished custom home in Aripeka, lot included, starts around $1.25 million, depending on the builder: ` +
+      `A finished custom home in Aripeka, lot included, starts around $1.2 million, depending on the builder: ` +
       ARIPEKA_BUILDERS.map((b) => `${b.name} ${b.from} (${b.plan} plan)`).join(', ') +
       ` (builders' prices, ${ARIPEKA_BUILDERS_AS_OF}).`,
   };
