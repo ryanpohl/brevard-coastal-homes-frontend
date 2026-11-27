@@ -16,6 +16,7 @@ export const CONDO_GLANCE_CITIES = new Set(['melbourne-beach']);
 const PER_MONTH = { Monthly: 1, Quarterly: 1 / 3, Annually: 1 / 12, Yearly: 1 / 12, 'Semi-Annually': 1 / 6 };
 const short = (n) => (n >= 1e6 ? `$${parseFloat((n / 1e6).toFixed(2))}M` : `$${Math.round(n / 1000)}K`);
 const money = (n) => `$${Math.round(n).toLocaleString('en-US')}`;
+const v = (n, many, one) => (n === 1 ? one : many);
 const median = (xs) => {
   const s = [...xs].sort((a, b) => a - b);
   return s.length ? s[Math.floor((s.length - 1) / 2)] : null;
@@ -79,12 +80,12 @@ export default async function CondosAtAGlance({ citySlug, cityName, asOf, showBu
   }
   const withRules = Object.values(buckets).reduce((a, b) => a + b, 0);
   const rentalParts = [
-    buckets.short && `${buckets.short} allow rentals shorter than a month`,
-    buckets.month1 && `${buckets.month1} allow 1-month rentals`,
-    buckets.month3 && `${buckets.month3} require 2–3 months`,
-    buckets.month6 && `${buckets.month6} require 6 months or more`,
-    buckets.nomin && `${buckets.nomin} have no minimum`,
-    buckets.none && `${buckets.none} allow no rentals`,
+    buckets.short && `${buckets.short} ${v(buckets.short, 'allow', 'allows')} rentals shorter than a month`,
+    buckets.month1 && `${buckets.month1} ${v(buckets.month1, 'allow', 'allows')} 1-month rentals`,
+    buckets.month3 && `${buckets.month3} ${v(buckets.month3, 'require', 'requires')} 2–3 months`,
+    buckets.month6 && `${buckets.month6} ${v(buckets.month6, 'require', 'requires')} 6 months or more`,
+    buckets.nomin && `${buckets.nomin} ${v(buckets.nomin, 'have', 'has')} no minimum`,
+    buckets.none && `${buckets.none} ${v(buckets.none, 'allow', 'allows')} no rentals`,
   ].filter(Boolean);
 
   return (
