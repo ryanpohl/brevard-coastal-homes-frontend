@@ -315,7 +315,7 @@ function CommunityFacts({ slug }) {
 // the current listings, plus the amenities, so Google and AI answers find
 // the key numbers without reading down to the FAQ. Rows without data are
 // left out; the whole box is left out if there's no snapshot.
-function HibcPricesHoa({ snapshot, sold = {}, asOf }) {
+function HibcPricesHoa({ snapshot, sold = {}, asOf, mode = 'top' }) {
   // Upgraded 2026-11-27 (per Ryan: "upgrade the harbor island box") to the
   // newer "at a Glance" format: what sold in the past 12 months, days on
   // market and sold vs. asking for homes and condos, plus the community facts
@@ -334,6 +334,47 @@ function HibcPricesHoa({ snapshot, sold = {}, asOf }) {
   const allLow = Math.min(...rows.filter(([, t]) => t?.count).map(([, t]) => t.low));
   const allHigh = Math.max(...rows.filter(([, t]) => t?.count).map(([, t]) => t.high));
   const soldCount = rows.reduce((n, [, , , sd]) => n + (sd?.count || 0), 0);
+  if (mode === 'details') {
+    return (
+      <section className="hibc-prices" aria-labelledby="hibc-details-heading">
+        <h2 id="hibc-details-heading" className="hibc-prices__title">
+          About Harbor Island Beach Club: Key Facts
+        </h2>
+        <ul className="glance-facts">
+          {rows
+            .filter(([, t]) => t?.count > 0)
+            .map(([label, t]) => {
+              const span = (xs, f = (x) => x) =>
+                xs?.length ? (Math.min(...xs) === Math.max(...xs) ? f(Math.min(...xs)) : `${f(Math.min(...xs))}–${f(Math.max(...xs))}`) : null;
+              const beds = span(t.beds);
+              const sqft = span(t.sqft, (x) => x.toLocaleString('en-US'));
+              const built = span(t.built);
+              const avg = t.sum && t.count ? k(Math.round(t.sum / t.count)) : null;
+              return (
+                <li key={label}>
+                  <strong>{label} for sale:</strong> average asking price {avg}
+                  {beds ? `, ${beds} bedrooms` : ''}
+                  {sqft ? `, ${sqft} sq ft` : ''}
+                  {built ? `, built ${built}` : ''}.
+                </li>
+              );
+            })}
+          <li>
+            <strong>Amenities:</strong> private Atlantic beach access, a private 42-slip marina with direct Intracoastal
+            Waterway access, a resort-style pool and spa with shaded cabanas, and a fitness center. Golf-cart and pet
+            friendly.
+          </li>
+          <li>
+            <strong>Nightly rentals are allowed</strong>, which is uncommon in the Melbourne Beach area and a draw for
+            investors and second-home buyers.
+          </li>
+          <li>
+            <strong>Schools:</strong> Gemini Elementary, Hoover Middle and Melbourne High.
+          </li>
+        </ul>
+        </section>
+    );
+  }
   return (
     <section className="hibc-prices" aria-labelledby="hibc-prices-heading">
       <h2 id="hibc-prices-heading" className="hibc-prices__title">
@@ -376,38 +417,9 @@ function HibcPricesHoa({ snapshot, sold = {}, asOf }) {
           </tbody>
         </table>
       </div>
-      <ul className="glance-facts" style={{ marginTop: 10 }}>
-        {rows
-          .filter(([, t]) => t?.count > 0)
-          .map(([label, t]) => {
-            const span = (xs, f = (x) => x) =>
-              xs?.length ? (Math.min(...xs) === Math.max(...xs) ? f(Math.min(...xs)) : `${f(Math.min(...xs))}–${f(Math.max(...xs))}`) : null;
-            const beds = span(t.beds);
-            const sqft = span(t.sqft, (x) => x.toLocaleString('en-US'));
-            const built = span(t.built);
-            const avg = t.sum && t.count ? k(Math.round(t.sum / t.count)) : null;
-            return (
-              <li key={label}>
-                <strong>{label} for sale:</strong> average asking price {avg}
-                {beds ? `, ${beds} bedrooms` : ''}
-                {sqft ? `, ${sqft} sq ft` : ''}
-                {built ? `, built ${built}` : ''}.
-              </li>
-            );
-          })}
-        <li>
-          <strong>Amenities:</strong> private Atlantic beach access, a private 42-slip marina with direct Intracoastal
-          Waterway access, a resort-style pool and spa with shaded cabanas, and a fitness center. Golf-cart and pet
-          friendly.
-        </li>
-        <li>
-          <strong>Nightly rentals are allowed</strong>, which is uncommon in the Melbourne Beach area and a draw for
-          investors and second-home buyers.
-        </li>
-        <li>
-          <strong>Schools:</strong> Gemini Elementary, Hoover Middle and Melbourne High.
-        </li>
-      </ul>
+      <p className="hibc-prices__note" style={{ marginTop: 6 }}>
+        <a href="#hibc-details-heading">More about Harbor Island Beach Club: sizes, amenities and rentals ↓</a>
+      </p>
       <p className="hibc-prices__note">
         From the Space Coast MLS as of {asOf}. HOA is per month from current listings; confirm the exact fee and what it
         includes on each listing.
@@ -424,7 +436,38 @@ function HibcPricesHoa({ snapshot, sold = {}, asOf }) {
 // short table of the homes for sale now. Facts confirmed by Ryan 2026-11-26/27:
 // sections, guard gate staffed 24/7, model homes and hours, Rosewood Homes
 // is the local AR Homes franchise, "over 120 homesites".
-function AdelaideAtAGlance({ snapshot, asOf }) {
+function AdelaideAtAGlance({ snapshot, asOf, mode = 'top' }) {
+  if (mode === 'details') {
+    return (
+      <section className="hibc-prices" aria-labelledby="adelaide-details-heading">
+        <h2 id="adelaide-details-heading" className="hibc-prices__title">
+          About Adelaide: Key Facts
+        </h2>
+        <ul className="glance-facts">
+            <li>
+              <strong>Over 120 homesites in five sections:</strong> The Reserve (18 homesites behind its own private gate),
+              The Lakes (oversized homesites on or next to Lake Adelaide), The Preserve (homesites around a private 25-acre
+              water-to-wetlands preserve), The Park (24 homesites near the front, about a quarter to a third of an acre)
+              and The Ranch, the final phase, now selling. Most homesites are half an acre to over an acre, many with
+              water views.
+            </li>
+                <li>
+              <strong>Builders and model homes</strong> (models open Monday–Saturday 10 AM–5 PM, Sunday 12–5 PM):{' '}
+              <strong>AR Homes</strong> (built locally by Rosewood Homes, Inc.), the Lumina model at 3639 Lake Adelaide
+              Place, a one-story 4,485 sq ft home with 4 bedrooms and a 4-car garage; <strong>Christopher Burton Luxury
+              Homes</strong>, model at 3717 Upper Floridian Way; and <strong>Elan Builders</strong>, modern homes led by
+              Christopher Burton and designed by architect Phil Kean, with no model home in Adelaide now. Contact Ryan
+              before you visit and he&rsquo;ll go with you.
+            </li>
+                <li>
+              <strong>Amenities:</strong> a community dock and boardwalk on Lake Adelaide for paddling and sailing, a
+              5-acre park, tennis courts, a basketball half-court, jogging trails, and a pavilion and playground. About 15
+              minutes to the beaches, 30 minutes to Orlando International Airport and 45 minutes to Orlando.
+            </li>
+            </ul>
+      </section>
+    );
+  }
   if (!snapshot) return null;
   const money = (n) => `$${n.toLocaleString('en-US')}`;
   const short = (n) => (n >= 1e6 ? `$${parseFloat((n / 1e6).toFixed(2))}M` : `$${Math.round(n / 1000)}K`);
@@ -469,27 +512,10 @@ function AdelaideAtAGlance({ snapshot, asOf }) {
           (the gate is staffed 24/7) in Viera West, Rockledge, FL 32955, around the 120-acre Lake Adelaide. Over a
           third of it is water or preserve.
         </li>
-        <li>
-          <strong>Over 120 homesites in five sections:</strong> The Reserve (18 homesites behind its own private gate),
-          The Lakes (oversized homesites on or next to Lake Adelaide), The Preserve (homesites around a private 25-acre
-          water-to-wetlands preserve), The Park (24 homesites near the front, about a quarter to a third of an acre)
-          and The Ranch, the final phase, now selling. Most homesites are half an acre to over an acre, many with
-          water views.
-        </li>
-        <li>
-          <strong>Builders and model homes</strong> (models open Monday–Saturday 10 AM–5 PM, Sunday 12–5 PM):{' '}
-          <strong>AR Homes</strong> (built locally by Rosewood Homes, Inc.), the Lumina model at 3639 Lake Adelaide
-          Place, a one-story 4,485 sq ft home with 4 bedrooms and a 4-car garage; <strong>Christopher Burton Luxury
-          Homes</strong>, model at 3717 Upper Floridian Way; and <strong>Elan Builders</strong>, modern homes led by
-          Christopher Burton and designed by architect Phil Kean, with no model home in Adelaide now. Contact Ryan
-          before you visit and he&rsquo;ll go with you.
-        </li>
-        <li>
-          <strong>Amenities:</strong> a community dock and boardwalk on Lake Adelaide for paddling and sailing, a
-          5-acre park, tennis courts, a basketball half-court, jogging trails, and a pavilion and playground. About 15
-          minutes to the beaches, 30 minutes to Orlando International Airport and 45 minutes to Orlando.
-        </li>
       </ul>
+      <p className="hibc-prices__note" style={{ marginTop: 6 }}>
+        <a href="#adelaide-details-heading">More about Adelaide: details ↓</a>
+      </p>
       <p className="hibc-prices__note">Prices and HOA fees from current MLS listings as of {asOf}.</p>
     </section>
   );
@@ -549,7 +575,33 @@ function AdelaideForSaleTable({ snapshot, asOf }) {
 // viera.com/aripeka (2026-11-27): starting in the $1.2M's, four builders,
 // gated, trails, pocket parks, lakes, central park with clubhouse; model
 // homes and hours; zoned schools. Live counts and prices from the MLS.
-function AripekaAtAGlance({ snapshot, sold, asOf }) {
+function AripekaAtAGlance({ snapshot, sold, asOf, mode = 'top' }) {
+  if (mode === 'details') {
+    return (
+      <section className="hibc-prices" aria-labelledby="aripeka-details-heading">
+        <h2 id="aripeka-details-heading" className="hibc-prices__title">
+          About Aripeka at Viera: Key Facts
+        </h2>
+        <ul className="glance-facts">
+            <li>
+              <strong>About 250 wooded homesites</strong> laid out around the community&rsquo;s mature oak, palm and pine
+              trees, with nature trails, pocket parks and lakes, and a private central park with a clubhouse that has a
+              catering kitchen and indoor and outdoor gathering spaces.
+            </li>
+                <li>
+              <strong>Model homes:</strong> CDS Builders, the Live Oak at 1726 Gracewood Drive (Mon–Sat 10–6, Sun 12–6);
+              LifeStyle Homes, the Key Largo at 1746 Gracewood Drive (Mon–Sat 10–5, Sun 12–5); Joyal Homes, the Sandhill
+              Key at 1756 Gracewood Drive (Mon–Sat 10–5, Sun 12–5); and Stanley Homes, the Emerald at 8350 Waxwing Circle
+              (Mon–Sat 10:30–5, Sun 12–4). Contact Ryan before your first model visit and he&rsquo;ll go with you.
+            </li>
+                <li>
+              <strong>Schools:</strong> Viera Elementary (K–6), Viera Middle (7–8) and Viera High (9–12), with Viera
+              Charter School (K–8) nearby.
+            </li>
+            </ul>
+      </section>
+    );
+  }
   if (!snapshot) return null;
   const short = (n) => (n >= 1e6 ? `$${parseFloat((n / 1e6).toFixed(2))}M` : `$${Math.round(n / 1000)}K`);
   const range = (t) => (t.low === t.high ? short(t.low) : `${short(t.low)}–${short(t.high)}`);
@@ -584,22 +636,10 @@ function AripekaAtAGlance({ snapshot, sold, asOf }) {
           Space Coast (homes have Melbourne, FL 32940 addresses). It is not the Gulf Coast town of Aripeka in Pasco
           County.
         </li>
-        <li>
-          <strong>About 250 wooded homesites</strong> laid out around the community&rsquo;s mature oak, palm and pine
-          trees, with nature trails, pocket parks and lakes, and a private central park with a clubhouse that has a
-          catering kitchen and indoor and outdoor gathering spaces.
-        </li>
-        <li>
-          <strong>Model homes:</strong> CDS Builders, the Live Oak at 1726 Gracewood Drive (Mon–Sat 10–6, Sun 12–6);
-          LifeStyle Homes, the Key Largo at 1746 Gracewood Drive (Mon–Sat 10–5, Sun 12–5); Joyal Homes, the Sandhill
-          Key at 1756 Gracewood Drive (Mon–Sat 10–5, Sun 12–5); and Stanley Homes, the Emerald at 8350 Waxwing Circle
-          (Mon–Sat 10:30–5, Sun 12–4). Contact Ryan before your first model visit and he&rsquo;ll go with you.
-        </li>
-        <li>
-          <strong>Schools:</strong> Viera Elementary (K–6), Viera Middle (7–8) and Viera High (9–12), with Viera
-          Charter School (K–8) nearby.
-        </li>
       </ul>
+      <p className="hibc-prices__note" style={{ marginTop: 6 }}>
+        <a href="#aripeka-details-heading">More about Aripeka at Viera: details ↓</a>
+      </p>
       <p className="hibc-prices__note">Prices from current MLS listings as of {asOf}.</p>
     </section>
   );
@@ -1553,6 +1593,263 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
     year: 'numeric',
     timeZone: 'America/New_York',
   });
+  // Community "at a Glance" boxes (2026-11-27), one entry per page; the
+  // top half renders above the listings, the details half below them.
+  const GLANCE_PROPS = {
+    'pangea-park': {
+      name: "Pangea Park",
+      filter: listingsFilterParams,
+      asOf: snapshotUpdated,
+      types: [
+              { type: 'Home', one: 'single-family home', many: 'single-family homes' },
+              { type: 'Condo', one: 'villa', many: 'villas' },
+            ],
+      facts: [
+              <>
+                <strong>A Viera Builders community</strong> in South Viera (Melbourne, FL 32940), mixing single-family
+                homes in Craftsman, Modern Coastal and Farmhouse styles with maintenance-free paired and multiplex villas
+                (listed as condos on the MLS).
+              </>,
+              <>
+                <strong>Villas</strong> run about 1,480–1,920 sq ft from the Iris, Lilac, Emerald and Sapphire plans; the
+                villa HOA covers lawn care, pest control, exterior paint, the roof and exterior insurance. Every home has
+                Google Smart Home products, FPL BuildSmart construction (up to 30% lower energy costs) and Viera Builders&rsquo;
+                Healthy Home Advantage certification.
+              </>,
+              <>
+                <strong>Amenities:</strong> a neighborhood park with a pavilion, playground, tennis courts and a lap pool,
+                close to The Avenue Viera, Costco, Duran Golf Club, the Brevard Zoo and Viera Hospital. Schools: Viera
+                Elementary and Viera High, with Viera Middle or Johnson Middle (confirm by address).
+              </>,
+            ],
+    },
+    'reeling-park': {
+      name: "Reeling Park",
+      filter: listingsFilterParams,
+      asOf: snapshotUpdated,
+      types: [{ type: 'Home', one: 'home', many: 'homes' }],
+      facts: [
+              <>
+                <strong>A Viera Builders courtyard-home community</strong> in eastern Addison Village, Viera (Melbourne,
+                FL 32940), with Spanish Colonial&ndash;style homes from the San Marco and Castillo Courtyard Collections,
+                built on Traditional Neighborhood Design principles. New construction starts in the high $400,000s.
+              </>,
+              <>
+                <strong>Homes</strong> run about 1,850–3,738 sq ft, mostly 3–5 bedrooms, on lots of roughly a tenth to a
+                quarter acre, with optional golf-cart garages and FPL BuildSmart construction (up to 30% lower energy
+                costs).
+              </>,
+              <>
+                <strong>Amenities:</strong> a dog park, half-basketball court, playground, sand volleyball, a soccer field,
+                picnic areas and a pavilion, plus Addison Village Club membership with two pools, tennis and pickleball.
+                Schools: mostly Quest Elementary, DeLaura Middle and Viera High (confirm by address).
+              </>,
+            ],
+    },
+    'summer-lakes': {
+      name: "Summer Lakes",
+      hideHoaRange: true,
+      filter: listingsFilterParams,
+      asOf: snapshotUpdated,
+      types: [{ type: 'Home', one: 'estate home', many: 'estate homes' }],
+      facts: [
+              <>
+                <strong>A guard-gated lakefront community</strong> of about 94 estate homes in central Viera (Rockledge, FL
+                32955 addresses), built around an approximately 80-acre lake crossed by a pedestrian trestle bridge.
+                Built out, so homes are resales.
+              </>,
+              <>
+                <strong>Homes</strong> date mainly from 2006–2007 and run roughly 3,200–9,000 sq ft, often with saltwater
+                pools and summer kitchens, on some of the largest lots in any gated Viera community (about 0.7–0.9
+                acres); most have lake views and many have private docks. The lake supports kayaking, paddle boating
+                and sailing.
+              </>,
+              <>
+                <strong>HOA:</strong> $1,125 every six months ($2,250 a year) to the Summer Lakes association, plus a second
+                fee of about $280 a year, so about $2,530 a year in total (about $211 a month), per recent MLS listings.
+              </>,
+              <>
+                <strong>Location:</strong> minutes from The Avenue Viera, Duran Golf Club and Viera Hospital; zoned for Viera
+                High School. Also called Summer Lakes Rockledge or Summer Lakes Viera West.
+              </>,
+            ],
+    },
+    'laurasia': {
+      name: "Laurasia",
+      filter: listingsFilterParams,
+      asOf: snapshotUpdated,
+      types: [{ type: 'Home', one: 'home', many: 'homes' }],
+      facts: [
+              <>
+                <strong>A gated, new-construction Viera Builders community</strong> of modern Mediterranean-style homes in
+                Viera, FL 32940, walkable and golf-cart friendly. Viera Builders plans start at $790,400 (Carrington) and
+                run to $971,400 (Altamura II), as of November 2026.
+              </>,
+              <>
+                <strong>14 one- and two-story plans</strong> in two collections, Inglenook (65-ft lots) and Silverado (75-ft
+                lots), about 2,670–3,940 sq ft and 3–5 bedrooms; several Silverado plans have a two-car plus golf-cart
+                garage. Every home has FPL BuildSmart construction, Brilliant Smart Home technology and Healthy Home
+                Advantage, with a 2-year builder and 10-year structural warranty.
+              </>,
+              <>
+                <strong>Model home:</strong> 2755 Pelagornis Drive, Viera (generally Mon–Sat 10–6, Sun 12–5; contact Ryan
+                before you visit). HOA $400 a quarter. Schools: Viera Elementary, Viera Middle and Viera High, with
+                Viera Charter (K–8) an option. Close to Duran Golf Club, The Avenue Viera, Costco and the Brevard Zoo.
+              </>,
+            ],
+    },
+    'arrivas-village': {
+      name: "Arrivas Village",
+      filter: listingsFilterParams,
+      asOf: snapshotUpdated,
+      types: [{ type: 'Home', one: 'home', many: 'homes' }],
+      facts: [
+              <>
+                <strong>A Viera Builders neighborhood of just over 200 Spanish Colonial&ndash;style courtyard homes</strong>,
+                built in two phases, in central Viera West (Melbourne, FL 32940), across from The Avenue Viera with Duran
+                Golf Club right behind it. Viera Builders has sold out its homesites, so homes here are resales.
+              </>,
+              <>
+                <strong>Homes</strong> have arched doorways, wrought-iron gates and barrel-tile roofs, with balconies,
+                verandas and private courtyards (some with summer kitchens) and rear-entry garages off alleys, which keeps
+                the sidewalk-lined streets walkable and golf-cart friendly. Floor plans run from about 1,500 to over 3,500
+                sq ft.
+              </>,
+              <>
+                <strong>Amenities and HOA:</strong> a community pool, dog park and playground; the association, the Central
+                Viera Community Association, handles exterior painting and landscaping for many homes. Most homes also
+                carry a Viera West CDD fee; confirm both on each listing.
+              </>,
+            ],
+    },
+    'atlin-cove': {
+      name: "Atlin Cove",
+      filter: listingsFilterParams,
+      asOf: snapshotUpdated,
+      types: [{ type: 'Home', one: 'home', many: 'homes' }],
+      facts: [
+              <>
+                <strong>A new single-family neighborhood by Viera Builders</strong> in Viera West (Melbourne, FL 32940), off
+                Lake Andrew Drive behind Costco and across from Pangea Park. Viera Builders plans start at $457,000 and run
+                to about $606,900 before lot premiums and options.
+              </>,
+              <>
+                <strong>Plans:</strong> two collections, Baltic and Chesapeake, on 40- and 50-foot lots, about 1,692–3,037 sq
+                ft with 3–4 bedrooms, 2–3.5 baths and two-car garages (plans include the Brisa, Brisa II, Biloxi, Beacon,
+                Crestview, Coral, Caspian and Crystal). Model home at 9812 Palena Drive; contact Ryan before you visit.
+              </>,
+              <>
+                <strong>Community:</strong> a planned neighborhood pool and amenity center and walking and biking trails,
+                with natural gas, close to The Avenue Viera, I-95 and the Pineda Causeway to the beaches.
+              </>,
+            ],
+    },
+    'tortoise-island': {
+      name: "Tortoise Island",
+      filter: listingsFilterParams,
+      asOf: snapshotUpdated,
+      types: [{ type: 'Home', one: 'home', many: 'homes' }],
+      facts: [
+              <>
+                <strong>A 24-hour guard-gated waterfront community</strong> of 357 homesites on about 210 acres in South
+                Patrick Shores (Satellite Beach, FL 32937 addresses), with one gated entry off Tortoise Drive near the
+                Pineda Causeway. Built out mostly from the late 1970s to the early 2000s, so homes are resales.
+              </>,
+              <>
+                <strong>On the water:</strong> most homesites (about a third to nearly a full acre) sit on deep-water canals
+                or the Banana River with private docks, with boating access to the Indian River Lagoon and the
+                Intracoastal Waterway. Homes run roughly 2,300–6,700 sq ft. Canal depths vary; confirm for your boat.
+              </>,
+              <>
+                <strong>Amenities:</strong> the Tortoise Island Recreation Center with a pool, fitness center, tennis and
+                pickleball courts and a clubhouse, plus walking paths and preserved gopher tortoise habitat. Schools: Sea
+                Park Elementary, DeLaura Middle and Satellite High.
+              </>,
+            ],
+    },
+    'lansing-island': {
+      name: "Lansing Island",
+      filter: listingsFilterParams,
+      asOf: snapshotUpdated,
+      types: [{ type: 'Home', one: 'home', many: 'homes' }],
+      facts: [
+              <>
+                <strong>A private, 24-hour guard-gated island</strong> in Indian Harbour Beach (homes carry Satellite Beach, FL
+                32937 addresses), reached by a single causeway and covered drawbridge past a manned gatehouse, between the
+                Banana River and the Grand Canal, about a mile from the Atlantic.
+              </>,
+              <>
+                <strong>All single-family homes</strong> (no condos or vacant lots), roughly 3,000 to over 10,000 sq ft on
+                homesites of about three-quarters of an acre to just under an acre, some near two acres; nearly every
+                homesite has direct water access and many have private docks.
+              </>,
+              <>
+                <strong>Amenities and HOA:</strong> a clubhouse, tennis, pickleball and basketball courts, a resort-style pool,
+                a fitness center and a playground. HOA fees run about $544–$657 a month, per MLS records of recent sales.
+                Schools: commonly Ocean Breeze Elementary, DeLaura Middle and Satellite High (confirm by address).
+              </>,
+            ],
+    },
+    'aquarina': {
+      name: "Aquarina",
+      hideHoaRange: true,
+      filter: listingsFilterParams,
+      asOf: snapshotUpdated,
+      types: [
+              { type: 'Home', one: 'single-family home', many: 'single-family homes' },
+              { type: 'Condo', one: 'condo or villa', many: 'condos and villas' },
+              { type: 'Land', one: 'lot', many: 'lots' },
+            ],
+      facts: [
+              <>
+                <strong>Gated, ocean-to-river community</strong> in Melbourne Beach, FL 32951, on both sides of A1A
+                inside the Archie Carr National Wildlife Refuge, north of Sebastian Inlet, with 18 neighborhoods of
+                oceanfront condos, riverfront single-family homes, villas and townhomes.
+              </>,
+              <>
+                <strong>Amenities:</strong> an 18-hole, par-62 Audubon-certified golf course (open to the public), six
+                Har-Tru clay tennis courts, a private oceanfront Beach Club, a boat ramp and fishing dock on the Indian
+                River, a fitness center, a library and the Aqua Bar &amp; Grill.
+              </>,
+              <>
+                <strong>HOA:</strong> the Aquarina master association fee is about $1,535 a quarter for 2026 (about $512
+                a month), and since January 2026 it includes golf and tennis play, according to Aquarina Country Club.
+                Each of the 18 sections also has its own enclave or condo dues (condo associations include Ocean Dunes,
+                The Marlin, Egret Trace, Tidewater and The Hammock), so totals vary; there is no equity or enrollment
+                fee. Schools: Gemini Elementary, Hoover Middle and Melbourne High (confirm by address).
+              </>,
+            ],
+    },
+    'avalonia': {
+      name: "Avalonia",
+      filter: listingsFilterParams,
+      asOf: snapshotUpdated,
+      types: [
+              { type: 'Home', one: 'single-family home', many: 'single-family homes' },
+              { type: 'Condo', one: 'villa', many: 'villas' },
+            ],
+      facts: [
+              <>
+                <strong>Avalonia is sold out by Viera Builders</strong>, so homes here are resales. It is in Addison
+                Village in Viera West (Melbourne, FL 32940 addresses), near The Avenue Viera.
+              </>,
+              <>
+                <strong>Single-family homes and single-story paired and 4-plex villas</strong> (the MLS lists the villas
+                as condos), mostly 3 bedrooms and 2 baths, about 1,450–2,550 sq ft. The villas come in four floor plans of
+                about 1,481–1,809 sq ft with 2-car garages. Viera Builders features include foam-filled concrete block
+                construction, impact-resistant front windows, gas ranges and tankless gas water heaters.
+              </>,
+              <>
+                <strong>Villa HOA</strong>, through the Central Viera Community Association (CVCA), covers roof
+                maintenance, exterior paint and pressure washing, lawn care, landscaping, irrigation and pest control,
+                according to Viera Builders and recent listings. Residents can join the Addison Village Club, with a
+                clubhouse, zero-entry and lap pools, fitness and sports courts (membership fees apply). Most homes also
+                carry a Viera West CDD fee; confirm dues and what they cover on each listing.
+              </>,
+            ],
+    },
+  };
+  const glanceProps = GLANCE_PROPS[slug] || null;
 
   // Per-community listing counts for the hub page's community list
   // (2026-10-03, per Ryan) — same exact-subdivision match each community's
@@ -2572,293 +2869,24 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {/* Pangea Park and Reeling Park at a Glance (2026-11-27): Google quoted
             REMAX, Zillow and Jack Jeffcoat for their prices and plans. Facts
             match each page's area-guide text. Tested once the API allows. */}
-        {slug === 'pangea-park' && (
-          <CommunityAtAGlance
-            name="Pangea Park"
-            filter={listingsFilterParams}
-            asOf={snapshotUpdated}
-            types={[
-              { type: 'Home', one: 'single-family home', many: 'single-family homes' },
-              { type: 'Condo', one: 'villa', many: 'villas' },
-            ]}
-            facts={[
-              <>
-                <strong>A Viera Builders community</strong> in South Viera (Melbourne, FL 32940), mixing single-family
-                homes in Craftsman, Modern Coastal and Farmhouse styles with maintenance-free paired and multiplex villas
-                (listed as condos on the MLS).
-              </>,
-              <>
-                <strong>Villas</strong> run about 1,480–1,920 sq ft from the Iris, Lilac, Emerald and Sapphire plans; the
-                villa HOA covers lawn care, pest control, exterior paint, the roof and exterior insurance. Every home has
-                Google Smart Home products, FPL BuildSmart construction (up to 30% lower energy costs) and Viera Builders&rsquo;
-                Healthy Home Advantage certification.
-              </>,
-              <>
-                <strong>Amenities:</strong> a neighborhood park with a pavilion, playground, tennis courts and a lap pool,
-                close to The Avenue Viera, Costco, Duran Golf Club, the Brevard Zoo and Viera Hospital. Schools: Viera
-                Elementary and Viera High, with Viera Middle or Johnson Middle (confirm by address).
-              </>,
-            ]}
-          />
-        )}
-        {slug === 'reeling-park' && (
-          <CommunityAtAGlance
-            name="Reeling Park"
-            filter={listingsFilterParams}
-            asOf={snapshotUpdated}
-            types={[{ type: 'Home', one: 'home', many: 'homes' }]}
-            facts={[
-              <>
-                <strong>A Viera Builders courtyard-home community</strong> in eastern Addison Village, Viera (Melbourne,
-                FL 32940), with Spanish Colonial&ndash;style homes from the San Marco and Castillo Courtyard Collections,
-                built on Traditional Neighborhood Design principles. New construction starts in the high $400,000s.
-              </>,
-              <>
-                <strong>Homes</strong> run about 1,850–3,738 sq ft, mostly 3–5 bedrooms, on lots of roughly a tenth to a
-                quarter acre, with optional golf-cart garages and FPL BuildSmart construction (up to 30% lower energy
-                costs).
-              </>,
-              <>
-                <strong>Amenities:</strong> a dog park, half-basketball court, playground, sand volleyball, a soccer field,
-                picnic areas and a pavilion, plus Addison Village Club membership with two pools, tennis and pickleball.
-                Schools: mostly Quest Elementary, DeLaura Middle and Viera High (confirm by address).
-              </>,
-            ]}
-          />
-        )}
         {/* Summer Lakes and Laurasia at a Glance (2026-11-27): Google quoted
             Jack Jeffcoat and Zillow for prices, sizes and fees. Facts match each
             page's About text; tested once the API allows. */}
-        {slug === 'summer-lakes' && (
-          <CommunityAtAGlance
-            name="Summer Lakes"
-            hideHoaRange
-            filter={listingsFilterParams}
-            asOf={snapshotUpdated}
-            types={[{ type: 'Home', one: 'estate home', many: 'estate homes' }]}
-            facts={[
-              <>
-                <strong>A guard-gated lakefront community</strong> of about 94 estate homes in central Viera (Rockledge, FL
-                32955 addresses), built around an approximately 80-acre lake crossed by a pedestrian trestle bridge.
-                Built out, so homes are resales.
-              </>,
-              <>
-                <strong>Homes</strong> date mainly from 2006–2007 and run roughly 3,200–9,000 sq ft, often with saltwater
-                pools and summer kitchens, on some of the largest lots in any gated Viera community (about 0.7–0.9
-                acres); most have lake views and many have private docks. The lake supports kayaking, paddle boating
-                and sailing.
-              </>,
-              <>
-                <strong>HOA:</strong> $1,125 every six months ($2,250 a year) to the Summer Lakes association, plus a second
-                fee of about $280 a year, so about $2,530 a year in total (about $211 a month), per recent MLS listings.
-              </>,
-              <>
-                <strong>Location:</strong> minutes from The Avenue Viera, Duran Golf Club and Viera Hospital; zoned for Viera
-                High School. Also called Summer Lakes Rockledge or Summer Lakes Viera West.
-              </>,
-            ]}
-          />
-        )}
-        {slug === 'laurasia' && (
-          <CommunityAtAGlance
-            name="Laurasia"
-            filter={listingsFilterParams}
-            asOf={snapshotUpdated}
-            types={[{ type: 'Home', one: 'home', many: 'homes' }]}
-            facts={[
-              <>
-                <strong>A gated, new-construction Viera Builders community</strong> of modern Mediterranean-style homes in
-                Viera, FL 32940, walkable and golf-cart friendly. Viera Builders plans start at $790,400 (Carrington) and
-                run to $971,400 (Altamura II), as of November 2026.
-              </>,
-              <>
-                <strong>14 one- and two-story plans</strong> in two collections, Inglenook (65-ft lots) and Silverado (75-ft
-                lots), about 2,670–3,940 sq ft and 3–5 bedrooms; several Silverado plans have a two-car plus golf-cart
-                garage. Every home has FPL BuildSmart construction, Brilliant Smart Home technology and Healthy Home
-                Advantage, with a 2-year builder and 10-year structural warranty.
-              </>,
-              <>
-                <strong>Model home:</strong> 2755 Pelagornis Drive, Viera (generally Mon–Sat 10–6, Sun 12–5; contact Ryan
-                before you visit). HOA $400 a quarter. Schools: Viera Elementary, Viera Middle and Viera High, with
-                Viera Charter (K–8) an option. Close to Duran Golf Club, The Avenue Viera, Costco and the Brevard Zoo.
-              </>,
-            ]}
-          />
-        )}
         {/* Arrivas Village at a Glance (2026-11-27): Google quoted The Burgman
             Group and Carpenter Kessel; facts match its About text. */}
-        {slug === 'arrivas-village' && (
-          <CommunityAtAGlance
-            name="Arrivas Village"
-            filter={listingsFilterParams}
-            asOf={snapshotUpdated}
-            types={[{ type: 'Home', one: 'home', many: 'homes' }]}
-            facts={[
-              <>
-                <strong>A Viera Builders neighborhood of just over 200 Spanish Colonial&ndash;style courtyard homes</strong>,
-                built in two phases, in central Viera West (Melbourne, FL 32940), across from The Avenue Viera with Duran
-                Golf Club right behind it. Viera Builders has sold out its homesites, so homes here are resales.
-              </>,
-              <>
-                <strong>Homes</strong> have arched doorways, wrought-iron gates and barrel-tile roofs, with balconies,
-                verandas and private courtyards (some with summer kitchens) and rear-entry garages off alleys, which keeps
-                the sidewalk-lined streets walkable and golf-cart friendly. Floor plans run from about 1,500 to over 3,500
-                sq ft.
-              </>,
-              <>
-                <strong>Amenities and HOA:</strong> a community pool, dog park and playground; the association, the Central
-                Viera Community Association, handles exterior painting and landscaping for many homes. Most homes also
-                carry a Viera West CDD fee; confirm both on each listing.
-              </>,
-            ]}
-          />
-        )}
         {/* Atlin Cove and Tortoise Island at a Glance (2026-11-27): Google quoted
             Viera Builders/Zillow (Atlin Cove) and Zillow/Jack Jeffcoat/Carpenter
             Kessel (Tortoise Island). Tortoise Island facts match its area guide. */}
-        {slug === 'atlin-cove' && (
-          <CommunityAtAGlance
-            name="Atlin Cove"
-            filter={listingsFilterParams}
-            asOf={snapshotUpdated}
-            types={[{ type: 'Home', one: 'home', many: 'homes' }]}
-            facts={[
-              <>
-                <strong>A new single-family neighborhood by Viera Builders</strong> in Viera West (Melbourne, FL 32940), off
-                Lake Andrew Drive behind Costco and across from Pangea Park. Viera Builders plans start at $457,000 and run
-                to about $606,900 before lot premiums and options.
-              </>,
-              <>
-                <strong>Plans:</strong> two collections, Baltic and Chesapeake, on 40- and 50-foot lots, about 1,692–3,037 sq
-                ft with 3–4 bedrooms, 2–3.5 baths and two-car garages (plans include the Brisa, Brisa II, Biloxi, Beacon,
-                Crestview, Coral, Caspian and Crystal). Model home at 9812 Palena Drive; contact Ryan before you visit.
-              </>,
-              <>
-                <strong>Community:</strong> a planned neighborhood pool and amenity center and walking and biking trails,
-                with natural gas, close to The Avenue Viera, I-95 and the Pineda Causeway to the beaches.
-              </>,
-            ]}
-          />
-        )}
-        {slug === 'tortoise-island' && (
-          <CommunityAtAGlance
-            name="Tortoise Island"
-            filter={listingsFilterParams}
-            asOf={snapshotUpdated}
-            types={[{ type: 'Home', one: 'home', many: 'homes' }]}
-            facts={[
-              <>
-                <strong>A 24-hour guard-gated waterfront community</strong> of 357 homesites on about 210 acres in South
-                Patrick Shores (Satellite Beach, FL 32937 addresses), with one gated entry off Tortoise Drive near the
-                Pineda Causeway. Built out mostly from the late 1970s to the early 2000s, so homes are resales.
-              </>,
-              <>
-                <strong>On the water:</strong> most homesites (about a third to nearly a full acre) sit on deep-water canals
-                or the Banana River with private docks, with boating access to the Indian River Lagoon and the
-                Intracoastal Waterway. Homes run roughly 2,300–6,700 sq ft. Canal depths vary; confirm for your boat.
-              </>,
-              <>
-                <strong>Amenities:</strong> the Tortoise Island Recreation Center with a pool, fitness center, tennis and
-                pickleball courts and a clubhouse, plus walking paths and preserved gopher tortoise habitat. Schools: Sea
-                Park Elementary, DeLaura Middle and Satellite High.
-              </>,
-            ]}
-          />
-        )}
         {/* Lansing Island at a Glance (2026-11-27): Google quoted Jack Jeffcoat,
             Carpenter Kessel and Redfin; facts match its area guide. */}
-        {slug === 'lansing-island' && (
-          <CommunityAtAGlance
-            name="Lansing Island"
-            filter={listingsFilterParams}
-            asOf={snapshotUpdated}
-            types={[{ type: 'Home', one: 'home', many: 'homes' }]}
-            facts={[
-              <>
-                <strong>A private, 24-hour guard-gated island</strong> in Indian Harbour Beach (homes carry Satellite Beach, FL
-                32937 addresses), reached by a single causeway and covered drawbridge past a manned gatehouse, between the
-                Banana River and the Grand Canal, about a mile from the Atlantic.
-              </>,
-              <>
-                <strong>All single-family homes</strong> (no condos or vacant lots), roughly 3,000 to over 10,000 sq ft on
-                homesites of about three-quarters of an acre to just under an acre, some near two acres; nearly every
-                homesite has direct water access and many have private docks.
-              </>,
-              <>
-                <strong>Amenities and HOA:</strong> a clubhouse, tennis, pickleball and basketball courts, a resort-style pool,
-                a fitness center and a playground. HOA fees run about $544–$657 a month, per MLS records of recent sales.
-                Schools: commonly Ocean Breeze Elementary, DeLaura Middle and Satellite High (confirm by address).
-              </>,
-            ]}
-          />
-        )}
         {/* Aquarina at a Glance (2026-11-27, AI-visibility push): Google
             quoted Zillow and Compass for Aquarina prices and this site for the
             HOA structure and amenities. Facts match the About section. */}
-        {slug === 'aquarina' && (
-          <CommunityAtAGlance
-            name="Aquarina"
-            hideHoaRange
-            filter={listingsFilterParams}
-            asOf={snapshotUpdated}
-            types={[
-              { type: 'Home', one: 'single-family home', many: 'single-family homes' },
-              { type: 'Condo', one: 'condo or villa', many: 'condos and villas' },
-              { type: 'Land', one: 'lot', many: 'lots' },
-            ]}
-            facts={[
-              <>
-                <strong>Gated, ocean-to-river community</strong> in Melbourne Beach, FL 32951, on both sides of A1A
-                inside the Archie Carr National Wildlife Refuge, north of Sebastian Inlet, with 18 neighborhoods of
-                oceanfront condos, riverfront single-family homes, villas and townhomes.
-              </>,
-              <>
-                <strong>Amenities:</strong> an 18-hole, par-62 Audubon-certified golf course (open to the public), six
-                Har-Tru clay tennis courts, a private oceanfront Beach Club, a boat ramp and fishing dock on the Indian
-                River, a fitness center, a library and the Aqua Bar &amp; Grill.
-              </>,
-              <>
-                <strong>HOA:</strong> the Aquarina master association fee is about $1,535 a quarter for 2026 (about $512
-                a month), and since January 2026 it includes golf and tennis play, according to Aquarina Country Club.
-                Each of the 18 sections also has its own enclave or condo dues (condo associations include Ocean Dunes,
-                The Marlin, Egret Trace, Tidewater and The Hammock), so totals vary; there is no equity or enrollment
-                fee. Schools: Gemini Elementary, Hoover Middle and Melbourne High (confirm by address).
-              </>,
-            ]}
-          />
-        )}
         {/* Avalonia at a Glance (2026-11-27, AI-visibility push) — live MLS
             numbers plus the facts already in its About text. */}
-        {slug === 'avalonia' && (
-          <CommunityAtAGlance
-            name="Avalonia"
-            filter={listingsFilterParams}
-            asOf={snapshotUpdated}
-            types={[
-              { type: 'Home', one: 'single-family home', many: 'single-family homes' },
-              { type: 'Condo', one: 'villa', many: 'villas' },
-            ]}
-            facts={[
-              <>
-                <strong>Avalonia is sold out by Viera Builders</strong>, so homes here are resales. It is in Addison
-                Village in Viera West (Melbourne, FL 32940 addresses), near The Avenue Viera.
-              </>,
-              <>
-                <strong>Single-family homes and single-story paired and 4-plex villas</strong> (the MLS lists the villas
-                as condos), mostly 3 bedrooms and 2 baths, about 1,450–2,550 sq ft. The villas come in four floor plans of
-                about 1,481–1,809 sq ft with 2-car garages. Viera Builders features include foam-filled concrete block
-                construction, impact-resistant front windows, gas ranges and tankless gas water heaters.
-              </>,
-              <>
-                <strong>Villa HOA</strong>, through the Central Viera Community Association (CVCA), covers roof
-                maintenance, exterior paint and pressure washing, lawn care, landscaping, irrigation and pest control,
-                according to Viera Builders and recent listings. Residents can join the Addison Village Club, with a
-                clubhouse, zero-entry and lap pools, fitness and sports courts (membership fees apply). Most homes also
-                carry a Viera West CDD fee; confirm dues and what they cover on each listing.
-              </>,
-            ]}
-          />
-        )}
+        {/* Community "at a Glance" boxes (2026-11-27): props in glanceProps
+            above; the details half renders below the listings. */}
+        {glanceProps && <CommunityAtAGlance {...glanceProps} />}
         {/* Adelaide: builder incentives signup in place of the guide strip
             (2026-11-26, per Ryan) — see BuilderIncentivesSignup.js. */}
         {/* Aripeka too (2026-11-26, per Ryan: "can you do this for aripeka
@@ -2981,6 +3009,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             page's own listings (and its Homes/Condos view, if any), not the
             visitor's price/bed filters. See ListingAlertSignup.js. */}
         {/* Builder starting prices (2026-11-05, per Ryan), below the listings. */}
+        {/* Details halves of the "at a Glance" boxes (2026-11-27). */}
+        {glanceProps && <CommunityAtAGlance {...glanceProps} mode="details" />}
+        {slug === 'adelaide' && <AdelaideAtAGlance snapshot={communitySnapshot} asOf={snapshotUpdated} mode="details" />}
+        {isAripeka && primaryType !== 'Land' && (
+          <AripekaAtAGlance snapshot={communitySnapshot} sold={marketStats?.sold} asOf={snapshotUpdated} mode="details" />
+        )}
+        {isHarborIslandBeachClub && (
+          <HibcPricesHoa snapshot={communitySnapshot} sold={hibcSold} asOf={snapshotUpdated} mode="details" />
+        )}
         {slug === 'aripeka' && <AripekaBuilderPrices />}
         {slug === 'adelaide' && <AdelaideForSaleTable snapshot={communitySnapshot} asOf={snapshotUpdated} />}
         {slug === 'adelaide' && <AdelaideBuilderPrices />}

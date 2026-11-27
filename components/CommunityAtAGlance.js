@@ -14,7 +14,27 @@ const money = (n) => `$${Math.round(n).toLocaleString('en-US')}`;
 
 // `hideHoaRange`: leave out the listings' HOA range where listings mix
 // association-only dues with totals (Aquarina's master fee + enclave dues).
-export default async function CommunityAtAGlance({ name, filter, asOf, types, facts = [], hideHoaRange = false }) {
+// `mode` (2026-11-27, per Ryan: "split them all"): 'top' shows the live
+// numbers and the first fact above the listings; 'details' shows the other
+// facts in an "About {name}: Key Facts" section below the listings, so phones
+// reach the listings sooner while Google and AI tools still read every fact.
+export default async function CommunityAtAGlance({ name, filter, asOf, types, facts = [], hideHoaRange = false, mode = 'top' }) {
+  if (mode === 'details') {
+    const rest = facts.slice(1);
+    if (!rest.length) return null;
+    return (
+      <section className="hibc-prices" aria-labelledby="community-details-heading">
+        <h2 id="community-details-heading" className="hibc-prices__title">
+          About {name}: Key Facts
+        </h2>
+        <ul className="glance-facts">
+          {rest.map((f, i) => (
+            <li key={i}>{f}</li>
+          ))}
+        </ul>
+      </section>
+    );
+  }
   const [data, sold] = await Promise.all([
     api.getListings({ ...filter, pageSize: 100 }).catch(() => null),
     api.getSoldStats(filter).catch(() => null),
@@ -62,12 +82,11 @@ export default async function CommunityAtAGlance({ name, filter, asOf, types, fa
           </li>
         ) : null}
       </ul>
-      {facts.length > 0 && (
-        <ul className="glance-facts">
-          {facts.map((f, i) => (
-            <li key={i}>{f}</li>
-          ))}
-        </ul>
+      {facts.length > 0 && <p className="glance-lead">{facts[0]}</p>}
+      {facts.length > 1 && (
+        <p className="hibc-prices__note" style={{ marginTop: 6 }}>
+          <a href="#community-details-heading">More about {name}: sections, amenities and schools ↓</a>
+        </p>
       )}
       <p className="hibc-prices__note">From the Space Coast MLS as of {asOf}.</p>
     </section>
