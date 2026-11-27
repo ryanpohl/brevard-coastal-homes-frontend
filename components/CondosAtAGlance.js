@@ -15,10 +15,10 @@ import { cityListingsQueryParams } from '@/lib/constants';
  * Condos box: Condos page of cities in CONDO_GLANCE_CITIES.
  * Homes box: Homes page of cities in HOME_GLANCE_CITIES.
  */
-export const CONDO_GLANCE_CITIES = new Set(['melbourne-beach', 'satellite-beach', 'cocoa-beach', 'cape-canaveral', 'indian-harbour-beach', 'indialantic', 'merritt-island']);
+export const CONDO_GLANCE_CITIES = new Set(['melbourne-beach', 'satellite-beach', 'cocoa-beach', 'cape-canaveral', 'indian-harbour-beach', 'indialantic', 'merritt-island', 'viera-west']);
 // Cocoa Beach added 2026-11-27 (Google's answer for "cocoa beach homes for sale"
 // was all Zillow).
-export const HOME_GLANCE_CITIES = new Set(['melbourne-beach', 'cocoa-beach', 'satellite-beach', 'indialantic', 'merritt-island']);
+export const HOME_GLANCE_CITIES = new Set(['melbourne-beach', 'cocoa-beach', 'satellite-beach', 'indialantic', 'merritt-island', 'viera-west']);
 
 const PER_MONTH = { Monthly: 1, Quarterly: 1 / 3, Annually: 1 / 12, Yearly: 1 / 12, 'Semi-Annually': 1 / 6 };
 const short = (n) => (n >= 1e6 ? `$${parseFloat((n / 1e6).toFixed(2))}M` : `$${Math.round(n / 1000)}K`);
@@ -84,7 +84,8 @@ async function allListings(params) {
   return out;
 }
 
-export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType, showBuildingsLink = false }) {
+// `extra`: an optional closing paragraph (e.g. Viera West's community links).
+export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType, showBuildingsLink = false, extra = null }) {
   const isCondo = propertyType === 'Condo';
   const noun = isCondo ? { one: 'condo', many: 'condos', Many: 'Condos' } : { one: 'home', many: 'homes', Many: 'Homes' };
   const base = { ...cityListingsQueryParams(citySlug), propertyType };
@@ -105,8 +106,8 @@ export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType
   const tierParts = TIERS[propertyType].map((t) => {
     const n = listings.filter((l) => l.price >= prev && l.price < t.max).length;
     prev = t.max;
-    return t.label(n);
-  });
+    return n ? t.label(n) : null;
+  }).filter(Boolean);
 
   // Bedrooms, square feet and years built across what's for sale (2026-11-27:
   // Google quoted Trulia/Zillow for these ranges on "cocoa beach condos").
@@ -187,6 +188,9 @@ export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType
             }.`
           : ''}
       </p>
+      {/* Inland towns (Viera West, 2026-11-27) have no ocean or river split, so
+          the setting table only shows when there is more than one setting. */}
+      {settings.length > 1 && (
       <div className="glance-table-wrap">
         <table className="hibc-prices__table glance-table">
           <thead>
@@ -215,6 +219,13 @@ export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType
           </tbody>
         </table>
       </div>
+      )}
+      {settings.length <= 1 && isCondo && all.hoaLow != null && (
+        <p className="glance-lead" style={{ marginTop: 10 }}>
+          <strong>HOA:</strong> about{' '}
+          {all.hoaLow === all.hoaHigh ? money(all.hoaLow) : `${money(all.hoaLow)}–${money(all.hoaHigh)}`} a month.
+        </p>
+      )}
       {bedLine && (
         <p className="glance-lead" style={{ marginTop: 10 }}>
           <strong>By bedrooms:</strong> {bedLine}.
@@ -234,6 +245,11 @@ export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType
           </>
         ) : null}
       </p>
+      {extra && (
+        <p className="glance-lead" style={{ marginTop: 10 }}>
+          {extra}
+        </p>
+      )}
       {isCondo && withRules >= 5 && rentalParts.length > 0 && (
         <p className="glance-lead" style={{ marginTop: 10 }}>
           <strong>Rental rules:</strong> of the {withRules} condos for sale that list their rental rules, {list(rentalParts)}.

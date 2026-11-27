@@ -1130,7 +1130,26 @@ export default async function CityListingsPage({ params, searchParams: searchPar
         )}
         {/* Homes "at a Glance" (2026-11-27). */}
         {HOME_GLANCE_CITIES.has(citySlug) && propertySlug === 'homes-for-sale' && (
-          <PropertyAtAGlance citySlug={citySlug} cityName={city.name} asOf={asOf} propertyType="Home" />
+          <PropertyAtAGlance
+            citySlug={citySlug}
+            cityName={city.name}
+            asOf={asOf}
+            propertyType="Home"
+            extra={
+              citySlug === 'viera-west' ? (
+                <>
+                  <strong>Communities:</strong> gated custom-home communities{' '}
+                  <Link href="/neighborhoods/adelaide">Adelaide</Link>, <Link href="/neighborhoods/aripeka">Aripeka</Link> and{' '}
+                  <Link href="/neighborhoods/summer-lakes">Summer Lakes</Link>; Viera Builders communities including{' '}
+                  <Link href="/neighborhoods/laurasia">Laurasia</Link>, <Link href="/neighborhoods/pangea-park">Pangea Park</Link>,{' '}
+                  <Link href="/neighborhoods/reeling-park">Reeling Park</Link> and <Link href="/neighborhoods/atlin-cove">Atlin Cove</Link>;
+                  and 55+ communities <Link href="/neighborhoods/del-webb-viera">Del Webb at Viera</Link>,{' '}
+                  <Link href="/neighborhoods/heritage-isle">Heritage Isle</Link> and{' '}
+                  <Link href="/neighborhoods/bridgewater-at-viera">Bridgewater at Viera</Link>.
+                </>
+              ) : null
+            }
+          />
         )}
         {/* Area Guide link (2026-09-24, per Ryan: "Add a link to the top of
             the page... right under the intro text" — a single small text
