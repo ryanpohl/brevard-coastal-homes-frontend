@@ -359,6 +359,110 @@ function HibcPricesHoa({ snapshot, asOf }) {
   );
 }
 
+// Adelaide "At a Glance" (2026-11-27, per Ryan: "our #1 priority should be
+// that we get quoted on Google AI & ChatGPT"; Adelaide first). Google's AI
+// Overview quoted Redfin for prices, Jack Jeffcoat for lot sizes and Zillow
+// for the sections, so this puts those facts, confirmed by Ryan, at the top:
+// live counts, prices and HOA from the MLS, then the community facts, then a
+// short table of the homes for sale now. Facts confirmed by Ryan 2026-11-26/27:
+// sections, guard gate staffed 24/7, model homes and hours, Rosewood Homes
+// is the local AR Homes franchise, "over 120 homesites".
+function AdelaideAtAGlance({ snapshot, asOf }) {
+  if (!snapshot) return null;
+  const money = (n) => `$${n.toLocaleString('en-US')}`;
+  const short = (n) => (n >= 1e6 ? `$${parseFloat((n / 1e6).toFixed(2))}M` : `$${Math.round(n / 1000)}K`);
+  const homes = snapshot.byType?.Home;
+  const lots = snapshot.byType?.Land;
+  const hoa = snapshot.hoaByType?.Home;
+  const list = snapshot.homesForSale || [];
+  const median = list.length ? [...list].sort((a, b) => a.price - b.price)[Math.floor((list.length - 1) / 2)].price : null;
+  const street = (a) => String(a || '').split(',')[0];
+  return (
+    <section className="hibc-prices" aria-labelledby="adelaide-glance-heading">
+      <h2 id="adelaide-glance-heading" className="hibc-prices__title">
+        Adelaide at a Glance
+      </h2>
+      <ul className="glance-stats">
+        {homes && homes.count > 0 && (
+          <li>
+            <strong>{homes.count}</strong> {homes.count === 1 ? 'home' : 'homes'} for sale,{' '}
+            {homes.low === homes.high ? short(homes.low) : `${short(homes.low)}–${short(homes.high)}`}
+            {median ? `, median ${short(median)}` : ''}
+          </li>
+        )}
+        <li>
+          {lots && lots.count > 0 ? (
+            <>
+              <strong>{lots.count}</strong> {lots.count === 1 ? 'lot' : 'lots'} for sale,{' '}
+              {lots.low === lots.high ? short(lots.low) : `${short(lots.low)}–${short(lots.high)}`}
+            </>
+          ) : (
+            <>No lots listed on the MLS right now</>
+          )}
+        </li>
+        {hoa && (
+          <li>
+            HOA about {hoa.low === hoa.high ? money(hoa.low) : `${money(hoa.low)}–${money(hoa.high)}`} a month
+          </li>
+        )}
+      </ul>
+      <ul className="glance-facts">
+        <li>
+          <strong>Guard-gated</strong>, with the gate staffed 24/7. About 460 acres in Viera West (Rockledge, FL 32955),
+          roughly a third of it water and preserve, around the 120-acre Lake Adelaide.
+        </li>
+        <li>
+          <strong>Over 120 homesites in four sections:</strong> The Reserve (18 homesites behind its own private gate),
+          The Lakes (larger homesites on or next to Lake Adelaide), The Preserve (homesites along a 25-acre wetlands
+          preserve) and The Park (24 smaller homesites near the front, about a quarter to a third of an acre).
+          Homesites run from about a quarter acre to over 1.5 acres.
+        </li>
+        <li>
+          <strong>Model homes</strong>, open Monday–Saturday 10 AM–5 PM and Sunday 12–5 PM:{' '}
+          <strong>AR Homes</strong> (built locally by Rosewood Homes), the Lumina at 3639 Lake Adelaide Place, a
+          one-story 4,485 sq ft home with 4 bedrooms and a 4-car garage; and <strong>Christopher Burton Luxury
+          Homes</strong> at 3717 Upper Floridian Way. Contact Ryan before
+          you visit and he&rsquo;ll go with you.
+        </li>
+      </ul>
+      {list.length > 0 && (
+        <>
+          <h3 className="glance-subtitle">Adelaide homes for sale now</h3>
+          <div className="glance-table-wrap">
+            <table className="hibc-prices__table glance-table">
+              <thead>
+                <tr>
+                  <th scope="col">Address</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Beds / baths</th>
+                  <th scope="col">Sq ft</th>
+                  <th scope="col">Built</th>
+                </tr>
+              </thead>
+              <tbody>
+                {list.map((l) => (
+                  <tr key={l.id}>
+                    <th scope="row">
+                      <Link href={`/listings/${l.id}`}>{street(l.address)}</Link>
+                    </th>
+                    <td>{money(l.price)}</td>
+                    <td>
+                      {l.beds ?? '—'} / {l.baths ?? '—'}
+                    </td>
+                    <td>{l.sqft ? l.sqft.toLocaleString('en-US') : '—'}</td>
+                    <td>{l.yearBuilt || '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+      <p className="hibc-prices__note">Prices and HOA fees from current MLS listings as of {asOf}.</p>
+    </section>
+  );
+}
+
 function ModelTourLine({ name }) {
   return (
     <div className="model-tour-card">
@@ -1250,7 +1354,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         h.low = Math.min(h.low, fee);
         h.high = Math.max(h.high, fee);
       }
+      // Homes for sale now, highest price first (2026-11-27, for Adelaide's
+      // "At a Glance" table, which AI answers quote).
+      const homesForSale = (data.results || [])
+        .filter((l) => l.propertyType === 'Home' && l.status === 'Active' && typeof l.price === 'number' && l.price > 0)
+        .sort((a, b) => b.price - a.price)
+        .slice(0, 10)
+        .map((l) => ({ id: l.id, address: l.address, price: l.price, beds: l.beds, baths: l.baths, sqft: l.sqft, yearBuilt: l.yearBuilt }));
       communitySnapshot = {
+        homesForSale,
         hoaByType,
         // Condo buildings with units for sale (2026-11-09, per Ryan's Cocoa
         // Village AI screenshot, which named the buildings from other sites).
@@ -2083,6 +2195,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {isAdelaide && (
           <div style={{ marginBottom: 12 }}>
             <CommunityFacts slug={slug} />
+            <AdelaideAtAGlance snapshot={communitySnapshot} asOf={snapshotUpdated} />
             {/* Trimmed 2026-10-28 (per Ryan: too much text above the listings);
                 the longer builder copy is in the About section below. */}
             <p style={{ fontSize: 18, lineHeight: 1.6, color: 'var(--color-muted-dark)' }}>

@@ -3795,3 +3795,42 @@ body.signup-required .mobile-contact-bar {
 .incentives-card__form .btn {
   flex: 0 0 auto;
 }
+
+/* "At a Glance" box (Adelaide, 2026-11-27) — same frame as .hibc-prices. */
+.glance-stats {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  font-size: 15.5px;
+  color: var(--color-ink);
+}
+.glance-facts {
+  margin: 0 0 6px;
+  padding-left: 18px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--color-ink);
+}
+.glance-facts li {
+  margin-bottom: 6px;
+}
+.glance-subtitle {
+  font-family: var(--font-inter-tight);
+  font-size: 16px;
+  margin: 12px 0 4px;
+  color: var(--color-ink);
+}
+.glance-table-wrap {
+  overflow-x: auto;
+}
+.glance-table {
+  font-size: 14px;
+  min-width: 460px;
+}
+.glance-table a {
+  color: inherit;
+  text-decoration: underline;
+}
