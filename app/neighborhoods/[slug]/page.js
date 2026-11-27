@@ -2708,6 +2708,58 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             ]}
           />
         )}
+        {/* Atlin Cove and Tortoise Island at a Glance (2026-11-27): Google quoted
+            Viera Builders/Zillow (Atlin Cove) and Zillow/Jack Jeffcoat/Carpenter
+            Kessel (Tortoise Island). Tortoise Island facts match its area guide. */}
+        {slug === 'atlin-cove' && (
+          <CommunityAtAGlance
+            name="Atlin Cove"
+            filter={listingsFilterParams}
+            asOf={snapshotUpdated}
+            types={[{ type: 'Home', one: 'home', many: 'homes' }]}
+            facts={[
+              <>
+                <strong>A new single-family neighborhood by Viera Builders</strong> in Viera West (Melbourne, FL 32940), off
+                Lake Andrew Drive behind Costco and across from Pangea Park. Viera Builders plans start at $457,000 and run
+                to about $606,900 before lot premiums and options.
+              </>,
+              <>
+                <strong>Plans:</strong> two collections, Baltic and Chesapeake, on 40- and 50-foot lots, about 1,692–3,037 sq
+                ft with 3–4 bedrooms, 2–3.5 baths and two-car garages (plans include the Brisa, Brisa II, Biloxi, Beacon,
+                Crestview, Coral, Caspian and Crystal). Model home at 9812 Palena Drive; contact Ryan before you visit.
+              </>,
+              <>
+                <strong>Community:</strong> a planned neighborhood pool and amenity center and walking and biking trails,
+                with natural gas, close to The Avenue Viera, I-95 and the Pineda Causeway to the beaches.
+              </>,
+            ]}
+          />
+        )}
+        {slug === 'tortoise-island' && (
+          <CommunityAtAGlance
+            name="Tortoise Island"
+            filter={listingsFilterParams}
+            asOf={snapshotUpdated}
+            types={[{ type: 'Home', one: 'home', many: 'homes' }]}
+            facts={[
+              <>
+                <strong>A 24-hour guard-gated waterfront community</strong> of 357 homesites on about 210 acres in South
+                Patrick Shores (Satellite Beach, FL 32937 addresses), with one gated entry off Tortoise Drive near the
+                Pineda Causeway. Built out mostly from the late 1970s to the early 2000s, so homes are resales.
+              </>,
+              <>
+                <strong>On the water:</strong> most homesites (about a third to nearly a full acre) sit on deep-water canals
+                or the Banana River with private docks, with boating access to the Indian River Lagoon and the
+                Intracoastal Waterway. Homes run roughly 2,300–6,700 sq ft. Canal depths vary; confirm for your boat.
+              </>,
+              <>
+                <strong>Amenities:</strong> the Tortoise Island Recreation Center with a pool, fitness center, tennis and
+                pickleball courts and a clubhouse, plus walking paths and preserved gopher tortoise habitat. Schools: Sea
+                Park Elementary, DeLaura Middle and Satellite High.
+              </>,
+            ]}
+          />
+        )}
         {/* Aquarina at a Glance (2026-11-27, AI-visibility push): Google
             quoted Zillow and Compass for Aquarina prices and this site for the
             HOA structure and amenities. Facts match the About section. */}
