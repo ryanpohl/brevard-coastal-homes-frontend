@@ -2,16 +2,21 @@ import * as api from '@/lib/api';
 import { cityListingsQueryParams } from '@/lib/constants';
 
 /**
- * "{City} Condos at a Glance" (2026-11-27, per Ryan; AI-visibility push,
- * Melbourne Beach condos first). Google's AI Overview for "melbourne beach
- * condos for sale" quoted Zillow for the price range, median list price,
- * days on market and settings, and quoted this site for rental rules. This
- * box puts all of that near the top, live from the MLS: what's for sale by
- * setting (oceanfront / riverfront / not on the water) with HOA fees, the
- * past 12 months of sales, and how many condos allow which rental terms.
- * Shown on the Condos page of cities in CONDO_GLANCE_CITIES.
+ * "{City} Condos/Homes at a Glance" (2026-11-27, per Ryan: "our #1 priority
+ * should be that we get quoted on Google AI & ChatGPT"; "use any numbers &
+ * statements that will increase our odds"). Google's AI Overviews for
+ * "melbourne beach condos for sale" / "melbourne beach real estate" quoted
+ * Zillow for the price range, median list price, days on market and
+ * settings. This box puts those facts near the top, live from the MLS: what's
+ * for sale by setting (oceanfront / riverfront / not on the water), price
+ * tiers, the past 12 months of sales, and for condos HOA fees and how many
+ * allow which rental terms.
+ *
+ * Condos box: Condos page of cities in CONDO_GLANCE_CITIES.
+ * Homes box: Homes page of cities in HOME_GLANCE_CITIES.
  */
-export const CONDO_GLANCE_CITIES = new Set(['melbourne-beach']);
+export const CONDO_GLANCE_CITIES = new Set(['melbourne-beach', 'satellite-beach', 'cocoa-beach', 'cape-canaveral', 'indian-harbour-beach']);
+export const HOME_GLANCE_CITIES = new Set(['melbourne-beach']);
 
 const PER_MONTH = { Monthly: 1, Quarterly: 1 / 3, Annually: 1 / 12, Yearly: 1 / 12, 'Semi-Annually': 1 / 6 };
 const short = (n) => (n >= 1e6 ? `$${parseFloat((n / 1e6).toFixed(2))}M` : `$${Math.round(n / 1000)}K`);
@@ -20,6 +25,21 @@ const v = (n, many, one) => (n === 1 ? one : many);
 const median = (xs) => {
   const s = [...xs].sort((a, b) => a - b);
   return s.length ? s[Math.floor((s.length - 1) / 2)] : null;
+};
+const list = (parts) => (parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}` : parts[0]);
+
+const TIERS = {
+  Condo: [
+    { max: 450000, label: (n) => `${n} under $450K` },
+    { max: 800000, label: (n) => `${n} from $450K to $800K` },
+    { max: Infinity, label: (n) => `${n} at $800K or more` },
+  ],
+  Home: [
+    { max: 600000, label: (n) => `${n} under $600K` },
+    { max: 1000000, label: (n) => `${n} from $600K to $1M` },
+    { max: 2000000, label: (n) => `${n} from $1M to $2M` },
+    { max: Infinity, label: (n) => `${n} at $2M or more` },
+  ],
 };
 
 // Shortest rental term a listing's rules allow, as one bucket.
@@ -50,13 +70,24 @@ function group(listings) {
   };
 }
 
-export default async function CondosAtAGlance({ citySlug, cityName, asOf, showBuildingsLink = false }) {
-  const base = { ...cityListingsQueryParams(citySlug), propertyType: 'Condo' };
-  const [data, sold] = await Promise.all([
-    api.getListings({ ...base, pageSize: 100 }).catch(() => null),
-    api.getSoldStats(base).catch(() => null),
-  ]);
-  const listings = (data?.results || []).filter((l) => l.status === 'Active' && typeof l.price === 'number' && l.price > 0);
+// Every active listing of this type in the city (up to 5 pages of 100).
+async function allListings(params) {
+  const out = [];
+  for (let page = 1; page <= 5; page += 1) {
+    const data = await api.getListings({ ...params, pageSize: 100, page });
+    const rows = data?.results || [];
+    out.push(...rows);
+    if (rows.length < 100 || (typeof data.total === 'number' && out.length >= data.total)) break;
+  }
+  return out;
+}
+
+export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType, showBuildingsLink = false }) {
+  const isCondo = propertyType === 'Condo';
+  const noun = isCondo ? { one: 'condo', many: 'condos', Many: 'Condos' } : { one: 'home', many: 'homes', Many: 'Homes' };
+  const base = { ...cityListingsQueryParams(citySlug), propertyType };
+  const [rows, sold] = await Promise.all([allListings(base).catch(() => []), api.getSoldStats(base).catch(() => null)]);
+  const listings = rows.filter((l) => l.status === 'Active' && typeof l.price === 'number' && l.price > 0);
   if (!listings.length) return null;
 
   const all = group(listings);
@@ -68,15 +99,19 @@ export default async function CondosAtAGlance({ citySlug, cityName, asOf, showBu
     .filter((s) => s.rows.length)
     .map((s) => ({ label: s.label, ...group(s.rows) }));
 
-  const tiers = {
-    entry: listings.filter((l) => l.price < 450000).length,
-    mid: listings.filter((l) => l.price >= 450000 && l.price < 800000).length,
-    luxury: listings.filter((l) => l.price >= 800000).length,
-  };
+  let prev = 0;
+  const tierParts = TIERS[propertyType].map((t) => {
+    const n = listings.filter((l) => l.price >= prev && l.price < t.max).length;
+    prev = t.max;
+    return t.label(n);
+  });
+
   const buckets = {};
-  for (const l of listings) {
-    const b = rentalBucket(l.rentalRestrictions);
-    if (b) buckets[b] = (buckets[b] || 0) + 1;
+  if (isCondo) {
+    for (const l of listings) {
+      const b = rentalBucket(l.rentalRestrictions);
+      if (b) buckets[b] = (buckets[b] || 0) + 1;
+    }
   }
   const withRules = Object.values(buckets).reduce((a, b) => a + b, 0);
   const rentalParts = [
@@ -88,18 +123,24 @@ export default async function CondosAtAGlance({ citySlug, cityName, asOf, showBu
     buckets.none && `${buckets.none} ${v(buckets.none, 'allow', 'allows')} no rentals`,
   ].filter(Boolean);
 
+  const headingId = `${noun.many}-glance-heading`;
   return (
-    <section className="hibc-prices" aria-labelledby="condos-glance-heading">
-      <h2 id="condos-glance-heading" className="hibc-prices__title">
-        {cityName} Condos at a Glance
+    <section className="hibc-prices" aria-labelledby={headingId}>
+      <h2 id={headingId} className="hibc-prices__title">
+        {cityName} {noun.Many} at a Glance
       </h2>
       <p className="glance-lead">
-        <strong>{all.count} condos</strong> are for sale in {cityName}, FL right now, from {short(all.low)} to{' '}
-        {short(all.high)}, with a median list price of {short(all.median)}.
+        <strong>
+          {all.count} {v(all.count, noun.many, noun.one)}
+        </strong>{' '}
+        {v(all.count, 'are', 'is')} for sale in {cityName}, FL right now, from {short(all.low)} to {short(all.high)}, with a
+        median list price of {short(all.median)}.
         {sold?.count >= 3 && sold.medianPrice
-          ? ` In the past 12 months, ${sold.count} condos sold at a median ${short(sold.medianPrice)}${
-              sold.medianDaysOnMarket != null ? `, after a median ${sold.medianDaysOnMarket} days on the market` : ''
-            }${sold.medianSaleToListPct != null ? `, at ${sold.medianSaleToListPct}% of asking` : ''}.`
+          ? ` In the past 12 months, ${sold.count} ${noun.many} sold at a median ${short(sold.medianPrice)}${
+              sold.medianPerSqft ? ` ($${sold.medianPerSqft} per sq ft)` : ''
+            }${sold.medianDaysOnMarket != null ? `, after a median ${sold.medianDaysOnMarket} days on the market` : ''}${
+              sold.medianSaleToListPct != null ? `, at ${sold.medianSaleToListPct}% of asking` : ''
+            }.`
           : ''}
       </p>
       <div className="glance-table-wrap">
@@ -110,7 +151,7 @@ export default async function CondosAtAGlance({ citySlug, cityName, asOf, showBu
               <th scope="col">For sale</th>
               <th scope="col">Price range</th>
               <th scope="col">Median</th>
-              <th scope="col">HOA a month</th>
+              {isCondo && <th scope="col">HOA a month</th>}
             </tr>
           </thead>
           <tbody>
@@ -120,31 +161,38 @@ export default async function CondosAtAGlance({ citySlug, cityName, asOf, showBu
                 <td>{s.count}</td>
                 <td>{s.low === s.high ? short(s.low) : `${short(s.low)}–${short(s.high)}`}</td>
                 <td>{short(s.median)}</td>
-                <td>
-                  {s.hoaLow == null ? '—' : s.hoaLow === s.hoaHigh ? money(s.hoaLow) : `${money(s.hoaLow)}–${money(s.hoaHigh)}`}
-                </td>
+                {isCondo && (
+                  <td>
+                    {s.hoaLow == null ? '—' : s.hoaLow === s.hoaHigh ? money(s.hoaLow) : `${money(s.hoaLow)}–${money(s.hoaHigh)}`}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       <p className="glance-lead" style={{ marginTop: 10 }}>
-        <strong>By price:</strong> {tiers.entry} under $450K, {tiers.mid} from $450K to $800K and {tiers.luxury} at $800K or
-        more.{showBuildingsLink ? (
+        <strong>By price:</strong> {list(tierParts)}.
+        {showBuildingsLink ? (
           <>
             {' '}
             <a href="#condo-buildings">Compare {cityName} condo buildings ↓</a>
           </>
         ) : null}
       </p>
-      {withRules >= 5 && rentalParts.length > 0 && (
+      {isCondo && withRules >= 5 && rentalParts.length > 0 && (
         <p className="glance-lead" style={{ marginTop: 10 }}>
-          <strong>Rental rules:</strong> of the {withRules} condos for sale that list their rental rules,{' '}
-          {rentalParts.length > 1 ? `${rentalParts.slice(0, -1).join(', ')} and ${rentalParts[rentalParts.length - 1]}` : rentalParts[0]}.
+          <strong>Rental rules:</strong> of the {withRules} condos for sale that list their rental rules, {list(rentalParts)}.
           Rules are set by each building, so confirm them on the listing.
         </p>
       )}
-      <p className="hibc-prices__note">From the Space Coast MLS as of {asOf}. HOA fees shown per month.</p>
+      <p className="hibc-prices__note">
+        From the Space Coast MLS as of {asOf}.{isCondo ? ' HOA fees shown per month.' : ''}
+      </p>
     </section>
   );
+}
+
+export default function CondosAtAGlance(props) {
+  return <PropertyAtAGlance {...props} propertyType="Condo" />;
 }

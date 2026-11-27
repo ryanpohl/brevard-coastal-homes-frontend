@@ -14,7 +14,9 @@ import { cityListingsQueryParams, WATER_LAND_PAGES } from '@/lib/constants';
  * months (count, median sold price, days on market, sold vs. asking).
  * Shown on a city's oceanfront pages for cities in OCEANFRONT_GLANCE_CITIES.
  */
-export const OCEANFRONT_GLANCE_CITIES = new Set(['melbourne-beach']);
+// Satellite Beach, Cocoa Beach, Cape Canaveral, Indian Harbour Beach added
+// 2026-11-27 (ChatGPT sends visitors to their oceanfront condo pages).
+export const OCEANFRONT_GLANCE_CITIES = new Set(['melbourne-beach', 'satellite-beach', 'cocoa-beach', 'cape-canaveral', 'indian-harbour-beach']);
 
 const TYPES = [
   { type: 'Home', label: 'Homes', slug: 'oceanfront-homes-for-sale' },
