@@ -63,15 +63,36 @@ export const metadata = {
 // (see lib/api.js's default revalidate). Both the nav and footer need the
 // full lists, so we fetch once here and pass down rather than re-fetching
 // in every component.
+// If the backend can't be reached, the menus fall back to the site's own
+// lists (2026-11-27: a brief listings-server block dropped Adelaide, Aripeka
+// and Summer Lakes from the menu): cities from NAV_FALLBACK_CITIES and
+// neighborhoods from lib/navNeighborhoods.js's built-in rows. Cities and
+// neighborhoods are fetched separately so one failing doesn't empty both.
+const NAV_FALLBACK_CITIES = [
+  ['cocoa-beach', 'Cocoa Beach'],
+  ['cape-canaveral', 'Cape Canaveral'],
+  ['satellite-beach', 'Satellite Beach'],
+  ['indian-harbour-beach', 'Indian Harbour Beach'],
+  ['indialantic', 'Indialantic'],
+  ['melbourne-beach', 'Melbourne Beach'],
+  ['melbourne', 'Melbourne'],
+  ['merritt-island', 'Merritt Island'],
+  ['rockledge', 'Rockledge'],
+  ['viera', 'Viera'],
+  ['viera-west', 'Viera West'],
+].map(([slug, name]) => ({ slug, name }));
+
 async function getNavData() {
-  try {
-    const [{ cities }, { neighborhoods }] = await Promise.all([api.getCities(), api.getNeighborhoods()]);
-    return { cities, neighborhoods: navNeighborhoods(neighborhoods) };
-  } catch {
-    // Backend unreachable at build/request time — render nav/footer empty
-    // rather than crashing the whole site.
-    return { cities: [], neighborhoods: navNeighborhoods([]) };
-  }
+  const [citiesRes, neighborhoodsRes] = await Promise.allSettled([api.getCities(), api.getNeighborhoods()]);
+  const cities =
+    citiesRes.status === 'fulfilled' && Array.isArray(citiesRes.value?.cities) && citiesRes.value.cities.length
+      ? citiesRes.value.cities
+      : NAV_FALLBACK_CITIES;
+  const neighborhoods =
+    neighborhoodsRes.status === 'fulfilled' && Array.isArray(neighborhoodsRes.value?.neighborhoods)
+      ? neighborhoodsRes.value.neighborhoods
+      : [];
+  return { cities, neighborhoods: navNeighborhoods(neighborhoods) };
 }
 
 export default async function RootLayout({ children }) {
