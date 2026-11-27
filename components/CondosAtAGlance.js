@@ -18,7 +18,7 @@ import { cityListingsQueryParams } from '@/lib/constants';
 export const CONDO_GLANCE_CITIES = new Set(['melbourne-beach', 'satellite-beach', 'cocoa-beach', 'cape-canaveral', 'indian-harbour-beach']);
 // Cocoa Beach added 2026-11-27 (Google's answer for "cocoa beach homes for sale"
 // was all Zillow).
-export const HOME_GLANCE_CITIES = new Set(['melbourne-beach', 'cocoa-beach']);
+export const HOME_GLANCE_CITIES = new Set(['melbourne-beach', 'cocoa-beach', 'satellite-beach']);
 
 const PER_MONTH = { Monthly: 1, Quarterly: 1 / 3, Annually: 1 / 12, Yearly: 1 / 12, 'Semi-Annually': 1 / 6 };
 const short = (n) => (n >= 1e6 ? `$${parseFloat((n / 1e6).toFixed(2))}M` : `$${Math.round(n / 1000)}K`);
