@@ -61,6 +61,10 @@ import { guideSlugForPage } from '@/lib/neighborhoodGuides';
 // listings database (2026-11-13): Harbor Island Beach Club is south of
 // Melbourne Beach on A1A, not in Indian Harbour Beach.
 const GUIDE_TOWN_FOR_NEIGHBORHOOD = { 'harbor-island-beach-club': 'melbourne-beach' };
+// Viera Builders communities with no build lots left (no new-construction
+// incentives to offer), per Ryan 2026-11-26: "arrivas village doesn't have
+// any more build lots available". These keep the Viera Builders Guide strip.
+const INCENTIVES_SOLD_OUT = new Set(['arrivas-village']);
 import AripekaBuilderPrices from '@/components/AripekaBuilderPrices';
 import AdelaideBuilderPrices from '@/components/AdelaideBuilderPrices';
 import { adelaideBuilderFaq } from '@/lib/adelaideBuilders';
@@ -2290,7 +2294,7 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             do this for viera builders too"), except their Lots views. */}
         {slug === 'adelaide' || (slug === 'aripeka' && primaryType !== 'Land') ? (
           <BuilderIncentivesSignup label={neighborhood.name} filter={alertFilter} />
-        ) : guideSlugForPage(slug) === 'viera-builders' && primaryType !== 'Land' ? (
+        ) : guideSlugForPage(slug) === 'viera-builders' && primaryType !== 'Land' && !INCENTIVES_SOLD_OUT.has(slug) ? (
           <BuilderIncentivesSignup label={neighborhood.name} filter={alertFilter} builder="Viera Builders" />
         ) : guideSlugForPage(slug) ? (
           <NeighborhoodGuideStrip slug={guideSlugForPage(slug)} label={neighborhood.name} filter={alertFilter} />
