@@ -54,6 +54,7 @@ import ListingResultsLayout from '@/components/ListingResultsLayout';
 import OutOfStateBuyers from '@/components/OutOfStateBuyers';
 import GuideStrip from '@/components/GuideStrip';
 import NeighborhoodGuideStrip from '@/components/NeighborhoodGuideStrip';
+import BuilderIncentivesSignup from '@/components/BuilderIncentivesSignup';
 import { guideSlugForPage } from '@/lib/neighborhoodGuides';
 
 // Relocation guide town for neighborhoods filed under the wrong city in the
@@ -2281,7 +2282,11 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           <NeighborhoodLinkRow cityName={`Other ${siblingLinks.cityName}`} links={siblingLinks.links} />
         )}
         {/* Relocation guide near the top (2026-11-13) — GuideStrip.js. */}
-        {guideSlugForPage(slug) ? (
+        {/* Adelaide: builder incentives signup in place of the guide strip
+            (2026-11-26, per Ryan) — see BuilderIncentivesSignup.js. */}
+        {slug === 'adelaide' ? (
+          <BuilderIncentivesSignup label={neighborhood.name} filter={alertFilter} />
+        ) : guideSlugForPage(slug) ? (
           <NeighborhoodGuideStrip slug={guideSlugForPage(slug)} label={neighborhood.name} filter={alertFilter} />
         ) : (
           <GuideStrip townSlug={GUIDE_TOWN_FOR_NEIGHBORHOOD[slug] || neighborhood.city?.slug} />
