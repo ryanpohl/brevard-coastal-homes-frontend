@@ -16,7 +16,7 @@ import { cityListingsQueryParams, WATER_LAND_PAGES } from '@/lib/constants';
  */
 // Satellite Beach, Cocoa Beach, Cape Canaveral, Indian Harbour Beach added
 // 2026-11-27 (ChatGPT sends visitors to their oceanfront condo pages).
-export const OCEANFRONT_GLANCE_CITIES = new Set(['melbourne-beach', 'satellite-beach', 'cocoa-beach', 'cape-canaveral', 'indian-harbour-beach']);
+export const OCEANFRONT_GLANCE_CITIES = new Set(['melbourne-beach', 'satellite-beach', 'cocoa-beach', 'cape-canaveral', 'indian-harbour-beach', 'indialantic']);
 
 const TYPES = [
   { type: 'Home', label: 'Homes', slug: 'oceanfront-homes-for-sale' },
