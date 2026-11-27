@@ -2680,6 +2680,34 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             ]}
           />
         )}
+        {/* Arrivas Village at a Glance (2026-11-27): Google quoted The Burgman
+            Group and Carpenter Kessel; facts match its About text. */}
+        {slug === 'arrivas-village' && (
+          <CommunityAtAGlance
+            name="Arrivas Village"
+            filter={listingsFilterParams}
+            asOf={snapshotUpdated}
+            types={[{ type: 'Home', one: 'home', many: 'homes' }]}
+            facts={[
+              <>
+                <strong>A Viera Builders neighborhood of just over 200 Spanish Colonial&ndash;style courtyard homes</strong>,
+                built in two phases, in central Viera West (Melbourne, FL 32940), across from The Avenue Viera with Duran
+                Golf Club right behind it. Viera Builders has sold out its homesites, so homes here are resales.
+              </>,
+              <>
+                <strong>Homes</strong> have arched doorways, wrought-iron gates and barrel-tile roofs, with balconies,
+                verandas and private courtyards (some with summer kitchens) and rear-entry garages off alleys, which keeps
+                the sidewalk-lined streets walkable and golf-cart friendly. Floor plans run from about 1,500 to over 3,500
+                sq ft.
+              </>,
+              <>
+                <strong>Amenities and HOA:</strong> a community pool, dog park and playground; the association, the Central
+                Viera Community Association, handles exterior painting and landscaping for many homes. Most homes also
+                carry a Viera West CDD fee; confirm both on each listing.
+              </>,
+            ]}
+          />
+        )}
         {/* Aquarina at a Glance (2026-11-27, AI-visibility push): Google
             quoted Zillow and Compass for Aquarina prices and this site for the
             HOA structure and amenities. Facts match the About section. */}
