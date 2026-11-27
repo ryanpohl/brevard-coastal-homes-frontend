@@ -2569,6 +2569,63 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
           <NeighborhoodLinkRow cityName={`Other ${siblingLinks.cityName}`} links={siblingLinks.links} />
         )}
         {/* Relocation guide near the top (2026-11-13) — GuideStrip.js. */}
+        {/* Pangea Park and Reeling Park at a Glance (2026-11-27): Google quoted
+            REMAX, Zillow and Jack Jeffcoat for their prices and plans. Facts
+            match each page's area-guide text. Tested once the API allows. */}
+        {slug === 'pangea-park' && (
+          <CommunityAtAGlance
+            name="Pangea Park"
+            filter={listingsFilterParams}
+            asOf={snapshotUpdated}
+            types={[
+              { type: 'Home', one: 'single-family home', many: 'single-family homes' },
+              { type: 'Condo', one: 'villa', many: 'villas' },
+            ]}
+            facts={[
+              <>
+                <strong>A Viera Builders community</strong> in South Viera (Melbourne, FL 32940), mixing single-family
+                homes in Craftsman, Modern Coastal and Farmhouse styles with maintenance-free paired and multiplex villas
+                (listed as condos on the MLS).
+              </>,
+              <>
+                <strong>Villas</strong> run about 1,480–1,920 sq ft from the Iris, Lilac, Emerald and Sapphire plans; the
+                villa HOA covers lawn care, pest control, exterior paint, the roof and exterior insurance. Every home has
+                Google Smart Home products, FPL BuildSmart construction (up to 30% lower energy costs) and Viera Builders&rsquo;
+                Healthy Home Advantage certification.
+              </>,
+              <>
+                <strong>Amenities:</strong> a neighborhood park with a pavilion, playground, tennis courts and a lap pool,
+                close to The Avenue Viera, Costco, Duran Golf Club, the Brevard Zoo and Viera Hospital. Schools: Viera
+                Elementary and Viera High, with Viera Middle or Johnson Middle (confirm by address).
+              </>,
+            ]}
+          />
+        )}
+        {slug === 'reeling-park' && (
+          <CommunityAtAGlance
+            name="Reeling Park"
+            filter={listingsFilterParams}
+            asOf={snapshotUpdated}
+            types={[{ type: 'Home', one: 'home', many: 'homes' }]}
+            facts={[
+              <>
+                <strong>A Viera Builders courtyard-home community</strong> in eastern Addison Village, Viera (Melbourne,
+                FL 32940), with Spanish Colonial&ndash;style homes from the San Marco and Castillo Courtyard Collections,
+                built on Traditional Neighborhood Design principles. New construction starts in the high $400,000s.
+              </>,
+              <>
+                <strong>Homes</strong> run about 1,850–3,738 sq ft, mostly 3–5 bedrooms, on lots of roughly a tenth to a
+                quarter acre, with optional golf-cart garages and FPL BuildSmart construction (up to 30% lower energy
+                costs).
+              </>,
+              <>
+                <strong>Amenities:</strong> a dog park, half-basketball court, playground, sand volleyball, a soccer field,
+                picnic areas and a pavilion, plus Addison Village Club membership with two pools, tennis and pickleball.
+                Schools: mostly Quest Elementary, DeLaura Middle and Viera High (confirm by address).
+              </>,
+            ]}
+          />
+        )}
         {/* Aquarina at a Glance (2026-11-27, AI-visibility push): Google
             quoted Zillow and Compass for Aquarina prices and this site for the
             HOA structure and amenities. Facts match the About section. */}
