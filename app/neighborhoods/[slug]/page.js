@@ -408,7 +408,7 @@ function AdelaideAtAGlance({ snapshot, asOf }) {
       </ul>
       <ul className="glance-facts">
         <li>
-          <strong>Custom homes start from about $1.5 million.</strong> Adelaide is a 460-acre guard-gated community
+          <strong>Custom homes start from about $1.2–$1.5 million.</strong> Adelaide is a 460-acre guard-gated community
           (the gate is staffed 24/7) in Viera West, Rockledge, FL 32955, around the 120-acre Lake Adelaide. Over a
           third of it is water or preserve.
         </li>
