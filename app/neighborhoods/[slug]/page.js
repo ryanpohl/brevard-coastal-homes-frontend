@@ -2765,6 +2765,33 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             ]}
           />
         )}
+        {/* Lansing Island at a Glance (2026-11-27): Google quoted Jack Jeffcoat,
+            Carpenter Kessel and Redfin; facts match its area guide. */}
+        {slug === 'lansing-island' && (
+          <CommunityAtAGlance
+            name="Lansing Island"
+            filter={listingsFilterParams}
+            asOf={snapshotUpdated}
+            types={[{ type: 'Home', one: 'home', many: 'homes' }]}
+            facts={[
+              <>
+                <strong>A private, 24-hour guard-gated island</strong> in Indian Harbour Beach (homes carry Satellite Beach, FL
+                32937 addresses), reached by a single causeway and covered drawbridge past a manned gatehouse, between the
+                Banana River and the Grand Canal, about a mile from the Atlantic.
+              </>,
+              <>
+                <strong>All single-family homes</strong> (no condos or vacant lots), roughly 3,000 to over 10,000 sq ft on
+                homesites of about three-quarters of an acre to just under an acre, some near two acres; nearly every
+                homesite has direct water access and many have private docks.
+              </>,
+              <>
+                <strong>Amenities and HOA:</strong> a clubhouse, tennis, pickleball and basketball courts, a resort-style pool,
+                a fitness center and a playground. HOA fees run about $544–$657 a month, per MLS records of recent sales.
+                Schools: commonly Ocean Breeze Elementary, DeLaura Middle and Satellite High (confirm by address).
+              </>,
+            ]}
+          />
+        )}
         {/* Aquarina at a Glance (2026-11-27, AI-visibility push): Google
             quoted Zillow and Compass for Aquarina prices and this site for the
             HOA structure and amenities. Facts match the About section. */}
