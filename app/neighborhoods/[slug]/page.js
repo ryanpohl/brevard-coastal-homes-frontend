@@ -2626,6 +2626,60 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
             ]}
           />
         )}
+        {/* Summer Lakes and Laurasia at a Glance (2026-11-27): Google quoted
+            Jack Jeffcoat and Zillow for prices, sizes and fees. Facts match each
+            page's About text; tested once the API allows. */}
+        {slug === 'summer-lakes' && (
+          <CommunityAtAGlance
+            name="Summer Lakes"
+            filter={listingsFilterParams}
+            asOf={snapshotUpdated}
+            types={[{ type: 'Home', one: 'estate home', many: 'estate homes' }]}
+            facts={[
+              <>
+                <strong>A guard-gated lakefront community</strong> of about 94 estate homes in central Viera (Rockledge, FL
+                32955 addresses), built around an approximately 80-acre lake crossed by a pedestrian trestle bridge.
+                Built out, so homes are resales.
+              </>,
+              <>
+                <strong>Homes</strong> date mainly from 2006–2007 and run roughly 3,200–9,000 sq ft, often with saltwater
+                pools and summer kitchens, on some of the largest lots in any gated Viera community (about 0.7–0.9
+                acres); most have lake views and many have private docks. The lake supports kayaking, paddle boating
+                and sailing.
+              </>,
+              <>
+                <strong>Location:</strong> minutes from The Avenue Viera, Duran Golf Club and Viera Hospital; zoned for Viera
+                High School. Also called Summer Lakes Rockledge or Summer Lakes Viera West.
+              </>,
+            ]}
+          />
+        )}
+        {slug === 'laurasia' && (
+          <CommunityAtAGlance
+            name="Laurasia"
+            filter={listingsFilterParams}
+            asOf={snapshotUpdated}
+            types={[{ type: 'Home', one: 'home', many: 'homes' }]}
+            facts={[
+              <>
+                <strong>A gated, new-construction Viera Builders community</strong> of modern Mediterranean-style homes in
+                Viera, FL 32940, walkable and golf-cart friendly. Viera Builders plans start at $790,400 (Carrington) and
+                run to $971,400 (Altamura II), as of November 2026.
+              </>,
+              <>
+                <strong>14 one- and two-story plans</strong> in two collections, Inglenook (65-ft lots) and Silverado (75-ft
+                lots), about 2,670–3,940 sq ft and 3–5 bedrooms; several Silverado plans have a two-car plus golf-cart
+                garage. Every home has FPL BuildSmart construction, Brilliant Smart Home technology and Healthy Home
+                Advantage, with a 2-year builder and 10-year structural warranty.
+              </>,
+              <>
+                <strong>Model home:</strong> 2755 Pelagornis Drive, Viera (generally Mon–Sat 10–6, Sun 12–5; contact Ryan
+                before you visit). HOA $400 a quarter. Schools: Viera Elementary, Viera Middle and Viera High, with
+                Viera Charter (K–8) an option. Close to Duran Golf Club, The Avenue Viera, Costco and the Brevard Zoo.
+              </>,
+            ]}
+          />
+        )}
         {/* Aquarina at a Glance (2026-11-27, AI-visibility push): Google
             quoted Zillow and Compass for Aquarina prices and this site for the
             HOA structure and amenities. Facts match the About section. */}
