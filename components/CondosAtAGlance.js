@@ -86,7 +86,11 @@ async function allListings(params) {
 }
 
 // `extra`: an optional closing paragraph (e.g. Viera West's community links).
-export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType, showBuildingsLink = false, extra = null }) {
+// `mode` (2026-11-28, per Ryan: too tall above the listings on phones): 'top'
+// shows the heading and the opening sentence (the numbers AI answers quote)
+// with a link down; 'details' shows the setting table, bedrooms, sizes, price
+// tiers, the extra paragraph and rental rules below the listings.
+export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType, showBuildingsLink = false, extra = null, mode = 'top' }) {
   const isCondo = propertyType === 'Condo';
   const noun = isCondo ? { one: 'condo', many: 'condos', Many: 'Condos' } : { one: 'home', many: 'homes', Many: 'Homes' };
   const base = { ...cityListingsQueryParams(citySlug), propertyType };
@@ -170,6 +174,87 @@ export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType
   ].filter(Boolean);
 
   const headingId = `${noun.many}-glance-heading`;
+  const detailsId = `${noun.many}-details-heading`;
+  if (mode === 'details') {
+    return (
+      <section className="hibc-prices" aria-labelledby={detailsId}>
+        <h2 id={detailsId} className="hibc-prices__title">
+          {cityName} {noun.Many}: Market Details
+        </h2>
+        {/* Inland towns (Viera West, 2026-11-27) have no ocean or river split, so
+            the setting table only shows when there is more than one setting. */}
+        {settings.length > 1 && (
+        <div className="glance-table-wrap">
+          <table className="hibc-prices__table glance-table">
+            <thead>
+              <tr>
+                <th scope="col">Setting</th>
+                <th scope="col">For sale</th>
+                <th scope="col">Price range</th>
+                <th scope="col">Median</th>
+                {isCondo && <th scope="col">HOA a month</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {settings.map((s) => (
+                <tr key={s.label}>
+                  <th scope="row">{s.label}</th>
+                  <td>{s.count}</td>
+                  <td>{s.low === s.high ? short(s.low) : `${short(s.low)}–${short(s.high)}`}</td>
+                  <td>{short(s.median)}</td>
+                  {isCondo && (
+                    <td>
+                      {s.hoaLow == null ? '—' : s.hoaLow === s.hoaHigh ? money(s.hoaLow) : `${money(s.hoaLow)}–${money(s.hoaHigh)}`}
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        )}
+        {settings.length <= 1 && isCondo && all.hoaLow != null && (
+          <p className="glance-lead" style={{ marginTop: 10 }}>
+            <strong>HOA:</strong> about{' '}
+            {all.hoaLow === all.hoaHigh ? money(all.hoaLow) : `${money(all.hoaLow)}–${money(all.hoaHigh)}`} a month.
+          </p>
+        )}
+        {bedLine && (
+          <p className="glance-lead" style={{ marginTop: 10 }}>
+            <strong>By bedrooms:</strong> {bedLine}.
+          </p>
+        )}
+        {sizeLine && (
+          <p className="glance-lead" style={{ marginTop: 10 }}>
+            <strong>Sizes:</strong> {sizeLine}.
+          </p>
+        )}
+        <p className="glance-lead" style={{ marginTop: 10 }}>
+          <strong>By price:</strong> {list(tierParts)}.
+          {showBuildingsLink ? (
+            <>
+              {' '}
+              <a href="#condo-buildings">Compare {cityName} condo buildings ↓</a>
+            </>
+          ) : null}
+        </p>
+        {extra && (
+          <p className="glance-lead" style={{ marginTop: 10 }}>
+            {extra}
+          </p>
+        )}
+        {isCondo && withRules >= 5 && rentalParts.length > 0 && (
+          <p className="glance-lead" style={{ marginTop: 10 }}>
+            <strong>Rental rules:</strong> of the {withRules} condos for sale that list their rental rules, {list(rentalParts)}.
+            Rules are set by each building, so confirm them on the listing.
+          </p>
+        )}
+        <p className="hibc-prices__note">
+          From the Space Coast MLS as of {asOf}.{isCondo ? ' HOA fees shown per month.' : ''}
+        </p>
+      </section>
+    );
+  }
   return (
     <section className="hibc-prices" aria-labelledby={headingId}>
       <h2 id={headingId} className="hibc-prices__title">
@@ -189,76 +274,10 @@ export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType
             }.`
           : ''}
       </p>
-      {/* Inland towns (Viera West, 2026-11-27) have no ocean or river split, so
-          the setting table only shows when there is more than one setting. */}
-      {settings.length > 1 && (
-      <div className="glance-table-wrap">
-        <table className="hibc-prices__table glance-table">
-          <thead>
-            <tr>
-              <th scope="col">Setting</th>
-              <th scope="col">For sale</th>
-              <th scope="col">Price range</th>
-              <th scope="col">Median</th>
-              {isCondo && <th scope="col">HOA a month</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {settings.map((s) => (
-              <tr key={s.label}>
-                <th scope="row">{s.label}</th>
-                <td>{s.count}</td>
-                <td>{s.low === s.high ? short(s.low) : `${short(s.low)}–${short(s.high)}`}</td>
-                <td>{short(s.median)}</td>
-                {isCondo && (
-                  <td>
-                    {s.hoaLow == null ? '—' : s.hoaLow === s.hoaHigh ? money(s.hoaLow) : `${money(s.hoaLow)}–${money(s.hoaHigh)}`}
-                  </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      )}
-      {settings.length <= 1 && isCondo && all.hoaLow != null && (
-        <p className="glance-lead" style={{ marginTop: 10 }}>
-          <strong>HOA:</strong> about{' '}
-          {all.hoaLow === all.hoaHigh ? money(all.hoaLow) : `${money(all.hoaLow)}–${money(all.hoaHigh)}`} a month.
-        </p>
-      )}
-      {bedLine && (
-        <p className="glance-lead" style={{ marginTop: 10 }}>
-          <strong>By bedrooms:</strong> {bedLine}.
-        </p>
-      )}
-      {sizeLine && (
-        <p className="glance-lead" style={{ marginTop: 10 }}>
-          <strong>Sizes:</strong> {sizeLine}.
-        </p>
-      )}
-      <p className="glance-lead" style={{ marginTop: 10 }}>
-        <strong>By price:</strong> {list(tierParts)}.
-        {showBuildingsLink ? (
-          <>
-            {' '}
-            <a href="#condo-buildings">Compare {cityName} condo buildings ↓</a>
-          </>
-        ) : null}
-      </p>
-      {extra && (
-        <p className="glance-lead" style={{ marginTop: 10 }}>
-          {extra}
-        </p>
-      )}
-      {isCondo && withRules >= 5 && rentalParts.length > 0 && (
-        <p className="glance-lead" style={{ marginTop: 10 }}>
-          <strong>Rental rules:</strong> of the {withRules} condos for sale that list their rental rules, {list(rentalParts)}.
-          Rules are set by each building, so confirm them on the listing.
-        </p>
-      )}
-      <p className="hibc-prices__note">
-        From the Space Coast MLS as of {asOf}.{isCondo ? ' HOA fees shown per month.' : ''}
+      <p className="hibc-prices__note" style={{ marginTop: 6 }}>
+        <a href={`#${detailsId}`}>
+          More {cityName} {noun.one} market details: by setting, bedrooms, sizes and price ↓
+        </a>
       </p>
     </section>
   );

@@ -1058,6 +1058,30 @@ export default async function CityListingsPage({ params, searchParams: searchPar
   // always centered on the right place even with zero pins to show yet.
   const mapCenter = city.latitude != null && city.longitude != null ? { lat: city.latitude, lng: city.longitude } : null;
 
+  // The homes box's closing paragraph (Viera West's community links,
+  // Indian Harbour Beach's location line), shown in its details half.
+  const homeGlanceExtra =
+        citySlug === 'viera-west' ? (
+          <>
+            <strong>Communities:</strong> gated custom-home communities{' '}
+            <Link href="/neighborhoods/adelaide">Adelaide</Link>, <Link href="/neighborhoods/aripeka">Aripeka</Link> and{' '}
+            <Link href="/neighborhoods/summer-lakes">Summer Lakes</Link>; Viera Builders communities including{' '}
+            <Link href="/neighborhoods/laurasia">Laurasia</Link>, <Link href="/neighborhoods/pangea-park">Pangea Park</Link>,{' '}
+            <Link href="/neighborhoods/reeling-park">Reeling Park</Link> and <Link href="/neighborhoods/atlin-cove">Atlin Cove</Link>;
+            and 55+ communities <Link href="/neighborhoods/del-webb-viera">Del Webb at Viera</Link>,{' '}
+            <Link href="/neighborhoods/heritage-isle">Heritage Isle</Link> and{' '}
+            <Link href="/neighborhoods/bridgewater-at-viera">Bridgewater at Viera</Link>.
+          </>
+        ) : citySlug === 'indian-harbour-beach' ? (
+          <>
+            <strong>Location:</strong> Indian Harbour Beach sits on the barrier island between the Atlantic Ocean and
+            the Banana River, south of Satellite Beach and north of the Eau Gallie Causeway, with quick access to A1A
+            and mainland Melbourne. Many homes are on residential canals with boat access to the river; others are a
+            short walk to the beach, Bicentennial Beach Park and Gleason Park. Most homes are zoned for Ocean
+            Breeze Elementary, Hoover Middle and Satellite High.
+          </>
+        ) : null;
+
   return (
     <div>
       {combinedJsonLd.length > 0 && (
@@ -1135,28 +1159,7 @@ export default async function CityListingsPage({ params, searchParams: searchPar
             cityName={city.name}
             asOf={asOf}
             propertyType="Home"
-            extra={
-              citySlug === 'viera-west' ? (
-                <>
-                  <strong>Communities:</strong> gated custom-home communities{' '}
-                  <Link href="/neighborhoods/adelaide">Adelaide</Link>, <Link href="/neighborhoods/aripeka">Aripeka</Link> and{' '}
-                  <Link href="/neighborhoods/summer-lakes">Summer Lakes</Link>; Viera Builders communities including{' '}
-                  <Link href="/neighborhoods/laurasia">Laurasia</Link>, <Link href="/neighborhoods/pangea-park">Pangea Park</Link>,{' '}
-                  <Link href="/neighborhoods/reeling-park">Reeling Park</Link> and <Link href="/neighborhoods/atlin-cove">Atlin Cove</Link>;
-                  and 55+ communities <Link href="/neighborhoods/del-webb-viera">Del Webb at Viera</Link>,{' '}
-                  <Link href="/neighborhoods/heritage-isle">Heritage Isle</Link> and{' '}
-                  <Link href="/neighborhoods/bridgewater-at-viera">Bridgewater at Viera</Link>.
-                </>
-              ) : citySlug === 'indian-harbour-beach' ? (
-                <>
-                  <strong>Location:</strong> Indian Harbour Beach sits on the barrier island between the Atlantic Ocean and
-                  the Banana River, south of Satellite Beach and north of the Eau Gallie Causeway, with quick access to A1A
-                  and mainland Melbourne. Many homes are on residential canals with boat access to the river; others are a
-                  short walk to the beach, Bicentennial Beach Park and Gleason Park. Most homes are zoned for Ocean
-                  Breeze Elementary, Hoover Middle and Satellite High.
-                </>
-              ) : null
-            }
+            extra={homeGlanceExtra}
           />
         )}
         {/* Area Guide link (2026-09-24, per Ryan: "Add a link to the top of
@@ -1295,6 +1298,14 @@ export default async function CityListingsPage({ params, searchParams: searchPar
           page={page}
           totalPages={totalPages}
         />
+        {/* Details halves of the town "at a Glance" boxes (2026-11-28, per Ryan:
+            too tall above the listings on phones). */}
+        {CONDO_GLANCE_CITIES.has(citySlug) && propertySlug === 'condos-for-sale' && (
+          <CondosAtAGlance citySlug={citySlug} cityName={city.name} asOf={asOf} showBuildingsLink={Boolean(condoComparison?.length)} mode="details" />
+        )}
+        {HOME_GLANCE_CITIES.has(citySlug) && propertySlug === 'homes-for-sale' && (
+          <PropertyAtAGlance citySlug={citySlug} cityName={city.name} asOf={asOf} propertyType="Home" extra={homeGlanceExtra} mode="details" />
+        )}
         {oceanfrontAlert && (
           <ListingAlertSignup
             label={oceanfrontAlert.label}
