@@ -97,8 +97,20 @@ export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType
   const isCondo = propertyType === 'Condo';
   const noun = isCondo ? { one: 'condo', many: 'condos', Many: 'Condos' } : { one: 'home', many: 'homes', Many: 'Homes' };
   const base = { ...cityListingsQueryParams(citySlug), propertyType };
-  const [rows, sold] = await Promise.all([allListings(base).catch(() => []), api.getSoldStats(base).catch(() => null)]);
+  // The other type's count for a combined line (2026-11-28: Google answers
+  // "cocoa beach homes for sale" with homes, condos and townhomes together).
+  const otherType = isCondo ? 'Home' : 'Condo';
+  const otherSet = isCondo ? HOME_GLANCE_CITIES : CONDO_GLANCE_CITIES;
+  const [rows, sold, other] = await Promise.all([
+    allListings(base).catch(() => []),
+    api.getSoldStats(base).catch(() => null),
+    mode === 'top' && otherSet.has(citySlug)
+      ? allListings({ ...base, propertyType: otherType }).catch(() => null)
+      : null,
+  ]);
   const listings = rows.filter((l) => l.status === 'Active' && typeof l.price === 'number' && l.price > 0);
+  // Counted the same way as this box's own listings, so the two boxes agree.
+  const otherCount = other ? other.filter((l) => l.status === 'Active' && typeof l.price === 'number' && l.price > 0).length : 0;
   if (!listings.length) return null;
 
   const all = group(listings);
@@ -276,6 +288,16 @@ export async function PropertyAtAGlance({ citySlug, cityName, asOf, propertyType
               sold.medianSaleToListPct != null ? `, at ${sold.medianSaleToListPct}% of asking` : ''
             }.`
           : ''}
+        {otherCount > 0 ? (
+          <>
+            {' '}Counting {isCondo ? 'single-family homes' : 'condos'} too, {(all.count + otherCount).toLocaleString('en-US')} homes
+            and condos are for sale in {cityName} (
+            <a href={`/${citySlug}/${isCondo ? 'homes' : 'condos'}-for-sale`}>
+              {otherCount} {isCondo ? 'homes' : 'condos'}
+            </a>
+            ).
+          </>
+        ) : null}
       </p>
       <p className="hibc-prices__note" style={{ marginTop: 6 }}>
         <a href={`#${detailsId}`}>
