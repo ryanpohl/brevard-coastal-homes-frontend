@@ -19,7 +19,7 @@ export const CONDO_GLANCE_CITIES = new Set(['melbourne-beach', 'satellite-beach'
 // Cocoa Beach added 2026-11-27 (Google's answer for "cocoa beach homes for sale"
 // was all Zillow).
 // Indian Harbour Beach added 2026-11-27.
-export const HOME_GLANCE_CITIES = new Set(['melbourne-beach', 'cocoa-beach', 'satellite-beach', 'indialantic', 'indian-harbour-beach', 'merritt-island', 'viera-west', 'viera']);
+export const HOME_GLANCE_CITIES = new Set(['melbourne-beach', 'cocoa-beach', 'satellite-beach', 'indialantic', 'indian-harbour-beach', 'merritt-island', 'viera-west', 'viera', 'melbourne', 'rockledge']);
 
 const PER_MONTH = { Monthly: 1, Quarterly: 1 / 3, Annually: 1 / 12, Yearly: 1 / 12, 'Semi-Annually': 1 / 6 };
 const short = (n) => (n >= 1e6 ? `$${parseFloat((n / 1e6).toFixed(2))}M` : `$${Math.round(n / 1000)}K`);
@@ -80,7 +80,10 @@ async function allListings(params) {
     const data = await api.getListings({ ...params, pageSize: 100, page });
     const rows = data?.results || [];
     out.push(...rows);
-    if (rows.length < 100 || (typeof data.total === 'number' && out.length >= data.total)) break;
+    // Stop on the server's page count, not a short page: getListings drops
+    // rental/lease artifacts from each page, so a full page can come back
+    // with fewer than 100 rows (2026-11-28: Melbourne homes showed 98 of 441).
+    if (!rows.length || page >= (data?.totalPages || 1)) break;
   }
   return out;
 }
