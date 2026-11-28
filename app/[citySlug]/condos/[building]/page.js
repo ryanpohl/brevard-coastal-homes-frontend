@@ -43,8 +43,13 @@ async function load(params) {
   } catch {
     // Fall back to the slug below.
   }
+  // Cocoa has no town pages, only Cocoa Village (2026-11-28): its buildings
+  // link back to the Cocoa Village page instead of /cocoa/condos-for-sale.
+  if (citySlug === 'cocoa') {
+    return { citySlug, building, cityName: 'Cocoa Village', parentHref: '/neighborhoods/cocoa-village', parentLabel: 'Cocoa Village Homes & Condos for Sale' };
+  }
   const cityName = city?.name || citySlug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-  return { citySlug, building, cityName };
+  return { citySlug, building, cityName, parentHref: `/${citySlug}/condos-for-sale`, parentLabel: `${cityName} Condos for Sale` };
 }
 
 export async function generateMetadata({ params }) {
@@ -64,7 +69,7 @@ export async function generateMetadata({ params }) {
 export default async function CondoBuildingPage({ params }) {
   const page = await load(params);
   if (!page) notFound();
-  const { citySlug, building, cityName } = page;
+  const { citySlug, building, cityName, parentHref, parentLabel } = page;
   const data = await getCondoBuildingData(citySlug, building);
   const name = building.name;
   const sold = data?.soldStats && data.soldStats.count ? data.soldStats : null;
@@ -136,7 +141,7 @@ export default async function CondoBuildingPage({ params }) {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
-      { '@type': 'ListItem', position: 2, name: `${cityName} Condos for Sale`, item: `${SITE_URL}/${citySlug}/condos-for-sale` },
+      { '@type': 'ListItem', position: 2, name: parentLabel, item: `${SITE_URL}${parentHref}` },
       { '@type': 'ListItem', position: 3, name: `${name} Condos`, item: `${SITE_URL}/${citySlug}/condos/${building.slug}` },
     ],
   };
@@ -146,8 +151,8 @@ export default async function CondoBuildingPage({ params }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <div className="container" style={{ padding: '28px clamp(16px, 4vw, 56px) 8px', maxWidth: 1100 }}>
         <nav style={{ fontSize: 14, color: 'var(--color-muted-dark)', marginBottom: 12 }}>
-          <Link href={`/${citySlug}/condos-for-sale`} style={{ color: 'inherit', textDecoration: 'underline' }}>
-            {cityName} Condos for Sale
+          <Link href={parentHref} style={{ color: 'inherit', textDecoration: 'underline' }}>
+            {parentLabel}
           </Link>{' '}
           › {name}
         </nav>
@@ -296,7 +301,7 @@ export default async function CondoBuildingPage({ params }) {
         </p>
         <BrokerageNote block />
         <p style={{ marginTop: 16 }}>
-          <Link href={`/${citySlug}/condos-for-sale`} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
+          <Link href={parentHref} style={{ color: '#000', textDecoration: 'underline', fontWeight: 600 }}>
             See all {cityName} condos for sale &rarr;
           </Link>
           {/* Oceanfront buildings also link the city's oceanfront condo page

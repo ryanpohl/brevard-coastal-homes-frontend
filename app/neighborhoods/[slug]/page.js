@@ -56,6 +56,7 @@ import GuideStrip from '@/components/GuideStrip';
 import NeighborhoodGuideStrip from '@/components/NeighborhoodGuideStrip';
 import BuilderIncentivesSignup from '@/components/BuilderIncentivesSignup';
 import CommunityAtAGlance from '@/components/CommunityAtAGlance';
+import CondoBuildingDirectory from '@/components/CondoBuildingDirectory';
 import { guideSlugForPage } from '@/lib/neighborhoodGuides';
 
 // Relocation guide town for neighborhoods filed under the wrong city in the
@@ -3011,6 +3012,15 @@ export default async function NeighborhoodListingsPage({ params: paramsPromise, 
         {/* Builder starting prices (2026-11-05, per Ryan), below the listings. */}
         {/* Details halves of the "at a Glance" boxes (2026-11-27). */}
         {glanceProps && <CommunityAtAGlance {...glanceProps} mode="details" />}
+        {/* Cocoa Village condo buildings (2026-11-28). */}
+        {slug === 'cocoa-village' && (
+          <CondoBuildingDirectory
+            citySlug="cocoa"
+            cityName="Cocoa Village"
+            heading="Cocoa Village Condo Buildings"
+            intro="Riverfront and walk-to-the-village condo buildings in Cocoa Village with their own pages: listings, recent sales, HOA fees and rental rules."
+          />
+        )}
         {slug === 'adelaide' && <AdelaideAtAGlance snapshot={communitySnapshot} asOf={snapshotUpdated} mode="details" />}
         {isAripeka && primaryType !== 'Land' && (
           <AripekaAtAGlance snapshot={communitySnapshot} sold={marketStats?.sold} asOf={snapshotUpdated} mode="details" />
