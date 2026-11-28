@@ -1072,6 +1072,18 @@ export default async function CityListingsPage({ params, searchParams: searchPar
             <Link href="/neighborhoods/heritage-isle">Heritage Isle</Link> and{' '}
             <Link href="/neighborhoods/bridgewater-at-viera">Bridgewater at Viera</Link>.
           </>
+        ) : citySlug === 'viera' ? (
+          <>
+            <strong>Communities:</strong> this page covers Viera east of I-95, including Viera East,{' '}
+            <Link href="/neighborhoods/suntree">Suntree</Link> and{' '}
+            <Link href="/neighborhoods/modern-duran">Modern Duran</Link>. Viera&rsquo;s newer gated and Viera Builders
+            communities are west of I-95 on the <Link href="/viera-west/homes-for-sale">Viera West homes page</Link>:{' '}
+            <Link href="/neighborhoods/adelaide">Adelaide</Link>, <Link href="/neighborhoods/aripeka">Aripeka</Link>,{' '}
+            <Link href="/neighborhoods/summer-lakes">Summer Lakes</Link>, <Link href="/neighborhoods/pangea-park">Pangea Park</Link>,{' '}
+            <Link href="/neighborhoods/laurasia">Laurasia</Link> and the 55+ communities{' '}
+            <Link href="/neighborhoods/del-webb-viera">Del Webb at Viera</Link> and{' '}
+            <Link href="/neighborhoods/heritage-isle">Heritage Isle</Link>.
+          </>
         ) : citySlug === 'indian-harbour-beach' ? (
           <>
             <strong>Location:</strong> Indian Harbour Beach sits on the barrier island between the Atlantic Ocean and
