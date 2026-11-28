@@ -15,7 +15,7 @@ import { cityListingsQueryParams } from '@/lib/constants';
  * Condos box: Condos page of cities in CONDO_GLANCE_CITIES.
  * Homes box: Homes page of cities in HOME_GLANCE_CITIES.
  */
-export const CONDO_GLANCE_CITIES = new Set(['melbourne-beach', 'satellite-beach', 'cocoa-beach', 'cape-canaveral', 'indian-harbour-beach', 'indialantic', 'merritt-island', 'viera-west', 'rockledge']);
+export const CONDO_GLANCE_CITIES = new Set(['melbourne-beach', 'satellite-beach', 'cocoa-beach', 'cape-canaveral', 'indian-harbour-beach', 'indialantic', 'merritt-island', 'viera-west', 'rockledge', 'melbourne']);
 // Cocoa Beach added 2026-11-27 (Google's answer for "cocoa beach homes for sale"
 // was all Zillow).
 // Indian Harbour Beach added 2026-11-27.
